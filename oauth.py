@@ -12,6 +12,9 @@ _request_user_key = 'oauth_user'
 _session_uid_key = 'uid'
 _session_access_token_key = 'access_token'
 
+# ==== Internal Variables ====
+_login_callback = None
+
 
 # ==== Exceptions ====
 
@@ -316,7 +319,15 @@ def requires_login(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         try:
-            get_user()  # will return None if OAuth is skipped
+            user = get_user()  # will return None if OAuth is skipped
+            if user and _login_callback:
+                try:
+                    _login_callback(user)
+                except Exception as e:
+                    if _preferred_mime() == 'text/html':
+                        return _error_html(str(e))
+                    else:
+                        return jsonify(msg=str(e))
             return f(*args, **kwargs)
         except OAuthError as e:
             return _build_error_response(e, _get_original_path())
@@ -370,16 +381,19 @@ def clear_user() -> None:
         del session[_session_access_token_key]
 
 
-def init_app(app: Flask, config_file: str = 'oauth.config.json') -> None:
+def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=None) -> None:
     """
     Initialize OAuth configurations and callbacks in the provided Flask app
     :param app: Your Flask app
     :param config_file: The path to a configuration file for OAuth
+    :param login_callback: (optional) a callback function to call after successful login
     """
+    global _login_callback
     with open(config_file) as f:
         config = json.load(f)
         app.config[_config_key] = config
     app.add_url_rule(config['client']['callback_path'], None, _oauth_callback)
+    _login_callback = login_callback
 
 # TODO connect via API? --> avoid infinite loop && CORS issues
 # TODO automatically update access token?
