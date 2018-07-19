@@ -140,9 +140,7 @@ def _is_oauth_skipped():
     if whitelist:  # need to check if the client ip is in whitelist
         # if need real ip (when using a reverse-proxy like nginx)
         if config.get('resolve_real_ip'):
-            ip = request.environ.get('HTTP_X_FORWARDED_FOR') or \
-                 request.environ.get('HTTP_X_REAL_IP') or \
-                 request.remote_addr
+            ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
         else:
             ip = request.remote_addr
         # if whitelisted
