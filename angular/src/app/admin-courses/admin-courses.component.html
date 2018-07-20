@@ -1,0 +1,21 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="top attached ui segment">
+  <a routerLink="../course-new" class="ui primary button"><i class="icon plus"></i> New Course</a>
+</div>
+<div class="ui active text loader center aligned" *ngIf="loadingCourses">Loading course list...</div>
+<table class="ui table bottom attached unstackable celled" *ngIf="courses">
+  <thead><tr><th>ID</th><th>Code</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let course of courses, index as i">
+    <td>{{course.id}}</td>
+    <td>{{course.code}}</td>
+    <td>{{course.name}}</td>
+    <td class="collapsing">
+      <div class="ui buttons small">
+        <a routerLink="../courses/{{course.id}}" class="ui button icon"><i class="edit icon"></i></a>
+        <a (click)="deleteCourse(course, i, btn_delete_course)" #btn_delete_course class="ui red button icon"><i class="trash icon"></i></a>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>

@@ -1,0 +1,6 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg||'Unexpected Error'}}</div>
+  <p *ngIf="error.msg">{{error.detail}}</p>
+  <p *ngIf="!error.msg">{{error}}</p>
+</div>

@@ -1,0 +1,21 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="top attached ui segment">
+  <a routerLink="../term-new" class="ui primary button"><i class="icon plus"></i> New Term</a>
+</div>
+<div class="ui active text loader center aligned" *ngIf="loadingTerms">Loading term list...</div>
+<table class="ui table bottom attached unstackable celled" *ngIf="terms">
+  <thead><tr><th>ID</th><th>Title</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let term of terms, index as i">
+    <td>{{term.id}}</td>
+    <td>{{term.title}}</td>
+    <td>{{term.description}}</td>
+    <td class="collapsing">
+      <div class="ui buttons small">
+        <a routerLink="../terms/{{term.id}}" class="ui button icon"><i class="edit icon"></i></a>
+        <a (click)="deleteTerm(term, i, btn_delete_term)" #btn_delete_term class="ui red button icon"><i class="trash icon"></i></a>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>

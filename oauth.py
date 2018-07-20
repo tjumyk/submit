@@ -229,27 +229,6 @@ def _parse_group(_dict):
 
 # ==== API requests ====
 
-def _request_oauth_user(access_token):
-    if not access_token:
-        raise OAuthRequestError('access token is required')
-
-    config = current_app.config.get(_config_key)
-    config_server = config['server']
-
-    try:
-        response = requests.get(config_server['url'] + config_server['profile_api'], {'oauth_token': access_token})
-    except IOError:
-        raise OAuthAPIError('failed to access OAuth API (user profile)')
-
-    if response.status_code != 200:
-        raise _parse_response_error(response)
-    try:
-        _dict = response.json()
-    except ValueError:
-        raise OAuthResultError('invalid data format (user profile)')
-    return _parse_user(_dict)
-
-
 def _request_access_token(authorization_token):
     if not authorization_token:
         raise OAuthRequestError('authorization token is required')
@@ -280,6 +259,50 @@ def _request_access_token(authorization_token):
     token = data.get('access_token')
     if not token:
         raise OAuthResultError('access_token is missing or empty')
+    return token
+
+
+def _request_resource(path, access_token, params=None):
+    if not access_token:
+        raise OAuthRequestError('access token is required')
+    config = current_app.config.get(_config_key)
+    config_server = config['server']
+    params = params or {}
+    params['oauth_token'] = access_token
+    try:
+        response = requests.get(config_server['url'] + path, params)
+    except IOError:
+        raise OAuthAPIError('failed to access OAuth API (user profile)')
+    if response.status_code != 200:
+        raise _parse_response_error(response)
+    try:
+        return response.json()
+    except ValueError:
+        raise OAuthResultError('invalid data format (user profile)')
+
+
+def _request_admin_api(_type, access_token, params=None):
+    config = current_app.config.get(_config_key)
+    path = config['server']['admin_apis'].get(_type)
+    if not path:
+        raise OAuthRequestError('invalid admin api type')
+    return _request_resource(path, access_token, params)
+
+
+def _request_oauth_user(access_token):
+    config = current_app.config.get(_config_key)
+    config_server = config['server']
+    data = _request_resource(config_server['profile_api'], access_token)
+    return _parse_user(data)
+
+
+# ==== other private stuff ====
+
+def _get_access_token():
+    token = session.get(_session_access_token_key)
+    if token is None:
+        clear_user()
+        raise OAuthRequired()
     return token
 
 
@@ -319,13 +342,9 @@ def requires_login(f):
         try:
             user = get_user()  # will return None if OAuth is skipped
             if user and _login_callback:
-                try:
-                    _login_callback(user)
-                except Exception as e:
-                    if _preferred_mime() == 'text/html':
-                        return _error_html(str(e))
-                    else:
-                        return jsonify(msg=str(e))
+                ret = _login_callback(user)
+                if ret is not None:
+                    return ret
             return f(*args, **kwargs)
         except OAuthError as e:
             return _build_error_response(e, _get_original_path())
@@ -358,10 +377,7 @@ def get_user() -> [User, None]:
     if uid is None:
         clear_user()
         raise OAuthRequired()
-    access_token = session.get(_session_access_token_key)
-    if access_token is None:
-        clear_user()
-        raise OAuthRequired()
+    access_token = _get_access_token()
     user = _request_oauth_user(access_token)
     setattr(g, _request_user_key, user)
     return user
@@ -377,6 +393,11 @@ def clear_user() -> None:
         del session[_session_uid_key]
     if _session_access_token_key in session:
         del session[_session_access_token_key]
+
+
+def admin_get_groups():
+    data = _request_admin_api('groups', _get_access_token())
+    return [_parse_group(g) for g in data]
 
 
 def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=None) -> None:

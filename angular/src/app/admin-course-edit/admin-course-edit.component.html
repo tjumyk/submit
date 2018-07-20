@@ -1,0 +1,96 @@
+<app-error-message [error]="error"></app-error-message>
+<app-success-message [success]="success"></app-success-message>
+
+<div class="ui center aligned active text loader" *ngIf="loadingCourse">Loading course info...</div>
+
+<div class="ui grid stackable two column" *ngIf="course">
+  <!-- Left Panel -->
+  <div class="column">
+    <div class="ui segments">
+      <!--Header-->
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon book"></i>
+          {{course.code}}
+        </div>
+      </div>
+      <!--End of Header-->
+
+      <!-- Basic Info -->
+      <div class="ui segment">
+        <div class="ui list horizontal">
+          <div class="item">
+            <div class="header">ID</div>
+            {{course.id}}
+          </div>
+          <div class="item">
+            <div class="header">Code</div>
+            {{course.code}}
+          </div>
+          <div class="item">
+            <div class="header">Name</div>
+            {{course.name}}
+          </div>
+        </div>
+      </div>
+      <!-- End of Basic Info -->
+
+      <!--Icon Upload-->
+      <div class="ui segment">
+        <div class="ui center aligned grid">
+          <div class="column">
+            <form class="ui form" [ngClass]="{'loading': uploadingIcon}">
+              <div class="field">
+                <label>Icon</label>
+                <input type="file" hidden name="icon" #icon_input [accept]="iconValidator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
+                <img class="ui small centered image" [src]="course.icon" *ngIf="course.icon">
+                <div class="text muted" *ngIf="!course.icon">(No icon)</div>
+              </div>
+              <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
+              <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB, squared image only</p>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!--End of Icon Upload-->
+
+      <!--Lectures-->
+      <div class="segment">
+
+      </div>
+      <!--End of Lectures-->
+    </div>
+  </div>
+  <!-- End of Left Panel -->
+
+  <!--Right Panel-->
+  <div class="column">
+    <!--Terms-->
+    <div class="ui top attached segment">
+      <div class="ui header">
+        <i class="icon calendar"></i> Terms
+      </div>
+    </div>
+    <div class="ui attached segment">
+      <button class="ui button primary"><i class="icon plus"></i> New Term</button>
+    </div>
+    <table class="ui bottom attached table">
+      <thead><tr><th>ID</th><th>Year</th><th>Semester</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let term of terms, index as i">
+        <td>{{term.id}}</td>
+        <td>{{term.year}}</td>
+        <td>{{term.semester}}</td>
+        <td class="collapsing">
+          <div class="ui buttons small">
+            <a class="ui button icon" routerLink="../terms/{{term.id}}"><i class="ui edit icon"></i></a>
+            <a class="ui button icon red" #btnDeleteTerm (click)="deleteTerm(term, i, btnDeleteTerm)"><i class="ui trash icon"></i></a>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <!--End of Terms-->
+  </div>
+  <!--End of Right Panel-->
+</div>
