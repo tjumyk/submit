@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-
+from flask_migrate import Migrate
 import oauth
 from api_account import account_api
 from api_admin import admin_api
@@ -15,6 +15,7 @@ app = Flask(__name__)
 app.config.from_json('config.json')
 
 db.init_app(app)
+migrate = Migrate(app, db)
 upload.init_app(app)
 
 
