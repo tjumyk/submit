@@ -59,7 +59,7 @@ class Term(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
 
-    year = db.Column(db.Integer, nullable=False, primary_key=True)
+    year = db.Column(db.Integer, nullable=False)
     semester = db.Column(db.String(8), nullable=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -68,10 +68,12 @@ class Term(db.Model):
     tasks = db.relationship('Task', backref=db.backref('term'))
 
     def __repr__(self):
-        return '<Term %r>' % self.title
+        return '<Term %r, %r>' % (self.year, self.semester)
 
-    def to_dict(self, with_tasks=False, with_advanced_fields=False):
+    def to_dict(self, with_course=False, with_tasks=False, with_advanced_fields=False):
         d = dict(id=self.id, course_id=self.course_id, year=self.year, semester=self.semester)
+        if with_course:
+            d['course'] = self.course.to_dict()
         if with_tasks:
             d['tasks'] = [t.to_dict() for t in self.tasks]
         if with_advanced_fields:

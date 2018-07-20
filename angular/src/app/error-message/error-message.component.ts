@@ -7,12 +7,27 @@ import {ErrorMessage} from "../models";
   styleUrls: ['./error-message.component.less']
 })
 export class ErrorMessageComponent implements OnInit {
-  @Input() error: ErrorMessage;
+  private _error: ErrorMessage;
+  private history: ErrorMessage[] = [];
+
+  @Input() set error(value: ErrorMessage) {
+    this._error = value;
+    if(value != null && value != undefined)
+      this.history.push(value)
+  }
+
+  get error(): ErrorMessage {
+    return this._error;
+  }
 
   constructor() {
   }
 
   ngOnInit() {
+  }
+
+  deleteMessage(index){
+    this.history.splice(index, 1);
   }
 
 }

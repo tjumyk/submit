@@ -25,7 +25,7 @@ export class AdminCourseNewComponent implements OnInit {
   ngOnInit() {
   }
 
-  newTerm(f: NgForm) {
+  newCourse(f: NgForm) {
     if (f.invalid)
       return;
 

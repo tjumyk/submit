@@ -1,26 +1,109 @@
-<div class="ui segments">
-  <div class="ui segment">
-    <form class="ui form" #f="ngForm" (ngSubmit)="updateTerm(f)" [ngClass]="{'loading': updatingTerm}">
-      <div class="field required" [ngClass]="{'error': (title_model.touched || title_model.dirty || f.submitted) && title_model.invalid}">
-        <label>Title</label>
-        <input type="text" name="title" placeholder='e.g. "COMP9318 18s1" (at most 128 characters)'
-               required maxlength="128"
-               [(ngModel)]="form.title" #title_model="ngModel">
-        <div class="errors">
-          <label *ngIf="title_model.errors?.required">Title is required</label>
-          <label *ngIf="title_model.errors?.maxlength">Title is too long</label>
+<app-error-message [error]="error"></app-error-message>
+<app-success-message [success]="success"></app-success-message>
+
+<div class="ui text loader active" *ngIf="loadingTerm">Loading term info...</div>
+
+<div class="ui grid two column stackable" *ngIf="term">
+  <!-- Left Panel -->
+  <div class="column">
+    <div class="ui segments">
+      <!-- Header -->
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon calendar outline"></i>
+          {{ term.course.code }} - {{ term.year }}S{{ term.semester }}
         </div>
       </div>
-      <div class="field" [ngClass]="{'error': (desc_model.touched || desc_model.dirty || f.submitted) && desc_model.invalid}">
-        <label>Description</label>
-        <input type="text" name="description" placeholder='A general introduction of this course or term (at most 256 characters)'
-               maxlength="256"
-               [(ngModel)]="form.description" #desc_model="ngModel">
-        <div class="errors">
-          <label *ngIf="desc_model.errors?.maxlength">Description is too long</label>
+      <!-- End of Header -->
+
+      <!-- Basic info -->
+      <div class="ui segment">
+        <div class="ui list horizontal">
+          <div class="item">
+            <div class="header">ID</div>
+            {{ term.id }}
+          </div>
+          <div class="item">
+            <div class="header">Course</div>
+            <a routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
+          </div>
+          <div class="item">
+            <div class="header">Year</div>
+            {{ term.year }}
+          </div>
+          <div class="item">
+            <div class="header">Semester</div>
+            {{ term.semester }}
+          </div>
         </div>
       </div>
-      <button type="submit" class="ui primary button fluid">Add</button>
-    </form>
+      <!-- End of Basic info -->
+
+      <!-- Students -->
+      <div class="ui segment">
+        <div class="ui header dividing">
+          <i class="icon users"></i>
+          Students
+        </div>
+
+        <div class="ui segment top attached">
+          <div class="ui icon fluid input">
+            <input type="text" placeholder="Search groups by name..."
+                   (keyup)="searchGroup(searchGroupInput.value)" #searchGroupInput>
+            <i class="icon search"></i>
+          </div>
+          <p class="text muted" [hidden]="!groupSearchResults || groupSearchResults.length > 0"><i class="info circle icon"></i> No results</p>
+        </div>
+
+        <table class="ui table unstackable compact celled bottom attached" [hidden]="!groupSearchResults || groupSearchResults.length==0">
+          <thead><tr><th>ID</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let group of groupSearchResults; index as i">
+            <td>{{group.id}}</td>
+            <td>{{group.name}}</td>
+            <td class="collapsing">
+              <div class="ui small buttons">
+                <a class="ui icon button" ><i class="icon edit"></i></a>
+                <a class="ui primary icon button" *ngIf="!alreadyInStudentGroups(group); else alreadyInStudentGroupsBtn"
+                   #addToStudentGroupsBtn (click)="addToStudentGroups(user, i, addToStudentGroupsBtn)"><i class="icon plus"></i></a>
+                <ng-template #alreadyInStudentGroupsBtn><a class="ui green icon button"><i class="check icon"></i></a></ng-template>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
   </div>
+  <!-- End of Left Panel -->
+
+  <!-- Right Panel -->
+  <div class="column">
+    <!-- Tasks -->
+    <div class="ui top attached segment">
+      <div class="ui header">
+        <i class="icon tasks"></i> Tasks
+      </div>
+    </div>
+    <table class="ui bottom attached table">
+      <thead><tr><th>ID</th><th>Type</th><th>Title</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let task of term.tasks">
+      <td>{{ task.id }}</td>
+        <td>{{ task.type }}</td>
+        <td>{{ task.title }}</td>
+        <td class="collapsing">
+          <div class="ui small buttons">
+            <div class="ui button icon"><i class="icon edit"></i></div>
+            <div class="ui button icon"><i class="icon trash"></i></div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <!-- End of Right Panel -->
 </div>

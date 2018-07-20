@@ -1,8 +1,8 @@
 <app-error-message [error]="error"></app-error-message>
 <div class="top attached ui segment">
-  <a routerLink="../course-new" class="ui primary button"><i class="icon plus"></i> New Course</a>
+  <a routerLink="../new-course" class="ui primary button"><i class="icon plus"></i> New Course</a>
 </div>
-<div class="ui active text loader center aligned" *ngIf="loadingCourses">Loading course list...</div>
+<div class="ui active text loader" *ngIf="loadingCourses">Loading course list...</div>
 <table class="ui table bottom attached unstackable celled" *ngIf="courses">
   <thead><tr><th>ID</th><th>Code</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
   <tbody>

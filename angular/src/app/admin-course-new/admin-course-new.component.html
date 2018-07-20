@@ -1,29 +1,34 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui segment">
-  <div class="ui header dividing">
-    <i class="icon plus"></i> New Course
+
+<div class="ui grid stackable two column">
+  <div class="column">
+    <div class="ui segment">
+      <div class="ui header dividing">
+        <i class="icon plus"></i> New Course
+      </div>
+      <form class="ui form" #f="ngForm" (ngSubmit)="newCourse(f)" [ngClass]="{'loading': addingCourse}">
+        <div class="field required" [ngClass]="{'error': (code_model.touched || code_model.dirty || f.submitted) && code_model.invalid}">
+          <label>Code</label>
+          <input type="text" name="code" placeholder='e.g. "COMP9318" (at most 16 characters)'
+                 required maxlength="16"
+                 [(ngModel)]="form.code" #code_model="ngModel">
+          <div class="errors">
+            <label *ngIf="code_model.errors?.required"><i class="icon times"></i> Code is required</label>
+            <label *ngIf="code_model.errors?.maxlength"><i class="icon times"></i> Code is too long</label>
+          </div>
+        </div>
+        <div class="field required" [ngClass]="{'error': (name_model.touched || name_model.dirty || f.submitted) && name_model.invalid}">
+          <label>Name</label>
+          <input type="text" name="name" placeholder='e.g. "Data Warehousing and Data Mining" (at most 128 characters)'
+                 required maxlength="128"
+                 [(ngModel)]="form.name" #name_model="ngModel">
+          <div class="errors">
+            <label *ngIf="name_model.errors?.required"><i class="icon times"></i> Name is required</label>
+            <label *ngIf="name_model.errors?.maxlength"><i class="icon times"></i> Name is too long</label>
+          </div>
+        </div>
+        <button type="submit" class="ui primary button fluid">Add Course</button>
+      </form>
+    </div>
   </div>
-  <form class="ui form" #f="ngForm" (ngSubmit)="newTerm(f)" [ngClass]="{'loading': addingCourse}">
-    <div class="field required" [ngClass]="{'error': (code_model.touched || code_model.dirty || f.submitted) && code_model.invalid}">
-      <label>Code</label>
-      <input type="text" name="code" placeholder='e.g. "COMP9318" (at most 16 characters)'
-             required maxlength="16"
-             [(ngModel)]="form.code" #code_model="ngModel">
-      <div class="errors">
-        <label *ngIf="code_model.errors?.required"><i class="icon times"></i> Code is required</label>
-        <label *ngIf="code_model.errors?.maxlength"><i class="icon times"></i> Code is too long</label>
-      </div>
-    </div>
-    <div class="field required" [ngClass]="{'error': (name_model.touched || name_model.dirty || f.submitted) && name_model.invalid}">
-      <label>Name</label>
-      <input type="text" name="name" placeholder='e.g. "Data Warehousing and Data Mining" (at most 128 characters)'
-             required maxlength="128"
-             [(ngModel)]="form.name" #name_model="ngModel">
-      <div class="errors">
-        <label *ngIf="name_model.errors?.required"><i class="icon times"></i> Name is required</label>
-        <label *ngIf="name_model.errors?.maxlength"><i class="icon times"></i> Name is too long</label>
-      </div>
-    </div>
-    <button type="submit" class="ui primary button fluid">Add Course</button>
-  </form>
 </div>

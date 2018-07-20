@@ -42,7 +42,7 @@ def admin_course(cid):
         if course is None:
             return jsonify(msg='course not found'), 404
         if request.method == 'GET':
-            return jsonify(course.to_dict(with_advanced_fields=True))
+            return jsonify(course.to_dict(with_terms=True, with_advanced_fields=True))
         elif request.method == 'PUT':
             params = request.json or request.form or {}
             files = request.files
@@ -54,7 +54,7 @@ def admin_course(cid):
             if 'icon' in old:
                 handle_post_upload(old['icon'], upload_type)
             db.session.commit()
-            return jsonify(course.to_dict())
+            return jsonify(course.to_dict(with_terms=True, with_advanced_fields=True))
         else:  # DELETE
             db.session.delete(course)
             db.session.commit()
@@ -91,7 +91,7 @@ def admin_term(term_id):
             return jsonify(msg='term not found'), 404
 
         if request.method == 'GET':
-            return jsonify(term.to_dict(with_advanced_fields=True))
+            return jsonify(term.to_dict(with_course=True, with_advanced_fields=True))
         else:  # DELETE
             db.session.delete(term)
             db.session.commit()

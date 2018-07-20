@@ -5,3 +5,4 @@ __pycache__
 config.json
 oauth.config.json
 upload/
+static/

@@ -44,6 +44,9 @@ class TermService:
         if type(year) is not int:
             raise TermServiceError('year is not an integer')
 
+        if Term.query.filter(Term.course_id == course.id, Term.year == year, Term.semester == semester).count():
+            raise TermServiceError('duplicate term')
+
         term = Term(course=course, year=year, semester=semester)
         db.session.add(term)
         return term

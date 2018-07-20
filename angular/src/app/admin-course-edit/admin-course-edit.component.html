@@ -1,7 +1,7 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
 
-<div class="ui center aligned active text loader" *ngIf="loadingCourse">Loading course info...</div>
+<div class="ui active text loader" *ngIf="loadingCourse">Loading course info...</div>
 
 <div class="ui grid stackable two column" *ngIf="course">
   <!-- Left Panel -->
@@ -65,25 +65,23 @@
 
   <!--Right Panel-->
   <div class="column">
+
     <!--Terms-->
     <div class="ui top attached segment">
       <div class="ui header">
-        <i class="icon calendar"></i> Terms
+        <i class="icon calendar outline"></i> Terms
       </div>
-    </div>
-    <div class="ui attached segment">
-      <button class="ui button primary"><i class="icon plus"></i> New Term</button>
     </div>
     <table class="ui bottom attached table">
       <thead><tr><th>ID</th><th>Year</th><th>Semester</th><th class="collapsing">Ops</th></tr></thead>
       <tbody>
-      <tr *ngFor="let term of terms, index as i">
+      <tr *ngFor="let term of course.terms, index as i">
         <td>{{term.id}}</td>
         <td>{{term.year}}</td>
         <td>{{term.semester}}</td>
         <td class="collapsing">
           <div class="ui buttons small">
-            <a class="ui button icon" routerLink="../terms/{{term.id}}"><i class="ui edit icon"></i></a>
+            <a class="ui button icon" routerLink="../../terms/{{term.id}}"><i class="ui edit icon"></i></a>
             <a class="ui button icon red" #btnDeleteTerm (click)="deleteTerm(term, i, btnDeleteTerm)"><i class="ui trash icon"></i></a>
           </div>
         </td>
@@ -91,6 +89,42 @@
       </tbody>
     </table>
     <!--End of Terms-->
+
+    <!--New Term-->
+    <div class="ui segment">
+      <div class="ui header dividing">
+        <i class="icon plus"></i>
+        New Term
+      </div>
+
+      <form class="ui form" #f="ngForm" (ngSubmit)="addTerm(f)" [ngClass]="{'loading': addingTerm}">
+        <div class="field required"
+             [ngClass]="{'error': (f.submitted || yearModel.touched || yearModel.dirty) && yearModel.invalid}">
+          <label>Year</label>
+          <input type="number" name="year" placeholder="year of term" required min="2000" max="2200" [(ngModel)]="newTermForm.year" #yearModel="ngModel">
+          <div class="errors">
+            <label *ngIf="yearModel.errors?.required"><i class="icon times"></i>Year is required</label>
+            <label *ngIf="yearModel.errors?.min"><i class="icon times"></i>Year is at least 2000</label>
+            <label *ngIf="yearModel.errors?.max"><i class="icon times"></i>Year is at least 2200</label>
+          </div>
+        </div>
+        <div class="field required" [ngClass]="{'error': (f.submitted || semesterModel.touched || semesterModel.dirty) && semesterModel.invalid}">
+          <label>Semester</label>
+          <select name="semester" [(ngModel)]="newTermForm.semester" #semesterModel="ngModel" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="summer">summer</option>
+          </select>
+          <div class="errors">
+            <label *ngIf="semesterModel.errors?.required"><i class="icon times"></i>Semester is required</label>
+          </div>
+        </div>
+        <button type="submit" class="ui button primary">Add Term</button>
+      </form>
+    </div>
+    <!--End of New Term-->
+
   </div>
   <!--End of Right Panel-->
 </div>

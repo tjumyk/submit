@@ -4,9 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AdminComponent } from './admin/admin.component';
-import { AdminTermsComponent } from './admin-terms/admin-terms.component';
 import { AdminTermEditComponent } from './admin-term-edit/admin-term-edit.component';
-import { AdminTermNewComponent } from './admin-term-new/admin-term-new.component';
 import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import { HomeComponent } from './home/home.component';
@@ -22,9 +20,7 @@ import { SuccessMessageComponent } from './success-message/success-message.compo
   declarations: [
     AppComponent,
     AdminComponent,
-    AdminTermsComponent,
     AdminTermEditComponent,
-    AdminTermNewComponent,
     HomeComponent,
     ForbiddenComponent,
     NotFoundComponent,

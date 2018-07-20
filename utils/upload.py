@@ -67,6 +67,8 @@ def handle_upload(file, _type, image_check=False, image_check_squared=False):
 
 
 def handle_post_upload(old_url, _type):
+    if not old_url:
+        return
     parts = old_url.split('/')
     if len(parts) != 3:
         return
