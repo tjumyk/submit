@@ -344,6 +344,7 @@ def _oauth_api_proxy(path):
     except OAuthError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
+
 # ==== public decorators ====
 
 def requires_login(f):
