@@ -1,0 +1,32 @@
+{
+  "SECRET_KEY": "M5Oc1H_WlaQ",
+  "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
+  "SQLALCHEMY_TRACK_MODIFICATIONS": false,
+  "MAX_CONTENT_LENGTH": 262144,
+  "SESSION_COOKIE_NAME": "submit_session",
+
+  "MAIL": {
+    "display_name": "submit@UNSWKG",
+    "from": "admin@unswkg",
+    "mock_folder": "mailbox"
+  },
+  "SITE": {
+    "name": "UNSWKG Submit",
+    "root_url": "http://localhost:8888",
+    "base_url": "/",
+    "behind_proxy": false
+  },
+  "UPLOAD": {
+    "root_folder": "upload",
+    "avatar": {
+      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
+      "accept_ext": ["png", "jpg", "jpeg", "gif"],
+      "size_limit": 262144
+    },
+    "icon": {
+      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
+      "accept_ext": ["png", "jpg", "jpeg", "gif"],
+      "size_limit": 262144
+    }
+  }
+}
