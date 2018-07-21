@@ -105,7 +105,7 @@ export class AdminCourseEditComponent implements OnInit {
 
   deleteTerm(term, index, btn: HTMLElement) {
     if(!confirm(`Really want to delete term ${term.year}S${term.semester}? This is not recoverable!`))
-      return
+      return;
 
     btn.classList.add('loading', 'disabled');
     this.adminService.deleteTerm(term.id).pipe(
