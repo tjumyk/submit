@@ -7,7 +7,7 @@
     "url": "http://localhost:8077",
     "connect_page": "/oauth/connect",
     "token_api": "/api/oauth/token",
-    "profile_api": "/api/oauth/me",
+    "profile_api": "/api/account/me",
     "links": {
       "profile": "/settings/profile"
     }
@@ -16,6 +16,7 @@
     "id": 1,
     "secret": "99BBDFmYEnME0TM1uymbaVUJF9_vFjd4nvF6n3oWwxI",
     "url": "http://localhost:8888",
-    "callback_path": "/oauth-callback"
+    "callback_path": "/oauth-callback",
+    "api_proxy_path": "/api/oauth-proxy"
   }
 }

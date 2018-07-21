@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from models import db
-from oauth import requires_login, get_user
+from oauth import requires_admin
 from services.course import CourseService, CourseServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
@@ -10,17 +10,8 @@ from utils.upload import handle_upload, handle_post_upload, UploadError
 admin_api = Blueprint('admin_api', __name__)
 
 
-@admin_api.before_request
-def check_admin():
-    user = get_user()
-    if user is None:
-        return jsonify(msg='no user info'), 403
-    if not any(g.name == 'admin' for g in user.groups):
-        return jsonify(msg='admin required'), 403
-
-
 @admin_api.route('/courses', methods=['GET', 'POST'])
-@requires_login
+@requires_admin
 def admin_courses():
     try:
         if request.method == 'GET':
@@ -35,7 +26,7 @@ def admin_courses():
 
 
 @admin_api.route('/courses/<int:cid>', methods=['GET', 'PUT', 'DELETE'])
-@requires_login
+@requires_admin
 def admin_course(cid):
     try:
         course = CourseService.get(cid)
@@ -64,7 +55,7 @@ def admin_course(cid):
 
 
 @admin_api.route('/courses/<int:cid>/terms', methods=['GET', 'POST'])
-@requires_login
+@requires_admin
 def admin_terms(cid):
     try:
         course = CourseService.get(cid)
@@ -83,7 +74,7 @@ def admin_terms(cid):
 
 
 @admin_api.route('/terms/<int:term_id>', methods=['GET', 'DELETE'])
-@requires_login
+@requires_admin
 def admin_term(term_id):
     try:
         term = TermService.get(term_id)
@@ -101,7 +92,7 @@ def admin_term(term_id):
 
 
 @admin_api.route('/terms/<int:term_id>/teams', methods=['GET', 'POST'])
-@requires_login
+@requires_admin
 def admin_teams(term_id):
     try:
         term = TermService.get(term_id)
@@ -121,7 +112,7 @@ def admin_teams(term_id):
 
 
 @admin_api.route('/teams/<int:team_id>', methods=['GET', 'PUT', 'DELETE'])
-@requires_login
+@requires_admin
 def admin_team(team_id):
     try:
         team = TeamService.get(team_id)

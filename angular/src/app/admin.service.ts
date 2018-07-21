@@ -83,7 +83,7 @@ export class AdminService {
     let params = new HttpParams().append('name', name);
     if(limit != undefined && limit != null)
       params = params.append('limit', limit.toString());
-    return this.http.get<Group[]>(`${this.api}/account/groups`, {params: params}).pipe(
+    return this.http.get<Group[]>(`api/oauth-proxy/admin/groups`, {params: params}).pipe(
       tap(results=>this.logger.info(`Search groups by name "${name}", returned ${results.length} results`))
     )
   }

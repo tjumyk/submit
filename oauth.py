@@ -11,6 +11,7 @@ _config_key = 'OAUTH'
 _request_user_key = 'oauth_user'
 _session_uid_key = 'uid'
 _session_access_token_key = 'access_token'
+_admin_group_name = 'admin'
 
 # ==== Internal Variables ====
 _login_callback = None
@@ -262,37 +263,37 @@ def _request_access_token(authorization_token):
     return token
 
 
-def _request_resource(path, access_token, params=None):
+def _request_resource(path, access_token, params):
     if not access_token:
         raise OAuthRequestError('access token is required')
     config = current_app.config.get(_config_key)
     config_server = config['server']
-    params = params or {}
+    if params:
+        params = dict(params)
+    else:
+        params = {}
     params['oauth_token'] = access_token
     try:
         response = requests.get(config_server['url'] + path, params)
-    except IOError:
-        raise OAuthAPIError('failed to access OAuth API (user profile)')
+    except IOError as e:
+        raise OAuthAPIError('failed to access OAuth API')
     if response.status_code != 200:
         raise _parse_response_error(response)
+    return response
+
+
+def _request_resource_json(path, access_token, params=None):
+    response = _request_resource(path, access_token, params)
     try:
         return response.json()
     except ValueError:
-        raise OAuthResultError('invalid data format (user profile)')
-
-
-def _request_admin_api(_type, access_token, params=None):
-    config = current_app.config.get(_config_key)
-    path = config['server']['admin_apis'].get(_type)
-    if not path:
-        raise OAuthRequestError('invalid admin api type')
-    return _request_resource(path, access_token, params)
+        raise OAuthResultError('invalid data format')
 
 
 def _request_oauth_user(access_token):
     config = current_app.config.get(_config_key)
     config_server = config['server']
-    data = _request_resource(config_server['profile_api'], access_token)
+    data = _request_resource_json(config_server['profile_api'], access_token)
     return _parse_user(data)
 
 
@@ -306,7 +307,7 @@ def _get_access_token():
     return token
 
 
-# ==== OAuth callback ====
+# ==== Register Endpoints ====
 
 def _oauth_callback():
     config = current_app.config.get(_config_key)
@@ -334,6 +335,15 @@ def _oauth_callback():
         return _build_error_response(e, original_path, state)
 
 
+def _oauth_api_proxy(path):
+    try:
+        data = _request_resource_json('/api/' + path, _get_access_token(), request.args)
+        return jsonify(data)
+    except (OAuthRequired, OAuthRequestError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
+    except OAuthError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
+
 # ==== public decorators ====
 
 def requires_login(f):
@@ -345,6 +355,26 @@ def requires_login(f):
                 ret = _login_callback(user)
                 if ret is not None:
                     return ret
+            return f(*args, **kwargs)
+        except OAuthError as e:
+            return _build_error_response(e, _get_original_path())
+
+    return wrapped
+
+
+def requires_admin(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        try:
+            user = get_user()  # will return None if OAuth is skipped
+            if user and _login_callback:
+                ret = _login_callback(user)
+                if ret is not None:
+                    return ret
+            if user is None:
+                return jsonify(msg='user info required'), 401
+            if not any(g.name == _admin_group_name for g in user.groups):
+                return jsonify(msg='admin required'), 403
             return f(*args, **kwargs)
         except OAuthError as e:
             return _build_error_response(e, _get_original_path())
@@ -395,11 +425,6 @@ def clear_user() -> None:
         del session[_session_access_token_key]
 
 
-def admin_get_groups():
-    data = _request_admin_api('groups', _get_access_token())
-    return [_parse_group(g) for g in data]
-
-
 def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=None) -> None:
     """
     Initialize OAuth configurations and callbacks in the provided Flask app
@@ -412,6 +437,7 @@ def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=
         config = json.load(f)
         app.config[_config_key] = config
     app.add_url_rule(config['client']['callback_path'], None, _oauth_callback)
+    app.add_url_rule(config['client']['api_proxy_path'].rstrip('/') + '/<path:path>', None, _oauth_api_proxy)
     _login_callback = login_callback
 
 # TODO connect via API? --> avoid infinite loop && CORS issues
