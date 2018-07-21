@@ -1,6 +1,11 @@
 <div *ngFor="let error of history, index as i" class="ui error message">
   <i class="close icon" (click)="deleteMessage(i)"></i>
-  <div class="header"><i class="times circle icon"></i> {{error.msg||'Unexpected Error'}}</div>
+  <div class="header">
+    <i class="times circle icon"></i> {{error.msg||'Unexpected Error'}}
+    <a *ngIf="error.redirect_url" class="ui button" (click)="redirect(error.redirect_url)">
+      <i class="icon lock open"></i> Restart Authentication
+    </a>
+  </div>
   <p *ngIf="error.msg">{{error.detail}}</p>
   <p *ngIf="!error.msg">{{error}}</p>
 </div>

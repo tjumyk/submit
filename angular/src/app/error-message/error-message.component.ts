@@ -30,4 +30,8 @@ export class ErrorMessageComponent implements OnInit {
     this.history.splice(index, 1);
   }
 
+  redirect(url){
+    window.location.href=url;
+  }
+
 }
