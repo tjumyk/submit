@@ -8,7 +8,7 @@ import {ErrorMessage} from "../models";
 })
 export class ErrorMessageComponent implements OnInit {
   private _error: ErrorMessage;
-  private history: ErrorMessage[] = [];
+  history: ErrorMessage[] = [];
 
   @Input() set error(value: ErrorMessage) {
     this._error = value;
