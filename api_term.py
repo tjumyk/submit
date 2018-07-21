@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from models import db
 from oauth import requires_login
-from services.account import AccountService, AccountServiceError
+from services.account import AccountService
 from services.team import TeamServiceError, TeamService
 from services.term import TermService, TermServiceError
 

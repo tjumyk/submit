@@ -24,7 +24,7 @@ export class AdminGuard implements CanActivate {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    return this.accountService.get_current_user().pipe(
+    return this.accountService.getCurrentUser().pipe(
       map((user: User) => {
         if (user != null) {
           for (let group of user.groups) {

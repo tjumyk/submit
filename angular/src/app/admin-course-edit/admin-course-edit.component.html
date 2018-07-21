@@ -54,11 +54,63 @@
       </div>
       <!--End of Icon Upload-->
 
-      <!--Lectures-->
-      <div class="segment">
+      <!-- User Associations -->
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon user"></i>
+          User Associations
+        </div>
+        <table class="ui table unstackable compact celled">
+          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th>Role</th><th class="collapsing">Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let asso of course.user_associations, index as i">
+            <td>{{ asso.user.id }}</td>
+            <td>{{ asso.user.name }}</td>
+            <td>{{ asso.user.nickname }}</td>
+            <td>{{ asso.role }}</td>
+            <td class="collapsing">
+              <div class="ui small buttons">
+                <a #btnRemoveUserAssocitaion class="ui icon button red" (click)="removeUserAssociation(asso.user, asso.role, i, btnRemoveUserAssocitaion)"><i class="icon minus"></i></a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
 
+        <!-- Add User Associations -->
+        <div class="ui segment top attached">
+          <div class="ui icon fluid input">
+            <input type="text" placeholder="Search users by name or nickname..."
+                   (keyup)="searchUser(searchUserInput.value)" #searchUserInput>
+            <i class="icon search"></i>
+          </div>
+          <p class="text muted" [hidden]="!userSearchResults || userSearchResults.length > 0"><i class="info circle icon"></i> No results</p>
+        </div>
+
+        <table class="ui table unstackable compact celled bottom attached" [hidden]="!userSearchResults || userSearchResults.length==0">
+          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Lecturer Role</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let user of userSearchResults; index as i">
+            <td>{{user.id}}</td>
+            <td>{{user.name}}</td>
+            <td>{{ user.nickname }}</td>
+            <td class="collapsing center aligned">
+            <span *ngIf="!userAlreadyHasAssociation(user, 'lecturer'); else userAlreadyLecturer">
+              <a class="ui icon button small primary" #btnAddUserLecturer (click)="addUserAssociation(user, 'lecturer', btnAddUserLecturer)">
+                <i class="plus icon"></i>
+              </a>
+            </span>
+            <ng-template #userAlreadyLecturer>
+              <a class="ui icon button small green"><i class="check icon"></i></a>
+            </ng-template>
+            </td>
+            <td class="collapsing center aligned">
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <!-- End of Add User Associations -->
       </div>
-      <!--End of Lectures-->
     </div>
   </div>
   <!-- End of Left Panel -->
@@ -72,7 +124,7 @@
         <i class="icon calendar outline"></i> Terms
       </div>
     </div>
-    <table class="ui bottom attached table">
+    <table class="ui bottom attached table unstackable celled">
       <thead><tr><th>ID</th><th>Year</th><th>Semester</th><th class="collapsing">Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let term of course.terms, index as i">

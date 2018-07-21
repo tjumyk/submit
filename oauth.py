@@ -1,5 +1,6 @@
 import json
 from functools import wraps
+from typing import List
 from urllib.parse import urlencode
 
 import requests
@@ -210,8 +211,9 @@ def _parse_user(_dict):
         user.links[k] = server_url + v
 
     group_dicts = _dict.get('groups')
-    for group_dict in group_dicts:
-        user.groups.append(_parse_group(group_dict))
+    if group_dicts:
+        for group_dict in group_dicts:
+            user.groups.append(_parse_group(group_dict))
     return user
 
 
@@ -335,16 +337,6 @@ def _oauth_callback():
         return _build_error_response(e, original_path, state)
 
 
-def _oauth_api_proxy(path):
-    try:
-        data = _request_resource_json('/api/' + path, _get_access_token(), request.args)
-        return jsonify(data)
-    except (OAuthRequired, OAuthRequestError) as e:
-        return jsonify(msg=e.msg, detail=e.detail), 403
-    except OAuthError as e:
-        return jsonify(msg=e.msg, detail=e.detail), 500
-
-
 # ==== public decorators ====
 
 def requires_login(f):
@@ -426,6 +418,27 @@ def clear_user() -> None:
         del session[_session_access_token_key]
 
 
+def get_users() -> List[User]:
+    config = current_app.config.get(_config_key)
+    data = _request_resource_json(config['server']['admin_users_api'], _get_access_token())
+    user_dicts = data['users']
+    group_dicts = data['groups']
+    groups = {g['id']: _parse_group(g) for g in group_dicts}
+    users = []
+    for u in user_dicts:
+        user = _parse_user(u)
+        for gid in u['group_ids']:
+            user.groups.append(groups[gid])
+        users.append(user)
+    return users
+
+
+def get_groups() -> List[Group]:
+    config = current_app.config.get(_config_key)
+    data = _request_resource_json(config['server']['admin_groups_api'], _get_access_token())
+    return [_parse_group(g) for g in data]
+
+
 def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=None) -> None:
     """
     Initialize OAuth configurations and callbacks in the provided Flask app
@@ -438,7 +451,6 @@ def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=
         config = json.load(f)
         app.config[_config_key] = config
     app.add_url_rule(config['client']['callback_path'], None, _oauth_callback)
-    app.add_url_rule(config['client']['api_proxy_path'].rstrip('/') + '/<path:path>', None, _oauth_api_proxy)
     _login_callback = login_callback
 
 # TODO connect via API? --> avoid infinite loop && CORS issues

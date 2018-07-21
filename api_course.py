@@ -1,10 +1,7 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
-from models import db
 from oauth import requires_login
-from services.account import AccountService, AccountServiceError
 from services.course import CourseService, CourseServiceError
-from services.team import TeamServiceError, TeamService
 from services.term import TermService, TermServiceError
 
 course_api = Blueprint('course_api', __name__)

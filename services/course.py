@@ -1,7 +1,7 @@
 from sqlalchemy import or_
 
 from error import BasicError
-from models import Course, db, GroupCourseAssociations
+from models import Course, db, GroupCourseAssociation, UserCourseAssociation
 
 
 class CourseServiceError(BasicError):
@@ -15,6 +15,8 @@ class CourseService:
     profile_fields = {
         'icon'
     }
+    user_roles = {'lecturer'}
+    group_roles = {}  # will use group roles if necessary in the future
 
     @staticmethod
     def get(_id):
@@ -61,4 +63,66 @@ class CourseService:
 
     @staticmethod
     def get_group_associations(course):
-        return GroupCourseAssociations.query.with_parent(course).all()
+        return GroupCourseAssociation.query.with_parent(course).all()
+
+    @classmethod
+    def add_user_association(cls, course, user, role):
+        if course is None:
+            raise CourseServiceError('course is required')
+        if user is None:
+            raise CourseServiceError('user is required')
+        if role is None:
+            raise CourseServiceError('role is required')
+
+        if role not in cls.user_roles:
+            raise CourseServiceError('invalid role')
+        if UserCourseAssociation.query.filter_by(user_id=user.id, course_id=course.id, role=role).count():
+            raise CourseServiceError('already has role')
+        db.session.add(UserCourseAssociation(user=user, course=course, role=role))
+
+    @classmethod
+    def add_group_association(cls, course, group, role):
+        if course is None:
+            raise CourseServiceError('course is required')
+        if group is None:
+            raise CourseServiceError('group is required')
+        if role is None:
+            raise CourseServiceError('role is required')
+
+        if role not in cls.group_roles:
+            raise CourseServiceError('invalid role')
+        if GroupCourseAssociation.query.filter_by(group_id=group.id, course_id=course.id, role=role).count():
+            raise CourseServiceError('already has role')
+        db.session.add(GroupCourseAssociation(group=group, course=course, role=role))
+
+    @classmethod
+    def remove_user_association(cls, course, user, role):
+        if course is None:
+            raise CourseServiceError('course is required')
+        if user is None:
+            raise CourseServiceError('user is required')
+        if role is None:
+            raise CourseServiceError('role is required')
+
+        if role not in cls.user_roles:
+            raise CourseServiceError('invalid role')
+        asso = UserCourseAssociation.query.filter_by(user_id=user.id, course_id=course.id, role=role).first()
+        if asso is None:
+            raise CourseServiceError('no such role')
+        db.session.delete(asso)
+
+    @classmethod
+    def remove_group_association(cls, course, group, role):
+        if course is None:
+            raise CourseServiceError('course is required')
+        if group is None:
+            raise CourseServiceError('group is required')
+        if role is None:
+            raise CourseServiceError('role is required')
+
+        if role not in cls.group_roles:
+            raise CourseServiceError('invalid role')
+        asso = GroupCourseAssociation.query.filter_by(group_id=group.id, course_id=course.id, role=role).first()
+        if asso is None:
+            raise CourseServiceError('no such role')
+        db.session.delete(asso)

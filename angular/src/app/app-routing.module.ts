@@ -9,6 +9,7 @@ import {NotFoundComponent} from "./not-found/not-found.component";
 import {AdminCoursesComponent} from "./admin-courses/admin-courses.component";
 import {AdminCourseNewComponent} from "./admin-course-new/admin-course-new.component";
 import {AdminCourseEditComponent} from "./admin-course-edit/admin-course-edit.component";
+import {AdminAccountsComponent} from "./admin-accounts/admin-accounts.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -18,6 +19,7 @@ const routes: Routes = [
     canActivate: [AdminGuard],
     children: [
       {path: '', pathMatch: 'full', redirectTo: 'courses'},
+      {path: 'accounts', component: AdminAccountsComponent},
       {path: 'courses', component: AdminCoursesComponent},
       {path: 'new-course', component: AdminCourseNewComponent},
       {path: 'courses/:course_id', component: AdminCourseEditComponent},

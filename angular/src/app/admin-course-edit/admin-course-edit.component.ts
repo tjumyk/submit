@@ -1,11 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {Course, ErrorMessage, SuccessMessage} from "../models";
+import {Course, ErrorMessage, Group, SuccessMessage, User} from "../models";
 import {ActivatedRoute} from "@angular/router";
 import {AdminService, NewTermForm} from "../admin.service";
-import {finalize} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {NgForm} from "@angular/forms";
 import * as moment from "moment";
+import {Subject} from "rxjs/internal/Subject";
+import {of} from "rxjs/internal/observable/of";
 
 @Component({
   selector: 'app-admin-course-edit',
@@ -26,6 +28,11 @@ export class AdminCourseEditComponent implements OnInit {
   uploadingIcon: boolean;
   iconValidator: UploadValidator = new UploadValidator(UploadFilters.icon);
 
+  private searchGroupNames = new Subject<string>();
+  groupSearchResults: Group[];
+  private searchUserNames = new Subject<string>();
+  userSearchResults: Group[];
+
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute
@@ -38,19 +45,20 @@ export class AdminCourseEditComponent implements OnInit {
     const now = moment();
     this.newTermForm.year = now.year();
     const month = now.month();
-    if(month < 5)
+    if (month < 5)
       this.newTermForm.semester = '1';
-    else if(month < 9)
+    else if (month < 9)
       this.newTermForm.semester = '2';
-    else if(month <12)
+    else if (month < 12)
       this.newTermForm.semester = '3';
     else
       this.newTermForm.semester = 'summer';
 
     this.loadCourse();
+    this.setupSearch();
   }
 
-  loadCourse() {
+  private loadCourse() {
     this.loadingCourse = true;
     this.adminService.getCourse(this.course_id).pipe(
       finalize(() => this.loadingCourse = false)
@@ -58,6 +66,34 @@ export class AdminCourseEditComponent implements OnInit {
       course => this.course = course,
       error => this.error = error.error
     )
+  }
+
+  private setupSearch() {
+    this.searchUserNames.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((name: string) => {
+        if (!name)
+          return of(null);
+        return this.adminService.searchUsersByName(name, 10)
+      })
+    ).subscribe(
+      (results) => this.userSearchResults = results,
+      (error) => this.error = error.error
+    );
+
+    this.searchGroupNames.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((name: string) => {
+        if (!name)
+          return of(null);
+        return this.adminService.searchGroupsByName(name, 10)
+      })
+    ).subscribe(
+      (results) => this.groupSearchResults = results,
+      (error) => this.error = error.error
+    );
   }
 
   uploadIcon(input: HTMLInputElement) {
@@ -104,7 +140,7 @@ export class AdminCourseEditComponent implements OnInit {
   }
 
   deleteTerm(term, index, btn: HTMLElement) {
-    if(!confirm(`Really want to delete term ${term.year}S${term.semester}? This is not recoverable!`))
+    if (!confirm(`Really want to delete term ${term.year}S${term.semester}? This is not recoverable!`))
       return;
 
     btn.classList.add('loading', 'disabled');
@@ -115,6 +151,76 @@ export class AdminCourseEditComponent implements OnInit {
         this.course.terms.splice(index, 1);
         this.success = {msg: `Deleted term ${term.year}S${term.semester} successfully`};
       },
+      error => this.error = error.error
+    )
+  }
+
+  searchUser(name: string) {
+    this.searchUserNames.next(name);
+  }
+
+  searchGroup(name: string) {
+    this.searchGroupNames.next(name);
+  }
+
+  userAlreadyHasAssociation(user: User, role: string) {
+    for (let asso of this.course.user_associations) {
+      if (asso.user_id == user.id && asso.role == role)
+        return true;
+    }
+    return false;
+  }
+
+  groupAlreadyHasAssociation(group: Group, role: string) {
+    for (let asso of this.course.group_associations) {
+      if (asso.group_id == group.id && asso.role == role)
+        return true;
+    }
+    return false;
+  }
+
+  addUserAssociation(user: User, role: string, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    this.adminService.addUserCourseAssociation(user, this.course, role).pipe(
+      finalize((() => btn.classList.remove('loading', 'disabled')))
+    ).subscribe(
+      () => {
+        const asso = {user_id: user.id, user: user, course_id: this.course.id, course: this.course, role: role};
+        this.course.user_associations.push(asso)
+      },
+      error => this.error = error.error
+    )
+  }
+
+  addGroupAssociation(group: Group, role: string, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    this.adminService.addGroupCourseAssociation(group, this.course, role).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => {
+        const asso = {group_id: group.id, group: group, course_id: this.course.id, course: this.course, role: role};
+        this.course.group_associations.push(asso)
+      },
+      error => this.error = error.error
+    )
+  }
+
+  removeUserAssociation(user: User, role: string, index: number, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    this.adminService.removeUserCourseAssociation(user, this.course, role).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => this.course.user_associations.splice(index, 1),
+      error => this.error = error.error
+    )
+  }
+
+  removeGroupAssociation(group: Group, role: string, index: number, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    this.adminService.removeGroupCourseAssociation(group, this.course, role).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => this.course.group_associations.splice(index, 1),
       error => this.error = error.error
     )
   }

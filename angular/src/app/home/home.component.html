@@ -1,2 +1,19 @@
-<button class="ui violet button" routerLink="admin">Management</button>
-<a href="http://localhost:8077/account/logout" class="ui teal button">Logout</a>
+<div class="ui container">
+  <div class="ui middle aligned centered padded stackable grid">
+    <div class="column">
+      <div class="ui padded raised segment">
+        <h2 class="ui center aligned fluid header">
+          <img src="static/assets/logo-256.png">
+          UNSWKG Submit
+        </h2>
+        <app-error-message [error]="error"></app-error-message>
+        <div class="ui active inline centered text loader" *ngIf="loadingUser">Loading user info...</div>
+        <div *ngIf="user" class="ui center aligned grid">
+          <div class="column">
+            <a class="ui violet button" routerLink="admin" *ngIf="isAdmin">Management</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<app-error-message [error]="error"></app-error-message>
+<app-success-message [success]="success"></app-success-message>
+
+<div class="ui grid two column stackable">
+  <div class="column">
+    <div class="ui active text loader" *ngIf="loadingUsers"></div>
+    <div *ngIf="users">
+      <div class="ui top attached clearing segment">
+        <div class="ui left floated header">
+          <i class="icon user"></i> Synced Users
+        </div>
+        <div class="ui right floated header">
+          <a class="ui button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
+            <i class="icon sync"></i> Sync Users
+          </a>
+        </div>
+      </div>
+      <table class="ui compact unstackable bottom attached table celled">
+        <thead><tr><th>ID</th><th>Name</th><th>E-mail</th><th>Nickname</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.nickname }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="ui active text loader" *ngIf="loadingGroups"></div>
+    <div *ngIf="groups">
+      <div class="ui top attached clearing segment">
+        <div class="ui left floated header">
+          <i class="icon users"></i> Synced Groups
+        </div>
+        <div class="ui right floated header">
+          <a class="ui button small primary" (click)="syncGroups()" [ngClass]="{'loading disabled': syncingGroups}">
+            <i class="icon sync"></i> Sync Groups
+          </a>
+        </div>
+      </div>
+      <table class="ui compact unstackable bottom attached table celled">
+        <thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let group of groups">
+          <td>{{ group.id }}</td>
+          <td>{{ group.name }}</td>
+          <td>{{ group.description }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

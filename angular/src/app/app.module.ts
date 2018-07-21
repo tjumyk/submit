@@ -15,6 +15,7 @@ import { AdminCoursesComponent } from './admin-courses/admin-courses.component';
 import { AdminCourseEditComponent } from './admin-course-edit/admin-course-edit.component';
 import { AdminCourseNewComponent } from './admin-course-new/admin-course-new.component';
 import { SuccessMessageComponent } from './success-message/success-message.component';
+import { AdminAccountsComponent } from './admin-accounts/admin-accounts.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { SuccessMessageComponent } from './success-message/success-message.compo
     AdminCoursesComponent,
     AdminCourseEditComponent,
     AdminCourseNewComponent,
-    SuccessMessageComponent
+    SuccessMessageComponent,
+    AdminAccountsComponent
   ],
   imports: [
     BrowserModule,

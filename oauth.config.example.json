@@ -8,6 +8,8 @@
     "connect_page": "/oauth/connect",
     "token_api": "/api/oauth/token",
     "profile_api": "/api/account/me",
+    "admin_users_api": "/api/admin/users",
+    "admin_groups_api": "/api/admin/groups",
     "links": {
       "profile": "/settings/profile"
     }
@@ -16,7 +18,6 @@
     "id": 1,
     "secret": "99BBDFmYEnME0TM1uymbaVUJF9_vFjd4nvF6n3oWwxI",
     "url": "http://localhost:8888",
-    "callback_path": "/oauth-callback",
-    "api_proxy_path": "/api/oauth-proxy"
+    "callback_path": "/oauth-callback"
   }
 }

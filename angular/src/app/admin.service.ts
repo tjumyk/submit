@@ -1,16 +1,16 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, Group, Term} from "./models";
+import {Course, Group, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
-import {tap} from "rxjs/operators";
+import {map, tap} from "rxjs/operators";
 
 export class NewCourseForm {
   code: string;
   name: string;
 }
 
-export class NewTermForm{
+export class NewTermForm {
   year: number;
   semester: string;
 }
@@ -27,6 +27,115 @@ export class AdminService {
     private logService: LogService
   ) {
     this.logger = this.logService.get_logger('AdminService')
+  }
+
+
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.api}/users`).pipe(
+      map((data) => {
+        let group_dict: { [gid: number]: Group } = {};
+        for (let group  of data['groups']) {
+          let g = group as Group;
+          group_dict[g.id] = g
+        }
+        let users: User[] = [];
+        for (let user of data['users']) {
+          let groups = [];
+          for (let gid of user['group_ids']) {
+            groups.push(group_dict[gid])
+          }
+          user['groups'] = groups;
+          let u = user as User;
+          users.push(u)
+        }
+        return users
+      }),
+      tap((courses) => this.logger.info(`Fetched user list (${courses.length} users)`))
+    )
+  }
+
+  searchUsersByName(name: string, limit?: number): Observable<User[]> {
+    let params = new HttpParams().append('name', name);
+    if (limit != undefined && limit != null)
+      params = params.append('limit', limit.toString());
+    return this.http.get<User[]>(`${this.api}/users`, {params: params}).pipe(
+      tap(results => this.logger.info(`Search users by name "${name}", returned ${results.length} results`))
+    )
+  }
+
+  getGroups(): Observable<Group[]> {
+    return this.http.get<Group[]>(`${this.api}/groups`).pipe(
+      tap((courses) => this.logger.info(`Fetched group list (${courses.length} groups)`))
+    )
+  }
+
+  searchGroupsByName(name: string, limit?: number): Observable<Group[]> {
+    let params = new HttpParams().append('name', name);
+    if (limit != undefined && limit != null)
+      params = params.append('limit', limit.toString());
+    return this.http.get<Group[]>(`${this.api}/groups`, {params: params}).pipe(
+      tap(results => this.logger.info(`Search groups by name "${name}", returned ${results.length} results`))
+    )
+  }
+
+  syncUsers(): Observable<any> {
+    return this.http.get(`${this.api}/sync-users`).pipe(
+      tap(() => this.logger.info(`Synchronised users`))
+    )
+  }
+
+  syncGroups(): Observable<any> {
+    return this.http.get(`${this.api}/sync-groups`).pipe(
+      tap(() => this.logger.info(`Synchronised groups`))
+    )
+  }
+
+  addUserCourseAssociation(user: User, course: Course, role: string): Observable<any> {
+    return this.http.put(`${this.api}/courses/${course.id}/users/${user.id}/${role}`, null).pipe(
+      tap(() => this.logger.info(`Added group "${user.name}" as "${role}" to course ${course.name}`))
+    )
+  }
+
+  addGroupCourseAssociation(group: Group, course: Course, role: string): Observable<any> {
+    return this.http.put(`${this.api}/courses/${course.id}/groups/${group.id}/${role}`, null).pipe(
+      tap(() => this.logger.info(`Added group "${group.name}" as "${role}" to course ${course.name}`))
+    )
+  }
+
+  removeUserCourseAssociation(user: User, course: Course, role: string): Observable<any> {
+    return this.http.delete(`${this.api}/courses/${course.id}/users/${user.id}/${role}`).pipe(
+      tap(() => this.logger.info(`Removed group "${user.name}" as "${role}" from course ${course.name}`))
+    )
+  }
+
+  removeGroupCourseAssociation(group: Group, course: Course, role: string): Observable<any> {
+    return this.http.delete(`${this.api}/courses/${course.id}/groups/${group.id}/${role}`).pipe(
+      tap(() => this.logger.info(`Removed group "${group.name}" as "${role}" from course ${course.name}`))
+    )
+  }
+
+  addUserTermAssociation(user: User, term: Term, role: string): Observable<any> {
+    return this.http.put(`${this.api}/terms/${term.id}/users/${user.id}/${role}`, null).pipe(
+      tap(() => this.logger.info(`Added group "${user.name}" as "${role}" to term ${term.id}`))
+    )
+  }
+
+  addGroupTermAssociation(group: Group, term: Term, role: string): Observable<any> {
+    return this.http.put(`${this.api}/terms/${term.id}/groups/${group.id}/${role}`, null).pipe(
+      tap(() => this.logger.info(`Added group "${group.name}" as "${role}" to term ${term.id}`))
+    )
+  }
+
+  removeUserTermAssociation(user: User, term: Term, role: string): Observable<any> {
+    return this.http.delete(`${this.api}/terms/${term.id}/users/${user.id}/${role}`).pipe(
+      tap(() => this.logger.info(`Removed group "${user.name}" as "${role}" from term ${term.id}`))
+    )
+  }
+
+  removeGroupTermAssociation(group: Group, term: Term, role: string): Observable<any> {
+    return this.http.delete(`${this.api}/terms/${term.id}/groups/${group.id}/${role}`).pipe(
+      tap(() => this.logger.info(`Removed group "${group.name}" as "${role}" from term ${term.id}`))
+    )
   }
 
   getCourses(): Observable<Course[]> {
@@ -61,15 +170,15 @@ export class AdminService {
     )
   }
 
-  getTerm(tid: number): Observable<Term>{
+  getTerm(tid: number): Observable<Term> {
     return this.http.get<Term>(`${this.api}/terms/${tid}`).pipe(
-      tap(term=>this.logger.info(`Fetched info of term "${term.course.code} - ${term.year}S${term.semester}"`))
+      tap(term => this.logger.info(`Fetched info of term "${term.course.code} - ${term.year}S${term.semester}"`))
     )
   }
 
-  addTerm(courseId: number, form:NewTermForm): Observable<Term>{
+  addTerm(courseId: number, form: NewTermForm): Observable<Term> {
     return this.http.post<Term>(`${this.api}/courses/${courseId}/terms`, form).pipe(
-      tap(term=>this.logger.info(`Added new term "${term.year}S${term.semester}" to course (course id: ${courseId})`))
+      tap(term => this.logger.info(`Added new term "${term.year}S${term.semester}" to course (course id: ${courseId})`))
     )
   }
 
@@ -79,12 +188,5 @@ export class AdminService {
     )
   }
 
-  searchGroupsByName(name: string, limit?: number): Observable<Group[]> {
-    let params = new HttpParams().append('name', name);
-    if(limit != undefined && limit != null)
-      params = params.append('limit', limit.toString());
-    return this.http.get<Group[]>(`api/oauth-proxy/admin/groups`, {params: params}).pipe(
-      tap(results=>this.logger.info(`Search groups by name "${name}", returned ${results.length} results`))
-    )
-  }
+
 }

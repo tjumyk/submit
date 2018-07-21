@@ -1,7 +1,7 @@
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Term, UserAlias, db
+from models import Term, UserAlias, db, GroupTermAssociation, UserTermAssociation
 
 
 class TermServiceError(BasicError):
@@ -9,6 +9,9 @@ class TermServiceError(BasicError):
 
 
 class TermService:
+    user_roles = {'tutor', 'marker', 'student'}
+    group_roles = {'tutor', 'marker', 'student'}
+
     @staticmethod
     def get(_id):
         if _id is None:
@@ -50,6 +53,68 @@ class TermService:
         term = Term(course=course, year=year, semester=semester)
         db.session.add(term)
         return term
+
+    @classmethod
+    def add_user_association(cls, term, user, role):
+        if term is None:
+            raise TermServiceError('term is required')
+        if user is None:
+            raise TermServiceError('user is required')
+        if role is None:
+            raise TermServiceError('role is required')
+
+        if role not in cls.user_roles:
+            raise TermServiceError('invalid role')
+        if UserTermAssociation.query.filter_by(user_id=user.id, term_id=term.id, role=role).count():
+            raise TermServiceError('already has role')
+        db.session.add(UserTermAssociation(user=user, term=term, role=role))
+
+    @classmethod
+    def add_group_association(cls, term, group, role):
+        if term is None:
+            raise TermServiceError('term is required')
+        if group is None:
+            raise TermServiceError('group is required')
+        if role is None:
+            raise TermServiceError('role is required')
+
+        if role not in cls.group_roles:
+            raise TermServiceError('invalid role')
+        if GroupTermAssociation.query.filter_by(group_id=group.id, term_id=term.id, role=role).count():
+            raise TermServiceError('already has role')
+        db.session.add(GroupTermAssociation(group=group, term=term, role=role))
+
+    @classmethod
+    def remove_user_association(cls, term, user, role):
+        if term is None:
+            raise TermServiceError('term is required')
+        if user is None:
+            raise TermServiceError('user is required')
+        if role is None:
+            raise TermServiceError('role is required')
+
+        if role not in cls.user_roles:
+            raise TermServiceError('invalid role')
+        asso = UserTermAssociation.query.filter_by(user_id=user.id, term_id=term.id, role=role).first()
+        if asso is None:
+            raise TermServiceError('no such role')
+        db.session.delete(asso)
+
+    @classmethod
+    def remove_group_association(cls, term, group, role):
+        if term is None:
+            raise TermServiceError('term is required')
+        if group is None:
+            raise TermServiceError('group is required')
+        if role is None:
+            raise TermServiceError('role is required')
+
+        if role not in cls.group_roles:
+            raise TermServiceError('invalid role')
+        asso = GroupTermAssociation.query.filter_by(group_id=group.id, term_id=term.id, role=role).first()
+        if asso is None:
+            raise TermServiceError('no such role')
+        db.session.delete(asso)
 
     @staticmethod
     def is_user_eligible(term, user, role=None):
