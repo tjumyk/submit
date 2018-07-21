@@ -12,7 +12,7 @@ course_api = Blueprint('course_api', __name__)
 
 @course_api.route('/', methods=['GET'])
 @requires_login
-def do_terms():
+def do_courses():
     try:
         return jsonify([t for t in CourseService.get_all()])
     except CourseServiceError as e:
@@ -21,7 +21,7 @@ def do_terms():
 
 @course_api.route('/<int:cid>/terms', methods=['GET'])
 @requires_login
-def do_teams(cid):
+def course_terms(cid):
     course = CourseService.get(cid)
     if course is None:
         return jsonify('course not found'), 404
