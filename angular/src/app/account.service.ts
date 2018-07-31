@@ -29,7 +29,6 @@ export class AccountService {
       tap(user => {
         this.logger.info(`Fetched user info of ${user.name}`);
         this.user = user;
-        setTimeout(() => this.user = null, 300);  // cache user info for a short period
       })
     )
   }
