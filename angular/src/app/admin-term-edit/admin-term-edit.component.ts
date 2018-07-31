@@ -18,8 +18,10 @@ export class AdminTermEditComponent implements OnInit {
   termId: number;
   term: Term;
 
+  searchingGroups: boolean;
   private searchGroupNames = new Subject<string>();
   groupSearchResults: Group[];
+  searchingUsers: boolean;
   private searchUserNames = new Subject<string>();
   userSearchResults: Group[];
 
@@ -53,7 +55,10 @@ export class AdminTermEditComponent implements OnInit {
       switchMap((name: string) => {
         if (!name)
           return of(null);
-        return this.adminService.searchUsersByName(name, 10)
+        this.searchingUsers=true;
+        return this.adminService.searchUsersByName(name, 10).pipe(
+          finalize(()=>this.searchingUsers=false)
+        )
       })
     ).subscribe(
       (results) => this.userSearchResults = results,
@@ -66,7 +71,10 @@ export class AdminTermEditComponent implements OnInit {
       switchMap((name: string) => {
         if (!name)
           return of(null);
-        return this.adminService.searchGroupsByName(name, 10)
+        this.searchingGroups = false;
+        return this.adminService.searchGroupsByName(name, 10).pipe(
+          finalize(()=>this.searchingGroups=false)
+        )
       })
     ).subscribe(
       (results) => this.groupSearchResults = results,

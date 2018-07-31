@@ -64,7 +64,7 @@
 
         <!-- Add User Associations -->
         <div class="ui segment top attached">
-          <div class="ui icon fluid input">
+          <div class="ui icon fluid input" [ngClass]="{'loading': searchingUsers}">
             <input type="text" placeholder="Search users by name or nickname..."
                    (keyup)="searchUser(searchUserInput.value)" #searchUserInput>
             <i class="icon search"></i>
@@ -141,7 +141,7 @@
 
         <!-- Add Group Associations -->
         <div class="ui segment top attached">
-          <div class="ui icon fluid input">
+          <div class="ui icon fluid input" [ngClass]="{'loading': searchingGroups}">
             <input type="text" placeholder="Search groups by name or description..."
                    (keyup)="searchGroup(searchGroupInput.value)" #searchGroupInput>
             <i class="icon search"></i>

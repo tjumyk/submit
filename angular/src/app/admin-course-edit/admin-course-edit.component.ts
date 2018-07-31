@@ -28,8 +28,10 @@ export class AdminCourseEditComponent implements OnInit {
   uploadingIcon: boolean;
   iconValidator: UploadValidator = new UploadValidator(UploadFilters.icon);
 
+  searchingGroups: boolean;
   private searchGroupNames = new Subject<string>();
   groupSearchResults: Group[];
+  searchingUsers: boolean;
   private searchUserNames = new Subject<string>();
   userSearchResults: Group[];
 
@@ -75,7 +77,10 @@ export class AdminCourseEditComponent implements OnInit {
       switchMap((name: string) => {
         if (!name)
           return of(null);
-        return this.adminService.searchUsersByName(name, 10)
+        this.searchingUsers = true;
+        return this.adminService.searchUsersByName(name, 10).pipe(
+          finalize(()=>this.searchingUsers=false)
+        )
       })
     ).subscribe(
       (results) => this.userSearchResults = results,
