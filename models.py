@@ -87,7 +87,7 @@ class Course(db.Model):
     def to_dict(self, with_terms=False, with_associations=False, with_advanced_fields=False):
         d = dict(id=self.id, code=self.code, name=self.name, icon=self.icon)
         if with_terms:
-            d['terms'] = [t.to_dict() for t in self.terms]
+            d['terms'] = [t.to_dict(with_course=False) for t in self.terms]
         if with_associations:
             d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
             d['group_associations'] = [a.to_dict(with_group=True) for a in self.group_associations]
@@ -165,7 +165,7 @@ class Term(db.Model):
     def __repr__(self):
         return '<Term %r, %r>' % (self.year, self.semester)
 
-    def to_dict(self, with_course=False, with_tasks=False, with_associations=False, with_advanced_fields=False):
+    def to_dict(self, with_course=True, with_tasks=False, with_associations=False, with_advanced_fields=False):
         d = dict(id=self.id, course_id=self.course_id, year=self.year, semester=self.semester)
         if with_course:
             d['course'] = self.course.to_dict()
