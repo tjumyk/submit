@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from error import BasicError
 from models import Task, db
 
@@ -10,7 +12,7 @@ class TaskService:
     title_max_length = 128
 
     @staticmethod
-    def get(_id):
+    def get(_id) -> Optional[Task]:
         if _id is None:
             raise TaskServiceError('id is required')
         if type(_id) is not int:
@@ -19,11 +21,11 @@ class TaskService:
         return Task.query.get(_id)
 
     @staticmethod
-    def get_all():
+    def get_all() -> List[Task]:
         return Task.query.all()
 
     @staticmethod
-    def add(term, _type, title, description):
+    def add(term, _type, title, description) -> Task:
         if term is None:
             raise TaskServiceError('term is required')
         if _type is None:

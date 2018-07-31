@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy import or_
 
 from error import BasicError
@@ -19,7 +21,7 @@ class CourseService:
     group_roles = {}  # will use group roles if necessary in the future
 
     @staticmethod
-    def get(_id):
+    def get(_id) -> Optional[Course]:
         if _id is None:
             raise CourseServiceError('id is required')
         if type(_id) is not int:
@@ -28,11 +30,11 @@ class CourseService:
         return Course.query.get(_id)
 
     @staticmethod
-    def get_all():
+    def get_all() -> List[Course]:
         return Course.query.all()
 
     @staticmethod
-    def add(code, name):
+    def add(code, name) -> Course:
         if code is None:
             raise CourseServiceError('code is required')
         if name is None:
@@ -50,7 +52,7 @@ class CourseService:
         return course
 
     @staticmethod
-    def update(course, **kwargs):
+    def update(course, **kwargs) -> dict:
         if course is None:
             raise CourseServiceError('course is required')
         for k in kwargs:
@@ -62,7 +64,7 @@ class CourseService:
         return old
 
     @staticmethod
-    def get_group_associations(course):
+    def get_group_associations(course) -> List[GroupCourseAssociation]:
         return GroupCourseAssociation.query.with_parent(course).all()
 
     @classmethod

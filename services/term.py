@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
@@ -13,7 +15,7 @@ class TermService:
     group_roles = {'tutor', 'marker', 'student'}
 
     @staticmethod
-    def get(_id):
+    def get(_id) -> Optional[Term]:
         if _id is None:
             raise TermServiceError('id is required')
         if type(_id) is not int:
@@ -22,22 +24,22 @@ class TermService:
         return Term.query.get(_id)
 
     @staticmethod
-    def get_for_user(user: UserAlias):
+    def get_for_user(user: UserAlias) -> List[Term]:
         if user is None:
             raise TermServiceError('user is required')
         return Term.query.options(joinedload('group_associations')) \
             .filter(UserAlias.id == user.id).all()
 
     @staticmethod
-    def get_for_course(course):
+    def get_for_course(course) -> List[Term]:
         return Term.query.with_parent(course).all()
 
     @staticmethod
-    def get_all():
+    def get_all() -> List[Term]:
         return Term.query.all()
 
     @staticmethod
-    def add(course, year, semester):
+    def add(course, year, semester) -> Term:
         if course is None:
             raise TermServiceError('course is required')
         if year is None:
@@ -117,7 +119,7 @@ class TermService:
         db.session.delete(asso)
 
     @staticmethod
-    def is_user_eligible(term, user, role=None):
+    def is_user_eligible(term, user, role=None) -> bool:
         # FIXME inefficient
         # GroupTermAssociations.query.options(joinedload('group.users'))\
         #     .filter(UserAlias.id==user.id)

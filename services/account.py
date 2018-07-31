@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy import or_
 
 import oauth
@@ -11,14 +13,14 @@ class AccountServiceError(BasicError):
 
 class AccountService:
     @staticmethod
-    def get_current_user():
+    def get_current_user() -> Optional[UserAlias]:
         user = oauth.get_user()
         if user is None:
             return None
         return AccountService.get_user(user.id)
 
     @staticmethod
-    def get_user(_id):
+    def get_user(_id) -> Optional[UserAlias]:
         if _id is None:
             raise AccountServiceError('id is required')
         if type(_id) is not int:
@@ -26,7 +28,7 @@ class AccountService:
         return UserAlias.query.get(_id)
 
     @staticmethod
-    def get_group(_id):
+    def get_group(_id) -> Optional[GroupAlias]:
         if _id is None:
             raise AccountServiceError('id is required')
         if type(_id) is not int:
@@ -34,11 +36,11 @@ class AccountService:
         return GroupAlias.query.get(_id)
 
     @staticmethod
-    def get_all_users():
+    def get_all_users() -> List[UserAlias]:
         return UserAlias.query.all()
 
     @staticmethod
-    def get_all_groups():
+    def get_all_groups() -> List[GroupAlias]:
         return GroupAlias.query.all()
 
     @staticmethod
@@ -148,7 +150,7 @@ class AccountService:
                 db.session.add(group_alias)
 
     @staticmethod
-    def search_user_by_name(name, limit=5):
+    def search_user_by_name(name, limit=5) -> List[UserAlias]:
         if name is None:
             raise AccountServiceError('name is required')
         if len(name) == 0:
@@ -163,7 +165,7 @@ class AccountService:
             return UserAlias.query.filter(_filter).limit(limit)
 
     @staticmethod
-    def search_group_by_name(name, limit=5):
+    def search_group_by_name(name, limit=5) -> List[GroupAlias]:
         if name is None:
             raise AccountServiceError('name is required')
         if len(name) == 0:

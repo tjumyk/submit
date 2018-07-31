@@ -1,7 +1,8 @@
 import re
+from typing import Optional, List
 
 from error import BasicError
-from models import Team, db, UserTeamAssociation
+from models import Team, db, UserTeamAssociation, UserAlias
 
 
 class TeamServiceError(BasicError):
@@ -17,7 +18,7 @@ class TeamService:
     }
 
     @staticmethod
-    def get(_id):
+    def get(_id)->Optional[Team]:
         if _id is None:
             raise TeamServiceError('id is required')
         if type(_id) is not int:
@@ -26,23 +27,23 @@ class TeamService:
         return Team.query.get(_id)
 
     @staticmethod
-    def get_all():
+    def get_all()->List[Team]:
         return Team.query.all()
 
     @staticmethod
-    def get_for_term(term):
+    def get_for_term(term)->List[Team]:
         if term is None:
             raise TeamServiceError('term is required')
         return Team.query.with_parent(term).all()
 
     @staticmethod
-    def get_for_user(user):
+    def get_for_user(user)->List[UserTeamAssociation]:
         if user is None:
             raise TeamServiceError('user is required')
         return UserTeamAssociation.query.with_parent(user).all()
 
     @staticmethod
-    def add(term, name, creator=None):
+    def add(term, name, creator=None)->Team:
         if term is None:
             raise TeamServiceError('term is required')
         if name is None:
@@ -64,7 +65,7 @@ class TeamService:
         return team
 
     @staticmethod
-    def get_creator(team):
+    def get_creator(team)->Optional[UserAlias]:
         asso = UserTeamAssociation.query.with_parent(team).filter_by(is_creator=True).first()
         if not asso:
             return None
@@ -78,17 +79,16 @@ class TeamService:
             raise TeamServiceError('user is required')
 
         from .term import TermService
-        if not TermService.is_user_eligible(team.term, user, 'student'):  # only students are eligible
-            raise TeamServiceError('user not eligible')
+        return TermService.is_user_eligible(team.term, user, 'student')
 
     @staticmethod
-    def get_user_associations(team):
+    def get_user_associations(team)->List[UserTeamAssociation]:
         if team is None:
             raise TeamServiceError('team is required')
         return UserTeamAssociation.query.with_parent(team).all()
 
     @staticmethod
-    def update(team, **kwargs):
+    def update(team, **kwargs)->dict:
         if team is None:
             raise TeamServiceError('team is required')
 
@@ -221,9 +221,6 @@ class TeamService:
             raise TeamServiceError('team creator already agreed')
         user_team.is_creator_agreed = True
 
-    @staticmethod
-    def get_user_associations(team):
-        return UserTeamAssociation.query.filter(Team.id == team.id).all()
 
     @staticmethod
     def finalise(team):
