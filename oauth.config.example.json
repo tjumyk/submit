@@ -20,7 +20,7 @@
     "url": "http://localhost:8888",
     "callback_path": "/oauth-callback",
     "profile_path": "/account/profile",
-    "admin_user_page": "/admin/users/:uid",
-    "admin_group_page": "/admin/groups/:gid"
+    "admin_user_path": "/admin/users/<int:uid>",
+    "admin_group_path": "/admin/groups/<int:gid>"
   }
 }
