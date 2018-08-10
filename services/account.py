@@ -36,12 +36,29 @@ class AccountService:
         return GroupAlias.query.get(_id)
 
     @staticmethod
+    def get_group_by_name(name) ->Optional[GroupAlias]:
+        if not name:
+            raise AccountServiceError('name is required')
+        return GroupAlias.query.filter_by(name=name).first()
+
+    @staticmethod
     def get_all_users() -> List[UserAlias]:
         return UserAlias.query.all()
 
     @staticmethod
     def get_all_groups() -> List[GroupAlias]:
         return GroupAlias.query.all()
+
+    @staticmethod
+    def add_group(name, description=None) ->GroupAlias:
+        try:
+            group = oauth.add_group(name, description)
+            group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)
+            db.session.add(group_alias)
+            return group_alias
+        except oauth.OAuthError as e:
+            raise AccountServiceError('Failed to add new group', e.msg)
+
 
     @staticmethod
     def sync_users():

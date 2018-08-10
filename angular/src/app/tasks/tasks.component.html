@@ -1,0 +1,53 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active inline centered" *ngIf="loadingTasks">Loading tasks...</div>
+
+<div *ngIf="tasks">
+
+  <div class="ui segment vertical" *ngFor="let item of taskCategories | keyvalue">
+    <div class="ui header">
+      <i class="icon" [ngClass]="categories[item.key].icon"></i>
+      {{ categories[item.key].name }}
+    </div>
+    <div class="ui three column grid stackable">
+      <div class="column" *ngFor="let task of item.value">
+        <div class="ui fluid card">
+          <div class="content">
+            <div class="header">{{ task.title }}</div>
+            <div class="description">
+              <p class="task-description">{{ task.description }}</p>
+              <div class="ui list">
+                <div class="item">
+                  <i class="icon clock outline"></i>
+                  <div class="content">
+                    Open: <span *ngIf="task.open_time; else timeTbd">{{ task.open_time|date:'short' }} ({{task._open_time_from_now}})</span>
+                  </div>
+                </div>
+                <div class="item">
+                  <i class="icon clock"></i>
+                  <div class="content">
+                    Due: <span *ngIf="task.due_time; else timeTbd">{{ task.due_time|date:'short' }} ({{task._due_time_from_now}})</span>
+                  </div>
+                </div>
+                <div class="item" *ngIf="task.is_team_task">
+                  <i class="icon users"></i>
+                  <div class="content">
+                    Team task (team size: {{printTaskTeamSize(task)}})
+                  </div>
+                </div>
+              </div>
+              <ng-template #timeTbd>TBD</ng-template>
+            </div>
+          </div>
+          <div class="extra content" *ngIf="task._accessible">
+            <div class="ui buttons fluid">
+              <a routerLink="{{ task.id }}" class="ui primary button"><i class="icon list"></i> Details</a>
+              <a routerLink="{{ task.id }}/submit" class="ui button" *ngIf="accessRoles.has('student')"><i class="icon paper plane outline"></i> Submit</a>
+              <a routerLink="/admin/tasks/{{ task.id }}" class="ui button" *ngIf="accessRoles.has('admin')"><i class="icon cog"></i> Configs</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

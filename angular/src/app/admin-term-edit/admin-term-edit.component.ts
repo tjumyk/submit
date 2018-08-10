@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Group, SuccessMessage, Term, User} from "../models";
-import {AdminService} from "../admin.service";
+import {ErrorMessage, Group, SuccessMessage, Task, Term} from "../models";
+import {AdminService, NewTaskForm} from "../admin.service";
 import {ActivatedRoute} from "@angular/router";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
 import {Subject} from "rxjs/internal/Subject";
 import {of} from "rxjs/internal/observable/of";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-admin-term-edit',
@@ -17,6 +18,8 @@ export class AdminTermEditComponent implements OnInit {
   loadingTerm: boolean;
   termId: number;
   term: Term;
+  newTaskForm: NewTaskForm = new NewTaskForm();
+  addingNewTask: boolean;
 
   searchingGroups: boolean;
   private searchGroupNames = new Subject<string>();
@@ -55,9 +58,9 @@ export class AdminTermEditComponent implements OnInit {
       switchMap((name: string) => {
         if (!name)
           return of(null);
-        this.searchingUsers=true;
+        this.searchingUsers = true;
         return this.adminService.searchUsersByName(name, 10).pipe(
-          finalize(()=>this.searchingUsers=false)
+          finalize(() => this.searchingUsers = false)
         )
       })
     ).subscribe(
@@ -73,7 +76,7 @@ export class AdminTermEditComponent implements OnInit {
           return of(null);
         this.searchingGroups = false;
         return this.adminService.searchGroupsByName(name, 10).pipe(
-          finalize(()=>this.searchingGroups=false)
+          finalize(() => this.searchingGroups = false)
         )
       })
     ).subscribe(
@@ -90,66 +93,44 @@ export class AdminTermEditComponent implements OnInit {
     this.searchGroupNames.next(name);
   }
 
-  userAlreadyHasAssociation(user: User, role: string) {
-    for (let asso of this.term.user_associations) {
-      if (asso.user_id == user.id && asso.role == role)
-        return true;
+  addTask(f: NgForm) {
+    if (f.invalid)
+      return;
+
+    this.addingNewTask = true;
+    this.adminService.addTask(this.termId, this.newTaskForm).pipe(
+      finalize(() => this.addingNewTask = false)
+    ).subscribe(
+      task => this.term.tasks.push(task),
+      error => this.error = error.error
+    )
+  }
+
+  removeTask(task: Task, index: number, btn: HTMLElement) {
+    if(!confirm(`Really want to delete task "${task.title}"?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteTask(task.id).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => this.term.tasks.splice(index, 1),
+      error => this.error = error.error
+    )
+  }
+
+  autoFillTaskTitle() {
+    if (this.newTaskForm.type) {
+      let type = this.newTaskForm.type;
+      let count = 0;
+      for (let task of this.term.tasks) {
+        if (task.type == type)
+          ++count;
+      }
+      type = type[0].toUpperCase() + type.substring(1);
+      this.newTaskForm.title = `${type} ${count + 1}`
+    } else {
+      this.newTaskForm.title = ''
     }
-    return false;
   }
-
-  groupAlreadyHasAssociation(group: Group, role: string) {
-    for (let asso of this.term.group_associations) {
-      if (asso.group_id == group.id && asso.role == role)
-        return true;
-    }
-    return false;
-  }
-
-  addUserAssociation(user: User, role: string, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.addUserTermAssociation(user, this.term, role).pipe(
-      finalize((() => btn.classList.remove('loading', 'disabled')))
-    ).subscribe(
-      () => {
-        const asso = {user_id: user.id, user: user, term_id: this.term.id, term: this.term, role: role};
-        this.term.user_associations.push(asso)
-      },
-      error => this.error = error.error
-    )
-  }
-
-  addGroupAssociation(group: Group, role: string, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.addGroupTermAssociation(group, this.term, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => {
-        const asso = {group_id: group.id, group: group, term_id: this.term.id, term: this.term, role: role};
-        this.term.group_associations.push(asso)
-      },
-      error => this.error = error.error
-    )
-  }
-
-  removeUserAssociation(user: User, role: string, index: number, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.removeUserTermAssociation(user, this.term, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => this.term.user_associations.splice(index, 1),
-      error => this.error = error.error
-    )
-  }
-
-  removeGroupAssociation(group: Group, role: string, index: number, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.removeGroupTermAssociation(group, this.term, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => this.term.group_associations.splice(index, 1),
-      error => this.error = error.error
-    )
-  }
-
 }

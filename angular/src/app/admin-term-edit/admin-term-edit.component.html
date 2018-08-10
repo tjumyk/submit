@@ -3,202 +3,66 @@
 
 <div class="ui text loader active" *ngIf="loadingTerm">Loading term info...</div>
 
-<div class="ui grid two column stackable" *ngIf="term">
-  <!-- Left Panel -->
-  <div class="column">
-    <div class="ui segments">
-      <!-- Header -->
-      <div class="ui segment">
-        <div class="ui header">
-          <i class="icon calendar outline"></i>
-          {{ term.course.code }} - {{ term.year }}S{{ term.semester }}
-        </div>
+<div class="ui grid equal width stackable" *ngIf="term">
+
+  <div class="row">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a class="section" routerLink="../../courses">Courses</a>
+        <i class="icon right angle divider"></i>
+        <a class="section" routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
+        <i class="icon right angle divider"></i>
+        <div class="section active">{{ term.year }} Semester {{ term.semester }}</div>
       </div>
-      <!-- End of Header -->
-
-      <!-- Basic info -->
-      <div class="ui segment">
-        <div class="ui list horizontal">
-          <div class="item">
-            <div class="header">ID</div>
-            {{ term.id }}
-          </div>
-          <div class="item">
-            <div class="header">Course</div>
-            <a routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
-          </div>
-          <div class="item">
-            <div class="header">Year</div>
-            {{ term.year }}
-          </div>
-          <div class="item">
-            <div class="header">Semester</div>
-            {{ term.semester }}
-          </div>
-        </div>
-      </div>
-      <!-- End of Basic info -->
-
-      <!-- User Associations -->
-      <div class="ui segment">
-        <div class="ui header">
-          <i class="icon user"></i>
-          User Associations
-        </div>
-        <table class="ui table unstackable compact celled">
-          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th>Role</th><th class="collapsing">Ops</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let asso of term.user_associations, index as i">
-            <td>{{ asso.user.id }}</td>
-            <td>{{ asso.user.name }}</td>
-            <td>{{ asso.user.nickname }}</td>
-            <td>{{ asso.role }}</td>
-            <td class="collapsing">
-              <div class="ui small buttons">
-                <a #btnRemoveUserAssocitaion class="ui icon button red" (click)="removeUserAssociation(asso.user, asso.role, i, btnRemoveUserAssocitaion)"><i class="icon minus"></i></a>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <!-- Add User Associations -->
-        <div class="ui segment top attached">
-          <div class="ui icon fluid input" [ngClass]="{'loading': searchingUsers}">
-            <input type="text" placeholder="Search users by name or nickname..."
-                   (keyup)="searchUser(searchUserInput.value)" #searchUserInput>
-            <i class="icon search"></i>
-          </div>
-          <p class="text muted" [hidden]="!userSearchResults || userSearchResults.length > 0"><i class="info circle icon"></i> No results</p>
-        </div>
-
-        <table class="ui table unstackable compact celled bottom attached" [hidden]="!userSearchResults || userSearchResults.length==0">
-          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Tutor Role</th><th class="collapsing">Marker Role</th><th class="collapsing">Student Role</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let user of userSearchResults; index as i">
-            <td>{{user.id}}</td>
-            <td>{{user.name}}</td>
-            <td>{{ user.nickname }}</td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!userAlreadyHasAssociation(user, 'tutor'); else userAlreadyTutor">
-            <a class="ui icon button small primary" #btnAddUserTutor (click)="addUserAssociation(user, 'tutor', btnAddUserTutor)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #userAlreadyTutor>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!userAlreadyHasAssociation(user, 'marker'); else userAlreadyMarker">
-            <a class="ui icon button small primary" #btnAddUserMarker (click)="addUserAssociation(user, 'marker', btnAddUserMarker)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #userAlreadyMarker>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!userAlreadyHasAssociation(user, 'student'); else userAlreadyStudent">
-            <a class="ui icon button small primary" #btnAddUserStudent (click)="addUserAssociation(user, 'student', btnAddUserStudent)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #userAlreadyStudent>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <!-- End of Add User Associations -->
-      </div>
-      <!-- End of User Associations -->
-
-      <!-- Group Associations -->
-      <div class="ui segment">
-        <div class="ui header">
-          <i class="icon users"></i>
-          Group Associations
-        </div>
-        <table class="ui table unstackable compact celled">
-          <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Role</th><th class="collapsing">Ops</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let asso of term.group_associations, index as i">
-            <td>{{ asso.group.id }}</td>
-            <td>{{ asso.group.name }}</td>
-            <td>{{ asso.group.description }}</td>
-            <td>{{ asso.role }}</td>
-            <td class="collapsing">
-              <div class="ui small buttons">
-                <div #btnRemoveGroupAssocitaion class="ui icon button red" (click)="removeGroupAssociation(asso.group, asso.role, i, btnRemoveGroupAssocitaion)"><i class="icon minus"></i></div>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <!-- Add Group Associations -->
-        <div class="ui segment top attached">
-          <div class="ui icon fluid input" [ngClass]="{'loading': searchingGroups}">
-            <input type="text" placeholder="Search groups by name or description..."
-                   (keyup)="searchGroup(searchGroupInput.value)" #searchGroupInput>
-            <i class="icon search"></i>
-          </div>
-          <p class="text muted" [hidden]="!groupSearchResults || groupSearchResults.length > 0"><i class="info circle icon"></i> No results</p>
-        </div>
-
-        <table class="ui table unstackable compact celled bottom attached" [hidden]="!groupSearchResults || groupSearchResults.length==0">
-          <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Tutor Role</th><th class="collapsing">Marker Role</th><th class="collapsing">Student Role</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let group of groupSearchResults; index as i">
-            <td>{{group.id}}</td>
-            <td>{{group.name}}</td>
-            <td>{{ group.description }}</td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!groupAlreadyHasAssociation(group, 'tutor'); else groupAlreadyTutor">
-            <a class="ui icon button small primary" #btnAddGroupTutor (click)="addGroupAssociation(group, 'tutor', btnAddGroupTutor)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #groupAlreadyTutor>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!groupAlreadyHasAssociation(group, 'marker'); else groupAlreadyMarker">
-            <a class="ui icon button small primary" #btnAddGroupMarker (click)="addGroupAssociation(group, 'marker', btnAddGroupMarker)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #groupAlreadyMarker>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-            <td class="collapsing center aligned">
-          <span *ngIf="!groupAlreadyHasAssociation(group, 'student'); else groupAlreadyStudent">
-            <a class="ui icon button small primary" #btnAddGroupStudent (click)="addGroupAssociation(group, 'student', btnAddGroupStudent)">
-              <i class="plus icon"></i>
-            </a>
-          </span>
-              <ng-template #groupAlreadyStudent>
-                <a class="ui icon button small green"><i class="check icon"></i></a>
-              </ng-template>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <!-- End of Add Group Associations -->
-      </div>
-      <!-- End of Group Associations -->
-
     </div>
-
   </div>
-  <!-- End of Left Panel -->
 
-  <!-- Right Panel -->
+  <div class="row">
+    <div class="column">
+      <div class="ui segments">
+        <!-- Header -->
+        <div class="ui clearing segment">
+          <a class="ui right floated button mini" routerLink="/terms/{{term.id}}">
+            <i class="icon eye"></i> View
+          </a>
+          <div class="ui left floated header">
+            <i class="icon calendar outline"></i>
+            {{ term.course.code }} - {{ term.year }}S{{ term.semester }}
+          </div>
+        </div>
+        <!-- End of Header -->
+
+        <!-- Basic info -->
+        <div class="ui segment">
+          <div class="ui list horizontal">
+            <div class="item">
+              <div class="header">ID</div>
+              {{ term.id }}
+            </div>
+            <div class="item">
+              <div class="header">Course</div>
+              <a routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
+            </div>
+            <div class="item">
+              <div class="header">Year</div>
+              {{ term.year }}
+            </div>
+            <div class="item">
+              <div class="header">Semester</div>
+              {{ term.semester }}
+            </div>
+            <div class="item">
+              <div class="header">Student Group</div>
+              <a target="_blank" href="admin/groups/{{ term.student_group.id }}">{{ term.student_group.name }}</a>
+            </div>
+          </div>
+        </div>
+        <!-- End of Basic info -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Left Panel -->
   <div class="column">
     <!-- Tasks -->
     <div class="ui top attached segment">
@@ -209,19 +73,66 @@
     <table class="ui bottom attached table unstackable celled">
       <thead><tr><th>ID</th><th>Type</th><th>Title</th><th class="collapsing">Ops</th></tr></thead>
       <tbody>
-      <tr *ngFor="let task of term.tasks">
-      <td>{{ task.id }}</td>
+      <tr *ngFor="let task of term.tasks; index as i">
+        <td>{{ task.id }}</td>
         <td>{{ task.type }}</td>
         <td>{{ task.title }}</td>
         <td class="collapsing">
           <div class="ui small buttons">
-            <div class="ui button icon"><i class="icon edit"></i></div>
-            <div class="ui button icon"><i class="icon trash"></i></div>
+            <a class="ui button icon" routerLink="../../tasks/{{ task.id }}"><i class="icon edit"></i></a>
+            <a class="ui button icon red" #btnRemoveTask (click)="removeTask(task, i, btnRemoveTask)"><i class="icon trash"></i></a>
           </div>
         </td>
       </tr>
       </tbody>
     </table>
+    <!-- End of Tasks -->
+  </div>
+  <!-- End of Left Panel -->
+
+  <!-- Right Panel -->
+  <div class="column">
+    <!-- Start of Add Task -->
+    <div class="ui segments">
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icons">
+            <i class="icon tasks"></i>
+            <i class="icon plus right bottom corner"></i>
+          </i>
+          New Task
+        </div>
+      </div>
+      <div class="ui segment">
+        <form class="ui form" #f="ngForm" (ngSubmit)="addTask(f)" [ngClass]="{'loading': addingNewTask}">
+          <div class="field required" [ngClass]="{'error': (newTaskTypeModel.touched||newTaskTypeModel.dirty||f.submitted) && newTaskTypeModel.invalid }">
+            <label>Task Type</label>
+            <select name="task_type" [(ngModel)]="newTaskForm.type" required #newTaskTypeModel="ngModel" (change)="autoFillTaskTitle()">
+              <option value="lab">Lab</option>
+              <option value="assignment">Assignment</option>
+              <option value="project">Project</option>
+            </select>
+            <div class="errors">
+              <label *ngIf="newTaskTypeModel.errors?.required">Task type is required</label>
+            </div>
+          </div>
+          <div class="field required" [ngClass]="{'error': (newTaskTitleModel.touched||newTaskTitleModel.dirty|| f.submitted) && newTaskTitleModel.invalid}">
+            <label>Title</label>
+            <input type="text" name="task_title" [(ngModel)]="newTaskForm.title" placeholder="Title of the task (at most 128 characters)" required #newTaskTitleModel="ngModel" maxlength="128">
+            <div class="errors">
+              <label *ngIf="newTaskTitleModel.errors?.required">Title is required</label>
+              <label *ngIf="newTaskTitleModel.errors?.maxlength">Title is too long</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Description (Optional)</label>
+            <textarea name="task_description" rows="3" [(ngModel)]="newTaskForm.description" placeholder="Short description of the task"></textarea>
+          </div>
+          <button class="ui fluid primary button" type="submit">Add Task</button>
+        </form>
+      </div>
+    </div>
+    <!-- End of Add Task -->
 
   </div>
   <!-- End of Right Panel -->

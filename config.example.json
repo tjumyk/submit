@@ -2,7 +2,7 @@
   "SECRET_KEY": "M5Oc1H_WlaQ",
   "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
   "SQLALCHEMY_TRACK_MODIFICATIONS": false,
-  "MAX_CONTENT_LENGTH": 262144,
+  "MAX_CONTENT_LENGTH": 2147483648,
   "SESSION_COOKIE_NAME": "submit_session",
 
   "MAIL": {
@@ -16,6 +16,7 @@
     "base_url": "/",
     "behind_proxy": false
   },
+  "DATA_FOLDER": "data",
   "UPLOAD": {
     "root_folder": "upload",
     "avatar": {
@@ -24,8 +25,8 @@
       "size_limit": 262144
     },
     "icon": {
-      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
-      "accept_ext": ["png", "jpg", "jpeg", "gif"],
+      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif", "image/svg+xml"],
+      "accept_ext": ["png", "jpg", "jpeg", "gif", "svg"],
       "size_limit": 262144
     }
   }

@@ -10,14 +10,17 @@
     "profile_api": "/api/account/me",
     "admin_users_api": "/api/admin/users",
     "admin_groups_api": "/api/admin/groups",
-    "links": {
-      "profile": "/settings/profile"
-    }
+    "profile_page": "/settings/profile",
+    "admin_user_page": "/admin/account/users/u/{uid}",
+    "admin_group_page": "/admin/account/groups/g/{gid}"
   },
   "client": {
     "id": 1,
     "secret": "99BBDFmYEnME0TM1uymbaVUJF9_vFjd4nvF6n3oWwxI",
     "url": "http://localhost:8888",
-    "callback_path": "/oauth-callback"
+    "callback_path": "/oauth-callback",
+    "profile_path": "/account/profile",
+    "admin_user_page": "/admin/users/:uid",
+    "admin_group_page": "/admin/groups/:gid"
   }
 }

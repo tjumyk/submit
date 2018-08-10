@@ -12,4 +12,4 @@ def get_me():
     user = AccountService.get_current_user()
     if user is None:
         return jsonify(msg='no user info'), 403
-    return jsonify(user.to_dict(with_associations=True))
+    return jsonify(user.to_dict())

@@ -1,18 +1,56 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, Group, Term, User} from "./models";
+import {Course, FileRequirement, Group, Task, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
 
 export class NewCourseForm {
   code: string;
   name: string;
+  tutor_group_name: string;
+  is_new_tutor_group: boolean;
 }
 
 export class NewTermForm {
   year: number;
   semester: string;
+  student_group_name: string;
+  is_new_student_group: boolean;
+}
+
+export class NewTaskForm{
+  type: string;
+  title: string;
+  description?: string;
+}
+
+export class UpdateTaskForm{
+  type: string;
+  title: string;
+  description?: string;
+  open_time?: string;
+  due_time?: string;
+  close_time? : string;
+  late_penalty?: number;
+  is_team_task: boolean;
+  team_min_size?: number;
+  team_max_size?: number;
+  submission_limit?: number;
+  submission_history_limit?: number;
+}
+
+export class NewMaterialForm{
+  type: string;
+  name: string;
+  description?: string;
+}
+
+export class NewFileRequirementForm{
+  name: string;
+  is_optional: boolean;
+  size_limit?:number;
+  description?:string;
 }
 
 @Injectable({
@@ -90,51 +128,15 @@ export class AdminService {
     )
   }
 
-  addUserCourseAssociation(user: User, course: Course, role: string): Observable<any> {
-    return this.http.put(`${this.api}/courses/${course.id}/users/${user.id}/${role}`, null).pipe(
-      tap(() => this.logger.info(`Added group "${user.name}" as "${role}" to course ${course.name}`))
+  deleteUser(user_id: number): Observable<any> {
+    return this.http.delete(`${this.api}/users/${user_id}`).pipe(
+      tap(()=>this.logger.info(`Deleted user alias (id=${user_id})`))
     )
   }
 
-  addGroupCourseAssociation(group: Group, course: Course, role: string): Observable<any> {
-    return this.http.put(`${this.api}/courses/${course.id}/groups/${group.id}/${role}`, null).pipe(
-      tap(() => this.logger.info(`Added group "${group.name}" as "${role}" to course ${course.name}`))
-    )
-  }
-
-  removeUserCourseAssociation(user: User, course: Course, role: string): Observable<any> {
-    return this.http.delete(`${this.api}/courses/${course.id}/users/${user.id}/${role}`).pipe(
-      tap(() => this.logger.info(`Removed group "${user.name}" as "${role}" from course ${course.name}`))
-    )
-  }
-
-  removeGroupCourseAssociation(group: Group, course: Course, role: string): Observable<any> {
-    return this.http.delete(`${this.api}/courses/${course.id}/groups/${group.id}/${role}`).pipe(
-      tap(() => this.logger.info(`Removed group "${group.name}" as "${role}" from course ${course.name}`))
-    )
-  }
-
-  addUserTermAssociation(user: User, term: Term, role: string): Observable<any> {
-    return this.http.put(`${this.api}/terms/${term.id}/users/${user.id}/${role}`, null).pipe(
-      tap(() => this.logger.info(`Added group "${user.name}" as "${role}" to term ${term.id}`))
-    )
-  }
-
-  addGroupTermAssociation(group: Group, term: Term, role: string): Observable<any> {
-    return this.http.put(`${this.api}/terms/${term.id}/groups/${group.id}/${role}`, null).pipe(
-      tap(() => this.logger.info(`Added group "${group.name}" as "${role}" to term ${term.id}`))
-    )
-  }
-
-  removeUserTermAssociation(user: User, term: Term, role: string): Observable<any> {
-    return this.http.delete(`${this.api}/terms/${term.id}/users/${user.id}/${role}`).pipe(
-      tap(() => this.logger.info(`Removed group "${user.name}" as "${role}" from term ${term.id}`))
-    )
-  }
-
-  removeGroupTermAssociation(group: Group, term: Term, role: string): Observable<any> {
-    return this.http.delete(`${this.api}/terms/${term.id}/groups/${group.id}/${role}`).pipe(
-      tap(() => this.logger.info(`Removed group "${group.name}" as "${role}" from term ${term.id}`))
+  deleteGroup(group_id: number): Observable<any> {
+    return this.http.delete(`${this.api}/groups/${group_id}`).pipe(
+      tap(()=>this.logger.info(`Deleted group alias (id=${group_id})`))
     )
   }
 
@@ -188,5 +190,42 @@ export class AdminService {
     )
   }
 
+  getTask(task_id: number): Observable<Task>{
+    return this.http.get<Task>(`${this.api}/tasks/${task_id}`)
+  }
 
+  addTask(term_id: number, form: NewTaskForm):Observable<Task>{
+    return this.http.post<Task>(`${this.api}/terms/${term_id}/tasks`, form)
+  }
+
+  updateTask(task_id: number, form: UpdateTaskForm):Observable<Task>{
+    return this.http.put<Task>(`${this.api}/tasks/${task_id}`, form)
+  }
+
+  deleteTask(task_id: number):Observable<any>{
+    return this.http.delete(`${this.api}/tasks/${task_id}`)
+  }
+
+  addMaterial(task_id: number, form: NewMaterialForm, file: File): Observable<HttpEvent<any>>{
+    const data = new FormData();
+    data.append('type', form.type);
+    data.append('name', form.name);
+    data.append('file', file);
+    if(form.description)
+      data.append('description', form.description);
+    const req = new HttpRequest('POST', `${this.api}/tasks/${task_id}/materials`, data, {reportProgress: true});
+    return this.http.request(req);
+  }
+
+  deleteMaterial(material_id: number): Observable<any>{
+    return this.http.delete(`${this.api}/materials/${material_id}`)
+  }
+
+  addFileRequirement(task_id: number, form:NewFileRequirementForm):Observable<FileRequirement>{
+    return this.http.post<FileRequirement>(`${this.api}/tasks/${task_id}/file-requirements`, form)
+  }
+
+  deleteFileRequirement(requirement_id: number):Observable<any>{
+    return this.http.delete(`${this.api}/file-requirements/${requirement_id}`)
+  }
 }

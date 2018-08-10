@@ -1,0 +1,158 @@
+<app-success-message [success]="success"></app-success-message>
+<app-error-message [error]="error"></app-error-message>
+<div class="ui text loader active inline centered" *ngIf="loadingTask">Loading task info...</div>
+
+<div *ngIf="task">
+  <div class="ui message warning" *ngIf="previewMode">
+    <i class="icon exclamation triangle"></i> You are previewing this task. The students will only see this page after the opening time.
+  </div>
+
+  <div class="ui breadcrumb">
+    <a routerLink="../.." class="section">Tasks</a>
+    <i class="icon divider right angle"></i>
+    <div class="section">{{category.name}}</div>
+    <i class="icon divider right angle"></i>
+    <div class="section active">{{task.title}}</div>
+  </div>
+
+  <div class="ui header">
+    <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
+    <div class="content">
+      {{ task.title }}
+      <div class="sub header">
+        {{ task.type | titlecase }}
+      </div>
+    </div>
+  </div>
+
+  <ng-template #timeTbd>TBD</ng-template>
+  <ng-template #no>No</ng-template>
+  <ng-template #noLimit>No limit</ng-template>
+
+  <div class="ui grid stackable">
+    <!--Left Panel-->
+    <div class="four wide column">
+      <div class="ui segments">
+        <!--Start of Time info-->
+        <div class="ui segment">
+          <div class="ui list">
+            <div class="item">
+              <i class="icon clock outline"></i>
+              <div class="content">
+                <div class="header">Open Time</div>
+                <div class="description">
+                  <div *ngIf="task.open_time; else timeTbd">
+                    <div>{{ task.open_time|date:'medium' }}</div>
+                    <div>({{task._open_time_from_now}})</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="icon clock"></i>
+              <div class="content">
+                <div class="header">Due Time</div>
+                <div class="description">
+                  <div *ngIf="task.due_time; else timeTbd">
+                    <div>{{ task.due_time|date:'medium' }}</div>
+                    <div>({{task._due_time_from_now}})</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="icon cut"></i>
+              <div class="content">
+                <div class="header">Late Penalty</div>
+                <div class="description">
+                  <div *ngIf="task.late_penalty!=null; else noLatePenalty">{{task.late_penalty|percent}} per day</div>
+                  <ng-template #noLatePenalty>Please refer to the specification</ng-template>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="icon times circle outline"></i>
+              <div class="content">
+                <div class="header">Close Time</div>
+                <div class="description">
+                  <div *ngIf="task.close_time; else timeTbd">
+                    <div>{{ task.close_time|date:'medium' }}</div>
+                    <div>({{task._close_time_from_now}})</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--End of Time info-->
+
+        <!--Start of Submission Info-->
+        <div class="ui segment">
+          <div class="ui list">
+            <div class="item">
+              <i class="icon users"></i>
+              <div class="content">
+                <div class="header">Is Team Task?</div>
+                <div class="description">
+                  <span *ngIf="task.is_team_task; else no">Yes</span>
+                </div>
+              </div>
+            </div>
+            <div class="item" *ngIf="task.is_team_task">
+              <i class="icon users"></i>
+              <div class="content">
+                <div class="header">Team Size</div>
+                <div class="description">
+                  {{printTaskTeamSize(task) | titlecase}}
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="icon paper plane outline"></i>
+              <div class="content">
+                <div class="header">Submission Limit</div>
+                <div class="description">
+                  <span *ngIf="task.submission_limit!=null; else noLimit">{{task.submission_limit}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="icon history"></i>
+              <div class="content">
+                <div class="header">Submission History Limit</div>
+                <div class="description">
+                  <span *ngIf="task.submission_history_limit!=null; else noLimit">{{task.submission_history_limit}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--End of Submission Info-->
+      </div>
+
+
+      <div class="ui menu vertical fluid" *ngIf="accessRoles.has('admin')">
+        <a class="item" routerLink="/admin/tasks/{{task.id}}">
+          <i class="icon cog"></i> Configurations
+        </a>
+      </div>
+    </div>
+    <!--End of Left Panel-->
+
+    <!--Right Panel-->
+    <div class="twelve wide column">
+      <div class="ui secondary pointing menu stackable">
+        <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
+        <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</a>
+        <a routerLink="my-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon paper plane outline"></i> My Submissions</a>
+        <div class="menu right">
+          <a routerLink="submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')"><i class="icon paper plane"></i>Submissions</a>
+        </div>
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+    <!--End of Right Panel-->
+
+  </div>
+
+</div>

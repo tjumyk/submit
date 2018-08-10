@@ -7,10 +7,34 @@
           UNSWKG Submit
         </h2>
         <app-error-message [error]="error"></app-error-message>
-        <div class="ui active inline centered text loader" *ngIf="loadingUser">Loading user info...</div>
-        <div *ngIf="user" class="ui center aligned grid">
+        <div class="ui active inline centered text loader" *ngIf="loadingUser || loadingCourses">
+          <span *ngIf="loadingUser; else loadingCoursesHint">Loading user info...</span>
+          <ng-template #loadingCoursesHint>Loading courses...</ng-template>
+        </div>
+        <div *ngIf="entries" class="ui center aligned grid two column">
+          <div class="column" *ngFor="let item of entries | keyvalue">
+            <div class="ui fluid card">
+              <div class="image" *ngIf="courseMap[item.key].icon">
+                <img [src]="courseMap[item.key].icon">
+              </div>
+              <div class="content">
+                <div class="header">{{ courseMap[item.key].code }}</div>
+                <div class="meta">
+                  {{ courseMap[item.key].name }}
+                </div>
+              </div>
+              <div class="ui menu vertical bottom attached">
+                <a class="item" *ngFor="let term of item.value" routerLink="terms/{{ term.id }}">
+                  <span>{{ term.year }} </span>
+                  <span>Semester {{ term.semester }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="entries" class="ui center aligned grid">
           <div class="column">
-            <a class="ui violet button" routerLink="admin" *ngIf="isAdmin">Management</a>
+            <a class="ui violet button" routerLink="admin" *ngIf="isAdmin"><i class="icon cogs"></i> Management</a>
           </div>
         </div>
       </div>

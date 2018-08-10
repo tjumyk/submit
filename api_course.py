@@ -11,7 +11,7 @@ course_api = Blueprint('course_api', __name__)
 @requires_login
 def do_courses():
     try:
-        return jsonify([t for t in CourseService.get_all()])
+        return jsonify([t.to_dict(with_terms=True) for t in CourseService.get_all()])
     except CourseServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

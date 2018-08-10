@@ -1,0 +1,20 @@
+<app-error-message [error]="error"></app-error-message>
+
+<div *ngIf="task" class="ui grid centered stackable">
+  <div class="column ten wide">
+    <div class="ui segment">
+      <form class="ui form" [ngClass]="{'loading': submitting}" (submit)="submit()">
+        <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors}">
+          <label>{{req.name}} <span *ngIf="req.is_optional">(Optional)</span></label>
+          <input type="file" name="{{req.name}}" [accept]="req._extension || '*/*'" (change)="updateFile(req, inputFile.files)" #inputFile>
+          <div class="errors">
+            <label *ngIf="req._form_errors?.required"><i class="icon times"></i> {{req.name}} is required</label>
+            <label *ngIf="req._form_errors?.extension"><i class="icon times"></i> Invalid file extension</label>
+            <label *ngIf="req._form_errors?.size"><i class="icon times"></i> File is too big (at most {{req.size_limit | size}})</label>
+          </div>
+        </div>
+        <button type="submit" class="ui primary button submit fluid"><i class="icon paper plane outline"></i> Submit</button>
+      </form>
+    </div>
+  </div>
+</div>

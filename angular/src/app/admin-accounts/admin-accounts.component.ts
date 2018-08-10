@@ -69,4 +69,30 @@ export class AdminAccountsComponent implements OnInit {
     )
   }
 
+  deleteUser(user:User, index: number, btn:HTMLElement){
+    if(!confirm(`Really want to delete user "${user.name}"? Only local alias will be deleted.`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteUser(user.id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>this.users.splice(index, 1),
+      error=>this.error=error.error
+    )
+  }
+
+  deleteGroup(group:Group, index: number, btn:HTMLElement){
+    if(!confirm(`Really want to delete group "${group.name}"? Only local alias will be deleted.`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteGroup(group.id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>this.groups.splice(index, 1),
+      error=>this.error=error.error
+    )
+  }
+
 }

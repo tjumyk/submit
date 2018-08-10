@@ -6,4 +6,5 @@ config.json
 oauth.config.json
 upload/
 static/
+data/
 test.db

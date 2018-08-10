@@ -1,0 +1,24 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
+
+<table class="ui table unstackable" *ngIf="submissions">
+  <thead><tr><th>#</th><th>ID</th><th>Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let sub of submissions; index as i">
+    <td>{{ i + 1 }}</td>
+    <td>{{sub.id}}</td>
+    <td>
+      <span *ngIf="task.is_team_task; else submitterCell">
+        <a routerLink="/admin/teams/{{sub.submitter_team_id}}">{{sub.submitter_team.name}}</a>
+      </span>
+      <ng-template #submitterCell>
+        <a target="_blank" routerLink="/admin/users/{{sub.submitter_id}}">{{sub.submitter.name}}</a>
+      </ng-template>
+    </td>
+    <td>{{sub.created_at}}</td>
+    <td>
+      <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
+    </td>
+  </tr>
+  </tbody>
+</table>

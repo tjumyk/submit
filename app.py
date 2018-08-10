@@ -4,6 +4,7 @@ import oauth
 from api_account import account_api
 from api_admin import admin_api
 from api_course import course_api
+from api_material import material_api
 from api_task import task_api
 from api_team import team_api
 from api_term import term_api
@@ -33,11 +34,12 @@ app.register_blueprint(course_api, url_prefix='/api/courses')
 app.register_blueprint(term_api, url_prefix='/api/terms')
 app.register_blueprint(team_api, url_prefix='/api/teams')
 app.register_blueprint(task_api, url_prefix='/api/tasks')
+app.register_blueprint(material_api, url_prefix='/api/materials')
 app.register_blueprint(admin_api, url_prefix='/api/admin')
 
 
 @app.route('/')
-@app.route('/team/<path:path>')
+@app.route('/terms/<path:path>')
 @app.route('/admin/<path:path>')
 @oauth.requires_login
 def get_index_page(path=''):

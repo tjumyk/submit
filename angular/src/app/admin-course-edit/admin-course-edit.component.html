@@ -4,6 +4,15 @@
 <div class="ui active text loader" *ngIf="loadingCourse">Loading course info...</div>
 
 <div class="ui grid stackable two column" *ngIf="course">
+  <div class="row">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a class="section" routerLink="..">Courses</a>
+        <i class="icon right angle divider"></i>
+        <div class="section active">{{ course.code }}</div>
+      </div>
+    </div>
+  </div>
   <!-- Left Panel -->
   <div class="column">
     <div class="ui segments">
@@ -31,6 +40,10 @@
             <div class="header">Name</div>
             {{course.name}}
           </div>
+          <div class="item">
+            <div class="header">Tutor Group</div>
+            <a target="_blank" href="admin/groups/{{ course.tutor_group.id }}">{{ course.tutor_group.name }}</a>
+          </div>
         </div>
       </div>
       <!-- End of Basic Info -->
@@ -47,70 +60,13 @@
                 <div class="text muted" *ngIf="!course.icon">(No icon)</div>
               </div>
               <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
-              <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB, squared image only</p>
+              <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB</p>
             </form>
           </div>
         </div>
       </div>
       <!--End of Icon Upload-->
 
-      <!-- User Associations -->
-      <div class="ui segment">
-        <div class="ui header">
-          <i class="icon user"></i>
-          User Associations
-        </div>
-        <table class="ui table unstackable compact celled">
-          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th>Role</th><th class="collapsing">Ops</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let asso of course.user_associations, index as i">
-            <td>{{ asso.user.id }}</td>
-            <td>{{ asso.user.name }}</td>
-            <td>{{ asso.user.nickname }}</td>
-            <td>{{ asso.role }}</td>
-            <td class="collapsing">
-              <div class="ui small buttons">
-                <a #btnRemoveUserAssocitaion class="ui icon button red" (click)="removeUserAssociation(asso.user, asso.role, i, btnRemoveUserAssocitaion)"><i class="icon minus"></i></a>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <!-- Add User Associations -->
-        <div class="ui segment top attached">
-          <div class="ui icon fluid input" [ngClass]="{'loading': searchingUsers}">
-            <input type="text" placeholder="Search users by name or nickname..."
-                   (keyup)="searchUser(searchUserInput.value)" #searchUserInput>
-            <i class="icon search"></i>
-          </div>
-          <p class="text muted" [hidden]="!userSearchResults || userSearchResults.length > 0"><i class="info circle icon"></i> No results</p>
-        </div>
-
-        <table class="ui table unstackable compact celled bottom attached" [hidden]="!userSearchResults || userSearchResults.length==0">
-          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Lecturer Role</th></tr></thead>
-          <tbody>
-          <tr *ngFor="let user of userSearchResults; index as i">
-            <td>{{user.id}}</td>
-            <td>{{user.name}}</td>
-            <td>{{ user.nickname }}</td>
-            <td class="collapsing center aligned">
-            <span *ngIf="!userAlreadyHasAssociation(user, 'lecturer'); else userAlreadyLecturer">
-              <a class="ui icon button small primary" #btnAddUserLecturer (click)="addUserAssociation(user, 'lecturer', btnAddUserLecturer)">
-                <i class="plus icon"></i>
-              </a>
-            </span>
-            <ng-template #userAlreadyLecturer>
-              <a class="ui icon button small green"><i class="check icon"></i></a>
-            </ng-template>
-            </td>
-            <td class="collapsing center aligned">
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <!-- End of Add User Associations -->
-      </div>
     </div>
   </div>
   <!-- End of Left Panel -->
@@ -153,7 +109,7 @@
         <div class="field required"
              [ngClass]="{'error': (f.submitted || yearModel.touched || yearModel.dirty) && yearModel.invalid}">
           <label>Year</label>
-          <input type="number" name="year" placeholder="year of term" required min="2000" max="2200" [(ngModel)]="newTermForm.year" #yearModel="ngModel">
+          <input type="number" name="year" placeholder="year of term" required min="2000" max="2200" [(ngModel)]="newTermForm.year" #yearModel="ngModel" (change)="autoFillForm()">
           <div class="errors">
             <label *ngIf="yearModel.errors?.required"><i class="icon times"></i>Year is required</label>
             <label *ngIf="yearModel.errors?.min"><i class="icon times"></i>Year is at least 2000</label>
@@ -162,7 +118,7 @@
         </div>
         <div class="field required" [ngClass]="{'error': (f.submitted || semesterModel.touched || semesterModel.dirty) && semesterModel.invalid}">
           <label>Semester</label>
-          <select name="semester" [(ngModel)]="newTermForm.semester" #semesterModel="ngModel" required>
+          <select name="semester" [(ngModel)]="newTermForm.semester" #semesterModel="ngModel" required (change)="autoFillForm()">
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -172,7 +128,23 @@
             <label *ngIf="semesterModel.errors?.required"><i class="icon times"></i>Semester is required</label>
           </div>
         </div>
-        <button type="submit" class="ui button primary">Add Term</button>
+        <div class="field required" [ngClass]="{'error': (student_group_name_model.touched || student_group_name_model.dirty || f.submitted) && student_group_name_model.invalid}">
+          <label>Student Group Name</label>
+          <input type="text" name="student_group_name" placeholder='Group name for students of this term (at most 24 characters)'
+                 required maxlength="24"
+                 [(ngModel)]="newTermForm.student_group_name" #student_group_name_model="ngModel">
+          <div class="errors">
+            <label *ngIf="student_group_name_model.errors?.required"><i class="icon times"></i> Student group name is required</label>
+            <label *ngIf="student_group_name_model.errors?.maxlength"><i class="icon times"></i> Student group name is too long</label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui input checkbox" (click)="checkboxNewStudentGroup.click()">
+            <input type="checkbox" #checkboxNewStudentGroup class="hidden" tabindex="0" name="is_new_student_group" [(ngModel)]="newTermForm.is_new_student_group">
+            <label>Create new student group</label>
+          </div>
+        </div>
+        <button type="submit" class="ui button primary fluid">Add Term</button>
       </form>
     </div>
     <!--End of New Term-->

@@ -1,12 +1,15 @@
 <div class="ui container">
   <h1 class="ui header">
     <img src="static/assets/logo-128.png">
-    UNSWKG Submit
+    <div class="content">
+      UNSWKG Submit
+      <div class="sub header">System Management</div>
+    </div>
   </h1>
-  <div class="ui segment">
-    <button class="ui button" routerLink="/">Home</button>
-    <button class="ui button" routerLink="accounts">Accounts</button>
-    <button class="ui button" routerLink="courses">Courses</button>
+  <div class="ui menu stackable">
+    <a class="item" routerLink="/"><i class="icon home"></i> Home</a>
+    <a class="item" routerLink="courses" routerLinkActive="active"><i class="icon book"></i> Courses</a>
+    <a class="item" routerLink="accounts" routerLinkActive="active"><i class="icon users"></i> Accounts</a>
   </div>
   <router-outlet></router-outlet>
 </div>

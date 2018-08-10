@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Course, ErrorMessage, Group, SuccessMessage, User} from "../models";
+import {Course, ErrorMessage, Group, SuccessMessage} from "../models";
 import {ActivatedRoute} from "@angular/router";
 import {AdminService, NewTermForm} from "../admin.service";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
@@ -39,6 +39,7 @@ export class AdminCourseEditComponent implements OnInit {
     private adminService: AdminService,
     private route: ActivatedRoute
   ) {
+    this.newTermForm.is_new_student_group = true;
   }
 
   ngOnInit() {
@@ -65,7 +66,10 @@ export class AdminCourseEditComponent implements OnInit {
     this.adminService.getCourse(this.course_id).pipe(
       finalize(() => this.loadingCourse = false)
     ).subscribe(
-      course => this.course = course,
+      course => {
+        this.course = course;
+        this.autoFillForm();
+      },
       error => this.error = error.error
     )
   }
@@ -79,7 +83,7 @@ export class AdminCourseEditComponent implements OnInit {
           return of(null);
         this.searchingUsers = true;
         return this.adminService.searchUsersByName(name, 10).pipe(
-          finalize(()=>this.searchingUsers=false)
+          finalize(() => this.searchingUsers = false)
         )
       })
     ).subscribe(
@@ -168,66 +172,15 @@ export class AdminCourseEditComponent implements OnInit {
     this.searchGroupNames.next(name);
   }
 
-  userAlreadyHasAssociation(user: User, role: string) {
-    for (let asso of this.course.user_associations) {
-      if (asso.user_id == user.id && asso.role == role)
-        return true;
+  autoFillForm(){
+    if(this.newTermForm.year && this.newTermForm.semester){
+      let shortCode = this.course.code.substr( -4, 4);
+      let shortYear = this.newTermForm.year % 100;
+      let shortSemester = this.newTermForm.semester[0];
+      this.newTermForm.student_group_name = `${shortCode}_${shortYear}s${shortSemester}_student`
+    }else{
+      this.newTermForm.student_group_name = ''
     }
-    return false;
-  }
-
-  groupAlreadyHasAssociation(group: Group, role: string) {
-    for (let asso of this.course.group_associations) {
-      if (asso.group_id == group.id && asso.role == role)
-        return true;
-    }
-    return false;
-  }
-
-  addUserAssociation(user: User, role: string, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.addUserCourseAssociation(user, this.course, role).pipe(
-      finalize((() => btn.classList.remove('loading', 'disabled')))
-    ).subscribe(
-      () => {
-        const asso = {user_id: user.id, user: user, course_id: this.course.id, course: this.course, role: role};
-        this.course.user_associations.push(asso)
-      },
-      error => this.error = error.error
-    )
-  }
-
-  addGroupAssociation(group: Group, role: string, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.addGroupCourseAssociation(group, this.course, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => {
-        const asso = {group_id: group.id, group: group, course_id: this.course.id, course: this.course, role: role};
-        this.course.group_associations.push(asso)
-      },
-      error => this.error = error.error
-    )
-  }
-
-  removeUserAssociation(user: User, role: string, index: number, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.removeUserCourseAssociation(user, this.course, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => this.course.user_associations.splice(index, 1),
-      error => this.error = error.error
-    )
-  }
-
-  removeGroupAssociation(group: Group, role: string, index: number, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    this.adminService.removeGroupCourseAssociation(group, this.course, role).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => this.course.group_associations.splice(index, 1),
-      error => this.error = error.error
-    )
   }
 
 }

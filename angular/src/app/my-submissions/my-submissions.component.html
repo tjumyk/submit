@@ -1,0 +1,16 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
+
+<table class="ui table unstackable" *ngIf="submissions">
+  <thead><tr><th>#</th><th>ID</th><th>Submitted At</th><th>Operations</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let sub of submissions; index as i">
+    <td>{{ i + 1 }}</td>
+    <td>{{sub.id}}</td>
+    <td>{{sub.created_at}}</td>
+    <td>
+      <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
+    </td>
+  </tr>
+  </tbody>
+</table>

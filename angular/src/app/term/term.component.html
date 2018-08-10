@@ -1,0 +1,39 @@
+<div class="ui container">
+  <div class="ui loader text active" *ngIf="loadingTerm">Loading term info...</div>
+
+  <div class="ui grid stackable">
+    <div class="column">
+      <app-error-message [error]="error"></app-error-message>
+
+      <div *ngIf="term">
+        <h2 class="ui header">
+          <img [src]="term.course.icon" *ngIf="term.course.icon; else defaultIcon">
+          <ng-template #defaultIcon><i class="icon book"></i></ng-template>
+          <div class="content">
+            {{ term.course.code }} <span class="term-name">{{ term.course.name }}</span>
+            <div class="sub header">
+              {{ term.year }} Semester {{ term.semester }}
+            </div>
+          </div>
+        </h2>
+
+        <div class="ui menu stackable">
+          <a routerLink="tasks" class="item" routerLinkActive="active"><i class="icon tasks"></i> Tasks</a>
+          <a routerLink="teams" class="item" routerLinkActive="active"><i class="icon users"></i> Teams</a>
+          <div class="right menu">
+            <a routerLink="/" class="item"><i class="icon reply"></i> Return to Home</a>
+            <a routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" class="item"><i class="icon cogs"></i>Management</a>
+            <a class="item" *ngIf="user" href="account/profile" target="_blank">
+              <img class="ui avatar image" [src]="user.avatar" *ngIf="user.avatar; else userIcon">
+              <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+              {{ user.nickname || user.name }}
+            </a>
+          </div>
+        </div>
+
+        <router-outlet></router-outlet>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -24,16 +24,12 @@ class UserAlias(db.Model):
     def __repr__(self):
         return '<UserAlias %r>' % self.name
 
-    def to_dict(self, with_groups=True, with_group_ids=False, with_associations=False, with_advanced_fields=False):
+    def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar)
         if with_groups:
             _dict['groups'] = [group.to_dict() for group in self.groups]
         if with_group_ids:
             _dict['group_ids'] = [group.id for group in self.groups]
-        if with_associations:
-            _dict['course_associations'] = [a.to_dict(with_course=True) for a in self.course_associations]
-            _dict['term_associations'] = [a.to_dict(with_term=True) for a in self.term_associations]
-            _dict['team_associations'] = [a.to_dict(with_team=True) for a in self.team_associations]
 
         if with_advanced_fields:
             _dict['created_at'] = self.created_at
@@ -44,7 +40,7 @@ class UserAlias(db.Model):
 
 class GroupAlias(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), unique=True, nullable=False)
+    name = db.Column(db.String(24), unique=True, nullable=False)
     description = db.Column(db.String(256))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -52,15 +48,12 @@ class GroupAlias(db.Model):
 
     users = db.relationship('UserAlias', secondary=user_groups_alias, backref=db.backref('groups', lazy=False))
 
-    def to_dict(self, with_users=False, with_user_ids=False, with_associations=False, with_advanced_fields=False):
+    def to_dict(self, with_users=False, with_user_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, description=self.description)
         if with_users:
             _dict['users'] = [user.to_dict(with_groups=False) for user in self.users]
         if with_user_ids:
             _dict['user_ids'] = [user.id for user in self.users]
-        if with_associations:
-            _dict['course_associations'] = [a.to_dict(with_course=True) for a in self.course_associations]
-            _dict['term_associations'] = [a.to_dict(with_term=True) for a in self.term_associations]
 
         if with_advanced_fields:
             _dict['created_at'] = self.created_at
@@ -71,6 +64,7 @@ class GroupAlias(db.Model):
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    tutor_group_id = db.Column(db.Integer, db.ForeignKey('group_alias.id'), nullable=False)
 
     code = db.Column(db.String(16), unique=True, nullable=False)
     name = db.Column(db.String(128), unique=True, nullable=False)
@@ -80,70 +74,18 @@ class Course(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     terms = db.relationship('Term', backref=db.backref('course'))
+    tutor_group = db.relationship('GroupAlias', lazy=False, backref=db.backref('tutor_of_courses'))
 
     def __repr__(self):
         return '<Course %r>' % self.name
 
-    def to_dict(self, with_terms=False, with_associations=False, with_advanced_fields=False):
-        d = dict(id=self.id, code=self.code, name=self.name, icon=self.icon)
+    def to_dict(self, with_terms=False, with_groups=False, with_advanced_fields=False):
+        d = dict(id=self.id, code=self.code, name=self.name, icon=self.icon, tutor_group_id=self.tutor_group_id)
         if with_terms:
-            d['terms'] = [t.to_dict(with_course=False) for t in self.terms]
-        if with_associations:
-            d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
-            d['group_associations'] = [a.to_dict(with_group=True) for a in self.group_associations]
+            d['terms'] = [t.to_dict(with_course=False, with_groups=with_groups) for t in self.terms]
+        if with_groups:
+            d['tutor_group'] = self.tutor_group.to_dict()
 
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
-        return d
-
-
-class UserCourseAssociation(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
-    role = db.Column(db.String(16), nullable=False, primary_key=True)
-
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    user = db.relationship('UserAlias', lazy=False, backref=db.backref('course_associations'))
-    course = db.relationship('Course', lazy=False, backref=db.backref('user_associations'))
-
-    def __repr__(self):
-        return '<UserCourseAssociation (%r, %r)>' % (self.user_id, self.course_id)
-
-    def to_dict(self, with_user=False, with_course=False, with_advanced_fields=False):
-        d = dict(user_id=self.user_id, course_id=self.course_id, role=self.role)
-        if with_user:
-            d['user'] = self.user.to_dict()
-        if with_course:
-            d['course'] = self.course.to_dict()
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
-        return d
-
-
-class GroupCourseAssociation(db.Model):
-    group_id = db.Column(db.Integer, db.ForeignKey('group_alias.id'), primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
-    role = db.Column(db.String(16), nullable=False, primary_key=True)
-
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    group = db.relationship('GroupAlias', lazy=False, backref=db.backref('course_associations'))
-    course = db.relationship('Course', lazy=False, backref=db.backref('group_associations'))
-
-    def __repr__(self):
-        return '<GroupCourseAssociation (%r, %r)>' % (self.group_id, self.course_id)
-
-    def to_dict(self, with_group=False, with_course=False, with_advanced_fields=False):
-        d = dict(group_id=self.group_id, course_id=self.course_id, role=self.role)
-        if with_group:
-            d['group'] = self.group.to_dict()
-        if with_course:
-            d['course'] = self.course.to_dict()
         if with_advanced_fields:
             d['created_at'] = self.created_at
             d['modified_at'] = self.modified_at
@@ -153,6 +95,7 @@ class GroupCourseAssociation(db.Model):
 class Term(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('group_alias.id'), nullable=False)
 
     year = db.Column(db.Integer, nullable=False)
     semester = db.Column(db.String(8), nullable=False)
@@ -161,72 +104,21 @@ class Term(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     tasks = db.relationship('Task', backref=db.backref('term'))
+    student_group = db.relationship('GroupAlias', lazy=False, backref=db.backref('student_of_terms'))
 
     def __repr__(self):
         return '<Term %r, %r>' % (self.year, self.semester)
 
-    def to_dict(self, with_course=True, with_tasks=False, with_associations=False, with_advanced_fields=False):
-        d = dict(id=self.id, course_id=self.course_id, year=self.year, semester=self.semester)
+    def to_dict(self, with_course=True, with_tasks=False, with_groups=False, with_advanced_fields=False):
+        d = dict(id=self.id, course_id=self.course_id, year=self.year, semester=self.semester,
+                 student_group_id=self.student_group_id)
         if with_course:
             d['course'] = self.course.to_dict()
         if with_tasks:
             d['tasks'] = [t.to_dict() for t in self.tasks]
-        if with_associations:
-            d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
-            d['group_associations'] = [a.to_dict(with_group=True) for a in self.group_associations]
+        if with_groups:
+            d['student_group'] = self.student_group.to_dict()
 
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
-        return d
-
-
-class UserTermAssociation(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), primary_key=True)
-    role = db.Column(db.String(16), nullable=False, primary_key=True)
-
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    user = db.relationship('UserAlias', lazy=False, backref=db.backref('term_associations'))
-    term = db.relationship('Term', lazy=False, backref=db.backref('user_associations'))
-
-    def __repr__(self):
-        return '<UserTermAssociation (%r, %r)>' % (self.user_id, self.term_id)
-
-    def to_dict(self, with_user=False, with_term=False, with_advanced_fields=False):
-        d = dict(user_id=self.user_id, term_id=self.term_id, role=self.role)
-        if with_user:
-            d['user'] = self.user.to_dict()
-        if with_term:
-            d['term'] = self.term.to_dict()
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
-        return d
-
-
-class GroupTermAssociation(db.Model):
-    group_id = db.Column(db.Integer, db.ForeignKey('group_alias.id'), primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), primary_key=True)
-    role = db.Column(db.String(16), nullable=False, primary_key=True)
-
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    group = db.relationship('GroupAlias', lazy=False, backref=db.backref('term_associations'))
-    term = db.relationship('Term', lazy=False, backref=db.backref('group_associations'))
-
-    def __repr__(self):
-        return '<GroupTermAssociation (%r, %r)>' % (self.group_id, self.term_id)
-
-    def to_dict(self, with_group=False, with_term=False, with_advanced_fields=False):
-        d = dict(group_id=self.group_id, term_id=self.term_id, role=self.role)
-        if with_group:
-            d['group'] = self.group.to_dict()
-        if with_term:
-            d['term'] = self.term.to_dict()
         if with_advanced_fields:
             d['created_at'] = self.created_at
             d['modified_at'] = self.modified_at
@@ -250,14 +142,11 @@ class Team(db.Model):
     def __repr__(self):
         return '<Team %r>' % self.name
 
-    def to_dict(self, with_associations=False, with_advanced_fields=False):
-        d = dict(id=self.id, term_id=self.term_id, name=self.name, is_finalised=self.is_finalised)
+    def to_dict(self, with_associations=False):
+        d = dict(id=self.id, term_id=self.term_id, name=self.name, is_finalised=self.is_finalised,
+                 created_at=self.created_at, modified_at=self.modified_at)
         if with_associations:
             d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
-
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
         return d
 
 
@@ -279,17 +168,16 @@ class UserTeamAssociation(db.Model):
     def __repr__(self):
         return '<UserTeamAssociation (%r, %r)>' % (self.user_id, self.team_id)
 
-    def to_dict(self, with_user=False, with_team=False, with_advanced_fields=False):
+    def to_dict(self, with_user=False, with_team=False):
         d = dict(user_id=self.user_id, team_id=self.team_id,
                  is_creator=self.is_creator, is_user_agreed=self.is_user_agreed,
-                 is_creator_agreed=self.is_creator_agreed)
+                 is_creator_agreed=self.is_creator_agreed,
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
         if with_user:
             d['user'] = self.user.to_dict()
         if with_team:
             d['team'] = self.team.to_dict()
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
         return d
 
 
@@ -303,12 +191,15 @@ class Task(db.Model):
 
     open_time = db.Column(db.DateTime)
     due_time = db.Column(db.DateTime)
+    close_time = db.Column(db.DateTime)
+    late_penalty = db.Column(db.Float)
 
     is_team_task = db.Column(db.Boolean, nullable=False, default=False)
     team_min_size = db.Column(db.Integer)
     team_max_size = db.Column(db.Integer)
 
     submission_limit = db.Column(db.Integer)
+    submission_history_limit = db.Column(db.Integer)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -320,18 +211,53 @@ class Task(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.title
 
-    def to_dict(self, with_materials=True, with_file_requirements=True, with_advanced_fields=False):
+    def to_dict(self, with_term=False, with_details=False):
         d = dict(id=self.id, term_id=self.term_id, type=self.type, title=self.title,
                  description=self.description, open_time=self.open_time, due_time=self.due_time,
+                 close_time=self.close_time, late_penalty=self.late_penalty,
                  is_team_task=self.is_team_task, team_min_size=self.team_min_size, team_max_size=self.team_max_size,
-                 submission_limit=self.submission_limit)
-        if with_materials:
+                 submission_limit=self.submission_limit, submission_history_limit=self.submission_history_limit,
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
+        if with_term:
+            d['term'] = self.term.to_dict()
+        if with_details:
             d['materials'] = [m.to_dict() for m in self.materials]
-        if with_file_requirements:
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
+        return d
+
+
+class SpecialConsideration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+
+    submitter_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+    submitter_team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+
+    due_time_extension = db.Column(db.Integer)
+    submission_limit_extension = db.Column(db.Integer)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    task = db.relationship('Task', backref=db.backref('special_considerations'))
+    submitter = db.relationship('UserAlias', backref=db.backref('special_considerations'))
+    submitter_team = db.relationship('Team', backref=db.backref('special_considerations'))
+
+    def __repr__(self):
+        return '<SpecialConsideration %r>' % self.id
+
+    def to_dict(self, with_task=False, with_submitter=False):
+        d = dict(id=self.id, task_id=self.task_id, submitter_id=self.submitter_id,
+                 submitter_team_id=self.submitter_team_id,
+                 due_time_extension=self.due_time_extension,
+                 submission_limit_extension=self.submission_limit_extension,
+                 created_at=self.created_at, modified_at=self.modified_at)
+        if with_task:
+            d['task'] = self.task.to_dict()
+        if with_submitter:
+            d['submitter'] = self.submitter.to_dict() if self.submitter else None
+            d['submitter_team'] = self.submitter_team.to_dict() if self.submitter_team else None
         return d
 
 
@@ -342,7 +268,7 @@ class Material(db.Model):
     type = db.Column(db.String(32), nullable=False)
     name = db.Column(db.String(128), nullable=False)
     description = db.Column(db.String(256))
-    file = db.Column(db.String(128), nullable=False)
+    file_path = db.Column(db.String(128), nullable=False, unique=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -352,10 +278,10 @@ class Material(db.Model):
 
     def to_dict(self, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id, type=self.type, name=self.name, description=self.description,
-                 file=self.file)
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
         if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
+            d['file_path'] = self.file_path
         return d
 
 
@@ -374,13 +300,11 @@ class FileRequirement(db.Model):
     def __repr__(self):
         return '<FileRequirement %r>' % self.name
 
-    def to_dict(self, with_advanced_fields=False):
+    def to_dict(self):
         d = dict(id=self.id, task_id=self.task_id, name=self.name, description=self.description,
-                 is_optional=self.is_optional, size_limit=self.size_limit)
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
-
+                 is_optional=self.is_optional, size_limit=self.size_limit,
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
         return d
 
 
@@ -399,12 +323,16 @@ class Submission(db.Model):
     def __repr__(self):
         return '<Submission %r>' % self.id
 
-    def to_dict(self, with_advanced_fields=False):
+    def to_dict(self, with_files=False, with_submitter=False, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id, submitter_id=self.submitter_id,
-                 submitter_team_id=self.submitter_team_id)
-        if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
+                 submitter_team_id=self.submitter_team_id,
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
+        if with_files:
+            d['files'] = [f.to_dict(with_advanced_fields=with_advanced_fields) for f in self.files]
+        if with_submitter:
+            d['submitter'] = self.submitter.to_dict() if self.submitter else None
+            d['submitter_team'] = self.submitter_team.to_dict() if self.submitter_team else None
         return d
 
 
@@ -413,7 +341,7 @@ class SubmissionFile(db.Model):
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
     requirement_id = db.Column(db.Integer, db.ForeignKey('file_requirement.id'), nullable=False)
 
-    file = db.Column(db.String(128))
+    file_path = db.Column(db.String(128))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -424,8 +352,9 @@ class SubmissionFile(db.Model):
         return '<SubmissionFile %r>' % self.id
 
     def to_dict(self, with_advanced_fields=False):
-        d = dict(id=self.id, submission_id=self.submission_id, requirement_id=self.requirement_id, )
+        d = dict(id=self.id, submission_id=self.submission_id, requirement_id=self.requirement_id,
+                 created_at=self.created_at,
+                 modified_at=self.modified_at)
         if with_advanced_fields:
-            d['created_at'] = self.created_at
-            d['modified_at'] = self.modified_at
+            d['file_path'] = self.file_path
         return d

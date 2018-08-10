@@ -17,6 +17,7 @@ export class User {
   avatar: string;
 
   groups: Group[];
+  team_association?: UserTeamAssociation[];
 }
 
 export class Group {
@@ -29,29 +30,106 @@ export class Course {
   id: number;
   code: string;
   name: string;
+  tutor_group_id: number;
 
+  icon?:string;
   terms?: Term[];
-  user_associations?: UserCourseAssociation[];
-  group_associations?: GroupCourseAssociation[];
+  tutor_group?: Group;
 }
 
 export class Term {
   id: number;
   course_id: number;
   course?: Course;
+  student_group_id: number;
 
   year: number;
   semester: string;
 
   tasks?: Task[];
-  user_associations?: UserTermAssociation[];
-  group_associations?: GroupTermAssociation[];
+  student_group?: Group;
 }
 
 export class Task {
   id: number;
+  term_id: number;
+
   type: string;
   title: string;
+  description?: string;
+
+  open_time?: string;
+  due_time?: string;
+  close_time?: string;
+  late_penalty?: number;
+
+  is_team_task: boolean;
+  team_min_size?: number;
+  team_max_size?: number;
+  submission_limit?: number;
+  submission_history_limit?: number;
+
+  created_at: string;
+  modified_at: string;
+
+  term?: Term;
+  materials?: Material[];
+  file_requirements?: FileRequirement[];
+}
+
+export class Material{
+  id: number;
+  task_id: number;
+
+  type: string;
+  name: string;
+  description?: string;
+
+  created_at: string;
+  modified_at: string;
+
+  file_path?: string;
+}
+
+export class FileRequirement{
+  id: number;
+  task_id: number;
+
+  name: string;
+  description?: string;
+  is_optional: boolean;
+  size_limit?: number;
+
+  created_at: string;
+  modified_at: string;
+}
+
+export class Submission{
+  id: number;
+  task_id: number;
+  submitter_id: number;
+  submitter_team_id: number;
+  files: SubmissionFile[];
+
+  task?:Task;
+  submitter?: User;
+  submitter_team?:Team;
+
+  created_at: string;
+  modified_at: string;
+}
+
+export class SubmissionFile{
+  id: number;
+  submission_id: number;
+  requirement_id: number;
+
+  submission?: Submission;
+  requirement?: FileRequirement;
+  file_path?: string;
+
+  created_at: string;
+  modified_at: string;
 }
 
 export class Team {
@@ -62,41 +140,6 @@ export class Team {
   user_associations?: UserTeamAssociation[];
 }
 
-export class UserCourseAssociation {
-  user_id: number;
-  course_id: number;
-  role: string;
-
-  user?: User;
-  course?: Course;
-}
-
-export class GroupCourseAssociation {
-  group_id: number;
-  course_id: number;
-  role: string;
-
-  group?: Group;
-  course?: Course;
-}
-
-export class UserTermAssociation {
-  user_id: number;
-  term_id: number;
-  role: string;
-
-  user?: User;
-  term?: Term;
-}
-
-export class GroupTermAssociation {
-  group_id: number;
-  term_id: number;
-  role: string;
-
-  group?: Group;
-  term?: Term;
-}
 
 export class UserTeamAssociation {
   user_id: number;

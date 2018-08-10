@@ -54,14 +54,13 @@ class User:
         self.avatar = avatar
 
         self.groups = []
-        self.links = {}
 
     def __repr__(self):
         return '<User %r>' % self.name
 
     def to_dict(self):
         return dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
-                    groups=[group.to_dict() for group in self.groups], links=self.links)
+                    groups=[group.to_dict() for group in self.groups])
 
 
 class Group:
@@ -205,11 +204,6 @@ def _parse_user(_dict):
     if user.avatar and not user.avatar.startswith('http://') and not user.avatar.startswith('https://'):
         user.avatar = server_url + '/' + user.avatar.lstrip('/')
 
-    # add useful links
-    links = config_server.get('links')
-    for k, v in links.items():
-        user.links[k] = server_url + v
-
     group_dicts = _dict.get('groups')
     if group_dicts:
         for group_dict in group_dicts:
@@ -265,27 +259,27 @@ def _request_access_token(authorization_token):
     return token
 
 
-def _request_resource(path, access_token, params):
+def _request_resource(path, access_token, method='get', **kwargs):
     if not access_token:
         raise OAuthRequestError('access token is required')
     config = current_app.config.get(_config_key)
     config_server = config['server']
-    if params:
-        params = dict(params)
+    if 'params' in kwargs:
+        params = dict(kwargs['params'])
     else:
         params = {}
     params['oauth_token'] = access_token
     try:
-        response = requests.get(config_server['url'] + path, params)
+        response = requests.request(method, config_server['url'] + path, params=params, **kwargs)
     except IOError as e:
         raise OAuthAPIError('failed to access OAuth API')
-    if response.status_code != 200:
+    if response.status_code // 100 != 2:
         raise _parse_response_error(response)
     return response
 
 
-def _request_resource_json(path, access_token, params=None):
-    response = _request_resource(path, access_token, params)
+def _request_resource_json(path, access_token, method='get', **kwargs):
+    response = _request_resource(path, access_token, method, **kwargs)
     try:
         return response.json()
     except ValueError:
@@ -439,6 +433,17 @@ def get_groups() -> List[Group]:
     return [_parse_group(g) for g in data]
 
 
+def add_group(name, description=None) -> Group:
+    config = current_app.config.get(_config_key)
+    group_data = {
+        'name': name,
+        'description': description
+    }
+    data = _request_resource_json(config['server']['admin_groups_api'], _get_access_token(), method='post',
+                                  json=group_data)
+    return _parse_group(data)
+
+
 def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=None) -> None:
     """
     Initialize OAuth configurations and callbacks in the provided Flask app
@@ -450,7 +455,16 @@ def init_app(app: Flask, config_file: str = 'oauth.config.json', login_callback=
     with open(config_file) as f:
         config = json.load(f)
         app.config[_config_key] = config
-    app.add_url_rule(config['client']['callback_path'], None, _oauth_callback)
+    server_config = config['server']
+    client_config = config['client']
+    server_url = server_config['url']
+    app.add_url_rule(client_config['callback_path'], None, _oauth_callback)
+    app.add_url_rule(client_config['profile_path'], 'account_profile',
+                     lambda: redirect(server_url + server_config['profile_page']))
+    app.add_url_rule(client_config['admin_user_path'], 'admin_user',
+                     lambda uid: redirect(server_url + server_config['admin_user_page'].format(uid=uid)))
+    app.add_url_rule(client_config['admin_group_path'], 'admin_group',
+                     lambda gid: redirect(server_url + server_config['admin_group_page'].format(gid=gid)))
     _login_callback = login_callback
 
 # TODO connect via API? --> avoid infinite loop && CORS issues

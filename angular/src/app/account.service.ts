@@ -21,13 +21,21 @@ export class AccountService {
     this.logger = logService.get_logger('AccountService')
   }
 
+  static isAdmin(user:User): boolean{
+    for(let group of user.groups){
+      if(group.name == 'admin')
+        return true;
+    }
+    return false;
+  }
+
   getCurrentUser(): Observable<User> {
     if (this.user)
       return of(this.user);
 
     return this.http.get<User>(`${this.api}/me`).pipe(
       tap(user => {
-        this.logger.info(`Fetched user info of ${user.name}`);
+        // this.logger.info(`Fetched user info of ${user.name}`);
         this.user = user;
       })
     )

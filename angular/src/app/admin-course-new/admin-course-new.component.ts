@@ -20,6 +20,7 @@ export class AdminCourseNewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {
+    this.form.is_new_tutor_group = true;
   }
 
   ngOnInit() {
@@ -38,5 +39,13 @@ export class AdminCourseNewComponent implements OnInit {
     )
   }
 
+  autoFillForm(){
+    if(this.form.code){
+      let shortCode = this.form.code.substr(-4, 4);
+      this.form.tutor_group_name = `${shortCode}_tutor`
+    }else{
+      this.form.tutor_group_name = ''
+    }
+  }
 
 }

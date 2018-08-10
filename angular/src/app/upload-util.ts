@@ -15,8 +15,8 @@ export class UploadFilters {
   };
 
   static icon: UploadFilter = {
-    "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
-    "accept_ext": ["png", "jpg", "jpeg", "gif"],
+    "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif", "image/svg+xml"],
+    "accept_ext": ["png", "jpg", "jpeg", "gif", "svg"],
     "size_limit": 262144
   };
 }
