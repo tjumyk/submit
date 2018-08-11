@@ -11,6 +11,7 @@ from services.account import AccountService
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.term import TermService, TermServiceError
+from utils.upload import md5sum
 
 task_api = Blueprint('task_api', __name__)
 
@@ -54,7 +55,7 @@ def task_submissions(tid):
         if not roles:
             return jsonify(msg='access forbidden'), 403
         if 'admin' not in roles and 'tutor' not in roles:
-            return jsonify(msg='only for admin or tutor'), 403
+            return jsonify(msg='only for admins or tutors'), 403
 
         # allow access even before the opening time
         return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_task(task)])
@@ -78,15 +79,13 @@ def task_my_submissions(tid):
         if not roles:
             return jsonify(msg='access forbidden'), 403
         if 'student' not in roles:
-            return jsonify(msg='not students'), 403
+            return jsonify(msg='only for students'), 403
 
         if request.method == 'GET':
             if not task.open_time or datetime.utcnow() < task.open_time:
                 raise SubmissionServiceError('task has not yet open')
             return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
         else:  # POST
-            # TODO consider submission_history_limit
-
             # time check will be done in SubmissionService.add method
 
             # prepare files and paths
@@ -105,7 +104,7 @@ def task_my_submissions(tid):
                 save_paths[req_id] = os.path.join(folder, req.name)
 
             # create new submission
-            submission, submissions_to_clear = SubmissionService.add(task, files, save_paths, submitter=user)
+            new_submission, submissions_to_clear = SubmissionService.add(task, files, save_paths, submitter=user)
 
             # clear outdated submissions according to history limit
             file_paths_to_remove = []
@@ -119,17 +118,24 @@ def task_my_submissions(tid):
             os.makedirs(folder_full)
 
             # save new files
+            file_objects = {f.requirement.id: f for f in new_submission.files}
             for req_id in files:
                 req = requirements[req_id]
                 file = files[req_id]
+                file_obj = file_objects[req_id]
                 path = save_paths[req_id]
                 full_path = os.path.join(data_folder, path)
                 file.save(full_path)
 
                 # size check
-                if req.size_limit is not None and os.stat(full_path).st_size > req.size_limit:
+                size = os.stat(full_path).st_size
+                if req.size_limit is not None and size > req.size_limit:
                     shutil.rmtree(folder_full)  # remove the whole folder
                     return jsonify(msg='file too big', detail=req.name), 400
+                file_obj.size = size
+
+                # md5 hash
+                file_obj.md5 = md5sum(full_path)
 
             # remove outdated files
             for batch in file_paths_to_remove:
@@ -145,7 +151,7 @@ def task_my_submissions(tid):
                         os.rmdir(folder_full)
 
             db.session.commit()
-            return jsonify(submission.to_dict()), 201
+            return jsonify(new_submission.to_dict()), 201
 
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

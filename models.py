@@ -270,6 +270,8 @@ class Material(db.Model):
     name = db.Column(db.String(128), nullable=False)
     description = db.Column(db.String(256))
     file_path = db.Column(db.String(128), nullable=False, unique=True)
+    size = db.Column(db.Integer)
+    md5 = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -279,6 +281,7 @@ class Material(db.Model):
 
     def to_dict(self, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id, type=self.type, name=self.name, description=self.description,
+                 size=self.size, md5=self.md5,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
         if with_advanced_fields:
@@ -346,7 +349,9 @@ class SubmissionFile(db.Model):
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
     requirement_id = db.Column(db.Integer, db.ForeignKey('file_requirement.id'), nullable=False)
 
-    file_path = db.Column(db.String(128))
+    path = db.Column(db.String(128), nullable=False, unique=True)
+    size = db.Column(db.Integer)
+    md5 = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -358,10 +363,12 @@ class SubmissionFile(db.Model):
 
     def to_dict(self, with_requirement=True, with_advanced_fields=False):
         d = dict(id=self.id, submission_id=self.submission_id, requirement_id=self.requirement_id,
+                 size=self.size,
+                 md5=self.md5,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
         if with_requirement:
             d['requirement'] = self.requirement.to_dict()
         if with_advanced_fields:
-            d['file_path'] = self.file_path
+            d['path'] = self.path
         return d

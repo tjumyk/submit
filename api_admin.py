@@ -9,7 +9,7 @@ from services.course import CourseService, CourseServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
-from utils.upload import handle_upload, handle_post_upload, UploadError
+from utils.upload import handle_upload, handle_post_upload, UploadError, md5sum
 
 admin_api = Blueprint('admin_api', __name__)
 
@@ -271,6 +271,8 @@ def admin_task_materials(tid):
 
             mat = TaskService.add_material(task, material_type, file_name, params.get('description'), save_path)
             file.save(full_path)
+            mat.size = os.stat(full_path).st_size
+            mat.md5 = md5sum(full_path)
             db.session.commit()
             return jsonify(mat.to_dict(with_advanced_fields=True)), 201
     except TaskServiceError as e:

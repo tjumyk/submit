@@ -98,7 +98,7 @@ class SubmissionService:
             save_path = save_paths.get(req.id)
             if not save_path:
                 raise SubmissionServiceError('save path is required', req.name)
-            file = SubmissionFile(submission=submission, requirement=req, file_path=save_path)
+            file = SubmissionFile(submission=submission, requirement=req, path=save_path)
             submission.files.append(file)
 
         # check remaining requirements
@@ -110,12 +110,12 @@ class SubmissionService:
         return submission, submissions_to_clear
 
     @staticmethod
-    def clear_submission(submission: Submission) ->List[str]:
+    def clear_submission(submission: Submission) -> List[str]:
         if submission is None:
             raise SubmissionServiceError('submission is requried')
         if submission.is_cleared:
             raise SubmissionServiceError('submission is already cleared')
-        file_paths = [f.file_path for f in submission.files]
+        file_paths = [f.path for f in submission.files]
         for file in submission.files:
             db.session.delete(file)
         submission.is_cleared = True

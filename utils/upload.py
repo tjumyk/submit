@@ -1,3 +1,4 @@
+import hashlib
 import os
 from uuid import uuid4
 
@@ -80,3 +81,13 @@ def handle_post_upload(old_url, _type):
     old_path = os.path.join(upload_root, sub_folder, file)
     if os.path.isfile(old_path):
         os.unlink(old_path)
+
+
+def md5sum(file_path, block_size=65536):
+    md5 = hashlib.md5()
+    with open(file_path, 'rb') as f:
+        block = f.read(block_size)
+        while block:
+            md5.update(block)
+            block = f.read(block_size)
+        return md5.hexdigest()
