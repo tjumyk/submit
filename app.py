@@ -5,6 +5,8 @@ from api_account import account_api
 from api_admin import admin_api
 from api_course import course_api
 from api_material import material_api
+from api_my_submission import my_submission_api
+from api_submission import submission_api
 from api_task import task_api
 from api_team import team_api
 from api_term import term_api
@@ -35,6 +37,8 @@ app.register_blueprint(term_api, url_prefix='/api/terms')
 app.register_blueprint(team_api, url_prefix='/api/teams')
 app.register_blueprint(task_api, url_prefix='/api/tasks')
 app.register_blueprint(material_api, url_prefix='/api/materials')
+app.register_blueprint(submission_api, url_prefix='/api/submissions')
+app.register_blueprint(my_submission_api, url_prefix='/api/my-submissions')
 app.register_blueprint(admin_api, url_prefix='/api/admin')
 
 
