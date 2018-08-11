@@ -29,20 +29,34 @@ class SubmissionService:
         return Submission.query.with_parent(task).all()
 
     @staticmethod
-    def get_for_task_and_user(task: Task, user: UserAlias) -> List[Submission]:
+    def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
         if task is None:
             raise SubmissionServiceError('task is required')
         if user is None:
             raise SubmissionServiceError('user is required')
-        return Submission.query.with_parent(task).with_parent(user).all()
+        query = Submission.query.with_parent(task).with_parent(user)
+        if not include_cleared:
+            query = query.filter_by(is_cleared=False)
+        return query.all()
 
     @staticmethod
-    def get_for_task_and_team(task: Task, team: Team) -> List[Submission]:
+    def get_for_task_and_team(task: Task, team: Team, include_cleared=False) -> List[Submission]:
         if task is None:
             raise SubmissionServiceError('task is required')
         if team is None:
             raise SubmissionServiceError('team is required')
-        return Submission.query.with_parent(task).with_parent(team).all()
+        query = Submission.query.with_parent(task).with_parent(team)
+        if not include_cleared:
+            query = query.filter_by(is_cleared=False)
+        return query.all()
+
+    @staticmethod
+    def get_file(_id: int) -> Optional[SubmissionFile]:
+        if _id is None:
+            raise SubmissionServiceError('id is required')
+        if type(_id) is not int:
+            raise SubmissionServiceError('id must be an integer')
+        return SubmissionFile.query.get(_id)
 
     @staticmethod
     def add(task: Task, files: Dict[int, FileStorage], save_paths: Dict[int, str],
