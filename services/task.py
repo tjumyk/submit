@@ -83,6 +83,15 @@ class TaskService:
                     kwargs[k] = parser.parse(v).replace(tzinfo=tz.tzlocal()).astimezone(tz.tzutc())
                 else:
                     kwargs[k] = None
+            if k in ['team_min_size', 'team_max_size',
+                     'submission_limit', 'submission_history_limit']:  # validate limit numbers
+                v = kwargs[k]
+                if v is not None:
+                    if type(v) is not int:
+                        raise TaskServiceError('invalid value for "%s"' % k, "%r is not an integer" % v)
+                    if v < 1:
+                        raise TaskServiceError('invalid value for "%s"' % k, "%r is less than 1" % v)
+
         old = {k: getattr(task, k) for k in kwargs}
         for k, v in kwargs.items():
             setattr(task, k, v)
