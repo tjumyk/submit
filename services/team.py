@@ -233,3 +233,15 @@ class TeamService:
             if not user_team.is_creator_agreed or user_team.is_user_agreed:
                 raise TeamServiceError('pending invitations or applications')
         team.is_finalised = True
+
+    @staticmethod
+    def is_member(team: Team, user: UserAlias):
+        if team is None:
+            raise TeamServiceError('team is required')
+        if user is None:
+            raise TeamServiceError('user is required')
+
+        for asso in team.user_associations:
+            if asso.user_id == user.id:
+                return True
+        return False
