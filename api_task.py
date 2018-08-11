@@ -58,7 +58,10 @@ def task_submissions(tid):
             return jsonify(msg='only for admins or tutors'), 403
 
         # allow access even before the opening time
-        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_task(task)])
+
+        # submitter here can be a user or a team
+        return jsonify([(submitter.to_dict(), count, last_submit_time) for submitter, count, last_submit_time in
+                        SubmissionService.get_summary_for_task(task)])
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

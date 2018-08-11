@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
@@ -23,10 +23,26 @@ class SubmissionService:
         return Submission.query.get(_id)
 
     @staticmethod
-    def get_for_task(task: Task) -> List[Submission]:
+    def get_summary_for_task(task: Task) -> List:
+        """
+        Return a list of tuple-like results.
+        If task is a team task, each result is (Team, count, last_time).
+        Otherwise, each result is (UserAlias, count, last_time).
+        """
         if task is None:
             raise SubmissionServiceError('task is required')
-        return Submission.query.with_parent(task).all()
+        if task.is_team_task:
+            return Submission.query.with_parent(task) \
+                .with_entities(Team, func.count(Submission.submitter_team_id), func.max(Submission.created_at)) \
+                .filter(Team.id == Submission.submitter_team_id) \
+                .group_by(Submission.submitter_team_id) \
+                .all()
+        else:
+            return Submission.query.with_parent(task) \
+                .with_entities(UserAlias, func.count(Submission.submitter_id), func.max(Submission.created_at)) \
+                .group_by(Submission.submitter_id) \
+                .filter(UserAlias.id == Submission.submitter_id) \
+                .all()
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
