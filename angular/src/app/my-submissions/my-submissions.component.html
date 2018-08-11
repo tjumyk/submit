@@ -7,7 +7,7 @@
   <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'disabled': sub.is_cleared}">
     <td>{{ i + 1 }}</td>
     <td>{{sub.id}}</td>
-    <td>{{sub.created_at}}</td>
+    <td>{{sub.created_at | date: 'medium'}}</td>
     <td>
       <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
     </td>

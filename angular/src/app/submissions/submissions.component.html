@@ -15,7 +15,7 @@
         <a target="_blank" routerLink="/admin/users/{{sub.submitter_id}}">{{sub.submitter.name}}</a>
       </ng-template>
     </td>
-    <td>{{sub.created_at}}</td>
+    <td>{{sub.created_at | date: 'medium'}}</td>
     <td>
       <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
     </td>
