@@ -356,10 +356,12 @@ class SubmissionFile(db.Model):
     def __repr__(self):
         return '<SubmissionFile %r>' % self.id
 
-    def to_dict(self, with_advanced_fields=False):
+    def to_dict(self, with_requirement=True, with_advanced_fields=False):
         d = dict(id=self.id, submission_id=self.submission_id, requirement_id=self.requirement_id,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
+        if with_requirement:
+            d['requirement'] = self.requirement.to_dict()
         if with_advanced_fields:
             d['file_path'] = self.file_path
         return d
