@@ -109,6 +109,7 @@ export class Submission{
   task_id: number;
   submitter_id: number;
   submitter_team_id: number;
+  is_cleared: boolean;
   files: SubmissionFile[];
 
   task?:Task;

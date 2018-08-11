@@ -4,7 +4,7 @@
 <table class="ui table unstackable" *ngIf="submissions">
   <thead><tr><th>#</th><th>ID</th><th>Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
   <tbody>
-  <tr *ngFor="let sub of submissions; index as i">
+  <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'disabled': sub.is_cleared}">
     <td>{{ i + 1 }}</td>
     <td>{{sub.id}}</td>
     <td>
