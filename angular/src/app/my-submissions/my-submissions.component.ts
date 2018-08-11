@@ -27,7 +27,7 @@ export class MySubmissionsComponent implements OnInit {
     this.taskId = parseInt(this.route.snapshot.parent.paramMap.get('task_id'));
 
     this.loadingSubmissions = true;
-    this.taskService.getSubmissions(this.taskId).pipe(
+    this.taskService.getMySubmissions(this.taskId).pipe(
       finalize(()=>this.loadingSubmissions=false)
     ).subscribe(
       submissions=>this.submissions=submissions,
