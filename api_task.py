@@ -56,7 +56,7 @@ def task_submissions(tid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admin or tutor'), 403
 
-        # allow access even before the opening time (for what?)
+        # allow access even before the opening time
         return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_task(task)])
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
@@ -86,7 +86,11 @@ def task_my_submissions(tid):
             return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
         else:  # POST
             # TODO consider submission_history_limit
+
+            # time check will be done in SubmissionService.add method
+
             # prepare files and paths
+            data_folder = app.config['DATA_FOLDER']
             folder = os.path.join('tasks', str(task.id), 'submissions', user.name, str(time.time()))
             files = {}
             save_paths = {}
@@ -100,16 +104,21 @@ def task_my_submissions(tid):
                 files[req_id] = file
                 save_paths[req_id] = os.path.join(folder, req.name)
 
-            # create submission
-            submission = SubmissionService.add(task, files, save_paths, submitter=user)
+            # create new submission
+            submission, submissions_to_clear = SubmissionService.add(task, files, save_paths, submitter=user)
 
-            # prepare folder
-            data_folder = app.config['DATA_FOLDER']
+            # clear outdated submissions according to history limit
+            file_paths_to_remove = []
+            for submission in submissions_to_clear:
+                file_paths_to_remove.append(SubmissionService.clear_submission(submission))
+
+            # prepare new folder
             folder_full = os.path.join(data_folder, folder)
-            if not os.path.isdir(folder_full):
-                os.makedirs(folder_full)
+            if os.path.lexists(folder_full):
+                raise SubmissionServiceError('submission folder already exists')
+            os.makedirs(folder_full)
 
-            # save files
+            # save new files
             for req_id in files:
                 req = requirements[req_id]
                 file = files[req_id]
@@ -121,6 +130,19 @@ def task_my_submissions(tid):
                 if req.size_limit is not None and os.stat(full_path).st_size > req.size_limit:
                     shutil.rmtree(folder_full)  # remove the whole folder
                     return jsonify(msg='file too big', detail=req.name), 400
+
+            # remove outdated files
+            for batch in file_paths_to_remove:
+                for file_path in batch:
+                    full_path = os.path.join(data_folder, file_path)
+                    if os.path.isfile(full_path):
+                        os.remove(full_path)
+                # try to delete parent folder if empty now (try to be conservative and make it extensible)
+                if batch:
+                    folder = os.path.dirname(batch[0])
+                    folder_full = os.path.join(data_folder, folder)
+                    if not os.listdir(folder_full):
+                        os.rmdir(folder_full)
 
             db.session.commit()
             return jsonify(submission.to_dict()), 201

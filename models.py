@@ -315,6 +315,8 @@ class Submission(db.Model):
     submitter_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
     submitter_team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
+    is_cleared = db.Column(db.Boolean, nullable=False, default=False)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -324,8 +326,10 @@ class Submission(db.Model):
         return '<Submission %r>' % self.id
 
     def to_dict(self, with_files=False, with_submitter=False, with_advanced_fields=False):
-        d = dict(id=self.id, task_id=self.task_id, submitter_id=self.submitter_id,
+        d = dict(id=self.id, task_id=self.task_id,
+                 submitter_id=self.submitter_id,
                  submitter_team_id=self.submitter_team_id,
+                 is_cleared=self.is_cleared,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
         if with_files:

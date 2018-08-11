@@ -1,7 +1,8 @@
 import os
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 
+from sqlalchemy import desc
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
@@ -45,7 +46,7 @@ class SubmissionService:
 
     @staticmethod
     def add(task: Task, files: Dict[int, FileStorage], save_paths: Dict[int, str],
-            submitter: UserAlias = None, submitter_team: Team = None):
+            submitter: UserAlias = None, submitter_team: Team = None) -> Tuple[Submission, List[Submission]]:
         # assume role has been checked (to minimize dependency)
         # TODO team submission
         # TODO special consideration
@@ -63,9 +64,17 @@ class SubmissionService:
 
         # submission limit check
         if task.submission_limit is not None:
-            old_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
-            if old_submissions >= task.submission_limit:
+            all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
+            if all_submissions >= task.submission_limit:
                 raise SubmissionServiceError('submission limit exceeded')
+
+        # submission history limit check
+        submissions_to_clear = []
+        if task.submission_history_limit is not None:
+            submissions_to_clear = Submission.query.with_parent(task).with_parent(submitter) \
+                .filter_by(is_cleared=False) \
+                .order_by(desc(Submission.id)) \
+                .offset(task.submission_history_limit - 1).all()
 
         # create submission object
         submission = Submission(task=task, submitter=submitter)
@@ -98,4 +107,16 @@ class SubmissionService:
                 raise SubmissionServiceError('unmet requirement', req.name)
 
         db.session.add(submission)
-        return submission
+        return submission, submissions_to_clear
+
+    @staticmethod
+    def clear_submission(submission: Submission) ->List[str]:
+        if submission is None:
+            raise SubmissionServiceError('submission is requried')
+        if submission.is_cleared:
+            raise SubmissionServiceError('submission is already cleared')
+        file_paths = [f.file_path for f in submission.files]
+        for file in submission.files:
+            db.session.delete(file)
+        submission.is_cleared = True
+        return file_paths
