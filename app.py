@@ -21,6 +21,11 @@ db.init_app(app)
 upload.init_app(app)
 
 
+# import logging
+# logging.basicConfig()
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+
 def _login_callback(user):
     try:
         AccountService.sync_user(user)
