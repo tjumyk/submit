@@ -74,7 +74,7 @@ class Course(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     terms = db.relationship('Term', backref=db.backref('course'))
-    tutor_group = db.relationship('GroupAlias', lazy=False, backref=db.backref('tutor_of_courses'))
+    tutor_group = db.relationship('GroupAlias', backref=db.backref('tutor_of_courses'))
 
     def __repr__(self):
         return '<Course %r>' % self.name
@@ -104,7 +104,7 @@ class Term(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     tasks = db.relationship('Task', backref=db.backref('term'))
-    student_group = db.relationship('GroupAlias', lazy=False, backref=db.backref('student_of_terms'))
+    student_group = db.relationship('GroupAlias', backref=db.backref('student_of_terms'))
 
     def __repr__(self):
         return '<Term %r, %r>' % (self.year, self.semester)
