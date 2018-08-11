@@ -66,7 +66,7 @@ export class AdminTaskEditComponent implements OnInit {
     this.form.team_max_size = task.team_max_size;
 
     this.form.late_penalty = task.late_penalty;
-    this.form.submission_limit = task.submission_limit;
+    this.form.submission_attempt_limit = task.submission_attempt_limit;
     this.form.submission_history_limit = task.submission_history_limit;
 
     if (task.open_time)

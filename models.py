@@ -198,7 +198,7 @@ class Task(db.Model):
     team_min_size = db.Column(db.Integer)
     team_max_size = db.Column(db.Integer)
 
-    submission_limit = db.Column(db.Integer)
+    submission_attempt_limit = db.Column(db.Integer)
     submission_history_limit = db.Column(db.Integer)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -216,7 +216,8 @@ class Task(db.Model):
                  description=self.description, open_time=self.open_time, due_time=self.due_time,
                  close_time=self.close_time, late_penalty=self.late_penalty,
                  is_team_task=self.is_team_task, team_min_size=self.team_min_size, team_max_size=self.team_max_size,
-                 submission_limit=self.submission_limit, submission_history_limit=self.submission_history_limit,
+                 submission_attempt_limit=self.submission_attempt_limit,
+                 submission_history_limit=self.submission_history_limit,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
         if with_term:
@@ -235,7 +236,7 @@ class SpecialConsideration(db.Model):
     submitter_team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
     due_time_extension = db.Column(db.Integer)
-    submission_limit_extension = db.Column(db.Integer)
+    submission_attempt_limit_extension = db.Column(db.Integer)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -251,7 +252,7 @@ class SpecialConsideration(db.Model):
         d = dict(id=self.id, task_id=self.task_id, submitter_id=self.submitter_id,
                  submitter_team_id=self.submitter_team_id,
                  due_time_extension=self.due_time_extension,
-                 submission_limit_extension=self.submission_limit_extension,
+                 submission_attempt_limit_extension=self.submission_attempt_limit_extension,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_task:
             d['task'] = self.task.to_dict()

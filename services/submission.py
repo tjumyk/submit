@@ -62,11 +62,11 @@ class SubmissionService:
         if task.close_time and now > task.close_time:
             raise SubmissionServiceError('task has closed')
 
-        # submission limit check
-        if task.submission_limit is not None:
+        # submission attempt limit check
+        if task.submission_attempt_limit is not None:
             all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
-            if all_submissions >= task.submission_limit:
-                raise SubmissionServiceError('submission limit exceeded')
+            if all_submissions >= task.submission_attempt_limit:
+                raise SubmissionServiceError('submission attempt limit exceeded')
 
         # submission history limit check
         submissions_to_clear = []

@@ -35,7 +35,7 @@ class TaskService:
         'is_team_task',
         'team_min_size',
         'team_max_size',
-        'submission_limit',
+        'submission_attempt_limit',
         'submission_history_limit'
     }
 
@@ -84,7 +84,7 @@ class TaskService:
                 else:
                     kwargs[k] = None
             if k in ['team_min_size', 'team_max_size',
-                     'submission_limit', 'submission_history_limit']:  # validate limit numbers
+                     'submission_attempt_limit', 'submission_history_limit']:  # validate limit numbers
                 v = kwargs[k]
                 if v is not None:
                     if type(v) is not int:
