@@ -110,7 +110,6 @@ class SubmissionService:
             -> Tuple[Submission, List[Submission]]:
         # assume role has been checked (to minimize dependency)
 
-        # TODO special consideration
         if task is None:
             raise SubmissionServiceError('task is required')
         if submitter is None:

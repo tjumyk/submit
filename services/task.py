@@ -170,7 +170,7 @@ class TaskService:
         return FileRequirement.query.get(_id)
 
     @staticmethod
-    def get_special_consideration(_id) ->Optional[SpecialConsideration]:
+    def get_special_consideration(_id) -> Optional[SpecialConsideration]:
         if _id is None:
             raise TaskServiceError('id is required')
         if type(_id) is not int:
@@ -211,6 +211,18 @@ class TaskService:
             raise TaskServiceError('at least one of user and team is required')
         if user is not None and team is not None:
             raise TaskServiceError('only one of user and team is required')
+        if due_time_extension is not None:
+            if type(due_time_extension) is not int:
+                raise TaskServiceError('due time extension must be an integer')
+            if due_time_extension <= 0:
+                raise TaskServiceError('due time extension must be larger than 0',
+                                       'You can leave it blank to specify no extension')
+        if submission_attempt_limit_extension is not None:
+            if type(submission_attempt_limit_extension) is not int:
+                raise TaskServiceError('submission attempt limit extension must be an integer')
+            if submission_attempt_limit_extension <= 0:
+                raise TaskServiceError('submission attempt limit extension must be larger than 0',
+                                       'You can leave it blank to specify no extension')
 
         if SpecialConsideration.query.filter_by(task=task, user=user, team=team).count():
             raise TaskServiceError('special consideration already exists')
