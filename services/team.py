@@ -33,6 +33,15 @@ class TeamService:
         return Team.query.all()
 
     @staticmethod
+    def get_by_task_name(task: Task, name: str)->Optional[Team]:
+        if task is None:
+            raise TeamServiceError('task is required')
+        if not name:
+            raise TeamServiceError('name is required')
+        # should be no duplicate team name in a task, enforced by add() method
+        return Team.query.filter_by(task_id=task.id, name=name).first()
+
+    @staticmethod
     def get_for_task(task) -> List[Team]:
         if task is None:
             raise TeamServiceError('task is required')

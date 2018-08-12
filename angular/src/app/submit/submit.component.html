@@ -2,6 +2,20 @@
 
 <div *ngIf="task" class="ui grid centered stackable">
   <div class="column ten wide">
+    <div class="ui message info icon" *ngIf="specialConsideration">
+      <i class="icon heart outline"></i>
+      <div class="content">
+        <div class="header">
+          We have special considerations on
+          <span *ngIf="task.is_team_task; else userSpecialHint">your team</span>
+          <ng-template #userSpecialHint>you</ng-template>
+        </div>
+        <ul class="list">
+          <li *ngIf="specialConsideration.due_time_extension">Due time +{{specialConsideration.due_time_extension}} hours.</li>
+          <li *ngIf="specialConsideration.submission_attempt_limit_extension">Submission attempt limit +{{specialConsideration.submission_attempt_limit_extension}}.</li>
+        </ul>
+      </div>
+    </div>
     <div class="ui segment">
       <form class="ui form" [ngClass]="{'loading': submitting}" (submit)="submit()">
         <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors}">

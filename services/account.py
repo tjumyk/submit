@@ -28,6 +28,12 @@ class AccountService:
         return UserAlias.query.get(_id)
 
     @staticmethod
+    def get_user_by_name(name)->Optional[UserAlias]:
+        if not name:
+            raise AccountServiceError('name is required')
+        return UserAlias.query.filter_by(name=name).first()
+
+    @staticmethod
     def get_group(_id) -> Optional[GroupAlias]:
         if _id is None:
             raise AccountServiceError('id is required')

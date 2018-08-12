@@ -32,7 +32,7 @@ export class Course {
   name: string;
   tutor_group_id: number;
 
-  icon?:string;
+  icon?: string;
   terms?: Term[];
   tutor_group?: Group;
 }
@@ -75,9 +75,10 @@ export class Task {
   term?: Term;
   materials?: Material[];
   file_requirements?: FileRequirement[];
+  special_considerations?: SpecialConsideration[];
 }
 
-export class Material{
+export class Material {
   id: number;
   task_id: number;
 
@@ -93,7 +94,7 @@ export class Material{
   md5?: string;
 }
 
-export class FileRequirement{
+export class FileRequirement {
   id: number;
   task_id: number;
 
@@ -106,21 +107,21 @@ export class FileRequirement{
   modified_at: string;
 }
 
-export class Submission{
+export class Submission {
   id: number;
   task_id: number;
   submitter_id: number;
   is_cleared: boolean;
   files: SubmissionFile[];
 
-  task?:Task;
+  task?: Task;
   submitter?: User;
 
   created_at: string;
   modified_at: string;
 }
 
-export class SubmissionFile{
+export class SubmissionFile {
   id: number;
   submission_id: number;
   requirement_id: number;
@@ -139,9 +140,9 @@ export class Team {
   id: number;
   task_id: number;
   name: string;
-  is_finalised:boolean;
+  is_finalised: boolean;
   avatar?: string;
-  slogan?:string;
+  slogan?: string;
 
   created_at: string;
   modified_at: string;
@@ -168,14 +169,33 @@ export class UserTeamAssociation {
   team?: Team;
 }
 
-export class UserSubmissionSummary{
+export class UserSubmissionSummary {
   user: User;
   total_submissions: number;
   last_submit_time: string;
 }
 
-export class TeamSubmissionSummary{
+export class TeamSubmissionSummary {
   team: Team;
   total_submissions: number;
   last_submit_time: string;
+}
+
+
+export class SpecialConsideration {
+  id: number;
+  task_id: number;
+
+  user_id?: number;
+  team_id?: number;
+
+  due_time_extension?: number;
+  submission_attempt_limit_extension?: number;
+
+  created_at: string;
+  modified_at: string;
+
+  task?: Task;
+  user?: User;
+  team?: Team;
 }

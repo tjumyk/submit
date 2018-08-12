@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, FileRequirement, Group, Task, Term, User} from "./models";
+import {Course, FileRequirement, Group, SpecialConsideration, Task, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
 
@@ -51,6 +51,13 @@ export class NewFileRequirementForm{
   is_optional: boolean;
   size_limit?:number;
   description?:string;
+}
+
+export class NewSpecialConsiderationForm{
+  user_name?: number;
+  team_name?:number;
+  due_time_extension?: number;
+  submission_attempt_limit_extension?: number;
 }
 
 @Injectable({
@@ -227,5 +234,13 @@ export class AdminService {
 
   deleteFileRequirement(requirement_id: number):Observable<any>{
     return this.http.delete(`${this.api}/file-requirements/${requirement_id}`)
+  }
+
+  addSpecialConsideration(task_id: number, form:NewSpecialConsiderationForm):Observable<SpecialConsideration>{
+    return this.http.post<SpecialConsideration>(`${this.api}/tasks/${task_id}/special-considerations`, form)
+  }
+
+  deleteSpecialConsiderations(spec_id: number):Observable<any>{
+    return this.http.delete(`${this.api}/special-considerations/${spec_id}`)
   }
 }

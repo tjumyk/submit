@@ -4,7 +4,7 @@ from typing import Optional, List
 from dateutil import parser, tz
 
 from error import BasicError
-from models import Task, db, Material, FileRequirement
+from models import Task, db, Material, FileRequirement, SpecialConsideration, UserAlias, Team
 
 
 class TaskServiceError(BasicError):
@@ -168,3 +168,54 @@ class TaskService:
             raise TaskServiceError('id must be an integer')
 
         return FileRequirement.query.get(_id)
+
+    @staticmethod
+    def get_special_consideration(_id) ->Optional[SpecialConsideration]:
+        if _id is None:
+            raise TaskServiceError('id is required')
+        if type(_id) is not int:
+            raise TaskServiceError('id must be an integer')
+
+        return SpecialConsideration.query.get(_id)
+
+    @staticmethod
+    def get_special_considerations_for_task(task: Task) -> List[SpecialConsideration]:
+        if task is None:
+            raise TaskServiceError('task is required')
+
+        return SpecialConsideration.query.with_parent(task).all()
+
+    @staticmethod
+    def get_special_consideration_for_task_user(task: Task, user: UserAlias) -> Optional[SpecialConsideration]:
+        if task is None:
+            raise TaskServiceError('task is required')
+        if user is None:
+            raise TaskServiceError('user is required')
+
+        return SpecialConsideration.query.with_parent(user).with_parent(task).first()
+
+    @staticmethod
+    def get_special_consideration_for_team(team: Team) -> Optional[SpecialConsideration]:
+        if team is None:
+            raise TaskServiceError('team is required')
+
+        return SpecialConsideration.query.with_parent(team).first()
+
+    @staticmethod
+    def add_special_consideration(task: Task, user: UserAlias, team: Team,
+                                  due_time_extension: int, submission_attempt_limit_extension: int) \
+            -> SpecialConsideration:
+        if task is None:
+            raise TaskServiceError('task is required')
+        if user is None and team is None:
+            raise TaskServiceError('at least one of user and team is required')
+        if user is not None and team is not None:
+            raise TaskServiceError('only one of user and team is required')
+
+        if SpecialConsideration.query.filter_by(task=task, user=user, team=team).count():
+            raise TaskServiceError('special consideration already exists')
+
+        spec = SpecialConsideration(task=task, user=user, team=team, due_time_extension=due_time_extension,
+                                    submission_attempt_limit_extension=submission_attempt_limit_extension)
+        db.session.add(spec)
+        return spec

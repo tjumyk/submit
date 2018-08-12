@@ -229,6 +229,7 @@ class Task(db.Model):
         if with_details:
             d['materials'] = [m.to_dict() for m in self.materials]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
+            d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
         return d
 
 

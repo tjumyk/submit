@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
+  SpecialConsideration,
   Submission,
   Task,
   Team,
@@ -127,5 +128,13 @@ export class TaskService {
 
   addTeam(task_id: number, form: NewTeamForm): Observable<Team> {
     return this.http.post<Team>(`${this.api}/${task_id}/teams`, form)
+  }
+
+  getMySpecialConsideration(task_id: number): Observable<SpecialConsideration>{
+    return this.http.get<SpecialConsideration>(`${this.api}/${task_id}/my-special-consideration`)
+  }
+
+  getMyTeamSpecialConsideration(task_id: number): Observable<SpecialConsideration>{
+    return this.http.get<SpecialConsideration>(`${this.api}/${task_id}/my-team-special-consideration`)
   }
 }

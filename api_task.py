@@ -150,6 +150,64 @@ def get_user(task_id, uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/my-special-consideration')
+@requires_login
+def task_my_special_consideration(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'student' not in roles:
+            return jsonify(msg='only for students'), 403
+
+        spec = TaskService.get_special_consideration_for_task_user(task, user)
+        if spec is None:
+            return "", 204
+        return jsonify(spec.to_dict())
+    except (TaskServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/my-team-special-consideration')
+@requires_login
+def task_my_team_special_consideration(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'student' not in roles:
+            return jsonify(msg='only for students'), 403
+
+        # team check
+        ass = TeamService.get_team_association(task, user)
+        if not ass:
+            return jsonify(msg='user not in a team'), 403
+        team = ass.team
+
+        spec = TaskService.get_special_consideration_for_team(team)
+        if spec is None:
+            return "", 204
+        return jsonify(spec.to_dict())
+    except (TaskServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:tid>/team-submissions/<int:team_id>')
 @requires_login
 def task_team_submissions(tid, team_id):

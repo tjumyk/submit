@@ -7,6 +7,7 @@ from werkzeug.datastructures import FileStorage
 
 from error import BasicError
 from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation
+from services.task import TaskService
 
 
 class SubmissionServiceError(BasicError):
@@ -132,14 +133,20 @@ class SubmissionService:
             if not team.is_finalised:
                 raise SubmissionServiceError('team is not finalised')
 
+            # get special considerations
+            special = TaskService.get_special_consideration_for_team(team)
+
             # team submission attempt limit check
-            if task.submission_attempt_limit is not None:
+            attempt_limit = task.submission_attempt_limit
+            if attempt_limit is not None:
+                if special and special.submission_attempt_limit_extension:
+                    attempt_limit += special.submission_attempt_limit_extension
                 all_submissions = Submission.query \
                     .filter(UserTeamAssociation.user_id == Submission.submitter_id,
                             UserTeamAssociation.team_id == team.id,
                             Submission.task_id == task.id) \
                     .count()
-                if all_submissions >= task.submission_attempt_limit:
+                if all_submissions >= attempt_limit:
                     raise SubmissionServiceError('submission attempt limit exceeded')
 
             # team submission history limit check
@@ -153,10 +160,16 @@ class SubmissionService:
                     .order_by(desc(Submission.id)) \
                     .offset(task.submission_history_limit - 1).all()
         else:
+            # get special considerations
+            special = TaskService.get_special_consideration_for_task_user(task, submitter)
+
             # user submission attempt limit check
-            if task.submission_attempt_limit is not None:
+            attempt_limit = task.submission_attempt_limit
+            if attempt_limit is not None:
+                if special and special.submission_attempt_limit_extension:
+                    attempt_limit += special.submission_attempt_limit_extension
                 all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
-                if all_submissions >= task.submission_attempt_limit:
+                if all_submissions >= attempt_limit:
                     raise SubmissionServiceError('submission attempt limit exceeded')
 
             # user submission history limit check

@@ -385,3 +385,57 @@ def admin_team(team_id):
             db.session.commit()
     except (TeamServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:task_id>/special-considerations', methods=['GET', 'POST'])
+@requires_admin
+def admin_task_special_considerations(task_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        if request.method == 'GET':
+            return jsonify([s.to_dict(with_user_or_team=True) for s in
+                            TaskService.get_special_considerations_for_task(task)])
+        else:  # POST
+            params = request.json
+
+            user_name = params.get('user_name')
+            if user_name:
+                user = AccountService.get_user_by_name(user_name)
+                if user is None:
+                    return jsonify(msg='user not found'), 400
+            else:
+                user = None
+
+            team_name = params.get('team_name')
+            if team_name:
+                team = TeamService.get_by_task_name(task, team_name)
+                if team is None:
+                    return jsonify(msg='team not found'), 400
+            else:
+                team = None
+
+            spec = TaskService.add_special_consideration(task, user, team,
+                                                         params.get('due_time_extension'),
+                                                         params.get('submission_attempt_limit_extension'))
+            db.session.commit()
+            return jsonify(spec.to_dict(with_user_or_team=True)), 201
+    except (TaskServiceError, AccountServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/special-considerations/<int:spec_id>', methods=['DELETE'])
+@requires_admin
+def admin_special_consideration(spec_id):
+    try:
+        spec = TaskService.get_special_consideration(spec_id)
+        if spec is None:
+            return jsonify(msg='special consideration not found'), 404
+
+        db.session.delete(spec)
+        db.session.commit()
+        return "", 204
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

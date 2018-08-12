@@ -1,6 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, FileRequirement, Material, SuccessMessage, Task} from "../models";
-import {AdminService, NewFileRequirementForm, NewMaterialForm, UpdateTaskForm} from "../admin.service";
+import {ErrorMessage, FileRequirement, Material, SpecialConsideration, SuccessMessage, Task} from "../models";
+import {
+  AdminService,
+  NewFileRequirementForm,
+  NewMaterialForm,
+  NewSpecialConsiderationForm,
+  UpdateTaskForm
+} from "../admin.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
@@ -17,6 +23,7 @@ export class AdminTaskEditComponent implements OnInit {
   success: SuccessMessage;
   error: ErrorMessage;
   secondaryError: ErrorMessage;
+  thirdError: ErrorMessage;
   taskId: number;
   task: Task;
   loadingTask: boolean;
@@ -33,6 +40,9 @@ export class AdminTaskEditComponent implements OnInit {
 
   addingFileRequirement: boolean;
   newFileRequirementForm: NewFileRequirementForm = new NewFileRequirementForm();
+
+  addingSpecialConsideration: boolean;
+  newSpecialConsideration: NewSpecialConsiderationForm = new NewSpecialConsiderationForm();
 
 
   constructor(
@@ -175,6 +185,29 @@ export class AdminTaskEditComponent implements OnInit {
     ).subscribe(
       () => this.task.file_requirements.splice(index, 1),
       error => this.secondaryError = error.error
+    )
+  }
+
+  addSpecialConsideration(f: NgForm){
+    if(f.invalid)
+      return;
+
+    this.addingSpecialConsideration = true;
+    this.adminService.addSpecialConsideration(this.taskId, this.newSpecialConsideration).pipe(
+      finalize(()=>this.addingSpecialConsideration=false)
+    ).subscribe(
+      spec=>this.task.special_considerations.push(spec),
+      error=>this.thirdError=error.error
+    )
+  }
+
+  deleteSpecialConsideration(spec: SpecialConsideration, index: number, btn:HTMLElement){
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteSpecialConsiderations(spec.id).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => this.task.special_considerations.splice(index, 1),
+      error => this.thirdError = error.error
     )
   }
 

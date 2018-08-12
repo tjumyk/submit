@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, FileRequirement, Task, Term, User} from "../models";
+import {ErrorMessage, FileRequirement, SpecialConsideration, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {TaskService} from "../task.service";
@@ -20,6 +20,9 @@ export class SubmitComponent implements OnInit {
   termId: number;
   term: Term;
   accessRoles: Set<string>;
+
+  specialConsideration: SpecialConsideration;
+  loadingSpecialConsideration: boolean;
 
   submitting: boolean;
   files: { [key: number]: File } = {};
@@ -65,6 +68,24 @@ export class SubmitComponent implements OnInit {
       if (dotPos > 0) {
         req['_extension'] = req.name.substring(dotPos)
       }
+    }
+
+    if(task.is_team_task){
+      this.loadingSpecialConsideration = true;
+      this.taskService.getMyTeamSpecialConsideration(this.taskId).pipe(
+        finalize(()=>this.loadingSpecialConsideration=false)
+      ).subscribe(
+         special=>this.specialConsideration=special,
+        error=>this.error=error.error
+      )
+    }else{
+      this.loadingSpecialConsideration = true;
+      this.taskService.getMySpecialConsideration(this.taskId).pipe(
+        finalize(()=>this.loadingSpecialConsideration=false)
+      ).subscribe(
+        special=>this.specialConsideration=special,
+        error=>this.error=error.error
+      )
     }
   }
 
