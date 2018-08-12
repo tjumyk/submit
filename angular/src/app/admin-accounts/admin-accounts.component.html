@@ -3,7 +3,7 @@
 
 <div class="ui grid two column stackable">
   <div class="column">
-    <div class="ui active text loader" *ngIf="loadingUsers"></div>
+    <div class="ui active text loader inline centered" *ngIf="loadingUsers">Loading users...</div>
     <div *ngIf="users">
       <div class="ui top attached clearing segment">
         <div class="ui left floated header">
@@ -36,7 +36,7 @@
   </div>
 
   <div class="column">
-    <div class="ui active text loader" *ngIf="loadingGroups"></div>
+    <div class="ui active text loader inline centered" *ngIf="loadingGroups">Loading groups...</div>
     <div *ngIf="groups">
       <div class="ui top attached clearing segment">
         <div class="ui left floated header">
