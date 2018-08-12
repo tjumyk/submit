@@ -360,7 +360,12 @@ def requires_admin(f):
                     return ret
             if user is None:
                 return jsonify(msg='user info required'), 401
-            if not any(g.name == _admin_group_name for g in user.groups):
+            is_admin = False
+            for group in user.groups:
+                if group.name == _admin_group_name:
+                    is_admin = True
+                    break
+            if not is_admin:
                 return jsonify(msg='admin required'), 403
             return f(*args, **kwargs)
         except OAuthError as e:
