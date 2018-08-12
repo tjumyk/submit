@@ -1,0 +1,169 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingTeamAssociation">Loading my team...</div>
+<div class="ui loader text active" *ngIf="loadingTeam">Loading team info...</div>
+<div class="ui loader text active inline centered" *ngIf="loadingTeams">Loading teams...</div>
+
+<div *ngIf="team">
+  <div class="ui message warning" *ngIf="teamAssociation.is_user_agreed && !teamAssociation.is_creator_agreed && !teamAssociation.is_invited">
+    <i class="icon hourglass half"></i> Your join application is waiting for the team creator's approval.
+    <button class="ui mini button" (click)="cancelJoin(btnCancelJoin)" #btnCancelJoin><i class="icon times"></i> Cancel Application</button>
+  </div>
+  <div class="ui grid stackable centered" *ngIf="!teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed && teamAssociation.is_invited">
+    <div class="column handle-invitation">
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon handshake outline"></i>
+          Invitation
+        </div>
+        You have been invited to this team. You must accept or reject this invitation before any other team interactions.
+        <div class="ui buttons">
+          <a class="ui button green">Accept</a>
+          <div class="or"></div>
+          <a class="ui button red">Reject</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui message warning" *ngIf="teamAssociation.is_creator && hasPendingRequests()">
+    <i class="icon hourglass half"></i> There are pending requests for you to resolve.
+  </div>
+
+  <div class="ui header">
+    <img [src]="team.avatar" *ngIf="team.avatar; else teamDefaultIcon" class="ui image">
+    <ng-template #teamDefaultIcon><i class="icon users"></i></ng-template>
+    <div class="content">
+      {{ team.name }}
+      <div class="sub header" *ngIf="team.slogan">{{team.slogan}}</div>
+    </div>
+  </div>
+
+  <div class="ui segment">
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">ID</div>
+        {{ team.id }}
+      </div>
+      <div class="item">
+        <div class="header">Created At</div>
+        {{team.created_at|date:'medium'}}
+      </div>
+      <div class="item">
+        <div class="header">Is Finalised?</div>
+        {{team.is_finalised}}
+      </div>
+    </div>
+  </div>
+
+  <table class="ui unstackable table">
+    <thead><tr><th>#</th><th>User</th><th>Is Creator?</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th><th *ngIf="teamAssociation.is_creator">Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let ass of team.user_associations; index as i">
+      <td>{{i+1}}</td>
+      <td>
+        <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
+        <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+      </td>
+      <td>{{ass.is_creator}}</td>
+      <td>{{ass.is_invited}}</td>
+      <td>{{ass.is_user_agreed}}</td>
+      <td>{{ass.is_creator_agreed}}</td>
+      <td *ngIf="teamAssociation.is_creator">
+        <div class="ui mini buttons" *ngIf="!ass.is_creator_agreed">
+          <a class="ui icon button green" title="Accept" (click)="acceptJoin(ass.user, btnAcceptJoin)" #btnAcceptJoin><i class="icon check"></i></a>
+          <a class="ui icon button red" title="Reject" (click)="rejectJoin(ass.user, btnRejectJoin)" #btnRejectJoin><i class="icon times"></i></a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="ui grid stackable center aligned one column" *ngIf="!team.is_finalised">
+    <div class="column team-operations" *ngIf="teamAssociation.is_creator">
+      <div class="ui buttons two">
+        <a class="ui button primary" (click)="finaliseTeam(btnFinaliseTeam)" #btnFinaliseTeam [ngClass]="{'disabled': hasPendingRequests()}">
+          <i class="icon gavel"></i> Finalise Team
+        </a>
+        <a class="ui button red" (click)="dismissTeam(btnDismissTeam)" #btnDismissTeam>
+          <i class="icon trash"></i> Dismiss Team
+        </a>
+      </div>
+      <p>
+        <i class="icon info circle"></i>
+        <span *ngIf="hasPendingRequests(); else finaliseHint">
+          You have to resolve all the pending requests before finalising the team.
+        </span>
+        <ng-template #finaliseHint>
+          You need to finalise the team to lock the member list before any submissions.
+        </ng-template>
+      </p>
+    </div>
+    <div class="column team-operations" *ngIf="!teamAssociation.is_creator && teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed">
+      <a class="ui button fluid red" (click)="leaveTeam(btnLeaveTeam)" #btnLeaveTeam><i class="icon sign out"></i> Leave Team</a>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="teams">
+  <div class="ui header center aligned icon">
+    <i class="icon circular users"></i>
+    <div class="content" *ngIf="teams.length; else noExistingTeams">
+      You are not in any team now!
+      <div class="sub header">
+        Please join an existing team or create a new team
+      </div>
+    </div>
+    <ng-template #noExistingTeams>
+      <div class="content">
+        There is no team now!
+        <div class="sub header">
+          Please create the first team!
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <table class="ui table unstackable" *ngIf="teams.length">
+    <thead><tr><th>ID</th><th>Name</th><th>Slogan</th><th>Is Finalised?</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let t of teams">
+      <td>{{t.id}}</td>
+      <td>{{t.name}}</td>
+      <td>{{t.slogan}}</td>
+      <td>{{t.is_finalised}}</td>
+      <td>
+        <a *ngIf="!t.is_finalised" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i>Join</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="ui grid centered stackable">
+    <div class="column new-team">
+      <div class="ui segment">
+        <h5 class="ui header">
+          <i class="icons">
+            <i class="icon users"></i>
+            <i class="icon right bottom corner plus"></i>
+          </i>
+          Create New Team
+        </h5>
+        <form class="ui form" [ngClass]="{'loading': creatingTeam}" (ngSubmit)="createTeam(f)" #f="ngForm">
+          <div class="field required" [ngClass]="{'error': (f.submitted || nameModel.dirty || nameModel.touched) && nameModel.invalid}">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="3-16 alphanumeric characters" [(ngModel)]="newTeamForm.name"
+                   required minlength="3" maxlength="16" pattern="^[\w]{3,16}$" #nameModel="ngModel">
+            <div class="errors">
+              <label *ngIf="nameModel.errors?.required"><i class="icon times"></i> Name is required</label>
+              <label *ngIf="nameModel.errors?.minlength"><i class="icon times"></i> Name too short, at least 3 characters</label>
+              <label *ngIf="nameModel.errors?.maxlength"><i class="icon times"></i> Name too long, at most 16 characters</label>
+              <label *ngIf="!nameModel.errors?.minlength && !nameModel.errors?.maxlength && nameModel.errors?.pattern">
+                <i class="icon times"></i> Invalid format, alphanumeric characters only
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="ui primary fluid button"><i class="icon plus"></i> Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingUser">Loading user info...</div>
+<div class="ui loader text active" *ngIf="loadingSubmissions">Loading submissions...</div>
+
+<div *ngIf="submissions">
+  <div class="ui breadcrumb">
+    <a routerLink=".." class="section">Submissions</a>
+    <i class="icon right angle divider"></i>
+    <div class="section active">
+      <span *ngIf="user.nickname; else nameOnly">{{user.nickname}} ({{user.name}})</span>
+      <ng-template #nameOnly>{{user.name}}</ng-template>
+    </div>
+  </div>
+
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>ID</th><th>Submitted At</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'submission-cleared': sub.is_cleared}">
+      <td>{{ i + 1 }}</td>
+      <td>{{sub.id}}</td>
+      <td>{{sub.created_at | date: 'medium'}}</td>
+      <td>
+        <a class="ui button mini icon" routerLink="{{sub.id}}" title="Details" *ngIf="!sub.is_cleared">
+          <i class="icon ellipsis horizontal"></i>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+

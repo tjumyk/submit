@@ -1,24 +1,24 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
+<div class="ui loader text active" *ngIf="loadingSummaries">Loading submission summaries...</div>
 
-<table class="ui table unstackable" *ngIf="submissions">
-  <thead><tr><th>#</th><th>ID</th><th>Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
-  <tbody>
-  <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'disabled': sub.is_cleared}">
-    <td>{{ i + 1 }}</td>
-    <td>{{sub.id}}</td>
-    <td>
-      <span *ngIf="task.is_team_task; else submitterCell">
-        <a routerLink="/admin/teams/{{sub.submitter_team_id}}">{{sub.submitter_team.name}}</a>
-      </span>
-      <ng-template #submitterCell>
-        <a target="_blank" routerLink="/admin/users/{{sub.submitter_id}}">{{sub.submitter.name}}</a>
-      </ng-template>
-    </td>
-    <td>{{sub.created_at | date: 'medium'}}</td>
-    <td>
-      <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<div *ngIf="userSummaries">
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>User</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let summary of userSummaries; index as i">
+      <td>{{i+1}}</td>
+      <td>
+        <a href="admin/users/{{summary.user.id}}" target="_blank">
+          <span *ngIf="summary.user.nickname; else nameOnly">{{summary.user.nickname}} ({{summary.user.name}})</span>
+          <ng-template #nameOnly>{{summary.user.name}}</ng-template>
+        </a>
+      </td>
+      <td>{{summary.total_submissions}}</td>
+      <td>{{summary.last_submit_time | date:'medium'}}</td>
+      <td>
+        <a routerLink="{{summary.user.id}}" class="ui button icon mini" title="Submissions"><i class="icon search"></i></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

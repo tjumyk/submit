@@ -1,0 +1,19 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingSummaries">Loading submission summaries...</div>
+
+<div *ngIf="teamSummaries">
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>Team</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let summary of teamSummaries; index as i">
+      <td>{{i+1}}</td>
+      <td><a routerLink="../teams/{{summary.team.id}}">{{summary.team.name}}</a></td>
+      <td>{{summary.total_submissions}}</td>
+      <td>{{summary.last_submit_time | date:'medium'}}</td>
+      <td>
+        <a routerLink="{{summary.team.id}}" class="ui button icon mini" title="Submissions"><i class="icon search"></i></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

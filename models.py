@@ -137,8 +137,7 @@ class Team(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    submissions = db.relationship('Submission', backref=db.backref('submitter_team'))
-    task = db.relationship('Task', backref=db.backref('submitter_teams'))
+    task = db.relationship('Task', backref=db.backref('teams'))
 
     def __repr__(self):
         return '<Team %r>' % self.id
@@ -237,8 +236,8 @@ class SpecialConsideration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
-    submitter_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
-    submitter_team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
     due_time_extension = db.Column(db.Integer)
     submission_attempt_limit_extension = db.Column(db.Integer)
@@ -247,23 +246,24 @@ class SpecialConsideration(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     task = db.relationship('Task', backref=db.backref('special_considerations'))
-    submitter = db.relationship('UserAlias', backref=db.backref('special_considerations'))
-    submitter_team = db.relationship('Team', backref=db.backref('special_considerations'))
+    user = db.relationship('UserAlias', backref=db.backref('special_considerations'))
+    team = db.relationship('Team', backref=db.backref('special_considerations'))
 
     def __repr__(self):
         return '<SpecialConsideration %r>' % self.id
 
-    def to_dict(self, with_task=False, with_submitter=False):
-        d = dict(id=self.id, task_id=self.task_id, submitter_id=self.submitter_id,
-                 submitter_team_id=self.submitter_team_id,
+    def to_dict(self, with_task=False, with_user_or_team=False):
+        d = dict(id=self.id, task_id=self.task_id,
+                 user_id=self.user_id,
+                 team_id=self.team_id,
                  due_time_extension=self.due_time_extension,
                  submission_attempt_limit_extension=self.submission_attempt_limit_extension,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_task:
             d['task'] = self.task.to_dict()
-        if with_submitter:
-            d['submitter'] = self.submitter.to_dict() if self.submitter else None
-            d['submitter_team'] = self.submitter_team.to_dict() if self.submitter_team else None
+        if with_user_or_team:
+            d['user'] = self.user.to_dict() if self.user else None
+            d['team'] = self.team.to_dict() if self.team else None
         return d
 
 
@@ -320,9 +320,7 @@ class FileRequirement(db.Model):
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-
-    submitter_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
-    submitter_team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    submitter_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), nullable=False)
 
     is_cleared = db.Column(db.Boolean, nullable=False, default=False)
 
@@ -337,7 +335,6 @@ class Submission(db.Model):
     def to_dict(self, with_files=False, with_submitter=False, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id,
                  submitter_id=self.submitter_id,
-                 submitter_team_id=self.submitter_team_id,
                  is_cleared=self.is_cleared,
                  created_at=self.created_at,
                  modified_at=self.modified_at)
@@ -345,7 +342,6 @@ class Submission(db.Model):
             d['files'] = [f.to_dict(with_advanced_fields=with_advanced_fields) for f in self.files]
         if with_submitter:
             d['submitter'] = self.submitter.to_dict() if self.submitter else None
-            d['submitter_team'] = self.submitter_team.to_dict() if self.submitter_team else None
         return d
 
 

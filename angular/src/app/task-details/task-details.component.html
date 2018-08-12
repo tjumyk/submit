@@ -18,6 +18,12 @@
           <div class="content">
             <div class="header"><a href="api/materials/{{mat.id}}/download">{{mat.name}}</a></div>
             <div class="metadata">
+              <span>Size: {{mat.size|size}}</span>
+              <span>MD5:
+                <span [attr.data-tooltip]="mat.md5" data-position="bottom center">
+                  {{mat.md5|slice:0:6}}
+                </span>
+              </span>
               <span>Last Updated: {{mat.modified_at | date: 'short'}}</span>
             </div>
             <div class="description">{{mat.description}}</div>

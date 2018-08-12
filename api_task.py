@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request, current_app as app
 
 from models import db
 from oauth import requires_login
-from services.account import AccountService
+from services.account import AccountService, AccountServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
@@ -40,9 +40,9 @@ def do_task(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@task_api.route('/<int:tid>/submissions')
+@task_api.route('/<int:tid>/user-submission-summaries')
 @requires_login
-def task_submissions(tid):
+def task_user_submission_summaries(tid):
     try:
         user = AccountService.get_current_user()
         if user is None:
@@ -60,9 +60,124 @@ def task_submissions(tid):
 
         # allow access even before the opening time
 
-        # submitter here can be a user or a team
-        return jsonify([(submitter.to_dict(), count, last_submit_time) for submitter, count, last_submit_time in
-                        SubmissionService.get_summary_for_task(task)])
+        return jsonify([s.to_dict() for s in SubmissionService.get_user_summaries(task)])
+    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/team-submission-summaries')
+@requires_login
+def task_team_submission_summaries(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        return jsonify([s.to_dict() for s in SubmissionService.get_team_summaries(task)])
+    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/user-submissions/<int:uid>')
+@requires_login
+def task_user_submissions(tid, uid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
+
+        # allow access even before the opening time
+
+        return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, target_user,
+                                                                                     include_cleared=True)])
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/users/<int:uid>')
+@requires_login
+def get_user(task_id, uid):
+    """
+    Convenience api for tutors to get student info
+    """
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 500
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        target_user = AccountService.get_user(uid)
+        if 'student' not in TermService.get_access_roles(task.term, target_user):
+            return jsonify(msg='only student info allowed')
+
+        return jsonify(target_user.to_dict())
+    except AccountServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/team-submissions/<int:team_id>')
+@requires_login
+def task_team_submissions(tid, team_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        team = TeamService.get(team_id)
+        if team is None:
+            return jsonify(msg='target team not found'), 404
+        if team.task_id != tid:
+            return jsonify(msg='target team does not belong to this task'), 400
+
+        # allow access even before the opening time
+
+        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team,
+                                                                                               include_cleared=True)])
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -87,7 +202,7 @@ def task_my_submissions(tid):
 
         if request.method == 'GET':
             if not task.open_time or datetime.utcnow() < task.open_time:
-                raise SubmissionServiceError('task has not yet open')
+                return jsonify(msg='task has not yet open'), 403
             return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
         else:  # POST
             # time check will be done in SubmissionService.add method
@@ -108,7 +223,7 @@ def task_my_submissions(tid):
                 save_paths[req_id] = os.path.join(folder, req.name)
 
             # create new submission
-            new_submission, submissions_to_clear = SubmissionService.add(task, files, save_paths, submitter=user)
+            new_submission, submissions_to_clear = SubmissionService.add(task, user, files, save_paths)
 
             # clear outdated submissions according to history limit
             file_paths_to_remove = []
@@ -118,7 +233,7 @@ def task_my_submissions(tid):
             # prepare new folder
             folder_full = os.path.join(data_folder, folder)
             if os.path.lexists(folder_full):
-                raise SubmissionServiceError('submission folder already exists')
+                return jsonify(msg='submission folder already exists'), 500
             os.makedirs(folder_full)
 
             # save new files
@@ -151,7 +266,7 @@ def task_my_submissions(tid):
                 if batch:
                     folder = os.path.dirname(batch[0])
                     folder_full = os.path.join(data_folder, folder)
-                    if not os.listdir(folder_full):
+                    if os.path.isdir(folder_full) and not os.listdir(folder_full):
                         os.rmdir(folder_full)
 
             db.session.commit()
@@ -161,13 +276,48 @@ def task_my_submissions(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/my-team-submissions', methods=['GET'])
+@requires_login
+def task_my_team_submissions(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'student' not in roles:
+            return jsonify(msg='only for students'), 403
+
+        # team check
+        ass = TeamService.get_team_association(task, user)
+        if not ass:
+            return jsonify(msg='user not in a team'), 403
+        team = ass.team
+        if not team.is_finalised:
+            return jsonify(msg='team is not finalised'), 403
+
+        # time check
+        if not task.open_time or datetime.utcnow() < task.open_time:
+            return jsonify(msg='task has not yet open'), 403
+
+        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team)])
+    except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:task_id>/teams', methods=['GET', 'POST'])
 @requires_login
 def do_teams(task_id):
     try:
         task = TaskService.get(task_id)
         if task is None:
-            return jsonify('task not found'), 404
+            return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
             return jsonify([t.to_dict() for t in TeamService.get_for_task(task)])
@@ -191,12 +341,12 @@ def my_team(task_id):
     try:
         task = TaskService.get(task_id)
         if task is None:
-            return jsonify('task not found'), 404
+            return jsonify(msg='task not found'), 404
         user = AccountService.get_current_user()
         if user is None:
             return jsonify(msg='no user info'), 403
 
-        ass = TeamService.get_team_associations(task, user)
+        ass = TeamService.get_team_association(task, user)
         if not ass:
             return "", 204
         return jsonify(ass.to_dict(with_team=True))

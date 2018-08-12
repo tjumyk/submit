@@ -1,0 +1,53 @@
+import { Component, OnInit } from '@angular/core';
+import {ErrorMessage, Submission, Task, User} from "../models";
+import {AccountService} from "../account.service";
+import {TaskService} from "../task.service";
+import {ActivatedRoute} from "@angular/router";
+import {finalize} from "rxjs/operators";
+
+@Component({
+  selector: 'app-submission-list',
+  templateUrl: './submission-list.component.html',
+  styleUrls: ['./submission-list.component.less']
+})
+export class SubmissionListComponent implements OnInit {
+
+  error: ErrorMessage;
+
+  taskId: number;
+  userId: number;
+  user: User;
+  submissions: Submission[];
+  loadingUser: boolean;
+  loadingSubmissions: boolean;
+
+  constructor(
+    private accountService: AccountService,
+    private taskService: TaskService,
+    private route: ActivatedRoute
+  ) { }
+
+  ngOnInit() {
+    this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
+    this.userId = parseInt(this.route.snapshot.paramMap.get('user_id'));
+
+    this.loadingUser = true;
+    this.taskService.getUser(this.taskId, this.userId).pipe(
+      finalize(()=>this.loadingUser=false)
+    ).subscribe(
+      user=>{
+        this.user = user;
+
+        this.loadingSubmissions = true;
+        this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
+          finalize(()=>this.loadingSubmissions=false)
+        ).subscribe(
+          submissions=>this.submissions=submissions,
+          error=>this.error=error.error
+        )
+      },
+      error=>this.error=error.error
+    )
+  }
+
+}

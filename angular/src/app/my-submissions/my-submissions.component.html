@@ -4,12 +4,12 @@
 <table class="ui table unstackable" *ngIf="submissions">
   <thead><tr><th>#</th><th>ID</th><th>Submitted At</th><th>Operations</th></tr></thead>
   <tbody>
-  <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'disabled': sub.is_cleared}">
+  <tr *ngFor="let sub of submissions; index as i">
     <td>{{ i + 1 }}</td>
     <td>{{sub.id}}</td>
     <td>{{sub.created_at | date: 'medium'}}</td>
     <td>
-      <a class="ui button mini" routerLink="{{sub.id}}"><i class="icon search"></i> View</a>
+      <a class="ui button mini icon" routerLink="{{sub.id}}" title="Details"><i class="icon ellipsis horizontal"></i></a>
     </td>
   </tr>
   </tbody>

@@ -6,11 +6,37 @@ from sqlalchemy import desc, func
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
-from models import Submission, Task, UserAlias, Team, SubmissionFile, db
+from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation
 
 
 class SubmissionServiceError(BasicError):
     pass
+
+
+class UserSubmissionSummary:
+    def __init__(self, user: UserAlias, total_submissions: int, last_submit_time: datetime):
+        self.user = user
+        self.total_submissions = total_submissions
+        self.last_submit_time = last_submit_time
+
+    def to_dict(self):
+        d = dict(user=self.user.to_dict(),
+                 total_submissions=self.total_submissions,
+                 last_submit_time=self.last_submit_time)
+        return d
+
+
+class TeamSubmissionSummary:
+    def __init__(self, team: Team, total_submissions: int, last_submit_time: datetime):
+        self.team = team
+        self.total_submissions = total_submissions
+        self.last_submit_time = last_submit_time
+
+    def to_dict(self):
+        d = dict(team=self.team.to_dict(),
+                 total_submissions=self.total_submissions,
+                 last_submit_time=self.last_submit_time)
+        return d
 
 
 class SubmissionService:
@@ -23,26 +49,30 @@ class SubmissionService:
         return Submission.query.get(_id)
 
     @staticmethod
-    def get_summary_for_task(task: Task) -> List:
-        """
-        Return a list of tuple-like results.
-        If task is a team task, each result is (Team, count, last_time).
-        Otherwise, each result is (UserAlias, count, last_time).
-        """
+    def get_user_summaries(task: Task) -> List[UserSubmissionSummary]:
         if task is None:
             raise SubmissionServiceError('task is required')
-        if task.is_team_task:
-            return Submission.query.with_parent(task) \
-                .with_entities(Team, func.count(Submission.submitter_team_id), func.max(Submission.created_at)) \
-                .filter(Team.id == Submission.submitter_team_id) \
-                .group_by(Submission.submitter_team_id) \
-                .all()
-        else:
-            return Submission.query.with_parent(task) \
-                .with_entities(UserAlias, func.count(Submission.submitter_id), func.max(Submission.created_at)) \
-                .group_by(Submission.submitter_id) \
-                .filter(UserAlias.id == Submission.submitter_id) \
-                .all()
+
+        query = Submission.query.with_parent(task) \
+            .with_entities(UserAlias, func.count(), func.max(Submission.created_at)) \
+            .group_by(Submission.submitter_id) \
+            .filter(UserAlias.id == Submission.submitter_id)
+        return [UserSubmissionSummary(user, total, last_time) for user, total, last_time in query.all()]
+
+    @staticmethod
+    def get_team_summaries(task: Task) -> List[TeamSubmissionSummary]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+        if not task.is_team_task:
+            raise SubmissionServiceError('task is not team task')
+
+        query = Submission.query.with_parent(task) \
+            .with_entities(Team, func.count(), func.max(Submission.created_at)) \
+            .filter(Team.id == UserTeamAssociation.team_id,
+                    Team.task_id == task.id,
+                    Submission.submitter_id == UserTeamAssociation.user_id) \
+            .group_by(Team.id)
+        return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
@@ -56,12 +86,12 @@ class SubmissionService:
         return query.all()
 
     @staticmethod
-    def get_for_task_and_team(task: Task, team: Team, include_cleared=False) -> List[Submission]:
-        if task is None:
-            raise SubmissionServiceError('task is required')
+    def get_for_team(team: Team, include_cleared=False) -> List[Submission]:
         if team is None:
             raise SubmissionServiceError('team is required')
-        query = Submission.query.with_parent(task).with_parent(team)
+        query = Submission.query.filter(Submission.submitter_id == UserTeamAssociation.user_id,
+                                        UserTeamAssociation.team_id == team.id,
+                                        Submission.task_id == team.task_id)
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
         return query.all()
@@ -75,10 +105,10 @@ class SubmissionService:
         return SubmissionFile.query.get(_id)
 
     @staticmethod
-    def add(task: Task, files: Dict[int, FileStorage], save_paths: Dict[int, str],
-            submitter: UserAlias = None, submitter_team: Team = None) -> Tuple[Submission, List[Submission]]:
+    def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str]) \
+            -> Tuple[Submission, List[Submission]]:
         # assume role has been checked (to minimize dependency)
-        # TODO team submission
+
         # TODO special consideration
         if task is None:
             raise SubmissionServiceError('task is required')
@@ -92,19 +122,50 @@ class SubmissionService:
         if task.close_time and now > task.close_time:
             raise SubmissionServiceError('task has closed')
 
-        # submission attempt limit check
-        if task.submission_attempt_limit is not None:
-            all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
-            if all_submissions >= task.submission_attempt_limit:
-                raise SubmissionServiceError('submission attempt limit exceeded')
+        if task.is_team_task:
+            # team check
+            from .team import TeamService
+            ass = TeamService.get_team_association(task, submitter)
+            if not ass:
+                raise SubmissionServiceError('user is not in a team')
+            team = ass.team
+            if not team.is_finalised:
+                raise SubmissionServiceError('team is not finalised')
 
-        # submission history limit check
-        submissions_to_clear = []
-        if task.submission_history_limit is not None:
-            submissions_to_clear = Submission.query.with_parent(task).with_parent(submitter) \
-                .filter_by(is_cleared=False) \
-                .order_by(desc(Submission.id)) \
-                .offset(task.submission_history_limit - 1).all()
+            # team submission attempt limit check
+            if task.submission_attempt_limit is not None:
+                all_submissions = Submission.query \
+                    .filter(UserTeamAssociation.user_id == Submission.submitter_id,
+                            UserTeamAssociation.team_id == team.id,
+                            Submission.task_id == task.id) \
+                    .count()
+                if all_submissions >= task.submission_attempt_limit:
+                    raise SubmissionServiceError('submission attempt limit exceeded')
+
+            # team submission history limit check
+            submissions_to_clear = []
+            if task.submission_history_limit is not None:
+                submissions_to_clear = Submission.query \
+                    .filter(UserTeamAssociation.user_id == Submission.submitter_id,
+                            UserTeamAssociation.team_id == team.id,
+                            Submission.task_id == task.id) \
+                    .filter_by(is_cleared=False) \
+                    .order_by(desc(Submission.id)) \
+                    .offset(task.submission_history_limit - 1).all()
+        else:
+            # user submission attempt limit check
+            if task.submission_attempt_limit is not None:
+                all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
+                if all_submissions >= task.submission_attempt_limit:
+                    raise SubmissionServiceError('submission attempt limit exceeded')
+
+            # user submission history limit check
+            submissions_to_clear = []
+            if task.submission_history_limit is not None:
+                submissions_to_clear = Submission.query.with_parent(task).with_parent(submitter) \
+                    .filter_by(is_cleared=False) \
+                    .order_by(desc(Submission.id)) \
+                    .offset(task.submission_history_limit - 1).all()
 
         # create submission object
         submission = Submission(task=task, submitter=submitter)
@@ -142,9 +203,10 @@ class SubmissionService:
     @staticmethod
     def clear_submission(submission: Submission) -> List[str]:
         if submission is None:
-            raise SubmissionServiceError('submission is requried')
+            raise SubmissionServiceError('submission is required')
         if submission.is_cleared:
             raise SubmissionServiceError('submission is already cleared')
+
         file_paths = [f.path for f in submission.files]
         for file in submission.files:
             db.session.delete(file)

@@ -66,7 +66,7 @@ export class TaskComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    clearTimeout(this.timeTrackerHandler);
+    clearInterval(this.timeTrackerHandler);
   }
 
   private setupTask(task: Task) {

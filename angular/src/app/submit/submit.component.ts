@@ -3,7 +3,7 @@ import {ErrorMessage, FileRequirement, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {TaskService} from "../task.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 
 @Component({
@@ -28,7 +28,8 @@ export class SubmitComponent implements OnInit {
     private accountService: AccountService,
     private termService: TermService,
     private taskService: TaskService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
   }
 
@@ -127,7 +128,7 @@ export class SubmitComponent implements OnInit {
     this.taskService.addSubmission(this.taskId, this.files).pipe(
       finalize(() => this.submitting = false)
     ).subscribe(
-      submission => console.info(submission),
+      submission => this.router.navigate([`../my-submissions/${submission.id}`], {relativeTo: this.route}),
       error => this.error = error.error
     )
   }

@@ -1,0 +1,43 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui text loader active" *ngIf="loadingSubmission">Loading submission info...</div>
+
+<div *ngIf="submission">
+  <div class="ui breadcrumb">
+    <a class="section" routerLink="..">Team Submissions</a>
+    <i class="icon right angle divider"></i>
+    <div class="active section">Submission {{submission.id}}</div>
+  </div>
+
+  <div class="ui segment">
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">Submitter</div>
+        <span *ngIf="submission.submitter.nickname; else nameOnly">{{submission.submitter.nickname}} ({{submission.submitter.name}})</span>
+        <ng-template #nameOnly>{{submission.submitter.name}}</ng-template>
+      </div>
+      <div class="item">
+        <div class="header">Submitted At</div>
+        {{ submission.created_at | date: 'medium' }} ({{createdFromNow}})
+      </div>
+    </div>
+  </div>
+
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Size</th><th>MD5 Hash</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let file of submission.files; index as i">
+      <td>{{i+1}}</td>
+      <td>{{file.id}}</td>
+      <td>{{file.requirement.name}}</td>
+      <td>{{file.size | size}}</td>
+      <td><span [attr.data-tooltip]="file.md5" data-position="bottom center">{{file.md5|slice:0:6}}</span></td>
+      <td>
+        <a class="ui mini icon button" href="api/my-team-submissions/{{submissionId}}/files/{{file.id}}/download"
+           title="Download">
+          <i class="icon download"></i>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

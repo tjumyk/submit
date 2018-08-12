@@ -17,7 +17,7 @@ export class User {
   avatar: string;
 
   groups: Group[];
-  team_association?: UserTeamAssociation[];
+  team_associations?: UserTeamAssociation[];
 }
 
 export class Group {
@@ -88,7 +88,9 @@ export class Material{
   created_at: string;
   modified_at: string;
 
-  file_path?: string;
+  file_path: string;
+  size?: number;
+  md5?: string;
 }
 
 export class FileRequirement{
@@ -108,13 +110,11 @@ export class Submission{
   id: number;
   task_id: number;
   submitter_id: number;
-  submitter_team_id: number;
   is_cleared: boolean;
   files: SubmissionFile[];
 
   task?:Task;
   submitter?: User;
-  submitter_team?:Team;
 
   created_at: string;
   modified_at: string;
@@ -127,7 +127,9 @@ export class SubmissionFile{
 
   submission?: Submission;
   requirement?: FileRequirement;
-  file_path?: string;
+  path: string;
+  size?: number;
+  md5?: string;
 
   created_at: string;
   modified_at: string;
@@ -135,9 +137,17 @@ export class SubmissionFile{
 
 export class Team {
   id: number;
-  term_id: number;
+  task_id: number;
   name: string;
+  is_finalised:boolean;
+  avatar?: string;
+  slogan?:string;
 
+  created_at: string;
+  modified_at: string;
+
+  task?: Task;
+  submissions?: Submission[];
   user_associations?: UserTeamAssociation[];
 }
 
@@ -146,6 +156,26 @@ export class UserTeamAssociation {
   user_id: number;
   team_id: number;
 
+  is_creator: boolean;
+  is_invited: boolean;
+  is_user_agreed: boolean;
+  is_creator_agreed: boolean;
+
+  created_at: string;
+  modified_at: string;
+
   user?: User;
   team?: Team;
+}
+
+export class UserSubmissionSummary{
+  user: User;
+  total_submissions: number;
+  last_submit_time: string;
+}
+
+export class TeamSubmissionSummary{
+  team: Team;
+  total_submissions: number;
+  last_submit_time: string;
 }

@@ -31,6 +31,15 @@ import {TasksComponent} from './tasks/tasks.component';
 import {TaskDetailsComponent} from './task-details/task-details.component';
 import {SubmissionsComponent} from './submissions/submissions.component';
 import {MySubmissionsComponent} from './my-submissions/my-submissions.component';
+import { MySubmissionDetailsComponent } from './my-submission-details/my-submission-details.component';
+import { SubmissionDetailsComponent } from './submission-details/submission-details.component';
+import { MyTeamComponent } from './my-team/my-team.component';
+import { MyTeamSubmissionsComponent } from './my-team-submissions/my-team-submissions.component';
+import { MyTeamSubmissionDetailsComponent } from './my-team-submission-details/my-team-submission-details.component';
+import { TeamSubmissionsComponent } from './team-submissions/team-submissions.component';
+import { TeamSubmissionDetailsComponent } from './team-submission-details/team-submission-details.component';
+import { SubmissionListComponent } from './submission-list/submission-list.component';
+import { TeamSubmissionListComponent } from './team-submission-list/team-submission-list.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +70,15 @@ import {MySubmissionsComponent} from './my-submissions/my-submissions.component'
     TaskDetailsComponent,
     SubmissionsComponent,
     MySubmissionsComponent,
+    MySubmissionDetailsComponent,
+    SubmissionDetailsComponent,
+    MyTeamComponent,
+    MyTeamSubmissionsComponent,
+    MyTeamSubmissionDetailsComponent,
+    TeamSubmissionsComponent,
+    TeamSubmissionDetailsComponent,
+    SubmissionListComponent,
+    TeamSubmissionListComponent,
   ],
   imports: [
     BrowserModule,

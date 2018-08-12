@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {ErrorMessage, Submission, Task} from "../models";
+import {Component, OnInit} from '@angular/core';
+import {ErrorMessage, Submission, Task, Team, TeamSubmissionSummary, UserSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
@@ -15,31 +15,33 @@ export class SubmissionsComponent implements OnInit {
 
   taskId: number;
   task: Task;
-  submissions: Submission[];
-  loadingSubmissions: boolean;
+  userSummaries: UserSubmissionSummary[];
+  teamSummaries: TeamSubmissionSummary[];
+  loadingSummaries: boolean;
 
   constructor(
     private accountService: AccountService,
     private taskService: TaskService,
     private route: ActivatedRoute
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     this.taskId = parseInt(this.route.snapshot.parent.paramMap.get('task_id'));
 
     this.taskService.getCachedTask(this.taskId).subscribe(
-      task=>{
+      task => {
         this.task = task;
 
-        this.loadingSubmissions = true;
-        this.taskService.getSubmissions(this.taskId).pipe(
-          finalize(()=>this.loadingSubmissions=false)
+        this.loadingSummaries = true;
+        this.taskService.getUserSubmissionSummaries(this.taskId).pipe(
+          finalize(() => this.loadingSummaries = false)
         ).subscribe(
-          submissions=>this.submissions=submissions,
-          error=>this.error=error.error
+          summaries => this.userSummaries = summaries,
+          error => this.error = error.error
         )
       },
-      error=>this.error=error.error
+      error => this.error = error.error
     );
 
   }

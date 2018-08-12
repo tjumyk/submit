@@ -20,6 +20,15 @@ import {SubmitComponent} from "./submit/submit.component";
 import {TaskDetailsComponent} from "./task-details/task-details.component";
 import {SubmissionsComponent} from "./submissions/submissions.component";
 import {MySubmissionsComponent} from "./my-submissions/my-submissions.component";
+import {MySubmissionDetailsComponent} from "./my-submission-details/my-submission-details.component";
+import {SubmissionDetailsComponent} from "./submission-details/submission-details.component";
+import {MyTeamComponent} from "./my-team/my-team.component";
+import {MyTeamSubmissionsComponent} from "./my-team-submissions/my-team-submissions.component";
+import {MyTeamSubmissionDetailsComponent} from "./my-team-submission-details/my-team-submission-details.component";
+import {SubmissionListComponent} from "./submission-list/submission-list.component";
+import {TeamSubmissionsComponent} from "./team-submissions/team-submissions.component";
+import {TeamSubmissionListComponent} from "./team-submission-list/team-submission-list.component";
+import {TeamSubmissionDetailsComponent} from "./team-submission-details/team-submission-details.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -32,16 +41,25 @@ const routes: Routes = [
       {
         path: 'tasks/:task_id',
         component: TaskComponent,
-        children:[
+        children: [
           {path: '', pathMatch: 'full', redirectTo: 'details'},
           {path: 'details', component: TaskDetailsComponent},
           {path: 'submit', component: SubmitComponent},
           {path: 'my-submissions', component: MySubmissionsComponent},
-          {path: 'submissions', component: SubmissionsComponent},
+          {path: 'my-submissions/:submission_id', component: MySubmissionDetailsComponent},
+          {path: 'my-team-submissions', component: MyTeamSubmissionsComponent},
+          {path: 'my-team-submissions/:submission_id', component: MyTeamSubmissionDetailsComponent},
+          {path: 'user-submissions', component: SubmissionsComponent},
+          {path: 'user-submissions/:user_id', component: SubmissionListComponent},
+          {path: 'user-submissions/:user_id/:submission_id', component: SubmissionDetailsComponent},
+          {path: 'team-submissions', component: TeamSubmissionsComponent},
+          {path: 'team-submissions/:team_id', component: TeamSubmissionListComponent},
+          {path: 'team-submissions/:team_id/:submission_id', component: TeamSubmissionDetailsComponent},
+          {path: 'my-team', component: MyTeamComponent},
+          {path: 'teams', component: TeamsComponent},
+          {path: 'teams/:team_id', component: TeamComponent}
         ]
-      },
-      {path: 'teams', pathMatch: 'full', component: TeamsComponent},
-      {path: 'teams/:team_id', component: TeamComponent}
+      }
     ]
   },
   {

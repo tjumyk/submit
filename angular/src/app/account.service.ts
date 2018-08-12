@@ -40,4 +40,8 @@ export class AccountService {
       })
     )
   }
+
+  getUser(id: number): Observable<User>{
+    return this.http.get<User>(`${this.api}/users/${id}`)
+  }
 }

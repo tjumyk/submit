@@ -39,7 +39,7 @@ class TeamService:
         return Team.query.with_parent(task).all()
 
     @staticmethod
-    def get_team_associations(task, user) -> Optional[UserTeamAssociation]:
+    def get_team_association(task: Task, user: UserAlias) -> Optional[UserTeamAssociation]:
         """
         Notice: not necessarily member of returned teams
         """
@@ -48,8 +48,14 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
-        return UserTeamAssociation.query.with_parent(user).join(Team) \
-            .filter(UserTeamAssociation.team_id == Team.id).first()
+        results = UserTeamAssociation.query.with_parent(user) \
+            .filter(UserTeamAssociation.team_id == Team.id,
+                    Team.task_id == task.id).all()
+        if results:
+            if len(results) > 1:
+                raise TeamServiceError('user has multiple associated teams')
+            return results[0]
+        return None
 
     @staticmethod
     def add(task: Task, name: str, creator: UserAlias = None) -> Team:
@@ -277,8 +283,8 @@ class TeamService:
         members = UserTeamAssociation.query.filter_by(team_id=team.id).count()
         task = team.task
         if task.team_min_size is not None and members < task.team_min_size:
-            raise TeamServiceError('team has too few members', 'At least %d members are required' % task.team_min_size)
+            raise TeamServiceError('too few members', 'At least %d members are required' % task.team_min_size)
         if task.team_max_size is not None and members > task.team_max_size:
-            raise TeamServiceError('team has too many members', 'At most %d members are allowed' % task.team_max_size)
+            raise TeamServiceError('too many members', 'At most %d members are allowed' % task.team_max_size)
 
         team.is_finalised = True

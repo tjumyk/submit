@@ -1,3 +1,55 @@
-<p>
-  team works!
-</p>
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader active text" *ngIf="loadingTeam">Loading team info...</div>
+
+<div *ngIf="team">
+  <div class="ui breadcrumb">
+    <a routerLink=".." class="section">Teams</a>
+    <i class="icon right angle divider"></i>
+    <div class="section active">{{team.name}}</div>
+  </div>
+
+  <div class="ui header">
+    <img [src]="team.avatar" *ngIf="team.avatar; else teamDefaultIcon" class="ui image">
+    <ng-template #teamDefaultIcon><i class="icon users"></i></ng-template>
+    <div class="content">
+      {{ team.name }}
+      <div class="sub header" *ngIf="team.slogan">{{team.slogan}}</div>
+    </div>
+  </div>
+
+  <div class="ui segment">
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">ID</div>
+        {{ team.id }}
+      </div>
+      <div class="item">
+        <div class="header">Created At</div>
+        {{team.created_at|date:'medium'}}
+      </div>
+      <div class="item">
+        <div class="header">Is Finalised?</div>
+        {{team.is_finalised}}
+      </div>
+    </div>
+  </div>
+
+  <table class="ui unstackable table">
+    <thead><tr><th>#</th><th>User</th><th>Is Creator?</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let ass of team.user_associations; index as i">
+      <td>{{i+1}}</td>
+      <td>
+        <a href="admin/users/{{ass.user_id}}" target="_blank">
+          <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
+        </a>
+        <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+      </td>
+      <td>{{ass.is_creator}}</td>
+      <td>{{ass.is_invited}}</td>
+      <td>{{ass.is_user_agreed}}</td>
+      <td>{{ass.is_creator_agreed}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
