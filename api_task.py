@@ -10,6 +10,7 @@ from oauth import requires_login
 from services.account import AccountService
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
+from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
 from utils.upload import md5sum
 
@@ -157,4 +158,47 @@ def task_my_submissions(tid):
             return jsonify(new_submission.to_dict()), 201
 
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/teams', methods=['GET', 'POST'])
+@requires_login
+def do_teams(task_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+
+        if request.method == 'GET':
+            return jsonify([t.to_dict() for t in TeamService.get_for_task(task)])
+        else:  # POST
+            user = AccountService.get_current_user()
+            if user is None:
+                return jsonify(msg='no user info'), 403
+
+            params = request.json
+            name = params.get('name')
+            team = TeamService.add(task, name, user)
+            db.session.commit()
+            return jsonify(team.to_dict(with_associations=True)), 201
+    except (TaskServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/my-team-association', methods=['GET'])
+@requires_login
+def my_team(task_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 403
+
+        ass = TeamService.get_team_associations(task, user)
+        if not ass:
+            return "", 204
+        return jsonify(ass.to_dict(with_team=True))
+    except (TaskServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

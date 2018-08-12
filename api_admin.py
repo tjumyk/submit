@@ -346,23 +346,16 @@ def admin_file_requirement(rid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/terms/<int:term_id>/teams', methods=['GET', 'POST'])
+@admin_api.route('/tasks/<int:task_id>/teams', methods=['GET'])
 @requires_admin
-def admin_teams(term_id):
+def admin_teams(task_id):
     try:
-        term = TermService.get(term_id)
-        if term is None:
-            return jsonify(msg='term not found'), 404
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
 
-        if request.method == 'GET':
-            return [t.to_dict() for t in TeamService.get_for_term(term)]
-        else:  # POST
-            params = request.json
-            name = params.get('name')
-            team = TeamService.add(term, None, name)
-            db.session.commit()
-            return jsonify(team.to_dict()), 201
-    except TeamServiceError as e:
+        return [t.to_dict() for t in TeamService.get_for_task(task)]
+    except (TaskServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

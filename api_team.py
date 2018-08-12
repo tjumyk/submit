@@ -16,15 +16,16 @@ def do_team(team_id):
         team = TeamService.get(team_id)
         if team is None:
             return jsonify(msg='team not found'), 404
-        user = AccountService.get_current_user()
-        if user is None:
-            return jsonify(msg='no user info'), 403
 
         if request.method == 'GET':
-            return jsonify(team.to_dict())
+            return jsonify(team.to_dict(with_associations=True))
         elif request.method == 'PUT':
-            if TeamService.get_creator(team) != user:
+            user = AccountService.get_current_user()
+            if user is None:
+                return jsonify(msg='no user info'), 403
+            if not TeamService.is_creator(team, user):
                 return jsonify(msg='team creator required'), 403
+
             params = request.json or request.form or {}
             files = request.files
             upload_type = 'avatar'
@@ -34,11 +35,16 @@ def do_team(team_id):
             old = TeamService.update(team, **params)
             if 'avatar' in old:
                 handle_post_upload(old['avatar'], upload_type)
+
             db.session.commit()
-            return jsonify(team.to_dict())
+            return jsonify(team.to_dict(with_associations=True))
         else:  # DELETE
-            if TeamService.get_creator(team) != user:
+            user = AccountService.get_current_user()
+            if user is None:
+                return jsonify(msg='no user info'), 403
+            if not TeamService.is_creator(team, user):
                 return jsonify(msg='team creator required'), 403
+
             TeamService.dismiss(team)
             db.session.commit()
             return "", 204
@@ -48,12 +54,16 @@ def do_team(team_id):
 
 @team_api.route('/<int:team_id>/users', methods=['GET'])
 @requires_login
-def team_invitations(team_id):
+def team_users(team_id):
+    """
+    Notice: team "users" are not necessarily "members", only those agreed by both the user and the team creator are
+    "members".
+    """
     try:
         team = TeamService.get(team_id)
         if team is None:
             return jsonify(msg='team not found'), 404
-        return jsonify([a.to_dict(with_user=True) for a in TeamService.get_user_associations(team)])
+        return jsonify([ass.to_dict(with_user=True) for ass in team.user_associations])
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -68,24 +78,24 @@ def team_invite(team_id, uid):
         user = AccountService.get_current_user()
         if user is None:
             return jsonify(msg='no user info'), 403
-        if TeamService.get_creator(team) != user:
+        if not TeamService.is_creator(team, user):
             return jsonify(msg='team creator required'), 403
-        invite_user = AccountService.get_user(uid)
-        if invite_user is None:
+        target_user = AccountService.get_user(uid)
+        if target_user is None:
             return jsonify(msg='invited user not found'), 404
 
         if request.method == 'PUT':
-            TeamService.invite(team, invite_user)
+            TeamService.invite(team, target_user)
             db.session.commit()
         else:  # DELETE
-            TeamService.cancel_invitation(team, user)
+            TeamService.handle_invitation(team, target_user, False)
             db.session.commit()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@team_api.route('/<int:team_id>/invite-accept', methods=['PUT'])
+@team_api.route('/<int:team_id>/handle-invite', methods=['PUT', 'DELETE'])
 @requires_login
 def team_invite_accept(team_id):
     try:
@@ -96,14 +106,14 @@ def team_invite_accept(team_id):
         if user is None:
             return jsonify(msg='no user info'), 403
 
-        TeamService.agree_invitation(team, user)
+        TeamService.handle_invitation(team, user, request.method == 'PUT')
         db.session.commit()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@team_api.route('/<int:team_id>/apply', methods=['PUT', 'DELETE'])
+@team_api.route('/<int:team_id>/join', methods=['PUT', 'DELETE'])
 @requires_login
 def team_apply(team_id):
     try:
@@ -120,14 +130,14 @@ def team_apply(team_id):
             TeamService.apply_join(team, user)
             db.session.commit()
         else:  # DELETE
-            TeamService.cancel_join_application(team, user)
+            TeamService.handle_join_application(team, user, False)
             db.session.commit()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@team_api.route('/<int:team_id>/apply-accept/<applicant_id>', methods=['PUT'])
+@team_api.route('/<int:team_id>/handle-join/<int:applicant_id>', methods=['PUT', 'DELETE'])
 @requires_login
 def team_apply_accept(team_id, applicant_id):
     try:
@@ -137,13 +147,31 @@ def team_apply_accept(team_id, applicant_id):
         user = AccountService.get_current_user()
         if user is None:
             return jsonify(msg='no user info'), 403
-        if TeamService.get_creator(team) != user:
+        if not TeamService.is_creator(team, user):
             return jsonify(msg='team creator required'), 403
         applicant = AccountService.get_user(applicant_id)
         if applicant is None:
             return jsonify(msg='applicant not found'), 404
 
-        TeamService.agree_join_application(team, applicant)
+        TeamService.handle_join_application(team, applicant, request.method == 'PUT')
+        db.session.commit()
+        return "", 204
+    except TeamServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@team_api.route('/<int:team_id>/leave', methods=['PUT'])
+@requires_login
+def team_leave(team_id):
+    try:
+        team = TeamService.get(team_id)
+        if team is None:
+            return jsonify(msg='team not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 403
+
+        TeamService.leave(team, user)
         db.session.commit()
         return "", 204
     except TeamServiceError as e:
@@ -160,7 +188,7 @@ def team_finalise(team_id):
         user = AccountService.get_current_user()
         if user is None:
             return jsonify(msg='no user info'), 403
-        if TeamService.get_creator(team) != user:
+        if not TeamService.is_creator(team, user):
             return jsonify(msg='team creator required'), 403
 
         TeamService.finalise(team)

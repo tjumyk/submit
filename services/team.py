@@ -1,8 +1,10 @@
 import re
 from typing import Optional, List
 
+from sqlalchemy import or_
+
 from error import BasicError
-from models import Team, db, UserTeamAssociation, UserAlias
+from models import Team, db, UserTeamAssociation, UserAlias, Task
 
 
 class TeamServiceError(BasicError):
@@ -18,7 +20,7 @@ class TeamService:
     }
 
     @staticmethod
-    def get(_id)->Optional[Team]:
+    def get(_id) -> Optional[Team]:
         if _id is None:
             raise TeamServiceError('id is required')
         if type(_id) is not int:
@@ -27,68 +29,97 @@ class TeamService:
         return Team.query.get(_id)
 
     @staticmethod
-    def get_all()->List[Team]:
+    def get_all() -> List[Team]:
         return Team.query.all()
 
     @staticmethod
-    def get_for_term(term)->List[Team]:
-        if term is None:
-            raise TeamServiceError('term is required')
-        return Team.query.with_parent(term).all()
+    def get_for_task(task) -> List[Team]:
+        if task is None:
+            raise TeamServiceError('task is required')
+        return Team.query.with_parent(task).all()
 
     @staticmethod
-    def get_for_user(user)->List[UserTeamAssociation]:
+    def get_team_associations(task, user) -> Optional[UserTeamAssociation]:
+        """
+        Notice: not necessarily member of returned teams
+        """
+        if task is None:
+            raise TeamServiceError('task is required')
         if user is None:
             raise TeamServiceError('user is required')
-        return UserTeamAssociation.query.with_parent(user).all()
+
+        return UserTeamAssociation.query.with_parent(user).join(Team) \
+            .filter(UserTeamAssociation.team_id == Team.id).first()
 
     @staticmethod
-    def add(term, name, creator=None)->Team:
-        if term is None:
-            raise TeamServiceError('term is required')
+    def add(task: Task, name: str, creator: UserAlias = None) -> Team:
+        """
+        If creator is None,
+        """
+        if task is None:
+            raise TeamServiceError('task is required')
         if name is None:
             raise TeamServiceError('name is required')
-
-        from .term import TermService
-        if not TermService.is_user_eligible(term, creator, 'student'):
-            raise TeamServiceError('user not eligible')
-
-        if Team.query.filter_by(name=name).count():
-            raise TeamServiceError('duplicate name')
         if not TeamService.name_pattern.match(name):
             raise TeamServiceError('invalid name format')
-        team = Team(term=term, name=name)
+
+        if not TeamService._is_eligible_student(task, creator):
+            raise TeamServiceError('not eligible student')
+
+        if not task.is_team_task:
+            raise TeamServiceError('task is not a team task')
+
+        ass = UserTeamAssociation.query.filter_by(user=creator) \
+            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == task.id) \
+            .first()
+        if ass:
+            raise TeamServiceError('user already associated with another team', ass.team.name)
+
+        if Team.query.filter_by(name=name, task_id=task.id).count():
+            raise TeamServiceError('duplicate name')
+
+        team = Team(task=task, name=name)
         if creator:
-            asso = UserTeamAssociation(user=creator, team=team, is_creator=True,
-                                       is_user_agreed=True, is_creator_agreed=True)
-            db.session.add(asso)
+            ass = UserTeamAssociation(user=creator, team=team, is_creator=True,
+                                      is_user_agreed=True, is_creator_agreed=True)
+            db.session.add(ass)
         return team
 
     @staticmethod
-    def get_creator(team)->Optional[UserAlias]:
-        asso = UserTeamAssociation.query.with_parent(team).filter_by(is_creator=True).first()
-        if not asso:
-            return None
-        return asso.user
+    def _is_eligible_student(task: Task, user: UserAlias):
+        if task is None:
+            raise TeamServiceError('task is required')
+        if user is None:
+            raise TeamServiceError('user is required')
+
+        term = task.term
+        for group in user.groups:
+            if group.id == term.student_group_id:
+                return True
+        return False
 
     @staticmethod
-    def is_user_eligible(team, user):
+    def is_member(team: Team, user: UserAlias):
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
             raise TeamServiceError('user is required')
 
-        from .term import TermService
-        return TermService.is_user_eligible(team.term, user, 'student')
+        return UserTeamAssociation.query.filter_by(team=team, user=user,
+                                                   is_creator_agreed=True, is_user_agreed=True).count() > 0
 
     @staticmethod
-    def get_user_associations(team)->List[UserTeamAssociation]:
+    def is_creator(team: Team, user: UserAlias):
         if team is None:
             raise TeamServiceError('team is required')
-        return UserTeamAssociation.query.with_parent(team).all()
+        if user is None:
+            raise TeamServiceError('user is required')
+
+        return UserTeamAssociation.query.filter_by(team=team, user=user, is_creator=True,
+                                                   is_creator_agreed=True, is_user_agreed=True).count() > 0
 
     @staticmethod
-    def update(team, **kwargs)->dict:
+    def update(team, **kwargs) -> dict:
         if team is None:
             raise TeamServiceError('team is required')
 
@@ -116,19 +147,30 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
+        if not TeamService._is_eligible_student(team.task, user):
+            raise TeamServiceError('not eligible student')
+
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is not None:
-            raise TeamServiceError('user already associated with team')
-        if not TeamService.is_user_eligible(team, user):
-            raise TeamServiceError('user not eligible')
-        user_team = UserTeamAssociation(user_id=user.id, team_id=team.id, is_creator_agreed=True, is_invited=True)
-        db.session.add(user_team)
+        ass = UserTeamAssociation.query.filter_by(user=user) \
+            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == team.task.id) \
+            .first()
+        if ass:
+            if ass.team_id == team.id:
+                raise TeamServiceError('user already associated with this team')
+            raise TeamServiceError('user already associated with another team', ass.team.name)
+
+        new_ass = UserTeamAssociation(user_id=user.id, team_id=team.id, is_creator_agreed=True, is_invited=True)
+        db.session.add(new_ass)
+        return new_ass
 
     @staticmethod
-    def cancel_invitation(team, user):
+    def handle_invitation(team, user, is_accepted):
+        """
+        If is_accepted is True, invitation accepted.
+        Otherwise, canceled by team creator or rejected by user
+        """
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
@@ -137,33 +179,18 @@ class TeamService:
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is None:
-            raise TeamServiceError('user not associated with team')
-        if not user_team.is_invited:
+        ass = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
+        if ass is None or not ass.is_invited:
             raise TeamServiceError('user was not invited to the team')
-        if user_team.is_user_agreed:
-            raise TeamServiceError('user already agreed')
-        db.session.delete(user_team)
+        if ass.is_user_agreed:
+            raise TeamServiceError('invitation already accepted')
 
-    @staticmethod
-    def agree_invitation(team, user):
-        if team is None:
-            raise TeamServiceError('team is required')
-        if user is None:
-            raise TeamServiceError('user is required')
-
-        if team.is_finalised:
-            raise TeamServiceError('team already finalised')
-
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is None:
-            raise TeamServiceError('user not associated with team')
-        if not user_team.is_invited:
-            raise TeamServiceError('user was not invited to the team')
-        if user_team.is_user_agreed:
-            raise TeamServiceError('user already agreed')
-        user_team.is_user_agreed = True
+        if is_accepted:
+            ass.is_user_agreed = True
+            return ass
+        else:
+            db.session.delete(ass)
+            return None
 
     @staticmethod
     def apply_join(team, user):
@@ -172,19 +199,30 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
+        if not TeamService._is_eligible_student(team.task, user):
+            raise TeamServiceError('not eligible student')
+
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is not None:
-            raise TeamServiceError('user already associated with team')
-        if not TeamService.is_user_eligible(team, user):
-            raise TeamServiceError('user not eligible')
-        user_team = UserTeamAssociation(user_id=user.id, team_id=team.id, is_user_agreed=True, is_invited=False)
-        db.session.add(user_team)
+        ass = UserTeamAssociation.query.filter_by(user=user) \
+            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == team.task.id) \
+            .first()
+        if ass:
+            if ass.team_id == team.id:
+                raise TeamServiceError('user already associated with this team')
+            raise TeamServiceError('user already associated with another team', ass.team.name)
+
+        new_ass = UserTeamAssociation(user_id=user.id, team_id=team.id, is_user_agreed=True, is_invited=False)
+        db.session.add(new_ass)
+        return new_ass
 
     @staticmethod
-    def cancel_join_application(team, user):
+    def handle_join_application(team, user, is_accepted):
+        """
+        If is_accepted is True, application accepted.
+        Otherwise, canceled by user or rejected by team creator
+        """
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
@@ -193,17 +231,21 @@ class TeamService:
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is None:
-            raise TeamServiceError('user not associated with team')
-        if user_team.is_invited:
-            raise TeamServiceError('user was invited to the team')
-        if user_team.is_creator_agreed:
-            raise TeamServiceError('team creator already agreed')
-        db.session.delete(user_team)
+        ass = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
+        if ass is None or ass.is_invited:
+            raise TeamServiceError('user is not applying for joining this team')
+        if ass.is_creator_agreed:
+            raise TeamServiceError('application already accepted')
+
+        if is_accepted:
+            ass.is_creator_agreed = True
+            return ass
+        else:
+            db.session.delete(ass)
+            return None
 
     @staticmethod
-    def agree_join_application(team, user):
+    def leave(team, user):
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
@@ -212,15 +254,12 @@ class TeamService:
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
-        user_team = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
-        if user_team is None:
-            raise TeamServiceError('user not associated with team')
-        if user_team.is_invited:
-            raise TeamServiceError('user was invited to the team')
-        if user_team.is_creator_agreed:
-            raise TeamServiceError('team creator already agreed')
-        user_team.is_creator_agreed = True
-
+        ass = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
+        if ass is None or not ass.is_creator_agreed or not ass.is_user_agreed:
+            raise TeamServiceError("user is not a member of this team")
+        if ass.is_creator:
+            raise TeamServiceError('creator is not allowed to leave')
+        db.session.delete(ass)
 
     @staticmethod
     def finalise(team):
@@ -229,19 +268,17 @@ class TeamService:
 
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
-        for user_team in UserTeamAssociation.query.filter_by(team_id=team.id):
-            if not user_team.is_creator_agreed or user_team.is_user_agreed:
-                raise TeamServiceError('pending invitations or applications')
+        if UserTeamAssociation.query.filter_by(team_id=team.id) \
+                .filter(or_(UserTeamAssociation.is_creator_agreed.is_(False),
+                            UserTeamAssociation.is_user_agreed.is_(False))) \
+                .count():
+            raise TeamServiceError('pending invitations or join applications')
+
+        members = UserTeamAssociation.query.filter_by(team_id=team.id).count()
+        task = team.task
+        if task.team_min_size is not None and members < task.team_min_size:
+            raise TeamServiceError('team has too few members', 'At least %d members are required' % task.team_min_size)
+        if task.team_max_size is not None and members > task.team_max_size:
+            raise TeamServiceError('team has too many members', 'At most %d members are allowed' % task.team_max_size)
+
         team.is_finalised = True
-
-    @staticmethod
-    def is_member(team: Team, user: UserAlias):
-        if team is None:
-            raise TeamServiceError('team is required')
-        if user is None:
-            raise TeamServiceError('user is required')
-
-        for asso in team.user_associations:
-            if asso.user_id == user.id:
-                return True
-        return False
