@@ -163,8 +163,10 @@ class UserTeamAssociation(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user = db.relationship('UserAlias', lazy=False, backref=db.backref('team_associations'))
-    team = db.relationship('Team', lazy=False, backref=db.backref('user_associations'))
+    user = db.relationship('UserAlias', lazy=False, backref=db.backref('team_associations',
+                                                                       cascade="all, delete-orphan"))
+    team = db.relationship('Team', lazy=False, backref=db.backref('user_associations',
+                                                                  cascade="all, delete-orphan"))
 
     def __repr__(self):
         return '<UserTeamAssociation (%r, %r)>' % (self.user_id, self.team_id)
