@@ -54,17 +54,33 @@
   </div>
 
   <div *ngIf="accessRoles.has('student')">
-    <div class="ui grid stackable center aligned">
-      <div class="column submit">
+    <div class="ui grid stackable center aligned one column">
+      <div class="column submit" *ngIf="!task.is_team_task">
         <div class="ui two buttons">
-          <div class="ui button primary" routerLink="../submit">
+          <a class="ui button primary" routerLink="../submit">
             <i class="icon plus"></i>
             New Submission
-          </div>
-          <div class="ui button" routerLink="../my-submissions">
+          </a>
+          <a class="ui button" routerLink="../my-submissions">
             <i class="icon paper plane outline"></i>
             My Submissions
-          </div>
+          </a>
+        </div>
+      </div>
+      <div class="column submit wide" *ngIf="task.is_team_task">
+        <div class="ui three buttons">
+          <a class="ui button" routerLink="../my-team">
+            <i class="icon users"></i>
+            My Team
+          </a>
+          <a class="ui button primary" routerLink="../submit">
+            <i class="icon plus"></i>
+            New Submission
+          </a>
+          <a class="ui button" routerLink="../my-team-submissions">
+            <i class="icon paper plane outline"></i>
+            Team Submissions
+          </a>
         </div>
       </div>
     </div>
