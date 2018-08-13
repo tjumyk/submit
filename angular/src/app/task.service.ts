@@ -20,6 +20,7 @@ export class CategoryInfo {
 
 export class NewTeamForm {
   name: string;
+  slogan?: string;
 }
 
 @Injectable({

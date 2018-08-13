@@ -161,6 +161,14 @@
               </label>
             </div>
           </div>
+          <div class="field" [ngClass]="{'error': (f.submitted||sloganModel.dirty||sloganModel.touched)&&sloganModel.invalid}">
+            <label>Slogan (Optional)</label>
+            <input type="text" name="slogan" placeholder="Use a slogan to attract others to join your team" maxlength="64"
+                   [(ngModel)]="newTeamForm.slogan" #sloganModel="ngModel">
+            <div class="errors">
+              <label *ngIf="sloganModel.errors?.maxlength"><i class="times icon"></i> Slogan is too long</label>
+            </div>
+          </div>
           <button type="submit" class="ui primary fluid button"><i class="icon plus"></i> Create</button>
         </form>
       </div>

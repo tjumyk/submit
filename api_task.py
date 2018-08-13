@@ -385,8 +385,7 @@ def do_teams(task_id):
                 return jsonify(msg='no user info'), 403
 
             params = request.json
-            name = params.get('name')
-            team = TeamService.add(task, name, user)
+            team = TeamService.add(task, user, params.get('name'), params.get('slogan'))
             db.session.commit()
             return jsonify(team.to_dict(with_associations=True)), 201
     except (TaskServiceError, TeamServiceError) as e:

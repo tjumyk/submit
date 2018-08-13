@@ -67,10 +67,7 @@ class TeamService:
         return None
 
     @staticmethod
-    def add(task: Task, name: str, creator: UserAlias = None) -> Team:
-        """
-        If creator is None,
-        """
+    def add(task: Task, creator: UserAlias, name: str, slogan: Optional[str]) -> Team:
         if task is None:
             raise TeamServiceError('task is required')
         if name is None:
@@ -93,7 +90,7 @@ class TeamService:
         if db.session.query(func.count()).filter(Team.name == name, Team.task_id == task.id).scalar():
             raise TeamServiceError('duplicate name')
 
-        team = Team(task=task, name=name)
+        team = Team(task=task, name=name, slogan=slogan)
         if creator:
             ass = UserTeamAssociation(user=creator, team=team, is_creator=True,
                                       is_user_agreed=True, is_creator_agreed=True)

@@ -144,6 +144,7 @@ class Team(db.Model):
 
     def to_dict(self, with_associations=False):
         d = dict(id=self.id, task_id=self.task_id, name=self.name, is_finalised=self.is_finalised,
+                 avatar=self.avatar, slogan=self.slogan,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_associations:
             d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
