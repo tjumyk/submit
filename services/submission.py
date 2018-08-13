@@ -56,7 +56,7 @@ class SubmissionService:
 
         query = Submission.query.with_parent(task) \
             .with_entities(UserAlias, func.count(), func.max(Submission.created_at)) \
-            .group_by(Submission.submitter_id) \
+            .group_by(UserAlias.id) \
             .filter(UserAlias.id == Submission.submitter_id)
         return [UserSubmissionSummary(user, total, last_time) for user, total, last_time in query.all()]
 
