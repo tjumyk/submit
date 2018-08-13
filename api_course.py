@@ -7,7 +7,7 @@ from services.term import TermService, TermServiceError
 course_api = Blueprint('course_api', __name__)
 
 
-@course_api.route('/', methods=['GET'])
+@course_api.route('', methods=['GET'])
 @requires_login
 def do_courses():
     try:
