@@ -11,6 +11,12 @@ export class ErrorMessageComponent implements OnInit {
   history: ErrorMessage[] = [];
 
   @Input() set error(value: ErrorMessage) {
+    if(value instanceof ProgressEvent && value.type == 'error'){
+      value = {
+        msg: 'connection failed'
+      }
+    }
+
     this._error = value;
     if(value != null && value != undefined)
       this.history.push(value)
