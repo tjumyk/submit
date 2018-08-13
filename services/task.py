@@ -154,8 +154,8 @@ class TaskService:
         if not cls.file_name_pattern.match(name):
             raise TaskServiceError('invalid name format')
 
-        if db.session.query(func.count()).filter_by(FileRequirement.task_id == task.id,
-                                                    FileRequirement.name == name).scalar():
+        if db.session.query(func.count()).filter(FileRequirement.task_id == task.id,
+                                                 FileRequirement.name == name).scalar():
             raise TaskServiceError('duplicate name')
 
         req = FileRequirement(task=task, name=name, description=description, is_optional=is_optional,
