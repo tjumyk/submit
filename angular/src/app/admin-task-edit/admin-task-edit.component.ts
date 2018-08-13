@@ -93,6 +93,12 @@ export class AdminTaskEditComponent implements OnInit {
       this.form.close_time = moment(task.close_time).format('YYYY-MM-DDTHH:mm');
     else
       this.form.close_time = task.close_time;
+
+    // adjust special consideration form
+    if(this.task.is_team_task)
+      this.newSpecialConsideration.user_name = null;
+    else
+      this.newSpecialConsideration.team_name = null;
   }
 
   update(f: NgForm) {
@@ -188,20 +194,20 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
-  addSpecialConsideration(f: NgForm){
-    if(f.invalid)
+  addSpecialConsideration(f: NgForm) {
+    if (f.invalid)
       return;
 
     this.addingSpecialConsideration = true;
     this.adminService.addSpecialConsideration(this.taskId, this.newSpecialConsideration).pipe(
-      finalize(()=>this.addingSpecialConsideration=false)
+      finalize(() => this.addingSpecialConsideration = false)
     ).subscribe(
-      spec=>this.task.special_considerations.push(spec),
-      error=>this.thirdError=error.error
+      spec => this.task.special_considerations.push(spec),
+      error => this.thirdError = error.error
     )
   }
 
-  deleteSpecialConsideration(spec: SpecialConsideration, index: number, btn:HTMLElement){
+  deleteSpecialConsideration(spec: SpecialConsideration, index: number, btn: HTMLElement) {
     btn.classList.add('loading', 'disabled');
     this.adminService.deleteSpecialConsiderations(spec.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))

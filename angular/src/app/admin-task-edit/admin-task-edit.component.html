@@ -108,13 +108,13 @@
           </div>
           <div class="field">
             <label>Submission Attempt Limit</label>
-            <input type="number" min="1" placeholder="Maximal number of submissions for one submitter" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
+            <input type="number" min="1" placeholder="Maximal number of submission attempts for a user/team" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
           </div>
           <div class="field">
             <label>Submission History Limit</label>
-            <input type="number" min="1" placeholder="Maximal number of submissions history for one submitter" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
+            <input type="number" min="1" placeholder="Maximal number of submissions history to keep" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
           </div>
-          <button class="ui button primary fluid" type="submit">Update</button>
+          <button class="ui button primary fluid" type="submit">Save</button>
         </form>
       </div>
     </div>
@@ -295,75 +295,86 @@
       </div>
     </div>
 
-    <!--Start of Special Consideration-->
-    <div class="ui segment top attached">
-      <h4 class="ui header">
-        <i class="icon heart outline"></i>
-        Special Considerations
-      </h4>
-    </div>
-    <table class="ui table unstackable celled bottom attached">
-      <thead><tr><th>ID</th><th>User</th><th>Team</th><th>Due Time Extension (hrs)</th><th>Submission Attempt Limit Extension</th><th>Ops</th></tr></thead>
-      <tbody>
-      <tr *ngFor="let spec of task.special_considerations; index as i">
-        <td>{{spec.id}}</td>
-        <td>
-          <a *ngIf="spec.user" href="admin/users/{{spec.user_id}}" target="_blank">
-            <span *ngIf="spec.user.nickname; else nameOnly">{{spec.user.nickname}} ({{spec.user.name}})</span>
-            <ng-template #nameOnly>{{spec.user.name}}</ng-template>
-          </a>
-        </td>
-        <td>
-          <a *ngIf="spec.team" routerLink="/terms/{{task.term_id}}/tasks/{{taskId}}/teams/{{spec.team_id}}">
-            {{spec.team.name}}
-          </a>
-        </td>
-        <td>{{spec.due_time_extension}}</td>
-        <td>{{spec.submission_attempt_limit_extension}}</td>
-        <td>
-          <a class="ui icon button mini red" (click)="deleteSpecialConsideration(spec, i ,btnDeleteSpecialConsideration)" #btnDeleteSpecialConsideration><i class="icon trash"></i></a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <!--End of Special Consideration-->
-
     <app-error-message [error]="thirdError"></app-error-message>
 
-    <!--Start of New Special Consideration-->
-    <div class="ui segments">
-      <div class="ui segment">
-        <h4 class="ui header">
-          <i class="icons">
+    <div class="ui grid two column stackable">
+      <div class="column">
+        <!--Start of Special Consideration-->
+        <div class="ui segment top attached">
+          <h4 class="ui header">
             <i class="icon heart outline"></i>
-            <i class="icon right bottom corner plus"></i>
-          </i>
-          New Special Consideration
-        </h4>
+            Special Considerations
+          </h4>
+        </div>
+        <table class="ui table unstackable celled bottom attached">
+          <thead><tr><th>ID</th><th>User/Team</th><th>Due Time Extension (hours)</th><th>Submission Attempt Limit Extension</th><th>Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let spec of task.special_considerations; index as i">
+            <td>{{spec.id}}</td>
+            <td>
+              <a *ngIf="spec.user" href="admin/users/{{spec.user_id}}" target="_blank">
+                <span *ngIf="spec.user.nickname; else nameOnly">{{spec.user.nickname}} ({{spec.user.name}})</span>
+                <ng-template #nameOnly>{{spec.user.name}}</ng-template>
+              </a>
+              <a *ngIf="spec.team" routerLink="/terms/{{task.term_id}}/tasks/{{taskId}}/teams/{{spec.team_id}}">
+                {{spec.team.name}}
+              </a>
+            </td>
+            <td>{{spec.due_time_extension}}</td>
+            <td>{{spec.submission_attempt_limit_extension}}</td>
+            <td>
+              <a class="ui icon button mini red" (click)="deleteSpecialConsideration(spec, i ,btnDeleteSpecialConsideration)" #btnDeleteSpecialConsideration><i class="icon trash"></i></a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <!--End of Special Consideration-->
       </div>
-      <div class="ui segment">
-        <form class="ui form" #fNewSpecialConsideration="ngForm" (ngSubmit)="addSpecialConsideration(fNewSpecialConsideration)" [ngClass]="{'loading': addingSpecialConsideration}">
-          <div class="field" *ngIf="!task.is_team_task">
-            <label>User Name</label>
-            <input type="text" [(ngModel)]="newSpecialConsideration.user_name" name="user_name">
+
+      <div class="column">
+        <!--Start of New Special Consideration-->
+        <div class="ui segments">
+          <div class="ui segment">
+            <h4 class="ui header">
+              <i class="icons">
+                <i class="icon heart outline"></i>
+                <i class="icon right bottom corner plus"></i>
+              </i>
+              New Special Consideration
+            </h4>
           </div>
-          <div class="field" *ngIf="task.is_team_task">
-            <label>Team Name</label>
-            <input type="text" [(ngModel)]="newSpecialConsideration.team_name" name="team_name">
+          <div class="ui segment">
+            <form class="ui form" #fNewSpecialConsideration="ngForm" (ngSubmit)="addSpecialConsideration(fNewSpecialConsideration)" [ngClass]="{'loading': addingSpecialConsideration}">
+              <div class="field" *ngIf="!task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || sepcialUserNameModel.dirty || sepcialUserNameModel.touched) && sepcialUserNameModel.invalid}">
+                <label>User Name</label>
+                <input type="text" [(ngModel)]="newSpecialConsideration.user_name" name="user_name" required #sepcialUserNameModel="ngModel" placeholder="Name of user">
+                <div class="errors">
+                  <label *ngIf="sepcialUserNameModel.errors?.required">User name is required</label>
+                </div>
+              </div>
+              <div class="field" *ngIf="task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || specialTeamNameModel.dirty || specialTeamNameModel.touched) && specialTeamNameModel.invalid}">
+                <label>Team Name</label>
+                <input type="text" [(ngModel)]="newSpecialConsideration.team_name" name="team_name" required #specialTeamNameModel="ngModel" placeholder="Name of team">
+                <div class="errors">
+                  <label *ngIf="specialTeamNameModel.errors?.required">Team name is required</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Due Time Extension (hours)</label>
+                <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.due_time_extension" name="due_time_extension" placeholder="Extension of due time (in hours)">
+              </div>
+              <div class="field">
+                <label>Submission Attempt Limit Extension</label>
+                <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.submission_attempt_limit_extension" name="submission_attempt_limit_extension" placeholder="Extension of submission attempt limit">
+              </div>
+              <button type="submit" class="ui button primary fluid">Add Special Consideration</button>
+            </form>
           </div>
-          <div class="field">
-            <label>Due Time Extension (hours)</label>
-            <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.due_time_extension" name="due_time_extension">
-          </div>
-          <div class="field">
-            <label>Submission Attempt Limit Extension</label>
-            <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.submission_attempt_limit_extension" name="submission_attempt_limit_extension">
-          </div>
-          <button type="submit" class="ui button primary fluid">Add Special Consideration</button>
-        </form>
+        </div>
+        <!--End of New Special Consideration-->
       </div>
     </div>
-    <!--End of New Special Consideration-->
+
   </div>
   <!-- End of Right Panel -->
 </div>
