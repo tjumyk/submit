@@ -9,8 +9,7 @@
   </div>
 
   <div class="ui header">
-    <img [src]="team.avatar" *ngIf="team.avatar; else teamDefaultIcon" class="ui image">
-    <ng-template #teamDefaultIcon><i class="icon users"></i></ng-template>
+    <i class="icon users"></i>
     <div class="content">
       {{ team.name }}
       <div class="sub header" *ngIf="team.slogan">{{team.slogan}}</div>
@@ -35,17 +34,19 @@
   </div>
 
   <table class="ui unstackable table">
-    <thead><tr><th>#</th><th>User</th><th>Is Creator?</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th></tr></thead>
+    <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Updated At</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th></tr></thead>
     <tbody>
     <tr *ngFor="let ass of team.user_associations; index as i">
       <td>{{i+1}}</td>
       <td>
         <a href="admin/users/{{ass.user_id}}" target="_blank">
           <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
+          <ng-template #nameOnly>{{ass.user.name}}</ng-template>
         </a>
-        <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+        <div class="ui label small" *ngIf="ass.user_id==team.creator_id">Creator</div>
       </td>
-      <td>{{ass.is_creator}}</td>
+      <td>{{ass.created_at|date:'medium'}}</td>
+      <td>{{ass.modified_at|date:'medium'}}</td>
       <td>{{ass.is_invited}}</td>
       <td>{{ass.is_user_agreed}}</td>
       <td>{{ass.is_creator_agreed}}</td>

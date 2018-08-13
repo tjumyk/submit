@@ -1,5 +1,5 @@
 import re
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from sqlalchemy import or_, func
 
@@ -42,10 +42,16 @@ class TeamService:
         return Team.query.filter_by(task_id=task.id, name=name).first()
 
     @staticmethod
-    def get_for_task(task) -> List[Team]:
+    def get_for_task(task) -> List[Tuple[Team, int]]:
         if task is None:
             raise TeamServiceError('task is required')
-        return Team.query.with_parent(task).all()
+        sub_query = db.session.query(Team.id.label('team_id'),
+                                     func.count(UserTeamAssociation.user_id).label('total_user_associations')) \
+            .filter(Team.task_id == task.id).outerjoin(UserTeamAssociation, Team.id == UserTeamAssociation.team_id) \
+            .group_by(Team.id).subquery()
+        return db.session.query(Team, sub_query.c.total_user_associations) \
+            .filter(Team.id == sub_query.c.team_id) \
+            .all()
 
     @staticmethod
     def get_team_association(task: Task, user: UserAlias) -> Optional[UserTeamAssociation]:
@@ -70,6 +76,8 @@ class TeamService:
     def add(task: Task, creator: UserAlias, name: str, slogan: Optional[str]) -> Team:
         if task is None:
             raise TeamServiceError('task is required')
+        if creator is None:
+            raise TeamServiceError('creator is required')
         if name is None:
             raise TeamServiceError('name is required')
         if not TeamService.name_pattern.match(name):
@@ -90,9 +98,9 @@ class TeamService:
         if db.session.query(func.count()).filter(Team.name == name, Team.task_id == task.id).scalar():
             raise TeamServiceError('duplicate name')
 
-        team = Team(task=task, name=name, slogan=slogan)
+        team = Team(task=task, creator=creator, name=name, slogan=slogan)
         if creator:
-            ass = UserTeamAssociation(user=creator, team=team, is_creator=True,
+            ass = UserTeamAssociation(user=creator, team=team,
                                       is_user_agreed=True, is_creator_agreed=True)
             db.session.add(ass)
         return team
@@ -111,29 +119,14 @@ class TeamService:
         return False
 
     @staticmethod
-    def is_member(team: Team, user: UserAlias):
-        if team is None:
-            raise TeamServiceError('team is required')
-        if user is None:
-            raise TeamServiceError('user is required')
-
-        return db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id,
-                                                     UserTeamAssociation.user_id == user.id,
-                                                     UserTeamAssociation.is_creator_agreed == True,
-                                                     UserTeamAssociation.is_user_agreed == True).scalar() > 0
-
-    @staticmethod
     def is_creator(team: Team, user: UserAlias):
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
             raise TeamServiceError('user is required')
 
-        return db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id,
-                                                     UserTeamAssociation.user_id == user.id,
-                                                     UserTeamAssociation.is_creator == True,
-                                                     UserTeamAssociation.is_creator_agreed == True,
-                                                     UserTeamAssociation.is_user_agreed == True).scalar() > 0
+        # assume creator is already a member, i.e. double-agreed (enforced by add())
+        return team.creator_id == user.id
 
     @staticmethod
     def update(team, **kwargs) -> dict:
@@ -262,7 +255,7 @@ class TeamService:
             return None
 
     @staticmethod
-    def leave(team, user):
+    def leave(team: Team, user:UserAlias):
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
@@ -274,7 +267,7 @@ class TeamService:
         ass = UserTeamAssociation.query.filter_by(user_id=user.id, team_id=team.id).first()
         if ass is None or not ass.is_creator_agreed or not ass.is_user_agreed:
             raise TeamServiceError("user is not a member of this team")
-        if ass.is_creator:
+        if team.creator_id == user.id:
             raise TeamServiceError('creator is not allowed to leave')
         db.session.delete(ass)
 

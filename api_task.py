@@ -378,7 +378,8 @@ def do_teams(task_id):
             return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            return jsonify([t.to_dict() for t in TeamService.get_for_task(task)])
+            return jsonify([(t.to_dict(with_creator=True), total_user_associations)
+                            for t, total_user_associations in TeamService.get_for_task(task)])
         else:  # POST
             user = AccountService.get_current_user()
             if user is None:

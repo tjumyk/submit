@@ -124,7 +124,17 @@ export class TaskService {
   }
 
   getTeams(task_id: number): Observable<Team[]> {
-    return this.http.get<Team[]>(`${this.api}/${task_id}/teams`)
+    return this.http.get<[Team, number][]>(`${this.api}/${task_id}/teams`).pipe(
+      map(records=>{
+        const teams = [];
+        for(let record of records){
+          const team = record[0];
+          team.total_user_associations = record[1];
+          teams.push(team)
+        }
+        return teams
+      })
+    )
   }
 
   addTeam(task_id: number, form: NewTeamForm): Observable<Team> {

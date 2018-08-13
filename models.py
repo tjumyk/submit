@@ -128,6 +128,7 @@ class Term(db.Model):
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), nullable=False)
 
     name = db.Column(db.String(16), nullable=False)
     is_finalised = db.Column(db.Boolean, nullable=False, default=False)
@@ -138,14 +139,19 @@ class Team(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     task = db.relationship('Task', backref=db.backref('teams'))
+    creator = db.relationship('UserAlias', backref=db.backref('created_teams'))
 
     def __repr__(self):
         return '<Team %r>' % self.id
 
-    def to_dict(self, with_associations=False):
-        d = dict(id=self.id, task_id=self.task_id, name=self.name, is_finalised=self.is_finalised,
+    def to_dict(self, with_creator=False, with_associations=False):
+        d = dict(id=self.id, task_id=self.task_id, creator_id=self.creator_id,
+                 name=self.name,
+                 is_finalised=self.is_finalised,
                  avatar=self.avatar, slogan=self.slogan,
                  created_at=self.created_at, modified_at=self.modified_at)
+        if with_creator:
+            d['creator'] = self.creator.to_dict()
         if with_associations:
             d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
         return d
@@ -155,7 +161,6 @@ class UserTeamAssociation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), primary_key=True)
 
-    is_creator = db.Column(db.Boolean, nullable=False, default=False)
     is_invited = db.Column(db.Boolean, nullable=False, default=False)
     is_user_agreed = db.Column(db.Boolean, nullable=False, default=False)
     is_creator_agreed = db.Column(db.Boolean, nullable=False, default=False)
@@ -173,7 +178,6 @@ class UserTeamAssociation(db.Model):
 
     def to_dict(self, with_user=False, with_team=False):
         d = dict(user_id=self.user_id, team_id=self.team_id,
-                 is_creator=self.is_creator,
                  is_invited=self.is_invited,
                  is_user_agreed=self.is_user_agreed,
                  is_creator_agreed=self.is_creator_agreed,

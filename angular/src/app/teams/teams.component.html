@@ -2,12 +2,20 @@
 <div class="ui loader active text" *ngIf="loadingTeams">Loading teams...</div>
 
 <table class="ui table unstackable" *ngIf="teams">
-  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Operations</th></tr></thead>
+  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
   <tbody>
   <tr *ngFor="let team of teams; index as i">
     <td>{{i+1}}</td>
     <td>{{team.id}}</td>
     <td>{{team.name}}</td>
+    <td>
+      <a href="admin/users/{{team.creator_id}}" target="_blank">
+        <span *ngIf="team.creator.nickname; else nameOnly">{{team.creator.nickname}} ({{team.creator.name}})</span>
+      </a>
+      <ng-template #nameOnly>{{team.creator.name}}</ng-template>
+    </td>
+    <td>{{team.slogan}}</td>
+    <td>{{team.total_user_associations}}</td>
     <td>
       <a class="ui button icon mini" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
     </td>

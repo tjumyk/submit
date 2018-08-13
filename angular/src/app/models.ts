@@ -139,17 +139,22 @@ export class SubmissionFile {
 export class Team {
   id: number;
   task_id: number;
+  creator_id: number;
+
   name: string;
   is_finalised: boolean;
-  avatar?: string;
   slogan?: string;
 
   created_at: string;
   modified_at: string;
 
   task?: Task;
+  creator?: User;
   submissions?: Submission[];
   user_associations?: UserTeamAssociation[];
+
+  // client-side injected attributes
+  total_user_associations: number;
 }
 
 
@@ -157,7 +162,6 @@ export class UserTeamAssociation {
   user_id: number;
   team_id: number;
 
-  is_creator: boolean;
   is_invited: boolean;
   is_user_agreed: boolean;
   is_creator_agreed: boolean;

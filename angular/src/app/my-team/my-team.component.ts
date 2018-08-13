@@ -152,6 +152,9 @@ export class MyTeamComponent implements OnInit {
   }
 
   finaliseTeam(btn:HTMLElement){
+    if(!confirm("After you finalise the team, the member list will be locked and you won't be able to dismiss the team. Continue?"))
+      return;
+
     btn.classList.add('loading', 'disabled');
     this.teamService.finaliseTeam(this.team.id).pipe(
       finalize(()=>btn.classList.remove('loading', 'disabled'))

@@ -5,9 +5,10 @@
 
 <div *ngIf="team">
   <div class="ui message warning" *ngIf="teamAssociation.is_user_agreed && !teamAssociation.is_creator_agreed && !teamAssociation.is_invited">
-    <i class="icon hourglass half"></i> Your join application is waiting for the team creator's approval.
-    <button class="ui mini button" (click)="cancelJoin(btnCancelJoin)" #btnCancelJoin><i class="icon times"></i> Cancel Application</button>
+    <i class="icon hourglass half"></i> Your join request is waiting for the team creator's approval.
+    <button class="ui mini button" (click)="cancelJoin(btnCancelJoin)" #btnCancelJoin><i class="icon times"></i> Cancel Request</button>
   </div>
+
   <div class="ui grid stackable centered" *ngIf="!teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed && teamAssociation.is_invited">
     <div class="column handle-invitation">
       <div class="ui segment">
@@ -24,13 +25,25 @@
       </div>
     </div>
   </div>
-  <div class="ui message warning" *ngIf="teamAssociation.is_creator && hasPendingRequests()">
-    <i class="icon hourglass half"></i> There are pending requests for you to resolve.
+
+  <div *ngIf="team.creator_id==user.id">
+    <div class="ui message warning" *ngIf="hasPendingRequests(); else noPendingRequest">
+      <i class="icon hourglass half"></i> There are pending requests for you to resolve.
+    </div>
+    <ng-template #noPendingRequest>
+      <div class="ui message info" *ngIf="!team.is_finalised">
+        <i class="icon info circle"></i>
+        Please finalise your team when you confirm the member list. Only after the team is finalised, the team members can make submissions for this task.
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="ui message info" *ngIf="teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed && team.creator_id!=user.id && !team.is_finalised">
+    <i class="icon info circle"></i> Your team needs to be finalised by the team creator before you can make any submissions for this task.
   </div>
 
   <div class="ui header">
-    <img [src]="team.avatar" *ngIf="team.avatar; else teamDefaultIcon" class="ui image">
-    <ng-template #teamDefaultIcon><i class="icon users"></i></ng-template>
+    <i class="icon users"></i>
     <div class="content">
       {{ team.name }}
       <div class="sub header" *ngIf="team.slogan">{{team.slogan}}</div>
@@ -45,32 +58,41 @@
       </div>
       <div class="item">
         <div class="header">Created At</div>
-        {{team.created_at|date:'medium'}}
+        {{team.created_at|date:'short'}}
       </div>
       <div class="item">
-        <div class="header">Is Finalised?</div>
-        {{team.is_finalised}}
+        <div class="content">
+          <div class="header">Status</div>
+          <span *ngIf="!team.is_finalised; else alreadyFinalisedText"><i class="icon lock open green"></i> Open</span>
+          <ng-template #alreadyFinalisedText><i class="icon lock red"></i> Finalised</ng-template>
+        </div>
       </div>
     </div>
   </div>
 
   <table class="ui unstackable table">
-    <thead><tr><th>#</th><th>User</th><th>Is Creator?</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th><th *ngIf="teamAssociation.is_creator">Operations</th></tr></thead>
+    <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Joined At</th><th>Status</th><th *ngIf="team.creator_id==user.id">Operations</th></tr></thead>
     <tbody>
-    <tr *ngFor="let ass of team.user_associations; index as i">
+    <tr *ngFor="let ass of team.user_associations; index as i" [ngClass]="{'active': user.id==ass.user_id}">
       <td>{{i+1}}</td>
       <td>
+        <img [src]="ass.user.avatar" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
+        <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
         <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
         <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+        &nbsp;<i class="icon star yellow" *ngIf="ass.user_id==team.creator_id" title="Creator"></i>
       </td>
-      <td>{{ass.is_creator}}</td>
-      <td>{{ass.is_invited}}</td>
-      <td>{{ass.is_user_agreed}}</td>
-      <td>{{ass.is_creator_agreed}}</td>
-      <td *ngIf="teamAssociation.is_creator">
-        <div class="ui mini buttons" *ngIf="!ass.is_creator_agreed">
-          <a class="ui icon button green" title="Accept" (click)="acceptJoin(ass.user, btnAcceptJoin)" #btnAcceptJoin><i class="icon check"></i></a>
-          <a class="ui icon button red" title="Reject" (click)="rejectJoin(ass.user, btnRejectJoin)" #btnRejectJoin><i class="icon times"></i></a>
+      <td>{{ass.created_at|date:'short'}}</td>
+      <td><span *ngIf="ass.is_creator_agreed&&ass.is_user_agreed">{{ass.modified_at|date:'short'}}</span></td>
+      <td>
+        <span *ngIf="ass.is_user_agreed && ass.is_creator_agreed"><i class="icon check green"></i> Member</span>
+        <span *ngIf="ass.is_user_agreed && !ass.is_creator_agreed"><i class="icon hourglass half yellow"></i> Requesting</span>
+        <span *ngIf="!ass.is_user_agreed && ass.is_creator_agreed"><i class="icon hourglass half yellow"></i> Inviting</span>
+      </td>
+      <td *ngIf="team.creator_id==user.id">
+        <div class="ui small buttons" *ngIf="!ass.is_creator_agreed">
+          <a class="ui icon button green" (click)="acceptJoin(ass.user, btnAcceptJoin)" #btnAcceptJoin><i class="icon check"></i> Accept</a>
+          <a class="ui icon button red" (click)="rejectJoin(ass.user, btnRejectJoin)" #btnRejectJoin><i class="icon times"></i> Reject</a>
         </div>
       </td>
     </tr>
@@ -78,7 +100,7 @@
   </table>
 
   <div class="ui grid stackable center aligned one column" *ngIf="!team.is_finalised">
-    <div class="column team-operations" *ngIf="teamAssociation.is_creator">
+    <div class="column team-operations" *ngIf="team.creator_id==user.id">
       <div class="ui buttons two">
         <a class="ui button primary" (click)="finaliseTeam(btnFinaliseTeam)" #btnFinaliseTeam [ngClass]="{'disabled': hasPendingRequests()}">
           <i class="icon gavel"></i> Finalise Team
@@ -88,16 +110,12 @@
         </a>
       </div>
       <p>
-        <i class="icon info circle"></i>
-        <span *ngIf="hasPendingRequests(); else finaliseHint">
-          You have to resolve all the pending requests before finalising the team.
+        <span *ngIf="hasPendingRequests()">
+          <i class="icon info circle"></i> You have to resolve all the pending requests before finalising the team.
         </span>
-        <ng-template #finaliseHint>
-          You need to finalise the team to lock the member list before any submissions.
-        </ng-template>
       </p>
     </div>
-    <div class="column team-operations" *ngIf="!teamAssociation.is_creator && teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed">
+    <div class="column team-operations" *ngIf="team.creator_id!=user.id && teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed">
       <a class="ui button fluid red" (click)="leaveTeam(btnLeaveTeam)" #btnLeaveTeam><i class="icon sign out"></i> Leave Team</a>
     </div>
   </div>
@@ -123,15 +141,22 @@
   </div>
 
   <table class="ui table unstackable" *ngIf="teams.length">
-    <thead><tr><th>ID</th><th>Name</th><th>Slogan</th><th>Is Finalised?</th><th>Operations</th></tr></thead>
+    <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
     <tbody>
     <tr *ngFor="let t of teams">
       <td>{{t.id}}</td>
       <td>{{t.name}}</td>
-      <td>{{t.slogan}}</td>
-      <td>{{t.is_finalised}}</td>
       <td>
-        <a *ngIf="!t.is_finalised" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i>Join</a>
+        <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
+        <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
+        <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
+        <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
+      </td>
+      <td>{{t.slogan}}</td>
+      <td>{{t.total_user_associations}}</td>
+      <td>
+        <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
+        <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
       </td>
     </tr>
     </tbody>

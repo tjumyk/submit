@@ -346,19 +346,6 @@ def admin_file_requirement(rid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/tasks/<int:task_id>/teams', methods=['GET'])
-@requires_admin
-def admin_teams(task_id):
-    try:
-        task = TaskService.get(task_id)
-        if task is None:
-            return jsonify(msg='task not found'), 404
-
-        return [t.to_dict() for t in TeamService.get_for_task(task)]
-    except (TaskServiceError, TeamServiceError) as e:
-        return jsonify(msg=e.msg, detail=e.detail), 400
-
-
 @admin_api.route('/teams/<int:team_id>', methods=['GET', 'PUT', 'DELETE'])
 @requires_admin
 def admin_team(team_id):
