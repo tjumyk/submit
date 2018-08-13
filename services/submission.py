@@ -54,10 +54,16 @@ class SubmissionService:
         if task is None:
             raise SubmissionServiceError('task is required')
 
-        query = Submission.query.with_parent(task) \
-            .with_entities(UserAlias, func.count(), func.max(Submission.created_at)) \
-            .group_by(UserAlias.id) \
-            .filter(UserAlias.id == Submission.submitter_id)
+        sub_query = db.session.query(UserAlias.id.label('user_id'),
+                                     func.count().label('total_submissions'),
+                                     func.max(Submission.created_at).label('last_submit_time')) \
+            .filter(UserAlias.id == Submission.submitter_id,
+                    Submission.task_id == task.id) \
+            .group_by(UserAlias.id).subquery()
+        query = db.session.query(UserAlias,
+                                 sub_query.c.total_submissions,
+                                 sub_query.c.last_submit_time) \
+            .filter(sub_query.c.user_id == UserAlias.id)
         return [UserSubmissionSummary(user, total, last_time) for user, total, last_time in query.all()]
 
     @staticmethod
@@ -67,12 +73,18 @@ class SubmissionService:
         if not task.is_team_task:
             raise SubmissionServiceError('task is not team task')
 
-        query = Submission.query.with_parent(task) \
-            .with_entities(Team, func.count(), func.max(Submission.created_at)) \
+        sub_query = db.session.query(Team.id.label('team_id'),
+                                     func.count().label('total_submissions'),
+                                     func.max(Submission.created_at).label('last_submit_time')) \
             .filter(Team.id == UserTeamAssociation.team_id,
                     Team.task_id == task.id,
-                    Submission.submitter_id == UserTeamAssociation.user_id) \
-            .group_by(Team.id)
+                    Submission.submitter_id == UserTeamAssociation.user_id,
+                    Submission.task_id == task.id) \
+            .group_by(Team.id).subquery()
+        query = db.session.query(Team,
+                                 sub_query.c.total_submissions,
+                                 sub_query.c.last_submit_time) \
+            .filter(sub_query.c.team_id == Team.id)
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
@@ -140,11 +152,11 @@ class SubmissionService:
             if attempt_limit is not None:
                 if special and special.submission_attempt_limit_extension:
                     attempt_limit += special.submission_attempt_limit_extension
-                all_submissions = Submission.query \
+                all_submissions = db.session.query(func.count()) \
                     .filter(UserTeamAssociation.user_id == Submission.submitter_id,
                             UserTeamAssociation.team_id == team.id,
                             Submission.task_id == task.id) \
-                    .count()
+                    .scalar()
                 if all_submissions >= attempt_limit:
                     raise SubmissionServiceError('submission attempt limit exceeded')
 
@@ -167,7 +179,10 @@ class SubmissionService:
             if attempt_limit is not None:
                 if special and special.submission_attempt_limit_extension:
                     attempt_limit += special.submission_attempt_limit_extension
-                all_submissions = Submission.query.with_parent(task).with_parent(submitter).count()
+                all_submissions = db.session.query(func.count()) \
+                    .filter(Submission.task_id == task.id,
+                            Submission.submitter_id == submitter.id)\
+                    .scalar()
                 if all_submissions >= attempt_limit:
                     raise SubmissionServiceError('submission attempt limit exceeded')
 

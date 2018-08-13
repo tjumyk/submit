@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 import oauth
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from error import BasicError
 from models import Course, db
@@ -47,7 +47,7 @@ class CourseService:
         if len(name) > CourseService.name_max_length:
             raise CourseServiceError('name too long')
 
-        if Course.query.filter(or_(Course.code == code, Course.name == name)).count():
+        if db.session.query(func.count()).filter(or_(Course.code == code, Course.name == name)).scalar():
             raise CourseServiceError('duplicate code or name')
 
         if is_new_tutor_group:

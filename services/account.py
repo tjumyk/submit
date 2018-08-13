@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 import oauth
 from error import BasicError
@@ -93,7 +93,7 @@ class AccountService:
                               UserAlias.nickname == user.nickname)
             else:
                 _filter = or_(UserAlias.name == user.name, UserAlias.email == user.email)
-            if UserAlias.query.filter(_filter).count():
+            if db.session.query(func.count()).filter(_filter).scalar():
                 raise AccountServiceError('failed to sync user', 'User name, email has been occupied')
             user_alias = UserAlias(id=user.id, name=user.name, email=user.email, nickname=user.nickname,
                                    avatar=user.avatar)
@@ -131,7 +131,7 @@ class AccountService:
         missing_group_ids = remote_group_ids - local_group_ids
         if missing_group_ids:
             missing_groups = [remote_groups[gid] for gid in missing_group_ids]
-            if GroupAlias.query.filter(GroupAlias.name.in_([g.name for g in missing_groups])).count():
+            if db.session.query(func.count()).filter(GroupAlias.name.in_([g.name for g in missing_groups])).scalar():
                 raise AccountServiceError('failed to sync groups', 'Group name has been occupied')
             for group in missing_groups:
                 group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)
@@ -165,7 +165,7 @@ class AccountService:
         missing_group_ids = remote_group_ids - local_group_ids
         if missing_group_ids:
             missing_groups = [remote_groups[gid] for gid in missing_group_ids]
-            if GroupAlias.query.filter(GroupAlias.name.in_([g.name for g in missing_groups])).count():
+            if db.session.query(func.count()).filter(GroupAlias.name.in_([g.name for g in missing_groups])).scalar():
                 raise AccountServiceError('failed to sync groups', 'Group name has been occupied')
             for group in missing_groups:
                 group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)

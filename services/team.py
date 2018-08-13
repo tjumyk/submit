@@ -1,7 +1,7 @@
 import re
 from typing import Optional, List
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from error import BasicError
 from models import Team, db, UserTeamAssociation, UserAlias, Task
@@ -33,7 +33,7 @@ class TeamService:
         return Team.query.all()
 
     @staticmethod
-    def get_by_task_name(task: Task, name: str)->Optional[Team]:
+    def get_by_task_name(task: Task, name: str) -> Optional[Team]:
         if task is None:
             raise TeamServiceError('task is required')
         if not name:
@@ -90,7 +90,7 @@ class TeamService:
         if ass:
             raise TeamServiceError('user already associated with another team', ass.team.name)
 
-        if Team.query.filter_by(name=name, task_id=task.id).count():
+        if db.session.query(func.count()).filter(Team.name == name, Team.task_id == task.id).scalar():
             raise TeamServiceError('duplicate name')
 
         team = Team(task=task, name=name)
@@ -120,8 +120,10 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
-        return UserTeamAssociation.query.filter_by(team=team, user=user,
-                                                   is_creator_agreed=True, is_user_agreed=True).count() > 0
+        return db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id,
+                                                     UserTeamAssociation.user_id == user.id,
+                                                     UserTeamAssociation.is_creator_agreed == True,
+                                                     UserTeamAssociation.is_user_agreed == True).scalar() > 0
 
     @staticmethod
     def is_creator(team: Team, user: UserAlias):
@@ -130,8 +132,11 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
-        return UserTeamAssociation.query.filter_by(team=team, user=user, is_creator=True,
-                                                   is_creator_agreed=True, is_user_agreed=True).count() > 0
+        return db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id,
+                                                     UserTeamAssociation.user_id == user.id,
+                                                     UserTeamAssociation.is_creator == True,
+                                                     UserTeamAssociation.is_creator_agreed == True,
+                                                     UserTeamAssociation.is_user_agreed == True).scalar() > 0
 
     @staticmethod
     def update(team, **kwargs) -> dict:
@@ -283,13 +288,14 @@ class TeamService:
 
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
-        if UserTeamAssociation.query.filter_by(team_id=team.id) \
-                .filter(or_(UserTeamAssociation.is_creator_agreed.is_(False),
-                            UserTeamAssociation.is_user_agreed.is_(False))) \
-                .count():
+        if db.session.query(func.count()) \
+                .filter(UserTeamAssociation.team_id == team.id,
+                        or_(UserTeamAssociation.is_creator_agreed == False,
+                            UserTeamAssociation.is_user_agreed == False)) \
+                .scalar():
             raise TeamServiceError('pending invitations or join applications')
 
-        members = UserTeamAssociation.query.filter_by(team_id=team.id).count()
+        members = db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id).scalar()
         task = team.task
         if task.team_min_size is not None and members < task.team_min_size:
             raise TeamServiceError('too few members', 'At least %d members are required' % task.team_min_size)

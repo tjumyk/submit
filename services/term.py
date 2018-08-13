@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
@@ -49,7 +50,9 @@ class TermService:
         if not student_group_name:
             raise TermServiceError('student group name is required')
 
-        if Term.query.filter(Term.course_id == course.id, Term.year == year, Term.semester == semester).count():
+        if db.session.query(func.count()).filter(Term.course_id == course.id,
+                                                 Term.year == year,
+                                                 Term.semester == semester).scalar():
             raise TermServiceError('duplicate term')
 
         if is_new_student_group:

@@ -2,6 +2,7 @@ import re
 from typing import Optional, List
 
 from dateutil import parser, tz
+from sqlalchemy import func
 
 from error import BasicError
 from models import Task, db, Material, FileRequirement, SpecialConsideration, UserAlias, Team
@@ -119,9 +120,10 @@ class TaskService:
         if not cls.file_name_pattern.match(name):
             raise TaskServiceError('invalid name format')
 
-        if Material.query.filter_by(task=task, name=name).count():  # check in task scope
+        if db.session.query(func.count()).filter(Material.task_id == task.id,
+                                                 Material.name == name).scalar():  # check in task scope
             raise TaskServiceError('duplicate name')
-        if Material.query.filter_by(file_path=file_path).count():  # check in global scope
+        if db.session.query(func.count()).filter(Material.file_path == file_path).scalar():  # check in global scope
             raise TaskServiceError('duplicate file path')
         mat = Material(task=task, type=_type, name=name, description=description, file_path=file_path)
         db.session.add(mat)
@@ -152,7 +154,8 @@ class TaskService:
         if not cls.file_name_pattern.match(name):
             raise TaskServiceError('invalid name format')
 
-        if FileRequirement.query.filter_by(task=task, name=name).count():
+        if db.session.query(func.count()).filter_by(FileRequirement.task_id == task.id,
+                                                    FileRequirement.name == name).scalar():
             raise TaskServiceError('duplicate name')
 
         req = FileRequirement(task=task, name=name, description=description, is_optional=is_optional,
@@ -224,7 +227,9 @@ class TaskService:
                 raise TaskServiceError('submission attempt limit extension must be larger than 0',
                                        'You can leave it blank to specify no extension')
 
-        if SpecialConsideration.query.filter_by(task=task, user=user, team=team).count():
+        if db.session.query(func.count()).filter(SpecialConsideration.task_id == task.id,
+                                                 SpecialConsideration.user == user,
+                                                 SpecialConsideration.team == team).scalar():
             raise TaskServiceError('special consideration already exists')
 
         spec = SpecialConsideration(task=task, user=user, team=team, due_time_extension=due_time_extension,
