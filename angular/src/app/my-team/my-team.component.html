@@ -90,6 +90,9 @@
         <span *ngIf="!ass.is_user_agreed && ass.is_creator_agreed"><i class="icon hourglass half yellow"></i> Inviting</span>
       </td>
       <td *ngIf="team.creator_id==user.id">
+        <div class="ui small buttons" *ngIf="ass.user_id != user.id && ass.is_creator_agreed && ass.is_user_agreed">
+          <a class="ui icon button red" (click)="kickOut(ass.user, btnKickOut)" #btnKickOut><i class="icon times"></i> Kick Out</a>
+        </div>
         <div class="ui small buttons" *ngIf="!ass.is_creator_agreed">
           <a class="ui icon button green" (click)="acceptJoin(ass.user, btnAcceptJoin)" #btnAcceptJoin><i class="icon check"></i> Accept</a>
           <a class="ui icon button red" (click)="rejectJoin(ass.user, btnRejectJoin)" #btnRejectJoin><i class="icon times"></i> Reject</a>

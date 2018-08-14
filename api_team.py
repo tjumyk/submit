@@ -178,6 +178,29 @@ def team_leave(team_id):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@team_api.route('/<int:team_id>/kick-out/<int:uid>', methods=['PUT'])
+@requires_login
+def team_kick_out(team_id, uid):
+    try:
+        team = TeamService.get(team_id)
+        if team is None:
+            return jsonify(msg='team not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 403
+        if not TeamService.is_creator(team, user):
+            return jsonify(msg='team creator required'), 403
+        target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
+
+        TeamService.leave(team, target_user)
+        db.session.commit()
+        return "", 204
+    except TeamServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @team_api.route('/<int:team_id>/finalise', methods=['PUT'])
 @requires_login
 def team_finalise(team_id):

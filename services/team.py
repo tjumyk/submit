@@ -255,7 +255,7 @@ class TeamService:
             return None
 
     @staticmethod
-    def leave(team: Team, user:UserAlias):
+    def leave(team: Team, user: UserAlias):
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:

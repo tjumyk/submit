@@ -151,6 +151,16 @@ export class MyTeamComponent implements OnInit {
     )
   }
 
+  kickOut(user:User, btn:HTMLElement){
+    btn.classList.add('loading', 'disabled');
+    this.teamService.kickOut(this.team.id, user.id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>this.ngOnInit(),
+      error=>this.error=error.error
+    )
+  }
+
   finaliseTeam(btn:HTMLElement){
     if(!confirm("After you finalise the team, the member list will be locked and you won't be able to dismiss the team. Continue?"))
       return;

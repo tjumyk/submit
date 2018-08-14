@@ -66,6 +66,10 @@ export class TeamService {
     return this.http.put(`${this.api}/${team_id}/leave`, null)
   }
 
+  kickOut(team_id: number, user_id: number) {
+    return this.http.put(`${this.api}/${team_id}/kick-out/${user_id}`, null)
+  }
+
   finaliseTeam(team_id: number): Observable<any> {
     return this.http.put(`${this.api}/${team_id}/finalise`, null)
   }
