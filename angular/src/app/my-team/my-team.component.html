@@ -71,7 +71,7 @@
   </div>
 
   <table class="ui unstackable table">
-    <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Joined At</th><th>Status</th><th *ngIf="team.creator_id==user.id">Operations</th></tr></thead>
+    <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Joined At</th><th>Status</th><th *ngIf="team.creator_id==user.id && !team.is_finalised">Operations</th></tr></thead>
     <tbody>
     <tr *ngFor="let ass of team.user_associations; index as i" [ngClass]="{'active': user.id==ass.user_id}">
       <td>{{i+1}}</td>
@@ -89,7 +89,7 @@
         <span *ngIf="ass.is_user_agreed && !ass.is_creator_agreed"><i class="icon hourglass half yellow"></i> Requesting</span>
         <span *ngIf="!ass.is_user_agreed && ass.is_creator_agreed"><i class="icon hourglass half yellow"></i> Inviting</span>
       </td>
-      <td *ngIf="team.creator_id==user.id">
+      <td *ngIf="team.creator_id==user.id && !team.is_finalised">
         <div class="ui small buttons" *ngIf="ass.user_id != user.id && ass.is_creator_agreed && ass.is_user_agreed">
           <a class="ui icon button red" (click)="kickOut(ass.user, btnKickOut)" #btnKickOut><i class="icon times"></i> Kick Out</a>
         </div>
