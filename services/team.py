@@ -256,6 +256,9 @@ class TeamService:
 
     @staticmethod
     def leave(team: Team, user: UserAlias):
+        """
+        User leaves by himself or kicked out by the team creator.
+        """
         if team is None:
             raise TeamServiceError('team is required')
         if user is None:
