@@ -149,7 +149,14 @@ export class SubmitComponent implements OnInit {
     this.taskService.addSubmission(this.taskId, this.files).pipe(
       finalize(() => this.submitting = false)
     ).subscribe(
-      submission => this.router.navigate([`../my-submissions/${submission.id}`], {relativeTo: this.route}),
+      submission => {
+        let redirect;
+        if(this.task.is_team_task)
+          redirect = `../my-team-submissions/${submission.id}`;
+        else
+          redirect = `../my-submissions/${submission.id}`;
+        this.router.navigate([redirect], {relativeTo: this.route})
+      },
       error => this.error = error.error
     )
   }
