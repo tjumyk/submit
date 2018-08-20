@@ -5,6 +5,12 @@ import {TermService} from "../term.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
+import * as moment from "moment";
+
+export class AttemptEntry {
+  attempted: boolean;
+  special: boolean;
+}
 
 @Component({
   selector: 'app-submit',
@@ -23,6 +29,11 @@ export class SubmitComponent implements OnInit {
 
   status: SubmissionStatus;
   loadingStatus: boolean;
+
+  isReadyToSubmit: boolean;
+  isClosed: boolean;
+  attemptEntries: AttemptEntry[];
+
 
   submitting: boolean;
   files: { [key: number]: File } = {};
@@ -75,7 +86,7 @@ export class SubmitComponent implements OnInit {
       this.taskService.getMyTeamSubmissionStatus(this.taskId).pipe(
         finalize(() => this.loadingStatus = false)
       ).subscribe(
-        status => this.status = status,
+        status => this.setupStatus(status),
         error => this.error = error.error
       )
     } else {
@@ -83,9 +94,60 @@ export class SubmitComponent implements OnInit {
       this.taskService.getMySubmissionStatus(this.taskId).pipe(
         finalize(() => this.loadingStatus = false)
       ).subscribe(
-        status => this.status = status,
+        status => this.setupStatus(status),
         error => this.error = error.error
       )
+    }
+  }
+
+  private setupStatus(status: SubmissionStatus) {
+    this.status = status;
+
+    this.checkTimeAndReadyToSubmit();
+    this.attemptEntries = this.buildAttemptEntries();
+  }
+
+  private checkTimeAndReadyToSubmit() {
+    // check time
+    this.isClosed = this.task.close_time && moment().isAfter(moment(this.task.close_time));
+    if (this.isClosed) {
+      this.isReadyToSubmit = false;
+      return;
+    }
+
+    // check team
+    if (this.task.is_team_task && (!this.status.team_association || !this.status.team_association.team.is_finalised)) {
+      this.isReadyToSubmit = false;
+      return;
+    }
+
+    // check attempt limit
+    if (this.task.submission_attempt_limit != null) {
+      let attemptLimit = this.task.submission_attempt_limit;
+      if (this.status.special_consideration && this.status.special_consideration.submission_attempt_limit_extension)
+        attemptLimit += this.status.special_consideration.submission_attempt_limit_extension;
+      this.isReadyToSubmit = this.status.attempts < attemptLimit;
+    } else {
+      this.isReadyToSubmit = true;
+    }
+  }
+
+  private buildAttemptEntries(): AttemptEntry[] {
+    if (this.task.submission_attempt_limit != null && this.status.attempts != null) {
+      let attemptLimit = this.task.submission_attempt_limit;
+      if (this.status.special_consideration && this.status.special_consideration.submission_attempt_limit_extension)
+        attemptLimit += this.status.special_consideration.submission_attempt_limit_extension;
+
+      const entries: AttemptEntry[] = [];
+      for (let i = 0; i < attemptLimit; ++i) {
+        entries.push({
+          attempted: i < this.status.attempts,
+          special: i >= this.task.submission_attempt_limit
+        })
+      }
+      return entries
+    } else {
+      return null;
     }
   }
 

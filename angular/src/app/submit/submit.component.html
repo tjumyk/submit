@@ -3,6 +3,51 @@
 
 <div *ngIf="status" class="ui grid centered stackable">
   <div class="column ten wide">
+
+    <div *ngIf="task.is_team_task">
+      <div class="ui message warning icon" *ngIf="!status.team_association">
+        <i class="icon user"></i>
+        <div class="content">
+          <div class="header">You are not in any team now!</div>
+          <p>Please join an existing team or create a new team first.</p>
+        </div>
+      </div>
+      <div *ngIf="status.team_association">
+        <div class="ui message warning icon" *ngIf="!status.team_association.is_user_agreed || !status.team_association.is_creator_agreed; else memberMessages">
+          <i class="icon users"></i>
+          <div class="content">
+            <div class="header">Your membership in team "{{status.team_association.team.name}}" has not been confirmed</div>
+            <p *ngIf="status.team_association.is_invited && !status.team_association.is_user_agreed">
+              Please accept the invitation first.
+            </p>
+            <p *ngIf="!status.team_association.is_invited && !status.team_association.is_creator_agreed">
+              Please ask the team creator to accept your join request.
+            </p>
+          </div>
+        </div>
+        <ng-template #memberMessages>
+          <div class="ui message warning icon" *ngIf="!status.team_association.team.is_finalised">
+            <i class="icon gavel"></i>
+            <div class="content">
+              <div class="header">Your team has not been finalised</div>
+              <p *ngIf="status.team_association.team.creator_id==user.id; else memberNotFinalisedHint">Please finalise the team first.</p>
+              <ng-template #memberNotFinalisedHint>
+                <p>Please ask the team creator to finalise the team first.</p>
+              </ng-template>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="ui message warning icon" *ngIf="isClosed">
+      <i class="icon times circle outline"></i>
+      <div class="content">
+        <div class="header">Task has been closed</div>
+        <p>You are not allowed to make new submissions after the close time</p>
+      </div>
+    </div>
+
     <div class="ui message info icon" *ngIf="status.special_consideration">
       <i class="icon heart outline"></i>
       <div class="content">
@@ -17,9 +62,24 @@
         </ul>
       </div>
     </div>
+
+    <div class="ui segment" *ngIf="attemptEntries">
+      <div class="attempts-bar">
+        <div class="items">
+          <div class="item" *ngFor="let entry of attemptEntries" [ngClass]="{'attempted': entry.attempted}"></div>
+        </div>
+        <div class="label">
+          Attempts: {{status.attempts}} &nbsp; Limit: {{task.submission_attempt_limit}}
+          <span *ngIf="status.special_consideration?.submission_attempt_limit_extension">
+              (+{{status.special_consideration?.submission_attempt_limit_extension}})
+            </span>
+        </div>
+      </div>
+    </div>
+
     <div class="ui segment">
       <form class="ui form" [ngClass]="{'loading': submitting}" (submit)="submit()">
-        <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors}">
+        <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors, 'disabled': !isReadyToSubmit}">
           <label>{{req.name}} <span *ngIf="req.is_optional">(Optional)</span></label>
           <input type="file" name="{{req.name}}" [accept]="req._extension || '*/*'" (change)="updateFile(req, inputFile.files)" #inputFile>
           <div class="errors">
@@ -28,8 +88,9 @@
             <label *ngIf="req._form_errors?.size"><i class="icon times"></i> File is too big (at most {{req.size_limit | size}})</label>
           </div>
         </div>
-        <button type="submit" class="ui primary button submit fluid"><i class="icon paper plane outline"></i> Submit</button>
+        <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
       </form>
     </div>
+
   </div>
 </div>

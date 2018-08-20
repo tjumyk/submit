@@ -1,0 +1,30 @@
+.attempts-bar{
+  .items{
+    display: flex;
+    .item{
+      position: relative;
+      flex: 1;
+      height: 1em;
+      margin: 0 1px;
+      background-color: #eee;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+      @border-radius: .28571429rem;
+
+      &:first-child{
+        margin-left: 0;
+        border-radius: @border-radius 0 0 @border-radius;
+      }
+      &:last-child{
+        margin-right: 0;
+        border-radius: 0 @border-radius @border-radius 0;
+      }
+      &.attempted{
+        background: green;
+      }
+    }
+  }
+  .label{
+    text-align: center;
+    font-weight: bold;
+  }
+}
