@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
-  SpecialConsideration,
   Submission,
+  SubmissionStatus,
   Task,
   Team,
   TeamSubmissionSummary,
@@ -125,9 +125,9 @@ export class TaskService {
 
   getTeams(task_id: number): Observable<Team[]> {
     return this.http.get<[Team, number][]>(`${this.api}/${task_id}/teams`).pipe(
-      map(records=>{
+      map(records => {
         const teams = [];
-        for(let record of records){
+        for (let record of records) {
           const team = record[0];
           team.total_user_associations = record[1];
           teams.push(team)
@@ -141,11 +141,11 @@ export class TaskService {
     return this.http.post<Team>(`${this.api}/${task_id}/teams`, form)
   }
 
-  getMySpecialConsideration(task_id: number): Observable<SpecialConsideration>{
-    return this.http.get<SpecialConsideration>(`${this.api}/${task_id}/my-special-consideration`)
+  getMySubmissionStatus(task_id: number): Observable<SubmissionStatus> {
+    return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/my-submission-status`)
   }
 
-  getMyTeamSpecialConsideration(task_id: number): Observable<SpecialConsideration>{
-    return this.http.get<SpecialConsideration>(`${this.api}/${task_id}/my-team-special-consideration`)
+  getMyTeamSubmissionStatus(task_id: number): Observable<SubmissionStatus> {
+    return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/my-team-submission-status`)
   }
 }

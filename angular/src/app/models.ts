@@ -203,3 +203,9 @@ export class SpecialConsideration {
   user?: User;
   team?: Team;
 }
+
+export class SubmissionStatus {
+  attempts: number;
+  team_association?: UserTeamAssociation;
+  special_consideration?: SpecialConsideration;
+}
