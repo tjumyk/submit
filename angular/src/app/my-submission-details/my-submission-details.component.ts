@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, Submission} from "../models";
+import {ErrorMessage, Submission, SuccessMessage} from "../models";
 import {SubmissionService} from "../submission.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -12,6 +12,8 @@ import * as moment from "moment";
 })
 export class MySubmissionDetailsComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
+  success: SuccessMessage;
+
   submissionId: number;
   submission: Submission;
   loadingSubmission: boolean;
@@ -43,6 +45,9 @@ export class MySubmissionDetailsComponent implements OnInit, OnDestroy {
 
   private setupSubmission(submission: Submission){
     this.submission = submission;
+
+    if(moment().diff(moment(submission.created_at), 'seconds')<3)
+      this.success = {msg: 'Submitted successfully'};
 
     const timeTracker = () => {
       this.createdFromNow = moment(submission.created_at).fromNow()
