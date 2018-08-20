@@ -29,6 +29,7 @@ import {SubmissionListComponent} from "./submission-list/submission-list.compone
 import {TeamSubmissionsComponent} from "./team-submissions/team-submissions.component";
 import {TeamSubmissionListComponent} from "./team-submission-list/team-submission-list.component";
 import {TeamSubmissionDetailsComponent} from "./team-submission-details/team-submission-details.component";
+import {JoinOrCreateTeamComponent} from "./join-or-create-team/join-or-create-team.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -56,6 +57,7 @@ const routes: Routes = [
           {path: 'team-submissions/:team_id', component: TeamSubmissionListComponent},
           {path: 'team-submissions/:team_id/:submission_id', component: TeamSubmissionDetailsComponent},
           {path: 'my-team', component: MyTeamComponent},
+          {path: 'my-team/join-or-create', component: JoinOrCreateTeamComponent},
           {path: 'teams', component: TeamsComponent},
           {path: 'teams/:team_id', component: TeamComponent}
         ]

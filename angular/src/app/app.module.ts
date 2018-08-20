@@ -40,6 +40,7 @@ import { TeamSubmissionsComponent } from './team-submissions/team-submissions.co
 import { TeamSubmissionDetailsComponent } from './team-submission-details/team-submission-details.component';
 import { SubmissionListComponent } from './submission-list/submission-list.component';
 import { TeamSubmissionListComponent } from './team-submission-list/team-submission-list.component';
+import { JoinOrCreateTeamComponent } from './join-or-create-team/join-or-create-team.component';
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { TeamSubmissionListComponent } from './team-submission-list/team-submiss
     TeamSubmissionDetailsComponent,
     SubmissionListComponent,
     TeamSubmissionListComponent,
+    JoinOrCreateTeamComponent,
   ],
   imports: [
     BrowserModule,

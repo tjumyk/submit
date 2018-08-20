@@ -1,0 +1,85 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingTeamAssociation">Loading my team...</div>
+<div class="ui loader text active" *ngIf="loadingTeams">Loading teams...</div>
+
+<div *ngIf="teams">
+  <div class="ui header center aligned icon">
+    <i class="icon circular users"></i>
+    <div class="content" *ngIf="teams.length; else noExistingTeams">
+      You are not in any team now!
+      <div class="sub header">
+        Please join an existing team or create a new team
+      </div>
+    </div>
+    <ng-template #noExistingTeams>
+      <div class="content">
+        There is no team now!
+        <div class="sub header">
+          Please create the first team!
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <table class="ui table unstackable" *ngIf="teams.length">
+    <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let t of teams">
+      <td>{{t.id}}</td>
+      <td>{{t.name}}</td>
+      <td>
+        <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
+        <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
+        <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
+        <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
+      </td>
+      <td>{{t.slogan}}</td>
+      <td>{{t.total_user_associations}}</td>
+      <td>
+        <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
+        <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="ui divider horizontal">Or</div>
+
+  <div class="ui grid centered stackable">
+    <div class="column new-team">
+      <div class="ui segment">
+        <h5 class="ui header">
+          <i class="icons">
+            <i class="icon users"></i>
+            <i class="icon right bottom corner plus"></i>
+          </i>
+          Create New Team
+        </h5>
+        <form class="ui form" [ngClass]="{'loading': creatingTeam}" (ngSubmit)="createTeam(f)" #f="ngForm">
+          <div class="field required" [ngClass]="{'error': (f.submitted || nameModel.dirty || nameModel.touched) && nameModel.invalid}">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="3-16 alphanumeric characters" [(ngModel)]="newTeamForm.name"
+                   required minlength="3" maxlength="16" pattern="^[\w]{3,16}$" #nameModel="ngModel">
+            <div class="errors">
+              <label *ngIf="nameModel.errors?.required"><i class="icon times"></i> Name is required</label>
+              <label *ngIf="nameModel.errors?.minlength"><i class="icon times"></i> Name too short, at least 3 characters</label>
+              <label *ngIf="nameModel.errors?.maxlength"><i class="icon times"></i> Name too long, at most 16 characters</label>
+              <label *ngIf="!nameModel.errors?.minlength && !nameModel.errors?.maxlength && nameModel.errors?.pattern">
+                <i class="icon times"></i> Invalid format, alphanumeric characters only
+              </label>
+            </div>
+          </div>
+          <div class="field" [ngClass]="{'error': (f.submitted||sloganModel.dirty||sloganModel.touched)&&sloganModel.invalid}">
+            <label>Slogan (Optional)</label>
+            <input type="text" name="slogan" placeholder="Use a slogan to attract others to join your team" maxlength="64"
+                   [(ngModel)]="newTeamForm.slogan" #sloganModel="ngModel">
+            <div class="errors">
+              <label *ngIf="sloganModel.errors?.maxlength"><i class="times icon"></i> Slogan is too long</label>
+            </div>
+          </div>
+          <button type="submit" class="ui primary fluid button"><i class="icon plus"></i> Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
