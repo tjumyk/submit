@@ -99,6 +99,19 @@ class SubmissionService:
         return query.all()
 
     @staticmethod
+    def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+        if user is None:
+            raise SubmissionServiceError('user is required')
+        query = db.session.query(func.count()) \
+            .filter(Submission.task_id == task.id,
+                    Submission.submitter_id == user.id)
+        if not include_cleared:
+            query = query.filter(Submission.is_cleared == False)
+        return query.scalar()
+
+    @staticmethod
     def get_for_team(team: Team, include_cleared=False) -> List[Submission]:
         if team is None:
             raise SubmissionServiceError('team is required')
@@ -108,6 +121,18 @@ class SubmissionService:
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
         return query.all()
+
+    @staticmethod
+    def count_for_team(team: Team, include_cleared=False) -> int:
+        if team is None:
+            raise SubmissionServiceError('team is required')
+        query = db.session.query(func.count()) \
+            .filter(Submission.submitter_id == UserTeamAssociation.user_id,
+                    UserTeamAssociation.team_id == team.id,
+                    Submission.task_id == team.task_id)
+        if not include_cleared:
+            query = query.filter(Submission.is_cleared == False)
+        return query.scalar()
 
     @staticmethod
     def get_file(_id: int) -> Optional[SubmissionFile]:
@@ -181,7 +206,7 @@ class SubmissionService:
                     attempt_limit += special.submission_attempt_limit_extension
                 all_submissions = db.session.query(func.count()) \
                     .filter(Submission.task_id == task.id,
-                            Submission.submitter_id == submitter.id)\
+                            Submission.submitter_id == submitter.id) \
                     .scalar()
                 if all_submissions >= attempt_limit:
                     raise SubmissionServiceError('submission attempt limit exceeded')

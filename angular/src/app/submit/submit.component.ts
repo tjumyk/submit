@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, FileRequirement, SpecialConsideration, Task, Term, User} from "../models";
+import {ErrorMessage, FileRequirement, SubmissionStatus, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {TaskService} from "../task.service";
@@ -21,8 +21,8 @@ export class SubmitComponent implements OnInit {
   term: Term;
   accessRoles: Set<string>;
 
-  specialConsideration: SpecialConsideration;
-  loadingSpecialConsideration: boolean;
+  status: SubmissionStatus;
+  loadingStatus: boolean;
 
   submitting: boolean;
   files: { [key: number]: File } = {};
@@ -70,21 +70,21 @@ export class SubmitComponent implements OnInit {
       }
     }
 
-    if(task.is_team_task){
-      this.loadingSpecialConsideration = true;
-      this.taskService.getMyTeamSpecialConsideration(this.taskId).pipe(
-        finalize(()=>this.loadingSpecialConsideration=false)
+    if (task.is_team_task) {
+      this.loadingStatus = true;
+      this.taskService.getMyTeamSubmissionStatus(this.taskId).pipe(
+        finalize(() => this.loadingStatus = false)
       ).subscribe(
-         special=>this.specialConsideration=special,
-        error=>this.error=error.error
+        status => this.status = status,
+        error => this.error = error.error
       )
-    }else{
-      this.loadingSpecialConsideration = true;
-      this.taskService.getMySpecialConsideration(this.taskId).pipe(
-        finalize(()=>this.loadingSpecialConsideration=false)
+    } else {
+      this.loadingStatus = true;
+      this.taskService.getMySubmissionStatus(this.taskId).pipe(
+        finalize(() => this.loadingStatus = false)
       ).subscribe(
-        special=>this.specialConsideration=special,
-        error=>this.error=error.error
+        status => this.status = status,
+        error => this.error = error.error
       )
     }
   }
@@ -151,7 +151,7 @@ export class SubmitComponent implements OnInit {
     ).subscribe(
       submission => {
         let redirect;
-        if(this.task.is_team_task)
+        if (this.task.is_team_task)
           redirect = `../my-team-submissions/${submission.id}`;
         else
           redirect = `../my-submissions/${submission.id}`;

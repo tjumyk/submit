@@ -1,7 +1,7 @@
 <app-error-message [error]="error"></app-error-message>
 <div class="ui loader text active" *ngIf="loadingTeamAssociation">Loading my team...</div>
 <div class="ui loader text active" *ngIf="loadingTeam">Loading team info...</div>
-<div class="ui loader text active inline centered" *ngIf="loadingTeams">Loading teams...</div>
+<div class="ui loader text active" *ngIf="loadingTeams">Loading teams...</div>
 
 <div *ngIf="team">
   <div class="ui message warning" *ngIf="teamAssociation.is_user_agreed && !teamAssociation.is_creator_agreed && !teamAssociation.is_invited">
