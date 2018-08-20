@@ -2,10 +2,11 @@ import os
 import shutil
 import time
 from datetime import datetime
+from typing import Optional
 
 from flask import Blueprint, jsonify, request, current_app as app
 
-from models import db
+from models import db, SpecialConsideration, UserTeamAssociation
 from oauth import requires_login
 from services.account import AccountService, AccountServiceError
 from services.submission import SubmissionService, SubmissionServiceError
@@ -15,6 +16,21 @@ from services.term import TermService, TermServiceError
 from utils.upload import md5sum
 
 task_api = Blueprint('task_api', __name__)
+
+
+class SubmissionStatus:
+    def __init__(self, attempts: Optional[int],
+                 team_association: Optional[UserTeamAssociation],
+                 special_consideration: Optional[SpecialConsideration]):
+        self.attempts = attempts
+        self.team_association = team_association
+        self.special_consideration = special_consideration
+
+    def to_dict(self):
+        d = dict(attempts=self.attempts)
+        d['team_association'] = self.team_association.to_dict(with_team=True) if self.team_association else None
+        d['special_consideration'] = self.special_consideration.to_dict() if self.special_consideration else None
+        return d
 
 
 @task_api.route('/<int:tid>')
@@ -150,9 +166,9 @@ def get_user(task_id, uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@task_api.route('/<int:tid>/my-special-consideration')
+@task_api.route('/<int:tid>/my-submission-status')
 @requires_login
-def task_my_special_consideration(tid):
+def task_my_submission_status(tid):
     try:
         user = AccountService.get_current_user()
         if user is None:
@@ -168,17 +184,17 @@ def task_my_special_consideration(tid):
         if 'student' not in roles:
             return jsonify(msg='only for students'), 403
 
-        spec = TaskService.get_special_consideration_for_task_user(task, user)
-        if spec is None:
-            return "", 204
-        return jsonify(spec.to_dict())
+        attempts = SubmissionService.count_for_task_and_user(task, user, include_cleared=True)
+        special = TaskService.get_special_consideration_for_task_user(task, user)
+        status = SubmissionStatus(attempts, None, special)
+        return jsonify(status.to_dict())
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@task_api.route('/<int:tid>/my-team-special-consideration')
+@task_api.route('/<int:tid>/my-team-submission-status')
 @requires_login
-def task_my_team_special_consideration(tid):
+def task_my_team_submission_status(tid):
     try:
         user = AccountService.get_current_user()
         if user is None:
@@ -196,14 +212,13 @@ def task_my_team_special_consideration(tid):
 
         # team check
         ass = TeamService.get_team_association(task, user)
-        if not ass:
-            return jsonify(msg='user not in a team'), 403
-        team = ass.team
-
-        spec = TaskService.get_special_consideration_for_team(team)
-        if spec is None:
-            return "", 204
-        return jsonify(spec.to_dict())
+        if ass and ass.team.is_finalised:
+            attempts = SubmissionService.count_for_team(ass.team, include_cleared=True)
+            special = TaskService.get_special_consideration_for_team(ass.team)
+            status = SubmissionStatus(attempts, ass, special)
+        else:
+            status = SubmissionStatus(None, ass, None)
+        return jsonify(status.to_dict())
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
