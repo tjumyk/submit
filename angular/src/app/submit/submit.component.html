@@ -1,8 +1,9 @@
 <app-error-message [error]="error"></app-error-message>
+<div class="ui text loader active" *ngIf="loadingStatus">Loading status...</div>
 
-<div *ngIf="task" class="ui grid centered stackable">
+<div *ngIf="status" class="ui grid centered stackable">
   <div class="column ten wide">
-    <div class="ui message info icon" *ngIf="specialConsideration">
+    <div class="ui message info icon" *ngIf="status.special_consideration">
       <i class="icon heart outline"></i>
       <div class="content">
         <div class="header">
@@ -11,8 +12,8 @@
           <ng-template #userSpecialHint>you</ng-template>
         </div>
         <ul class="list">
-          <li *ngIf="specialConsideration.due_time_extension">Due time +{{specialConsideration.due_time_extension}} hours.</li>
-          <li *ngIf="specialConsideration.submission_attempt_limit_extension">Submission attempt limit +{{specialConsideration.submission_attempt_limit_extension}}.</li>
+          <li *ngIf="status.special_consideration.due_time_extension">Due time +{{status.special_consideration.due_time_extension}} hours.</li>
+          <li *ngIf="status.special_consideration.submission_attempt_limit_extension">Submission attempt limit +{{status.special_consideration.submission_attempt_limit_extension}}.</li>
         </ul>
       </div>
     </div>
