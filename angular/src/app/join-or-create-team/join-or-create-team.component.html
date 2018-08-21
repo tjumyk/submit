@@ -21,29 +21,31 @@
     </ng-template>
   </div>
 
-  <table class="ui table unstackable" *ngIf="teams.length">
-    <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
-    <tbody>
-    <tr *ngFor="let t of teams">
-      <td>{{t.id}}</td>
-      <td>{{t.name}}</td>
-      <td>
-        <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
-        <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
-        <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
-        <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
-      </td>
-      <td>{{t.slogan}}</td>
-      <td>{{t.total_user_associations}}</td>
-      <td>
-        <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
-        <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <ng-container *ngIf="teams.length">
+    <table class="ui table unstackable">
+      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let t of teams">
+        <td>{{t.id}}</td>
+        <td>{{t.name}}</td>
+        <td>
+          <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
+          <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
+          <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
+          <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
+        </td>
+        <td>{{t.slogan}}</td>
+        <td>{{t.total_user_associations}}</td>
+        <td>
+          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
+          <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
+        </td>
+      </tr>
+      </tbody>
+    </table>
 
-  <div class="ui divider horizontal">Or</div>
+    <div class="ui divider horizontal">Or</div>
+  </ng-container>
 
   <div class="ui grid centered stackable">
     <div class="column new-team">
