@@ -1,0 +1,12 @@
+<app-error-message [error]="error"></app-error-message>
+
+<div *ngIf="task">
+  <div class="ui segment task-description" *ngIf="task.description">
+    {{ task.description }}
+  </div>
+
+  <div class="ui message info">
+    <i class="icon info circle"></i>
+    You will see more details after the opening time.
+  </div>
+</div>

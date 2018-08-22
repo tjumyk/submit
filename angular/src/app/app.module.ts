@@ -41,6 +41,8 @@ import { TeamSubmissionDetailsComponent } from './team-submission-details/team-s
 import { SubmissionListComponent } from './submission-list/submission-list.component';
 import { TeamSubmissionListComponent } from './team-submission-list/team-submission-list.component';
 import { JoinOrCreateTeamComponent } from './join-or-create-team/join-or-create-team.component';
+import { TaskPreviewComponent } from './task-preview/task-preview.component';
+import { TaskDetailsPreviewComponent } from './task-details-preview/task-details-preview.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +83,8 @@ import { JoinOrCreateTeamComponent } from './join-or-create-team/join-or-create-
     SubmissionListComponent,
     TeamSubmissionListComponent,
     JoinOrCreateTeamComponent,
+    TaskPreviewComponent,
+    TaskDetailsPreviewComponent,
   ],
   imports: [
     BrowserModule,

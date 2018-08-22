@@ -14,7 +14,9 @@
           <div class="content">
             <div class="header">{{ task.title }}</div>
             <div class="description">
-              <p class="task-description">{{ task.description }}</p>
+              <p class="task-description" *ngIf="task.description">
+                {{ task.description.split('\n', 1)[0] }}
+              </p>
               <div class="ui list">
                 <div class="item">
                   <i class="icon clock outline"></i>
@@ -38,12 +40,15 @@
               <ng-template #timeTbd>TBD</ng-template>
             </div>
           </div>
-          <div class="extra content" *ngIf="task._accessible">
-            <div class="ui buttons fluid">
+          <div class="extra content">
+            <div class="ui buttons fluid" *ngIf="task._accessible; else previewBtn">
               <a routerLink="{{ task.id }}" class="ui primary button"><i class="icon list"></i> Details</a>
               <a routerLink="{{ task.id }}/submit" class="ui button" *ngIf="accessRoles.has('student')"><i class="icon paper plane outline"></i> Submit</a>
               <a routerLink="/admin/tasks/{{ task.id }}" class="ui button" *ngIf="accessRoles.has('admin')"><i class="icon cog"></i> Configs</a>
             </div>
+            <ng-template #previewBtn>
+              <a routerLink="../tasks-preview/{{ task.id }}" class="ui button fluid"><i class="icon eye"></i> Preview</a>
+            </ng-template>
           </div>
         </div>
       </div>

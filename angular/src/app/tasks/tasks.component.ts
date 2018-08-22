@@ -81,12 +81,12 @@ export class TasksComponent implements OnInit, OnDestroy {
       list.push(task);
     }
 
-    const allowPreview = this.accessRoles.has('admin') || this.accessRoles.has('tutor');
+    const allowAccessBeforeOpen = this.accessRoles.has('admin') || this.accessRoles.has('tutor');
 
     const timeTracker = ()=>{
       const now = moment.now();
       for(let task of tasks){
-        task['_accessible'] = allowPreview || moment(task.open_time).isSameOrBefore(now);
+        task['_accessible'] = allowAccessBeforeOpen || (task.open_time && moment(task.open_time).isSameOrBefore(now));
         task['_open_time_from_now'] = task.open_time ? moment(task.open_time).fromNow() : null;
         task['_due_time_from_now'] = task.due_time ? moment(task.due_time).fromNow() : null;
         task['_close_time_from_now'] = task.close_time ? moment(task.close_time).fromNow() : null;

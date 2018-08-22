@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
   Submission,
@@ -29,6 +29,7 @@ export class NewTeamForm {
 export class TaskService {
   private api = 'api/tasks';
   private cachedTasks: { [key: number]: Task } = {};
+  private cachedTaskPreviews: { [key: number]: Task } = {};
 
   constructor(
     private http: HttpClient
@@ -79,6 +80,20 @@ export class TaskService {
     if (task)
       return of(task);
     return this.getTask(id);
+  }
+
+  getTaskPreview(id: number): Observable<Task> {
+    const params = new HttpParams().append('preview', 'true');
+    return this.http.get<Task>(`${this.api}/${id}`, {params: params}).pipe(
+      tap(task => this.cachedTaskPreviews[task.id] = task)
+    )
+  }
+
+  getCachedTaskPreview(id: number): Observable<Task> {
+    const task = this.cachedTaskPreviews[id];
+    if (task)
+      return of(task);
+    return this.getTaskPreview(id);
   }
 
   addSubmission(task_id: number, files: { [key: number]: File }): Observable<Submission> {

@@ -30,6 +30,8 @@ import {TeamSubmissionsComponent} from "./team-submissions/team-submissions.comp
 import {TeamSubmissionListComponent} from "./team-submission-list/team-submission-list.component";
 import {TeamSubmissionDetailsComponent} from "./team-submission-details/team-submission-details.component";
 import {JoinOrCreateTeamComponent} from "./join-or-create-team/join-or-create-team.component";
+import {TaskPreviewComponent} from "./task-preview/task-preview.component";
+import {TaskDetailsPreviewComponent} from "./task-details-preview/task-details-preview.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -39,6 +41,16 @@ const routes: Routes = [
     children: [
       {path: '', pathMatch: 'full', redirectTo: 'tasks'},
       {path: 'tasks', pathMatch: 'full', component: TasksComponent},
+      {
+        path: 'tasks-preview/:task_id',
+        component: TaskPreviewComponent,
+        children: [
+          {path: '', pathMatch: 'full', redirectTo: 'details'},
+          {path: 'details', component: TaskDetailsPreviewComponent},
+          {path: 'my-team', component: MyTeamComponent},
+          {path: 'my-team/join-or-create', component: JoinOrCreateTeamComponent},
+        ]
+      },
       {
         path: 'tasks/:task_id',
         component: TaskComponent,
