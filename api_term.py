@@ -38,6 +38,8 @@ def term_tasks(term_id):
             return jsonify(msg='term not found'), 404
         if not TermService.get_access_roles(term, user):
             return jsonify(msg='access forbidden'), 403
-        return jsonify([t.to_dict() for t in term.tasks])
+
+        # Notice: must not expose task details in this api because there's no time check here
+        return jsonify([t.to_dict(with_details=False) for t in term.tasks])
     except TermServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
