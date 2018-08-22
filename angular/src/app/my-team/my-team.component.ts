@@ -1,21 +1,26 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TaskService} from "../task.service";
 import {TeamService} from "../team.service";
-import {ErrorMessage, Team, User, UserTeamAssociation} from "../models";
+import {ErrorMessage, Task, Team, User, UserTeamAssociation} from "../models";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {AccountService} from "../account.service";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-my-team',
   templateUrl: './my-team.component.html',
   styleUrls: ['./my-team.component.less']
 })
-export class MyTeamComponent implements OnInit {
+export class MyTeamComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
 
   taskId: number;
   user: User;
+  task: Task;
+
+  beforeOpen: boolean;
+  timeTrackerHandler: number;
 
   teamAssociation: UserTeamAssociation;
   loadingTeamAssociation: boolean;
@@ -34,25 +39,49 @@ export class MyTeamComponent implements OnInit {
   }
 
   ngOnInit() {
-    // clear for reload
-    this.user = null;
-    this.teamAssociation = null;
-    this.team = null;
-
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
 
     this.accountService.getCurrentUser().subscribe(
       user => {
         this.user = user;
 
-        this.loadingTeamAssociation = true;
-        this.taskService.getMyTeamAssociation(this.taskId).pipe(
-          finalize(() => this.loadingTeamAssociation = false)
-        ).subscribe(
-          teamAssociation => this.setupTeamAssociation(teamAssociation),
+        let getTask;
+        if (this.route.parent.snapshot.url[0].path == 'tasks-preview') {
+          getTask = this.taskService.getCachedTaskPreview(this.taskId);
+        } else {
+          getTask = this.taskService.getCachedTask(this.taskId);
+        }
+        getTask.subscribe(
+          task => this.setupTask(task),
           error => this.error = error.error
-        )
+        );
       },
+      error => this.error = error.error
+    )
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.timeTrackerHandler);
+  }
+
+  private setupTask(task: Task) {
+    this.task = task;
+
+    const timeTracker = () => {
+      if (!task.open_time) {
+        this.beforeOpen = true
+      } else {
+        this.beforeOpen = !moment(task.open_time).isSameOrBefore(moment())
+      }
+    };
+    timeTracker();
+    this.timeTrackerHandler = setInterval(timeTracker, 10000);
+
+    this.loadingTeamAssociation = true;
+    this.taskService.getMyTeamAssociation(this.taskId).pipe(
+      finalize(() => this.loadingTeamAssociation = false)
+    ).subscribe(
+      teamAssociation => this.setupTeamAssociation(teamAssociation),
       error => this.error = error.error
     )
   }
