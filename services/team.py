@@ -1,6 +1,7 @@
 import re
 from typing import Optional, List, Tuple
 
+from datetime import datetime
 from sqlalchemy import or_, func
 
 from error import BasicError
@@ -88,6 +89,8 @@ class TeamService:
 
         if not task.is_team_task:
             raise TeamServiceError('task is not a team task')
+
+        # Notice: no time check here
 
         ass = UserTeamAssociation.query.filter_by(user=creator) \
             .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == task.id) \
@@ -290,6 +293,8 @@ class TeamService:
 
         members = db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id).scalar()
         task = team.task
+        if task.open_time is None or task.open_time > datetime.utcnow():
+            raise TeamServiceError('task has not yet open')
         if task.team_min_size is not None and members < task.team_min_size:
             raise TeamServiceError('too few members', 'At least %d members are required' % task.team_min_size)
         if task.team_max_size is not None and members > task.team_max_size:
