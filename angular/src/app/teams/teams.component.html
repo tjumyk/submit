@@ -17,7 +17,10 @@
     <td>{{team.slogan}}</td>
     <td>{{team.total_user_associations}}</td>
     <td>
-      <a class="ui button icon mini" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
+      <div class="ui buttons mini">
+        <a class="ui button icon" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
+        <a *ngIf="accessRoles.has('admin')" class="ui button icon red" title="Delete" (click)="deleteTeam(team, i, btnDeleteTeam)" #btnDeleteTeam><i class="icon trash"></i></a>
+      </div>
     </td>
   </tr>
   </tbody>

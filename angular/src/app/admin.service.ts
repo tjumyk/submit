@@ -243,4 +243,8 @@ export class AdminService {
   deleteSpecialConsiderations(spec_id: number):Observable<any>{
     return this.http.delete(`${this.api}/special-considerations/${spec_id}`)
   }
+
+  deleteTeam(team_id: number):Observable<any>{
+    return this.http.delete(`${this.api}/teams/${team_id}`)
+  }
 }

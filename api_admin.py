@@ -370,6 +370,7 @@ def admin_team(team_id):
         else:  # DELETE
             db.session.delete(team)
             db.session.commit()
+            return "", 204
     except (TeamServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
