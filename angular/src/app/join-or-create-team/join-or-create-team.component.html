@@ -8,7 +8,7 @@
     <div class="content" *ngIf="teams.length; else noExistingTeams">
       You are not in any team now!
       <div class="sub header">
-        Please join an existing team or create a new team
+        Please create a new team or join an existing team
       </div>
     </div>
     <ng-template #noExistingTeams>
@@ -20,34 +20,6 @@
       </div>
     </ng-template>
   </div>
-
-  <ng-container *ngIf="teams.length">
-    <table class="ui table unstackable">
-      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
-      <tbody>
-      <tr *ngFor="let t of teams">
-        <td>{{t.id}}</td>
-        <td>{{t.name}}</td>
-        <td>
-          <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
-          <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
-          <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
-          <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
-        </td>
-        <td>{{t.slogan}}</td>
-        <td>{{t.total_user_associations}}</td>
-        <td>
-          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
-          <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div class="ui divider horizontal">Or</div>
-  </ng-container>
-
-  <app-error-message [error]="createTeamError"></app-error-message>
 
   <div class="ui grid centered stackable">
     <div class="column new-team">
@@ -86,4 +58,40 @@
       </div>
     </div>
   </div>
+
+  <ng-container *ngIf="teams.length">
+    <div class="ui divider horizontal">Or</div>
+
+    <div class="ui menu secondary fitted">
+      <div class="item">
+        <div class="ui input left icon">
+          <i class="icon search"></i>
+          <input type="text" #inputTeamSearchKey (keyup)="teamSearchKey.next(inputTeamSearchKey.value)"
+                 placeholder="Search team...">
+        </div>
+      </div>
+    </div>
+
+    <table class="ui table unstackable">
+      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let t of listedTeams">
+        <td>{{t.id}}</td>
+        <td>{{t.name}}</td>
+        <td>
+          <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
+          <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
+          <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
+          <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
+        </td>
+        <td>{{t.slogan}}</td>
+        <td>{{t.total_user_associations}}</td>
+        <td>
+          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
+          <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ng-container>
 </div>
