@@ -3,6 +3,7 @@ from typing import Optional, List, Tuple
 
 from datetime import datetime
 from sqlalchemy import or_, func
+from sqlalchemy.orm import joinedload
 
 from error import BasicError
 from models import Team, db, UserTeamAssociation, UserAlias, Task
@@ -52,6 +53,7 @@ class TeamService:
             .group_by(Team.id).subquery()
         return db.session.query(Team, sub_query.c.total_user_associations) \
             .filter(Team.id == sub_query.c.team_id) \
+            .options(joinedload(Team.creator)) \
             .all()
 
     @staticmethod
