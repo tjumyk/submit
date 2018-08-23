@@ -6,9 +6,20 @@
     <div class="ui active text loader inline centered" *ngIf="loadingUsers">Loading users...</div>
     <div *ngIf="!loadingUsers">
       <div class="ui top attached clearing segment">
-        <a class="ui right floated button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
-          <i class="icon sync"></i> Sync Users
-        </a>
+        <div class="ui right floated menu secondary fitted">
+          <div class="item">
+            <div class="ui input icon">
+              <input type="text" name="userSearchKey" #inputUserSearch (keyup)="userSearchKey.next(inputUserSearch.value)"
+                     placeholder="Search by name...">
+              <i class="icon search"></i>
+            </div>
+          </div>
+          <div class="item">
+            <a class="ui button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
+              <i class="icon sync"></i> Sync Users
+            </a>
+          </div>
+        </div>
         <div class="ui left floated header">
           <i class="icon user"></i> Synced Users
         </div>

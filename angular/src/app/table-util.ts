@@ -7,14 +7,16 @@ export class PageEntry {
 export class Pagination<T> {
   readonly itemsPerPageOptions = [10, 20, 50, 100, 200, 500];
   readonly _pageEntryPadding = 3;
+  private _fieldComparators: { [key: string]: (a, b) => number } = {};
 
-  private _page: number = 1;
-  private _pages: number = 1;
-  private _itemsPerPage: number = 10; // make sure use one of itemsPerPageOptions as the default value
+  private _page: number;
+  private _pages: number;
+  private _itemsPerPage: number; // make sure use one of itemsPerPageOptions as the default value
 
   private _sortField: string;
   private _isSortDescending: boolean;
-  private _fieldComparators: { [key: string]: (a, b) => number } = {};
+  private _searchField: string;
+  private _searchKey: string;
 
   private _sourceItems: T[];
   private _items: T[];
@@ -22,8 +24,9 @@ export class Pagination<T> {
   private _pageItems: T[];
   private _pageEntries: PageEntry[];
 
-  constructor(sourceItems?: T[]) {
+  constructor(sourceItems?: T[], itemsPerPage: number = 20) {
     this._sourceItems = sourceItems;
+    this._itemsPerPage = itemsPerPage;
     this.updatePages()
   }
 
@@ -108,10 +111,26 @@ export class Pagination<T> {
       return
     }
 
-    // do sorting if required
     let items = this._sourceItems;
+    let usingSource = true;
+
+    // do filtering if required
+    if (this._searchField && this._searchKey) {
+      // only support string search now
+      const lowerKey = (this._searchKey + '').toLowerCase();
+      items = items.filter((item) => {
+        const lowerValue = (item[this._searchField] + '').toLowerCase();
+        return lowerValue.indexOf(lowerKey) >= 0
+      });
+      usingSource = false;
+    }
+
+    // do sorting if required
     if (this._sortField) {
-      items = items.slice(); // make a copy first
+      if (usingSource) {
+        items = items.slice(); // make a copy first
+        usingSource = false;
+      }
       // find compare function
       const compareFn = this._fieldComparators[this._sortField];
 
@@ -137,7 +156,7 @@ export class Pagination<T> {
     this._items = items;
 
     // compute pages
-    this._pages = Math.ceil(this._items.length / this._itemsPerPage);
+    this._pages = Math.ceil(this._items.length / this._itemsPerPage) || 1; // at least 1 page
     this._page = 1;
     this._itemPages = [];
     for (let i = 0; i < this._pages; ++i) {
@@ -158,17 +177,15 @@ export class Pagination<T> {
   }
 
   private makeEntries() {
-    const start = this._page - this._pageEntryPadding;
-    const end = this._page + this._pageEntryPadding;
+    const start = Math.max(1, this._page - this._pageEntryPadding);
+    const end = Math.min(this._pages, this._page + this._pageEntryPadding);
 
     this._pageEntries = [];
     for (let i = start; i <= end; ++i) {
-      if (i >= 1 && i <= this._pages) {
-        let entry: PageEntry = {page: i};
-        if (i == this._page)
-          entry.is_current = true;
-        this._pageEntries.push(entry)
-      }
+      let entry: PageEntry = {page: i};
+      if (i == this._page)
+        entry.is_current = true;
+      this._pageEntries.push(entry)
     }
     if (start > 2) {
       this._pageEntries.unshift({is_ellipse: true})
@@ -209,6 +226,14 @@ export class Pagination<T> {
       this._sortField = field;
       this._isSortDescending = isDescending;
       this.updatePages();
+    }
+  }
+
+  search(field: string, key: string) {
+    if (field != this._searchField || key != this._searchKey) {
+      this._searchField = field;
+      this._searchKey = key;
+      this.updatePages()
     }
   }
 

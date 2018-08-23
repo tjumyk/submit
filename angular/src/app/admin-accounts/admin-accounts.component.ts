@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Group, SuccessMessage, User} from "../models";
 import {AdminService} from "../admin.service";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {Pagination} from "../table-util";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-admin-accounts',
@@ -14,7 +15,8 @@ export class AdminAccountsComponent implements OnInit {
   success: SuccessMessage;
   loadingUsers: boolean;
   loadingGroups: boolean;
-  userPages = new Pagination<User>();
+  userPages: Pagination<User>;
+  userSearchKey = new Subject<string>();
   groups: Group[];
 
   syncingUsers: boolean;
@@ -26,6 +28,13 @@ export class AdminAccountsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.userSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      (key) => this.userPages.search('name', key),
+      error => this.error = error.error
+    );
+
     this.loadUsers();
     this.loadGroups();
   }
@@ -45,7 +54,7 @@ export class AdminAccountsComponent implements OnInit {
     this.adminService.getUsers().pipe(
       finalize(() => this.loadingUsers = false)
     ).subscribe(
-      users => this.userPages.sourceItems = users,
+      users => this.userPages = new Pagination<User>(users, 10),
       error => this.error = error.error
     );
   }
@@ -70,18 +79,18 @@ export class AdminAccountsComponent implements OnInit {
     )
   }
 
-  deleteUser(user:User, btn:HTMLElement){
-    if(!confirm(`Really want to delete user "${user.name}"? Only local alias will be deleted.`))
+  deleteUser(user: User, btn: HTMLElement) {
+    if (!confirm(`Really want to delete user "${user.name}"? Only local alias will be deleted.`))
       return;
 
     btn.classList.add('loading', 'disabled');
     this.adminService.deleteUser(user.id).pipe(
-      finalize(()=>btn.classList.remove('loading', 'disabled'))
+      finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
-      ()=>{
+      () => {
         let index = 0;
-        for(let _user of this.userPages.sourceItems){
-          if(_user.id == user.id){
+        for (let _user of this.userPages.sourceItems) {
+          if (_user.id == user.id) {
             this.userPages.sourceItems.splice(index, 1);
             this.userPages.reload();
             break;
@@ -89,20 +98,20 @@ export class AdminAccountsComponent implements OnInit {
           ++index;
         }
       },
-      error=>this.error=error.error
+      error => this.error = error.error
     )
   }
 
-  deleteGroup(group:Group, index: number, btn:HTMLElement){
-    if(!confirm(`Really want to delete group "${group.name}"? Only local alias will be deleted.`))
+  deleteGroup(group: Group, index: number, btn: HTMLElement) {
+    if (!confirm(`Really want to delete group "${group.name}"? Only local alias will be deleted.`))
       return;
 
     btn.classList.add('loading', 'disabled');
     this.adminService.deleteGroup(group.id).pipe(
-      finalize(()=>btn.classList.remove('loading', 'disabled'))
+      finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
-      ()=>this.groups.splice(index, 1),
-      error=>this.error=error.error
+      () => this.groups.splice(index, 1),
+      error => this.error = error.error
     )
   }
 
