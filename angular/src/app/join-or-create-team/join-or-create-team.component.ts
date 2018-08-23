@@ -14,6 +14,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class JoinOrCreateTeamComponent implements OnInit {
   error: ErrorMessage;
+  createTeamError: ErrorMessage;
 
   taskId: number;
   user: User;
@@ -84,7 +85,7 @@ export class JoinOrCreateTeamComponent implements OnInit {
       finalize(() => this.creatingTeam = false)
     ).subscribe(
       team => this.navigateToMyTeam(),
-      error => this.error = error.error
+      error => this.createTeamError = error.error
     )
   }
 
@@ -94,7 +95,10 @@ export class JoinOrCreateTeamComponent implements OnInit {
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
       () => this.navigateToMyTeam(),
-      error => this.error = error.error
+      error => {
+        this.error = error.error;
+        window.scroll(0, 0); // simple way to let the user see the error message if the team list is too long
+      }
     )
   }
 
