@@ -54,6 +54,7 @@ class TeamService:
         return db.session.query(Team, sub_query.c.total_user_associations) \
             .filter(Team.id == sub_query.c.team_id) \
             .options(joinedload(Team.creator)) \
+            .order_by(Team.id) \
             .all()
 
     @staticmethod
