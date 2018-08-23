@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Group, SuccessMessage, User} from "../models";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
+import {Pagination} from "../table-util";
 
 @Component({
   selector: 'app-admin-accounts',
@@ -13,7 +14,7 @@ export class AdminAccountsComponent implements OnInit {
   success: SuccessMessage;
   loadingUsers: boolean;
   loadingGroups: boolean;
-  users: User[];
+  userPages = new Pagination<User>();
   groups: Group[];
 
   syncingUsers: boolean;
@@ -44,7 +45,7 @@ export class AdminAccountsComponent implements OnInit {
     this.adminService.getUsers().pipe(
       finalize(() => this.loadingUsers = false)
     ).subscribe(
-      users => this.users = users,
+      users => this.userPages.sourceItems = users,
       error => this.error = error.error
     );
   }
@@ -69,7 +70,7 @@ export class AdminAccountsComponent implements OnInit {
     )
   }
 
-  deleteUser(user:User, index: number, btn:HTMLElement){
+  deleteUser(user:User, btn:HTMLElement){
     if(!confirm(`Really want to delete user "${user.name}"? Only local alias will be deleted.`))
       return;
 
@@ -77,7 +78,17 @@ export class AdminAccountsComponent implements OnInit {
     this.adminService.deleteUser(user.id).pipe(
       finalize(()=>btn.classList.remove('loading', 'disabled'))
     ).subscribe(
-      ()=>this.users.splice(index, 1),
+      ()=>{
+        let index = 0;
+        for(let _user of this.userPages.sourceItems){
+          if(_user.id == user.id){
+            this.userPages.sourceItems.splice(index, 1);
+            this.userPages.reload();
+            break;
+          }
+          ++index;
+        }
+      },
       error=>this.error=error.error
     )
   }
@@ -93,6 +104,31 @@ export class AdminAccountsComponent implements OnInit {
       ()=>this.groups.splice(index, 1),
       error=>this.error=error.error
     )
+  }
+
+  sortField(field: string, th: HTMLElement) {
+    let sibling = th.parentNode.firstChild;
+    while (sibling) {
+      if (sibling.nodeType == 1 && sibling != th) {
+        (sibling as Element).classList.remove('sorted', 'descending', 'ascending');
+      }
+      sibling = sibling.nextSibling;
+    }
+
+    if (!th.classList.contains('sorted')) {
+      th.classList.add('sorted', 'ascending');
+      th.classList.remove('descending');
+      this.userPages.sort(field, false);
+    } else {
+      if (th.classList.contains('ascending')) {
+        th.classList.remove('ascending');
+        th.classList.add('descending');
+        this.userPages.sort(field, true);
+      } else {
+        th.classList.remove('sorted', 'descending', 'ascending');
+        this.userPages.sort(null);
+      }
+    }
   }
 
 }

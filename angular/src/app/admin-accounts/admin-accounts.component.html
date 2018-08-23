@@ -1,24 +1,32 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
 
-<div class="ui grid two column stackable">
+<div class="ui grid stackable one column">
   <div class="column">
     <div class="ui active text loader inline centered" *ngIf="loadingUsers">Loading users...</div>
-    <div *ngIf="users">
+    <div *ngIf="!loadingUsers">
       <div class="ui top attached clearing segment">
+        <a class="ui right floated button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
+          <i class="icon sync"></i> Sync Users
+        </a>
         <div class="ui left floated header">
           <i class="icon user"></i> Synced Users
         </div>
-        <div class="ui right floated header">
-          <a class="ui button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
-            <i class="icon sync"></i> Sync Users
-          </a>
-        </div>
       </div>
-      <table class="ui compact unstackable bottom attached table celled">
-        <thead><tr><th>ID</th><th>Name</th><th>E-mail</th><th>Nickname</th><th>Ops</th></tr></thead>
+      <table class="ui sortable compact unstackable attached table celled">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th (click)="sortField('id', thID)" #thID>ID</th>
+          <th (click)="sortField('name', thName)" #thName>Name</th>
+          <th (click)="sortField('email', thEmail)" #thEmail>E-mail</th>
+          <th (click)="sortField('nickname', thNickName)" #thNickName>Nickname</th>
+          <th>Ops</th>
+        </tr>
+        </thead>
         <tbody>
-        <tr *ngFor="let user of users; index as i">
+        <tr *ngFor="let user of userPages.pageItems; index as i">
+          <td>{{userPages.startRow + i}}</td>
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
@@ -26,12 +34,36 @@
           <td>
             <div class="ui small buttons">
               <a target="_blank" href="admin/users/{{ user.id }}" class="ui button icon"><i class="icon edit"></i></a>
-              <a #btnDeleteUser class="ui button icon red" (click)="deleteUser(user, i, btnDeleteUser)"><i class="icon trash"></i></a>
+              <a #btnDeleteUser class="ui button icon red" (click)="deleteUser(user, btnDeleteUser)"><i class="icon trash"></i></a>
             </div>
           </td>
         </tr>
         </tbody>
       </table>
+      <div class="ui segment bottom attached clearing">
+        <div class="ui menu right floated secondary fitted">
+          <div class="item">
+            Showing {{userPages.startRow}}-{{userPages.endRow}} Rows, Total: {{userPages.items.length}}
+          </div>
+          <div class="item">
+            <form class="ui form">
+              <div class="inline field">
+                <label>Rows Per Page</label>
+                <select name="itemsPerPage" [(ngModel)]="userPages.itemsPerPage">
+                  <option [value]="num" *ngFor="let num of userPages.itemsPerPageOptions">{{num}}</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="ui pagination menu left floated">
+          <a class="item" *ngFor="let entry of userPages.pageEntries"
+             [ngClass]="{'active': entry.is_current, 'disabled': entry.is_ellipse}"
+             (click)="userPages.page=entry.page||userPages.page">
+            {{entry.page || '...'}}
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -39,13 +71,11 @@
     <div class="ui active text loader inline centered" *ngIf="loadingGroups">Loading groups...</div>
     <div *ngIf="groups">
       <div class="ui top attached clearing segment">
+        <a class="ui right floated button small primary" (click)="syncGroups()" [ngClass]="{'loading disabled': syncingGroups}">
+          <i class="icon sync"></i> Sync Groups
+        </a>
         <div class="ui left floated header">
           <i class="icon users"></i> Synced Groups
-        </div>
-        <div class="ui right floated header">
-          <a class="ui button small primary" (click)="syncGroups()" [ngClass]="{'loading disabled': syncingGroups}">
-            <i class="icon sync"></i> Sync Groups
-          </a>
         </div>
       </div>
       <table class="ui compact unstackable bottom attached table celled">
