@@ -62,12 +62,12 @@
   <ng-container *ngIf="teams.length">
     <div class="ui divider horizontal">Or</div>
 
-    <div class="ui menu secondary fitted">
-      <div class="item">
-        <div class="ui input left icon">
+    <div class="ui grid stackable centered">
+      <div class="column search-team">
+        <div class="ui input left icon fluid">
           <i class="icon search"></i>
           <input type="text" #inputTeamSearchKey (keyup)="teamSearchKey.next(inputTeamSearchKey.value)"
-                 placeholder="Search team...">
+                 placeholder="Search for a team to join...">
         </div>
       </div>
     </div>
