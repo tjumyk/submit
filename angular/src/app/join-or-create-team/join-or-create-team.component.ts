@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForm} from "@angular/forms";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {ErrorMessage, Team, User, UserTeamAssociation} from "../models";
 import {NewTeamForm, TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {TeamService} from "../team.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-join-or-create-team',
@@ -14,7 +15,6 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class JoinOrCreateTeamComponent implements OnInit {
   error: ErrorMessage;
-  createTeamError: ErrorMessage;
 
   taskId: number;
   user: User;
@@ -28,6 +28,10 @@ export class JoinOrCreateTeamComponent implements OnInit {
   newTeamForm: NewTeamForm = new NewTeamForm();
   creatingTeam: boolean;
 
+  teamSearchKey = new Subject<string>();
+  currentTeamSearchKey: string;
+  listedTeams: Team[];
+
   constructor(
     private accountService: AccountService,
     private taskService: TaskService,
@@ -39,6 +43,16 @@ export class JoinOrCreateTeamComponent implements OnInit {
 
   ngOnInit() {
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
+
+    this.teamSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      key => {
+        this.currentTeamSearchKey = key;
+        this.updateList();
+      },
+      error => this.error = error.error
+    );
 
     this.accountService.getCurrentUser().subscribe(
       user => {
@@ -64,7 +78,10 @@ export class JoinOrCreateTeamComponent implements OnInit {
       this.taskService.getTeams(this.taskId).pipe(
         finalize(() => this.loadingTeams = false)
       ).subscribe(
-        teams => this.teams = teams,
+        teams => {
+          this.teams = teams;
+          this.updateList();
+        },
         error => this.error = error.error
       )
     } else {
@@ -85,7 +102,7 @@ export class JoinOrCreateTeamComponent implements OnInit {
       finalize(() => this.creatingTeam = false)
     ).subscribe(
       team => this.navigateToMyTeam(),
-      error => this.createTeamError = error.error
+      error => this.error = error.error
     )
   }
 
@@ -100,6 +117,37 @@ export class JoinOrCreateTeamComponent implements OnInit {
         window.scroll(0, 0); // simple way to let the user see the error message if the team list is too long
       }
     )
+  }
+
+  updateList() {
+    let listed: Team[];
+    if (this.currentTeamSearchKey) {
+      const searchKeyLower = this.currentTeamSearchKey.toLowerCase();
+      listed = this.teams.filter((team) => {
+        if (team.name.toLowerCase().indexOf(searchKeyLower) >= 0)
+          return true;
+        if (team.id.toString().indexOf(searchKeyLower) >= 0)
+          return true;
+        if (team.creator.name.toLowerCase().indexOf(searchKeyLower) >= 0)
+          return true;
+        if (team.creator.nickname && team.creator.nickname.toLowerCase().indexOf(searchKeyLower) >= 0)
+          return true;
+        if (team.slogan && team.slogan.toLowerCase().indexOf(searchKeyLower) >= 0)
+          return true;
+        return false;
+      })
+    } else {
+      listed = this.teams.slice(); // make a copy
+    }
+
+    listed.sort((a, b) => {
+      if (a.is_finalised && !b.is_finalised)
+        return 1;
+      if (b.is_finalised && !a.is_finalised)
+        return -1;
+      return a.id - b.id
+    });
+    this.listedTeams = listed;
   }
 
 }

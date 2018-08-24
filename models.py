@@ -153,7 +153,8 @@ class Team(db.Model):
         if with_creator:
             d['creator'] = self.creator.to_dict()
         if with_associations:
-            d['user_associations'] = [a.to_dict(with_user=True) for a in self.user_associations]
+            d['user_associations'] = [a.to_dict(with_user=True) for a in
+                                      sorted(self.user_associations, key=lambda a: a.created_at)]
         return d
 
 
