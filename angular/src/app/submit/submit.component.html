@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <div class="ui segment">
+    <div class="ui segment" *ngIf="task.file_requirements.length; else noFileRequirements">
       <form class="ui form" [ngClass]="{'loading': submitting}" (submit)="submit()">
         <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors, 'disabled': !isReadyToSubmit}">
           <label>{{req.name}} <span *ngIf="req.is_optional">(Optional)</span></label>
@@ -91,6 +91,16 @@
         <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
       </form>
     </div>
+
+    <ng-template #noFileRequirements>
+      <div class="ui info message icon">
+        <i class="icon expand"></i>
+        <div class="content">
+          <div class="header">No file requirements</div>
+          <p>You are not required to submit anything for this task right now.</p>
+        </div>
+      </div>
+    </ng-template>
 
   </div>
 </div>
