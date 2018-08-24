@@ -8,6 +8,7 @@ export class Pagination<T> {
   readonly itemsPerPageOptions = [10, 20, 50, 100, 200, 500];
   readonly _pageEntryPadding = 3;
   private _fieldComparators: { [key: string]: (a, b) => number } = {};
+  private _searchMatcher: (item: T, key: string) => boolean;
 
   private _page: number;
   private _pages: number;
@@ -15,7 +16,6 @@ export class Pagination<T> {
 
   private _sortField: string;
   private _isSortDescending: boolean;
-  private _searchField: string;
   private _searchKey: string;
 
   private _sourceItems: T[];
@@ -115,13 +115,8 @@ export class Pagination<T> {
     let usingSource = true;
 
     // do filtering if required
-    if (this._searchField && this._searchKey) {
-      // only support string search now
-      const lowerKey = (this._searchKey + '').toLowerCase();
-      items = items.filter((item) => {
-        const lowerValue = (item[this._searchField] + '').toLowerCase();
-        return lowerValue.indexOf(lowerKey) >= 0
-      });
+    if (this._searchMatcher && this._searchKey) {
+      items = items.filter((item) => this._searchMatcher(item, this._searchKey));
       usingSource = false;
     }
 
@@ -229,12 +224,15 @@ export class Pagination<T> {
     }
   }
 
-  search(field: string, key: string) {
-    if (field != this._searchField || key != this._searchKey) {
-      this._searchField = field;
+  search(key: string) {
+    if (key != this._searchKey) {
       this._searchKey = key;
       this.updatePages()
     }
+  }
+
+  setSearchMatcher(matcher: (item: T, key: string) => boolean) {
+    this._searchMatcher = matcher;
   }
 
   setFieldComparator(field: string, compareFn: (a, b) => number) {
