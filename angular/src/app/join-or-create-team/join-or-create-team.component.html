@@ -73,7 +73,7 @@
     </div>
 
     <table class="ui table unstackable">
-      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th>Operations</th></tr></thead>
+      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th class="collapsing">Operations</th></tr></thead>
       <tbody>
       <tr *ngFor="let t of listedTeams">
         <td>{{t.id}}</td>
@@ -86,7 +86,7 @@
         </td>
         <td>{{t.slogan}}</td>
         <td>{{t.total_user_associations}}</td>
-        <td>
+        <td class="collapsing">
           <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
           <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
         </td>
