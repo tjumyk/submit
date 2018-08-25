@@ -17,32 +17,29 @@ import {AdminCourseNewComponent} from './admin-course-new/admin-course-new.compo
 import {SuccessMessageComponent} from './success-message/success-message.component';
 import {AdminAccountsComponent} from './admin-accounts/admin-accounts.component';
 import {AdminTaskEditComponent} from './admin-task-edit/admin-task-edit.component';
-import {AdminTeamsComponent} from './admin-teams/admin-teams.component';
+
 import {TermComponent} from './term/term.component';
 import {TaskComponent} from './task/task.component';
 import {TeamComponent} from './team/team.component';
 import {SubmitComponent} from './submit/submit.component';
-import {AdminSubmissionsComponent} from './admin-submissions/admin-submissions.component';
-import {AdminSubmissionComponent} from './admin-submission/admin-submission.component';
 import {TeamsComponent} from './teams/teams.component';
-import {AdminTeamComponent} from './admin-team/admin-team.component';
 import {SizePipe} from './size.pipe';
 import {TasksComponent} from './tasks/tasks.component';
 import {TaskDetailsComponent} from './task-details/task-details.component';
 import {SubmissionsComponent} from './submissions/submissions.component';
 import {MySubmissionsComponent} from './my-submissions/my-submissions.component';
-import { MySubmissionDetailsComponent } from './my-submission-details/my-submission-details.component';
-import { SubmissionDetailsComponent } from './submission-details/submission-details.component';
-import { MyTeamComponent } from './my-team/my-team.component';
-import { MyTeamSubmissionsComponent } from './my-team-submissions/my-team-submissions.component';
-import { MyTeamSubmissionDetailsComponent } from './my-team-submission-details/my-team-submission-details.component';
-import { TeamSubmissionsComponent } from './team-submissions/team-submissions.component';
-import { TeamSubmissionDetailsComponent } from './team-submission-details/team-submission-details.component';
-import { SubmissionListComponent } from './submission-list/submission-list.component';
-import { TeamSubmissionListComponent } from './team-submission-list/team-submission-list.component';
-import { JoinOrCreateTeamComponent } from './join-or-create-team/join-or-create-team.component';
-import { TaskPreviewComponent } from './task-preview/task-preview.component';
-import { TaskDetailsPreviewComponent } from './task-details-preview/task-details-preview.component';
+import {MySubmissionDetailsComponent} from './my-submission-details/my-submission-details.component';
+import {SubmissionDetailsComponent} from './submission-details/submission-details.component';
+import {MyTeamComponent} from './my-team/my-team.component';
+import {MyTeamSubmissionsComponent} from './my-team-submissions/my-team-submissions.component';
+import {MyTeamSubmissionDetailsComponent} from './my-team-submission-details/my-team-submission-details.component';
+import {TeamSubmissionsComponent} from './team-submissions/team-submissions.component';
+import {TeamSubmissionDetailsComponent} from './team-submission-details/team-submission-details.component';
+import {SubmissionListComponent} from './submission-list/submission-list.component';
+import {TeamSubmissionListComponent} from './team-submission-list/team-submission-list.component';
+import {JoinOrCreateTeamComponent} from './join-or-create-team/join-or-create-team.component';
+import {TaskPreviewComponent} from './task-preview/task-preview.component';
+import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-preview.component';
 
 @NgModule({
   declarations: [
@@ -59,15 +56,11 @@ import { TaskDetailsPreviewComponent } from './task-details-preview/task-details
     SuccessMessageComponent,
     AdminAccountsComponent,
     AdminTaskEditComponent,
-    AdminTeamsComponent,
     TermComponent,
     TaskComponent,
     TeamComponent,
     SubmitComponent,
-    AdminSubmissionsComponent,
-    AdminSubmissionComponent,
     TeamsComponent,
-    AdminTeamComponent,
     SizePipe,
     TasksComponent,
     TaskDetailsComponent,

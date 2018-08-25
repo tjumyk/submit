@@ -4,6 +4,7 @@ import {AdminService} from "../admin.service";
 import {debounceTime, finalize} from "rxjs/operators";
 import {Pagination} from "../table-util";
 import {Subject} from "rxjs";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-accounts',
@@ -23,11 +24,14 @@ export class AdminAccountsComponent implements OnInit {
   syncingGroups: boolean;
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Accounts', 'Management');
+
     this.userSearchKey.pipe(
       debounceTime(300)
     ).subscribe(

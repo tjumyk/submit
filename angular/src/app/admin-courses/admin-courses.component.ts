@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ErrorMessage, Course, Term} from "../models";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-courses',
@@ -15,14 +16,17 @@ export class AdminCoursesComponent implements OnInit {
   courses: Course[];
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) { }
 
   ngOnInit() {
-    this.loadTerms();
+    this.titleService.setTitle('Courses', 'Management');
+
+    this.loadCourses();
   }
 
-  private loadTerms(){
+  private loadCourses(){
     this.loadingCourses = true;
     this.adminService.getCourses().pipe(
       finalize(()=>this.loadingCourses=false)

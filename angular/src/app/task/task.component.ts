@@ -6,6 +6,7 @@ import {finalize} from "rxjs/operators";
 import {TermService} from "../term.service";
 import {AccountService} from "../account.service";
 import * as moment from "moment";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-task',
@@ -34,7 +35,8 @@ export class TaskComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private termService: TermService,
     private taskService: TaskService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
@@ -70,6 +72,8 @@ export class TaskComponent implements OnInit, OnDestroy {
   }
 
   private setupTask(task: Task) {
+    this.titleService.setTitle(task.title, `${this.term.year}S${this.term.semester}`, this.term.course.code);
+
     if (task.term_id != this.termId) {
       this.error = {msg: `Task (id=${task.id}) is not a task of this term`};
       return;

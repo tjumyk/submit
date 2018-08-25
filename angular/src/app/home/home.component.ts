@@ -4,6 +4,7 @@ import {Course, ErrorMessage, Term, User} from "../models";
 import {finalize} from "rxjs/operators";
 import {CourseService} from "../course.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-home',
@@ -25,11 +26,14 @@ export class HomeComponent implements OnInit {
     private accountService: AccountService,
     private courseService: CourseService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle();
+
     this.loadUser();
   }
 

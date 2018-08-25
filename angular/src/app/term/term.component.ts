@@ -4,6 +4,7 @@ import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-term',
@@ -23,7 +24,8 @@ export class TermComponent implements OnInit {
   constructor(
     private accountService: AccountService,
     private termService: TermService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
@@ -38,7 +40,10 @@ export class TermComponent implements OnInit {
         this.termService.getTerm(this.termId).pipe(
           finalize(() => this.loadingTerm = false)
         ).subscribe(
-          term => this.term = term,
+          term => {
+            this.term = term;
+            this.titleService.setTitle(`${term.year}S${term.semester}`, term.course.code);
+          },
           error => this.error = error.error
         )
       },

@@ -6,6 +6,7 @@ import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/oper
 import {Subject} from "rxjs/internal/Subject";
 import {of} from "rxjs/internal/observable/of";
 import {NgForm} from "@angular/forms";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-term-edit',
@@ -30,7 +31,8 @@ export class AdminTermEditComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
@@ -46,7 +48,10 @@ export class AdminTermEditComponent implements OnInit {
     this.adminService.getTerm(this.termId).pipe(
       finalize(() => this.loadingTerm = false)
     ).subscribe(
-      term => this.term = term,
+      term => {
+        this.term = term;
+        this.titleService.setTitle(`${term.year}S${term.semester}`, term.course.code, 'Management');
+      },
       error => this.error = error.error
     )
   }

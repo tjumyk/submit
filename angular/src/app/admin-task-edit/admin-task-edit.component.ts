@@ -13,6 +13,7 @@ import {NgForm} from "@angular/forms";
 import * as moment from "moment";
 import {HttpEventType} from "@angular/common/http";
 import {TaskService} from "../task.service";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-task-edit',
@@ -47,7 +48,8 @@ export class AdminTaskEditComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
     this.newFileRequirementForm.is_optional = false;
   }
@@ -65,6 +67,9 @@ export class AdminTaskEditComponent implements OnInit {
   }
 
   private setTask(task: Task) {
+    const term = task.term;
+    this.titleService.setTitle(task.title,`${term.year}S${term.semester}`, term.course.code, 'Management');
+
     this.task = task;
 
     this.form.type = task.type;

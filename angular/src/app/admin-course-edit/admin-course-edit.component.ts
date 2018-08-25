@@ -8,6 +8,7 @@ import {NgForm} from "@angular/forms";
 import * as moment from "moment";
 import {Subject} from "rxjs/internal/Subject";
 import {of} from "rxjs/internal/observable/of";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-course-edit',
@@ -37,7 +38,8 @@ export class AdminCourseEditComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
     this.newTermForm.is_new_student_group = true;
   }
@@ -67,6 +69,7 @@ export class AdminCourseEditComponent implements OnInit {
       finalize(() => this.loadingCourse = false)
     ).subscribe(
       course => {
+        this.titleService.setTitle(course.code, 'Management');
         this.course = course;
         this.autoFillForm();
       },

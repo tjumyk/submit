@@ -6,6 +6,7 @@ import {finalize} from "rxjs/operators";
 import * as moment from "moment";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-tasks',
@@ -33,7 +34,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   constructor(
     private accountService: AccountService,
     private termService: TermService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
@@ -70,6 +72,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   private setupTasks(tasks: Task[]){
+    this.titleService.setTitle('Tasks', `${this.term.year}S${this.term.semester}`, this.term.course.code);
+
     this.tasks = tasks;
 
     for(let task of tasks){

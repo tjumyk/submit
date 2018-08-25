@@ -4,6 +4,7 @@ import {ErrorMessage} from "../models";
 import {NgForm} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-course-new',
@@ -18,12 +19,14 @@ export class AdminCourseNewComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
     this.form.is_new_tutor_group = true;
   }
 
   ngOnInit() {
+    this.titleService.setTitle('New Course', 'Management');
   }
 
   newCourse(f: NgForm) {

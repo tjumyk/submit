@@ -6,6 +6,7 @@ import {TermService} from "../term.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-task-preview',
@@ -35,7 +36,8 @@ export class TaskPreviewComponent implements OnInit, OnDestroy {
     private termService: TermService,
     private taskService: TaskService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
   }
 
@@ -71,6 +73,8 @@ export class TaskPreviewComponent implements OnInit, OnDestroy {
   }
 
   private setupTask(task: Task) {
+    this.titleService.setTitle(`${task.title} (Preview)`, `${this.term.year}S${this.term.semester}`, this.term.course.code);
+
     if (task.term_id != this.termId) {
       this.error = {msg: `Task (id=${task.id}) is not a task of this term`};
       return;
