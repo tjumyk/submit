@@ -79,7 +79,7 @@
         <td>{{t.id}}</td>
         <td>{{t.name}}</td>
         <td>
-          <img [src]="t.creator.avatar" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
+          <img src="{{t.creator.avatar}}?size=64" *ngIf="t.creator.avatar; else defaultAvatar2" class="ui image avatar">
           <ng-template #defaultAvatar2><i class="icon user circle"></i></ng-template>
           <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
           <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
