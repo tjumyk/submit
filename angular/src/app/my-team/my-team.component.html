@@ -85,7 +85,7 @@
     <tr *ngFor="let ass of team.user_associations; index as i" [ngClass]="{'active': user.id==ass.user_id}">
       <td>{{i+1}}</td>
       <td>
-        <img [src]="ass.user.avatar" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
+        <img src="{{ass.user.avatar}}?size=64" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
         <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
         <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
         <ng-template #nameOnly>{{ass.user.name}}</ng-template>
