@@ -21,8 +21,7 @@ app.conf.update(
     task_routes={
         'celery_app.run_test': {'queue': 'submit-auto-test'},
     },
-    task_track_started=True,
-    result_persistent=True
+    task_track_started=True
 )
 
 
