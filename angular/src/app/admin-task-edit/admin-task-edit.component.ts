@@ -84,6 +84,9 @@ export class AdminTaskEditComponent implements OnInit {
     this.form.submission_attempt_limit = task.submission_attempt_limit;
     this.form.submission_history_limit = task.submission_history_limit;
 
+    this.form.evaluation_method = task.evaluation_method;
+    this.form.auto_test_trigger = task.auto_test_trigger;
+
     if (task.open_time)
       this.form.open_time = moment(task.open_time).format('YYYY-MM-DDTHH:mm');
     else

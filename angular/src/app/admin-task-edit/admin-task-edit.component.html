@@ -114,6 +114,20 @@
             <label>Submission History Limit</label>
             <input type="number" min="1" placeholder="Maximal number of submissions history to keep" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
           </div>
+          <div class="field">
+            <label>Evaluation Method</label>
+            <select name="evaluation_method" [(ngModel)]="form.evaluation_method">
+              <option value="auto_test">Auto Testing</option>
+              <option [ngValue]="null">Offline</option>
+            </select>
+          </div>
+          <div class="field" *ngIf="form.evaluation_method=='auto_test'">
+            <label>Auto Test Trigger</label>
+            <select name="auto_test_trigger" [(ngModel)]="form.auto_test_trigger">
+              <option value="submission">Triggered after each new submission</option>
+              <option [ngValue]="null">Manually triggered</option>
+            </select>
+          </div>
           <button class="ui button primary fluid" type="submit">Save</button>
         </form>
       </div>

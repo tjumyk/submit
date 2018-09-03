@@ -29,5 +29,19 @@
       "accept_ext": ["png", "jpg", "jpeg", "gif", "svg"],
       "size_limit": 262144
     }
+  },
+  "AUTO_TEST":{
+    "broker": "amqp://",
+    "backend": "db+sqlite:///results.sqlite",
+    "workers": [
+      {
+        "name": "test_worker",
+        "password": "13246543356754321435"
+      }
+    ],
+    "worker": {
+      "name": "test_worker",
+      "password": "13246543356754321435"
+    }
   }
 }

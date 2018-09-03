@@ -38,6 +38,8 @@ export class UpdateTaskForm{
   team_max_size?: number;
   submission_attempt_limit?: number;
   submission_history_limit?: number;
+  evaluation_method?: string;
+  auto_test_trigger?: string;
 }
 
 export class NewMaterialForm{

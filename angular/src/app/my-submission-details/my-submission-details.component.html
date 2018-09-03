@@ -18,6 +18,10 @@
     </div>
   </div>
 
+  <h4 class="ui header">
+    <i class="icon copy outline"></i>
+    Files
+  </h4>
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Size</th><th>MD5 Hash</th><th>Operations</th></tr></thead>
     <tbody>
@@ -36,4 +40,52 @@
     </tr>
     </tbody>
   </table>
+
+  <ng-container *ngIf="task.evaluation_method=='auto_test'">
+    <h4 class="ui header">
+      <i class="icon terminal"></i>
+      Auto Tests
+    </h4>
+
+    <ng-container *ngIf="autoTests">
+      <div class="ui segment" *ngFor="let test of autoTests">
+        <div class="ui list horizontal">
+          <div class="item">
+            <div class="header">ID</div>
+            {{test.id}}
+          </div>
+          <div class="item">
+            <div class="header">Worker</div>
+            <span *ngIf="test.hostname; else noWorker">{{test.hostname}}</span>
+            <ng-template #noWorker>(None)</ng-template>
+          </div>
+          <div class="item">
+            <div class="header">State</div>
+            <span [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
+            {{test.final_state || test.state}}
+          </span>
+          </div>
+          <div class="item">
+            <div class="header">Created At</div>
+            {{test.created_at | date: 'medium'}}
+          </div>
+          <div class="item">
+            <div class="header">Updated At</div>
+            {{test.modified_at | date: 'medium'}}
+          </div>
+        </div>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'FAILURE' || (test.final_state || test.state) == 'SUCCESS'">
+          <div *ngIf="test.exception_class">
+            <div class="ui divider horizontal">Exception</div>
+            <p><b>{{test.exception_class}}</b> {{test.exception_message}}</p>
+          </div>
+          <div *ngIf="test.result != null">
+            <div class="ui divider horizontal">Result</div>
+            <pre class="code">{{test.result|json}}</pre>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </ng-container>
 </div>

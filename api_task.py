@@ -346,6 +346,12 @@ def task_my_submissions(tid):
                         os.rmdir(folder_full)
 
             db.session.commit()
+
+            # start auto test if required
+            if task.evaluation_method == 'auto_test' and task.auto_test_trigger == 'submission':
+                SubmissionService.run_auto_test(new_submission)
+                db.session.commit()  # have to commit again
+
             return jsonify(new_submission.to_dict()), 201
 
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:

@@ -8,3 +8,4 @@ upload/
 static/
 data/
 test.db
+results.sqlite

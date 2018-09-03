@@ -2,11 +2,14 @@ import os
 from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 
+from celery.result import AsyncResult
 from sqlalchemy import desc, func
 from werkzeug.datastructures import FileStorage
 
+from celery_app import run_test
 from error import BasicError
-from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation
+from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest
+from services.auto_test import AutoTestService
 from services.task import TaskService
 
 
@@ -264,3 +267,15 @@ class SubmissionService:
             db.session.delete(file)
         submission.is_cleared = True
         return file_paths
+
+    @staticmethod
+    def run_auto_test(submission: Submission) -> Tuple[AutoTest, AsyncResult]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        if submission.task.evaluation_method != 'auto_test':
+            raise SubmissionServiceError('evaluation method is not auto testing')
+
+        result = run_test.apply_async((submission.id,), countdown=3)  # wait 3 seconds to allow db commit
+        test = AutoTestService.add(submission, result.id)
+        return test, result

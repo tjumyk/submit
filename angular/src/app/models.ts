@@ -69,6 +69,9 @@ export class Task {
   submission_attempt_limit?: number;
   submission_history_limit?: number;
 
+  evaluation_method?: string;
+  auto_test_trigger?: string;
+
   created_at: string;
   modified_at: string;
 
@@ -208,4 +211,37 @@ export class SubmissionStatus {
   attempts: number;
   team_association?: UserTeamAssociation;
   special_consideration?: SpecialConsideration;
+}
+
+export class AutoTest {
+  id: number;
+  submission_id: number;
+
+  work_id: string;
+
+  hostname?: string;
+  pid?: number;
+
+  state: string;
+  final_state?: string;
+  result?: any;
+  exception_class: string;
+  exception_message: string;
+  exception_traceback: string;
+
+  created_at: string;
+  modified_at: string;
+
+  submission?: Submission;
+  output_files?: AutoTestOutputFile[];
+}
+
+export class AutoTestOutputFile {
+  id: number;
+  auto_test_id: number;
+
+  path: string;
+  save_path: string;
+
+  auto_test?: AutoTest;
 }

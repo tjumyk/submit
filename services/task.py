@@ -37,7 +37,9 @@ class TaskService:
         'team_min_size',
         'team_max_size',
         'submission_attempt_limit',
-        'submission_history_limit'
+        'submission_history_limit',
+        'evaluation_method',
+        'auto_test_trigger',
     }
 
     @staticmethod

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -211,6 +212,9 @@ class Task(db.Model):
     submission_attempt_limit = db.Column(db.Integer)
     submission_history_limit = db.Column(db.Integer)
 
+    evaluation_method = db.Column(db.String(32))
+    auto_test_trigger = db.Column(db.String(32))
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -233,6 +237,8 @@ class Task(db.Model):
             d['close_time'] = self.close_time
             d['submission_attempt_limit'] = self.submission_attempt_limit
             d['submission_history_limit'] = self.submission_history_limit
+            d['evaluation_method'] = self.evaluation_method
+            d['auto_test_trigger'] = self.auto_test_trigger
             d['materials'] = [m.to_dict() for m in self.materials]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
             d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
@@ -341,7 +347,7 @@ class Submission(db.Model):
     def __repr__(self):
         return '<Submission %r>' % self.id
 
-    def to_dict(self, with_files=False, with_submitter=False, with_advanced_fields=False):
+    def to_dict(self, with_files=False, with_submitter=False, with_auto_tests=False, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id,
                  submitter_id=self.submitter_id,
                  is_cleared=self.is_cleared,
@@ -351,6 +357,8 @@ class Submission(db.Model):
             d['files'] = [f.to_dict(with_advanced_fields=with_advanced_fields) for f in self.files]
         if with_submitter:
             d['submitter'] = self.submitter.to_dict() if self.submitter else None
+        if with_auto_tests:
+            d['auto_tests'] = [t.to_dict() for t in self.auto_tests]
         return d
 
 
@@ -381,4 +389,76 @@ class SubmissionFile(db.Model):
             d['requirement'] = self.requirement.to_dict()
         if with_advanced_fields:
             d['path'] = self.path
+        return d
+
+
+class AutoTest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
+
+    work_id = db.Column(db.String(36), nullable=False)
+
+    hostname = db.Column(db.String(128))
+    pid = db.Column(db.Integer)
+
+    final_state = db.Column(db.String(16))
+    result = db.Column(db.String())
+    exception_class = db.Column(db.String(64))
+    exception_message = db.Column(db.String())
+    exception_traceback = db.Column(db.String())
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    submission = db.relationship('Submission', backref=db.backref('auto_tests'))
+
+    def __repr__(self):
+        return '<AutoTest %r>' % self.id
+
+    def to_dict(self, with_submission=False, with_advanced_fields=False):
+        d = dict(id=self.id, submission_id=self.submission_id,
+                 hostname=self.hostname, final_state=self.final_state,
+                 exception_class=self.exception_class, exception_message=self.exception_message,
+                 created_at=self.created_at, modified_at=self.modified_at)
+        try:
+            if self.result is not None:
+                d['result'] = json.loads(self.result)  # try to parse result as JSON string
+            else:
+                d['result'] = None
+        except ValueError:
+            d['result'] = self.result
+
+        if with_submission:
+            d['submission'] = self.submission.to_dict()
+        if with_advanced_fields:
+            d['work_id'] = self.work_id
+            d['pid'] = self.pid
+            d['output_files'] = [file.to_dict(with_advanced_fields=True) for file in self.output_files]
+            d['exception_traceback'] = self.exception_traceback
+        return d
+
+
+class AutoTestOutputFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    auto_test_id = db.Column(db.Integer, db.ForeignKey('auto_test.id'), nullable=False)
+
+    path = db.Column(db.String(128), nullable=False)
+    save_path = db.Column(db.String(128), nullable=False)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    auto_test = db.relationship('AutoTest', backref=db.backref('output_files', lazy=False,
+                                                               cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return '<AutoTestOutputFile %r>' % self.id
+
+    def to_dict(self, with_auto_test=False, with_advanced_fields=False):
+        d = dict(id=self.id, auto_test_id=self.auto_test_id, path=self.path,
+                 created_at=self.created_at, modified_at=self.modified_at)
+        if with_auto_test:
+            d['auto_test'] = self.auto_test.to_dict()
+        if with_advanced_fields:
+            d['save_path'] = self.save_path
         return d
