@@ -19,9 +19,10 @@ export class SubmissionService {
   getAutoTestStatusColor(status: string): string{
     switch (status) {
       case 'STARTED': return '#21ba45';
+      case 'SUCCESS': return '#21ba45';
       case 'RETRY': return '#fbbd08';
       case 'FAILURE': return '#db2828';
-      case 'SUCCESS': return '#21ba45';
+      case 'REVOKED': return '#db2828';
       default: return 'rgba(0,0,0,.87)';
     }
   }
