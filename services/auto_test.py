@@ -58,13 +58,18 @@ class AutoTestService:
         d = dict(state=result.state)
         if with_advanced_fields:
             d['work_id'] = result.id
-        if result.result:
-            if isinstance(result.result, BaseException):
+        if result.result is not None:
+            if result.state == 'SUCCESS':
+                d['result'] = result.result
+            elif result.state == 'FAILURE':
                 exception = result.result
                 d['exception_class'] = type(exception).__name__
                 d['exception_message'] = str(exception)
                 if with_advanced_fields:
                     d['exception_traceback'] = result.traceback
-            else:
-                d['result'] = result.result
+            elif result.state == 'STARTED':
+                worker_info = result.result
+                d['hostname'] = worker_info.get('hostname')
+                if with_advanced_fields:
+                    d['pid'] = worker_info.get('pid')
         return d
