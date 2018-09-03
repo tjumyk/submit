@@ -100,6 +100,7 @@ def run_test(self: Task, submission_id: int):
     report_started(submission_id, self.request.id, self.request.hostname, os.getpid())
 
     submission = get_submission(submission_id, self.request.id)
+    # TODO recognize task ID of the submission and copy corresponding assets for testing
 
     data_folder = config['DATA_FOLDER']
     exec_folder = os.path.join(data_folder, 'test_environments', self.request.id)
@@ -111,6 +112,9 @@ def run_test(self: Task, submission_id: int):
         download_submission_file(submission_id, self.request.id, file, local_save_path)
 
     # simulate a time-consuming task
+    # TODO timeout mechanism
+    # TODO Docker isolation
+    # TODO network/cpu/memory restrictions
     time.sleep(12)
     result = subprocess.run(['ls', '-l'], stdout=subprocess.PIPE, check=True)
 
