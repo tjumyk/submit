@@ -293,6 +293,12 @@ def admin_material(mid):
             save_path = os.path.join(data_folder, material.file_path)
             if os.path.isfile(save_path):
                 os.remove(save_path)
+
+            # remove parent folder if empty now
+            parent_folder = os.path.dirname(save_path)
+            if os.path.lexists(parent_folder) and not os.listdir(parent_folder):
+                os.rmdir(parent_folder)
+
             db.session.delete(material)
             db.session.commit()
             return "", 204
