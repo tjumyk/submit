@@ -4,7 +4,7 @@ import {Observable} from "rxjs";
 import {Team} from "./models";
 
 export class UpdateTeamForm {
-  slogan: string;
+  slogan?: string;
 }
 
 @Injectable({

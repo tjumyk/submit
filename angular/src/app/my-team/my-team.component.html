@@ -55,7 +55,29 @@
     <i class="icon users"></i>
     <div class="content">
       {{ team.name }}
+      <small *ngIf="user.id == team.creator_id && !showUpdateTeamForm"><i class="icon pencil link" (click)="showUpdateTeamForm=true" title="Edit"></i></small>
       <div class="sub header" *ngIf="team.slogan">{{team.slogan}}</div>
+    </div>
+  </div>
+
+  <div class="ui grid centered stackable" *ngIf="showUpdateTeamForm">
+    <div class="column update-team">
+      <div class="ui segment">
+        <form class="ui form" [ngClass]="{'loading': updatingTeam}" (ngSubmit)="updateTeam(f)" #f="ngForm">
+          <div class="field" [ngClass]="{'error': (f.submitted||sloganModel.dirty||sloganModel.touched)&&sloganModel.invalid}">
+            <label>Slogan (Optional)</label>
+            <input type="text" name="slogan" placeholder="Use a slogan to attract others to join your team" maxlength="64"
+                   [(ngModel)]="updateTeamForm.slogan" #sloganModel="ngModel">
+            <div class="errors">
+              <label *ngIf="sloganModel.errors?.maxlength"><i class="times icon"></i> Slogan is too long</label>
+            </div>
+          </div>
+          <div class="ui buttons fluid">
+            <button type="submit" class="ui primary button"><i class="icon save"></i> Save</button>
+            <button type="button" class="ui button" (click)="showUpdateTeamForm=false"><i class="icon eye slash"></i> Hide</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 

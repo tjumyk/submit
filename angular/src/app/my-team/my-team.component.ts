@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TaskService} from "../task.service";
-import {TeamService} from "../team.service";
+import {TeamService, UpdateTeamForm} from "../team.service";
 import {ErrorMessage, Task, Team, User, UserTeamAssociation} from "../models";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -28,6 +28,10 @@ export class MyTeamComponent implements OnInit, OnDestroy {
   team: Team;
   loadingTeam: boolean;
   reloadingTeam: boolean;
+
+  showUpdateTeamForm: boolean;
+  updateTeamForm = new UpdateTeamForm();
+  updatingTeam: boolean;
 
   constructor(
     private accountService: AccountService,
@@ -96,7 +100,7 @@ export class MyTeamComponent implements OnInit, OnDestroy {
       this.teamService.getTeam(this.teamAssociation.team_id).pipe(
         finalize(() => this.loadingTeam = false)
       ).subscribe(
-        team => this.team = team,
+        team => this.setupTeam(team),
         error => this.error = error.error
       )
     }
@@ -107,7 +111,23 @@ export class MyTeamComponent implements OnInit, OnDestroy {
     this.teamService.getTeam(this.teamAssociation.team_id).pipe(
       finalize(() => this.reloadingTeam = false)
     ).subscribe(
-      team => this.team = team,
+      team => this.setupTeam(team),
+      error => this.error = error.error
+    )
+  }
+
+  private setupTeam(team: Team) {
+    this.team = team;
+
+    this.updateTeamForm.slogan = team.slogan;
+  }
+
+  updateTeam() {
+    this.updatingTeam = true;
+    this.teamService.updateTeam(this.team.id, this.updateTeamForm).pipe(
+      finalize(() => this.updatingTeam = false)
+    ).subscribe(
+      team => this.setupTeam(team),
       error => this.error = error.error
     )
   }
