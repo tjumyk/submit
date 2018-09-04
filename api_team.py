@@ -26,7 +26,7 @@ def do_team(team_id):
             if not TeamService.is_creator(team, user):
                 return jsonify(msg='team creator required'), 403
 
-            params = request.json or request.form or {}
+            params = request.json or request.form.to_dict() or {}
             files = request.files
             upload_type = 'avatar'
             if 'avatar' in files:

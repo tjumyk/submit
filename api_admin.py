@@ -144,7 +144,7 @@ def admin_course(cid):
         if request.method == 'GET':
             return jsonify(course.to_dict(with_terms=True, with_groups=True, with_advanced_fields=True))
         elif request.method == 'PUT':
-            params = request.json or request.form or {}
+            params = request.json or request.form.to_dict() or {}
             files = request.files
             upload_type = 'icon'
             if 'icon' in files:
@@ -383,7 +383,7 @@ def admin_team(team_id):
         if request.method == 'GET':
             return team.to_dict(with_associations=True)
         elif request.method == 'PUT':
-            params = request.json or request.form or {}
+            params = request.json or request.form.to_dict() or {}
             files = request.files
             upload_type = 'avatar'
             if 'avatar' in files:
