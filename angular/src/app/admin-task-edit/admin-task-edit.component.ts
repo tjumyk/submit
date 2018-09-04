@@ -68,7 +68,7 @@ export class AdminTaskEditComponent implements OnInit {
 
   private setTask(task: Task) {
     const term = task.term;
-    this.titleService.setTitle(task.title,`${term.year}S${term.semester}`, term.course.code, 'Management');
+    this.titleService.setTitle(task.title, `${term.year}S${term.semester}`, term.course.code, 'Management');
 
     this.task = task;
 
@@ -103,7 +103,7 @@ export class AdminTaskEditComponent implements OnInit {
       this.form.close_time = task.close_time;
 
     // adjust special consideration form
-    if(this.task.is_team_task)
+    if (this.task.is_team_task)
       this.newSpecialConsideration.user_name = null;
     else
       this.newSpecialConsideration.team_name = null;
@@ -153,10 +153,16 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
-  updateMaterial(material: Material, index: number, btn:HTMLElement, input: HTMLInputElement){
-    if(input.files.length == 0)
+  updateMaterialSelectFile(material: Material, input: HTMLInputElement) {
+    const idx = material.name.lastIndexOf('.');
+    input.accept = idx > 0 ? material.name.substring(idx) : "*/*";
+    input.click()
+  }
+
+  updateMaterial(material: Material, index: number, btn: HTMLElement, input: HTMLInputElement) {
+    if (input.files.length == 0)
       return;
-    if (!confirm(`If you upload a new version of "${material.name}", the current version will be overwritten. Continue?`)){
+    if (!confirm(`If you upload a new version of "${material.name}", the current version will be overwritten. Continue?`)) {
       input.value = '';
       return;
     }
@@ -177,7 +183,7 @@ export class AdminTaskEditComponent implements OnInit {
             material['_update_progress'] = Math.round(100 * event.loaded / event.total);
             break;
           case HttpEventType.Response:
-            this.task.materials[index]=(event.body as Material);
+            this.task.materials[index] = (event.body as Material);
             this.success = {msg: `Updated material "${material.name}" successfully`}
         }
       },

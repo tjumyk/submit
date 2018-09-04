@@ -160,7 +160,7 @@
         <td>
           <div class="ui small buttons">
             <a href="api/admin/materials/{{ mat.id }}/download" class="ui button icon"><i class="icon download"></i></a>
-            <a class="ui button icon primary" (click)="inputFileUpdateMaterial.click()" #btnUpdateMaterial><i class="icon upload"></i></a>
+            <a class="ui button icon primary" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
             <a class="ui button red icon" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
           </div>
           <form class="hidden">
