@@ -31,6 +31,12 @@
         </li>
       </ul>
     </div>
+    <div class="ui segment center aligned">
+      <a href="api/tasks/{{taskId}}/download-materials-zip" class="ui button primary">
+        <i class="icon file archive outline"></i>
+        Download All as Zip
+      </a>
+    </div>
   </div>
 
   <div class="ui segment" *ngIf="task.file_requirements.length">

@@ -1,10 +1,13 @@
+import json
 import os
 import shutil
+import tempfile
 import time
+import zipfile
 from datetime import datetime
 from typing import Optional
 
-from flask import Blueprint, jsonify, request, current_app as app
+from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
 from models import db, SpecialConsideration, UserTeamAssociation
 from oauth import requires_login
@@ -433,4 +436,89 @@ def my_team(task_id):
             return "", 204
         return jsonify(ass.to_dict(with_team=True))
     except (TaskServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/download-materials-zip', methods=['GET'])
+@requires_login
+def download_materials_zip(task_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+
+        if 'admin' not in roles and 'tutor' not in roles:
+            if not task.open_time or task.open_time > datetime.utcnow():
+                return jsonify(msg='task has not yet open'), 403
+
+        tmp_dir = os.path.join(tempfile.gettempdir(), 'submit-material-zips')
+        if not os.path.lexists(tmp_dir):
+            os.makedirs(tmp_dir)
+
+        zip_file_name = None
+
+        # try to get cached zip file
+        zip_meta_path = os.path.join(tmp_dir, "%d.json" % task_id)
+        if os.path.isfile(zip_meta_path):
+            with open(zip_meta_path) as f_meta:
+                try:
+                    zip_meta = json.load(f_meta)
+                    zip_items = zip_meta['items']
+
+                    match = True
+                    for mat in task.materials:
+                        if zip_items.pop(mat.name) != mat.md5:
+                            match = False
+                            break
+                    if match and not zip_items:  # no remaining items (exact match)
+                        zip_file_name = zip_meta['zip']
+                except (TypeError, ValueError, KeyError):
+                    pass
+            if not zip_file_name or not os.path.isfile(os.path.join(tmp_dir, zip_file_name)):
+                zip_file_name = None
+
+        if not zip_file_name:
+            # make zip
+            data_folder = app.config['DATA_FOLDER']
+            ffd = None
+            try:
+                fd, zip_file_path = tempfile.mkstemp(suffix='.zip', dir=tmp_dir)
+                ffd = os.fdopen(fd, 'wb')
+                zip_file_name = os.path.relpath(zip_file_path, tmp_dir)
+                with zipfile.ZipFile(ffd, 'w', zipfile.ZIP_DEFLATED) as f_zip:
+                    for mat in task.materials:
+                        f_zip.write(os.path.join(data_folder, mat.file_path),
+                                    os.path.join('materials', mat.type, mat.name))
+            finally:
+                if ffd:
+                    ffd.close()
+
+            try:
+                # use exclusive file lock to avoid race condition
+                lock_path = os.path.join(tmp_dir, "%d.lock" % task_id)
+                with open(lock_path, 'x'):
+                    # save meta
+                    with open(zip_meta_path, 'w') as f_meta:
+                        json.dump({
+                            'zip': zip_file_name,
+                            'items': {m.name: m.md5 for m in task.materials}
+                        }, f_meta)
+                os.remove(lock_path)
+            except FileExistsError:
+                pass
+
+        # build attachment name
+        term = task.term
+        course = term.course
+        zip_attachment_name = '%s-%dS%s-%s.zip' % (course.code, term.year, term.semester, task.title)
+        zip_attachment_name = zip_attachment_name.replace(' ', '_')
+        return send_from_directory(tmp_dir, zip_file_name, as_attachment=True,
+                                   attachment_filename=zip_attachment_name)
+    except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
