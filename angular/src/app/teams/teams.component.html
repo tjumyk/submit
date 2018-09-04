@@ -1,6 +1,7 @@
 <app-error-message [error]="error"></app-error-message>
 <div class="ui loader active text" *ngIf="loadingTeams">Loading teams...</div>
 
+<ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
 <table class="ui table unstackable" *ngIf="teams">
   <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
   <tbody>
@@ -10,6 +11,7 @@
     <td>{{team.name}}</td>
     <td>
       <a href="admin/users/{{team.creator_id}}" target="_blank">
+        <img src="{{team.creator.avatar}}?size=64" *ngIf="team.creator.avatar; else defaultAvatar" class="ui image avatar">
         <span *ngIf="team.creator.nickname; else nameOnly">{{team.creator.nickname}} ({{team.creator.name}})</span>
       </a>
       <ng-template #nameOnly>{{team.creator.name}}</ng-template>

@@ -27,12 +27,14 @@
         {{team.created_at|date:'medium'}}
       </div>
       <div class="item">
-        <div class="header">Is Finalised?</div>
-        {{team.is_finalised}}
+        <div class="header">Status</div>
+        <span *ngIf="!team.is_finalised; else alreadyFinalisedText"><i class="icon lock open green"></i> Open</span>
+        <ng-template #alreadyFinalisedText><i class="icon lock"></i> Finalised</ng-template>
       </div>
     </div>
   </div>
 
+  <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
   <table class="ui unstackable table">
     <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Updated At</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th></tr></thead>
     <tbody>
@@ -40,10 +42,11 @@
       <td>{{i+1}}</td>
       <td>
         <a href="admin/users/{{ass.user_id}}" target="_blank">
+          <img src="{{ass.user.avatar}}?size=64" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
           <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
           <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+          &nbsp;<i class="icon star yellow" *ngIf="ass.user_id==team.creator_id" title="Creator"></i>
         </a>
-        <div class="ui label small" *ngIf="ass.user_id==team.creator_id">Creator</div>
       </td>
       <td>{{ass.created_at|date:'medium'}}</td>
       <td>{{ass.modified_at|date:'medium'}}</td>
