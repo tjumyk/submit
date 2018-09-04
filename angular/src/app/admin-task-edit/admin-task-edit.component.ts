@@ -153,6 +153,38 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
+  updateMaterial(material: Material, index: number, btn:HTMLElement, input: HTMLInputElement){
+    if(input.files.length == 0)
+      return;
+    if (!confirm(`If you upload a new version of "${material.name}", the current version will be overwritten. Continue?`)){
+      input.value = '';
+      return;
+    }
+
+    const file = input.files.item(0);
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.updateMaterial(material.id, file).pipe(
+      finalize(() => {
+        btn.classList.remove('loading', 'disabled');
+        input.value = '';
+        delete material['_update_progress'];
+      })
+    ).subscribe(
+      event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            material['_update_progress'] = Math.round(100 * event.loaded / event.total);
+            break;
+          case HttpEventType.Response:
+            this.task.materials[index]=(event.body as Material);
+            this.success = {msg: `Updated material "${material.name}" successfully`}
+        }
+      },
+      error => this.error = error.error
+    )
+  }
+
   deleteMaterial(material: Material, index: number, btn: HTMLElement) {
     if (!confirm(`Really want to delete material "${material.name}"?`))
       return;

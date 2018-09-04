@@ -279,7 +279,7 @@ def admin_task_materials(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/materials/<int:mid>', methods=['DELETE'])
+@admin_api.route('/materials/<int:mid>', methods=['DELETE', 'PUT'])
 @requires_admin
 def admin_material(mid):
     try:
@@ -287,13 +287,34 @@ def admin_material(mid):
         if material is None:
             return jsonify(msg='material not found'), 404
 
-        save_path = os.path.join(app.config['DATA_FOLDER'], material.file_path)
-        if os.path.isfile(save_path):
-            os.remove(save_path)
+        data_folder = app.config['DATA_FOLDER']
 
-        db.session.delete(material)
-        db.session.commit()
-        return "", 204
+        if request.method == 'DELETE':
+            save_path = os.path.join(data_folder, material.file_path)
+            if os.path.isfile(save_path):
+                os.remove(save_path)
+            db.session.delete(material)
+            db.session.commit()
+            return "", 204
+        else:  # PUT
+            file = request.files.get('file')
+            if file is None:
+                return jsonify(msg='file is required'), 400
+
+            sub_folders = os.path.join('tasks', str(material.task_id), 'materials', material.type)
+            folder = os.path.join(data_folder, sub_folders)
+            if not os.path.isdir(folder):
+                os.makedirs(folder)
+
+            save_path = os.path.join(sub_folders, material.name)
+            full_path = os.path.join(folder, material.name)
+
+            material.file_path = save_path
+            file.save(full_path)
+            material.size = os.stat(full_path).st_size
+            material.md5 = md5sum(full_path)
+            db.session.commit()
+            return jsonify(material.to_dict(with_advanced_fields=True))
     except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

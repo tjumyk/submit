@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, FileRequirement, Group, SpecialConsideration, Task, Term, User} from "./models";
+import {Course, FileRequirement, Group, Material, SpecialConsideration, Task, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
 
@@ -223,6 +223,13 @@ export class AdminService {
     if(form.description)
       data.append('description', form.description);
     const req = new HttpRequest('POST', `${this.api}/tasks/${task_id}/materials`, data, {reportProgress: true});
+    return this.http.request(req);
+  }
+
+  updateMaterial(material_id: number, file: File): Observable<HttpEvent<any>>{
+    const data = new FormData();
+    data.append('file', file);
+    const req = new HttpRequest('PUT', `${this.api}/materials/${material_id}`, data, {reportProgress: true});
     return this.http.request(req);
   }
 
