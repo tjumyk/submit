@@ -32,7 +32,7 @@
   },
   "AUTO_TEST":{
     "broker": "amqp://",
-    "backend": "db+sqlite:///results.sqlite",
+    "backend": "redis://",
     "workers": [
       {
         "name": "test_worker",

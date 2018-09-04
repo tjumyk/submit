@@ -4,4 +4,4 @@ flask-sqlalchemy
 psycopg2-binary
 requests
 Pillow
-celery
+celery[redis]
