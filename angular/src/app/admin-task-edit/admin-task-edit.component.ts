@@ -162,12 +162,11 @@ export class AdminTaskEditComponent implements OnInit {
   updateMaterial(material: Material, index: number, btn: HTMLElement, input: HTMLInputElement) {
     if (input.files.length == 0)
       return;
-    if (!confirm(`If you upload a new version of "${material.name}", the current version will be overwritten. Continue?`)) {
+    const file = input.files.item(0);
+    if (!confirm(`You are going to upload your local file "${file.name}" to update the contents of  material "${material.name}". The old contents will be overwritten but the name will not change. Continue?`)) {
       input.value = '';
       return;
     }
-
-    const file = input.files.item(0);
 
     btn.classList.add('loading', 'disabled');
     this.adminService.updateMaterial(material.id, file).pipe(
