@@ -66,7 +66,11 @@ export class LatePenalty {
 
     const penalties: number[] = [];
     for (let part of expression.split(/\s+/)) {
-      penalties.push(parseFloat(part))
+      const num = parseFloat(part);
+      if(isNaN(num) || num < 0){
+        throw `Invalid item in late penalty list: ${part}`;
+      }
+      penalties.push(num)
     }
     if (penalties.length == 0) {
       return null;
