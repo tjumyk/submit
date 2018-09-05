@@ -8,6 +8,7 @@
     <div class="section active">{{team.name}}</div>
   </div>
 
+  <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>ID</th><th>Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
     <tbody>
@@ -16,6 +17,7 @@
       <td>{{sub.id}}</td>
       <td>
         <a href="admin/users/{{sub.submitter_id}}" target="_blank">
+          <img src="{{sub.submitter.avatar}}?size=64" *ngIf="sub.submitter.avatar; else defaultAvatar" class="ui image avatar">
           <span *ngIf="sub.submitter.nickname; else nameOnly">{{sub.submitter.nickname}} ({{sub.submitter.name}})</span>
           <ng-template #nameOnly>{{sub.submitter.name}}</ng-template>
         </a>

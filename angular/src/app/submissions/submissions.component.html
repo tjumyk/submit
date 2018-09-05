@@ -2,6 +2,7 @@
 <div class="ui loader text active" *ngIf="loadingSummaries">Loading submission summaries...</div>
 
 <div *ngIf="userSummaries">
+  <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>User</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
     <tbody>
@@ -9,6 +10,7 @@
       <td>{{i+1}}</td>
       <td>
         <a href="admin/users/{{summary.user.id}}" target="_blank">
+          <img src="{{summary.user.avatar}}?size=64" *ngIf="summary.user.avatar; else defaultAvatar" class="ui image avatar">
           <span *ngIf="summary.user.nickname; else nameOnly">{{summary.user.nickname}} ({{summary.user.name}})</span>
           <ng-template #nameOnly>{{summary.user.name}}</ng-template>
         </a>

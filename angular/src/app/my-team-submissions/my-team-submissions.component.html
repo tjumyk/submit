@@ -17,6 +17,7 @@
   Older submissions have been removed due to the history limit of this task.
 </div>
 
+<ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
 <table class="ui table unstackable" *ngIf="submissions">
   <thead><tr><th>#</th><th>ID</th><th>Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
   <tbody>
@@ -24,6 +25,7 @@
     <td>{{i+1+attemptOffset}}</td>
     <td>{{sub.id}}</td>
     <td>
+      <img src="{{sub.submitter.avatar}}?size=64" *ngIf="sub.submitter.avatar; else defaultAvatar" class="ui image avatar">
       <span *ngIf="sub.submitter.nickname; else nameOnly">{{sub.submitter.nickname}} ({{sub.submitter.name}})</span>
       <ng-template #nameOnly>{{sub.submitter.name}}</ng-template>
     </td>
