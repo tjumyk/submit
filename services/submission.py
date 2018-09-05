@@ -99,7 +99,7 @@ class SubmissionService:
         query = Submission.query.with_parent(task).with_parent(user)
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
-        return query.all()
+        return query.order_by(Submission.id).all()
 
     @staticmethod
     def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
@@ -123,7 +123,7 @@ class SubmissionService:
                                         Submission.task_id == team.task_id)
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
-        return query.all()
+        return query.order_by(Submission.id).all()
 
     @staticmethod
     def count_for_team(team: Team, include_cleared=False) -> int:
