@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Submission, SubmissionStatus, Task, User} from "../models";
 import {AccountService} from "../account.service";
-import {TaskService} from "../task.service";
+import {LatePenalty, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-my-team-submissions',
@@ -57,7 +58,7 @@ export class MyTeamSubmissionsComponent implements OnInit {
             this.taskService.getMyTeamSubmissions(this.taskId).pipe(
               finalize(() => this.loadingSubmissions = false)
             ).subscribe(
-              submissions => this.submissions = submissions,
+              submissions => this.setupSubmissions(submissions),
               error => this.error = error.error
             )
           },
@@ -67,4 +68,23 @@ export class MyTeamSubmissionsComponent implements OnInit {
     )
   }
 
+  private setupSubmissions(submissions: Submission[]) {
+    this.submissions = submissions;
+
+    const penalty = LatePenalty.parse(this.task.late_penalty);
+    const dueMoment = moment(this.task.due_time);
+    if(this.status.special_consideration && this.status.special_consideration.due_time_extension){
+      dueMoment.add(this.status.special_consideration.due_time_extension, 'hour');
+    }
+    for(let sub of submissions){
+      const submitMoment = moment(sub.created_at);
+      if(submitMoment.isAfter(dueMoment)){
+        const lateDays = Math.ceil(submitMoment.diff(dueMoment, 'day', true));
+        sub['_lateDays'] = lateDays;
+        if(penalty){
+          sub['_latePenalty'] = penalty.getPenalty(lateDays);
+        }
+      }
+    }
+  }
 }
