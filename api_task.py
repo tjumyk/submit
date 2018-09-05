@@ -12,6 +12,7 @@ from flask import Blueprint, jsonify, request, current_app as app, send_from_dir
 from models import db, SpecialConsideration, UserTeamAssociation
 from oauth import requires_login
 from services.account import AccountService, AccountServiceError
+from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
@@ -348,6 +349,25 @@ def task_my_submissions(tid):
                     if os.path.isdir(folder_full) and not os.listdir(folder_full):
                         os.rmdir(folder_full)
 
+            # also clear auto tests if any
+            for submission in submissions_to_clear:
+                for test in submission.auto_tests:
+                    for file in test.output_files:
+                        save_path_full = os.path.join(data_folder, file.save_path)
+                        if os.path.lexists(save_path_full):
+                            os.remove(save_path_full)
+                    if test.output_files:  # try to remove parent folder if empty now
+                        folder_path = os.path.dirname(test.output_files[0].save_path)
+                        folder_path_full = os.path.join(data_folder, folder_path)
+                        if os.path.lexists(folder_path_full) and not os.listdir(folder_path_full):
+                            os.rmdir(folder_path_full)
+                    result = AutoTestService.get_result(test)
+                    result.forget()  # remove temporary result from storage (if any)
+
+                    for file in test.output_files:
+                        db.session.delete(file)
+                    db.session.delete(test)
+
             db.session.commit()
 
             # start auto test if required
@@ -357,7 +377,7 @@ def task_my_submissions(tid):
 
             return jsonify(new_submission.to_dict()), 201
 
-    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
