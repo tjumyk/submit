@@ -176,6 +176,9 @@ def do_test(sid, tid):
 
         result = AutoTestService.get_result(test)
         result.forget()  # remove temporary result from storage (if any)
+
+        for file in test.output_files:
+            db.session.delete(file)
         db.session.delete(test)
         db.session.commit()
         return "", 204

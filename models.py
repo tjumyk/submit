@@ -448,8 +448,7 @@ class AutoTestOutputFile(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    auto_test = db.relationship('AutoTest', backref=db.backref('output_files', lazy=False,
-                                                               cascade="all, delete-orphan"))
+    auto_test = db.relationship('AutoTest', backref=db.backref('output_files', lazy=False))
 
     def __repr__(self):
         return '<AutoTestOutputFile %r>' % self.id
