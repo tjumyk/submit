@@ -63,6 +63,20 @@
       </div>
     </div>
 
+    <div class="ui message info icon" *ngIf="task.submission_history_limit!=null && (task.submission_attempt_limit==null || task.submission_history_limit < task.submission_attempt_limit)">
+      <i class="icon history"></i>
+      <div class="content">
+        <div class="header">We have set a history limit</div>
+        <ul class="list">
+          <li>Only the latest {{task.submission_history_limit}} submissions
+            <span *ngIf="task.is_team_task"> in your whole team </span>
+            are kept and the older ones will be removed.
+          </li>
+          <li>We may use the full history or only the latest submission for the evaluation. Please refer to the specification.</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="ui segment" *ngIf="attemptEntries">
       <div class="attempts-bar">
         <div class="items">
