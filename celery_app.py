@@ -20,7 +20,7 @@ server_url = site_config['root_url'] + site_config['base_url']
 app = celery.Celery('submit', broker=celery_config['broker'], backend=celery_config['backend'])
 app.conf.update(
     task_routes={
-        'celery_app.run_test': {'queue': 'submit-auto-test'},
+        'celery_app.run_test': {'queue': 'auto-test'},
     },
     task_track_started=True
 )
