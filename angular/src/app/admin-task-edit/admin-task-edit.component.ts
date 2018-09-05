@@ -254,6 +254,9 @@ export class AdminTaskEditComponent implements OnInit {
   }
 
   deleteSpecialConsideration(spec: SpecialConsideration, index: number, btn: HTMLElement) {
+    if (!confirm(`Really want to delete special consideration ${spec.id}?`))
+      return;
+
     btn.classList.add('loading', 'disabled');
     this.adminService.deleteSpecialConsiderations(spec.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))
