@@ -40,11 +40,14 @@ export class LatePenalty {
   static parse(expression: string): LatePenalty {
     if (!expression)
       return null;
+    expression = expression.trim();
+    if (!expression)
+      return null;
 
     const segments: LatePenaltySegment[] = [];
 
     const penalties: number[] = [];
-    for (let part of expression.split(' ')) {
+    for (let part of expression.split(/\s+/)) {
       penalties.push(parseFloat(part))
     }
     if (penalties.length == 0) {
