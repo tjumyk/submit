@@ -83,7 +83,7 @@ class TaskService:
             if k in ['open_time', 'due_time', 'close_time']:  # fix datetime
                 v = kwargs[k]
                 if v:
-                    kwargs[k] = parser.parse(v).replace(tzinfo=tz.tzlocal()).astimezone(tz.tzutc())
+                    kwargs[k] = parser.parse(v)
                 else:
                     kwargs[k] = None
             if k in ['team_min_size', 'team_max_size',

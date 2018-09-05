@@ -4,6 +4,7 @@ import {Observable} from "rxjs/internal/Observable";
 import {Course, FileRequirement, Group, Material, SpecialConsideration, Task, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
+import * as moment from"moment";
 
 export class NewCourseForm {
   code: string;
@@ -208,7 +209,12 @@ export class AdminService {
   }
 
   updateTask(task_id: number, form: UpdateTaskForm):Observable<Task>{
-    return this.http.put<Task>(`${this.api}/tasks/${task_id}`, form)
+    const formCopy = {...form};
+    // transform naive time strings into ISO strings in UTC
+    formCopy.open_time = moment(form.open_time).toISOString();
+    formCopy.due_time = moment(form.due_time).toISOString();
+    formCopy.close_time = moment(form.close_time).toISOString();
+    return this.http.put<Task>(`${this.api}/tasks/${task_id}`, formCopy)
   }
 
   deleteTask(task_id: number):Observable<any>{
