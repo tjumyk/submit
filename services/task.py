@@ -1,7 +1,7 @@
 import re
 from typing import Optional, List
 
-from dateutil import parser, tz
+from dateutil import parser
 from sqlalchemy import func
 
 from error import BasicError
@@ -83,7 +83,7 @@ class TaskService:
             if k in ['open_time', 'due_time', 'close_time']:  # fix datetime
                 v = kwargs[k]
                 if v:
-                    kwargs[k] = parser.parse(v)
+                    kwargs[k] = parser.parse(v).replace(tzinfo=None)  # strip tzinfo from a UTC datetime
                 else:
                     kwargs[k] = None
             if k in ['team_min_size', 'team_max_size',
