@@ -37,6 +37,24 @@ export class LatePenalty {
     this.segments = segments;
   }
 
+  getPenalty(days: number): number{
+    if(!this.segments || this.segments.length == 0)
+      return null;
+    let penalty = 0;
+    let segmentIndex = 0;
+    while(days && segmentIndex < this.segments.length){
+      const segment = this.segments[segmentIndex++];
+      if(segment.days == null || days <= segment.days){
+        penalty += segment.penaltyPerDay * days;
+        break;
+      }
+      penalty += segment.penaltyPerDay * segment.days;
+      days -= segment.days;
+    }
+    penalty = Math.min(1.0, penalty);
+    return penalty;
+  }
+
   static parse(expression: string): LatePenalty {
     if (!expression)
       return null;
