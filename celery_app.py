@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import ssl
 import subprocess
 import time
 
@@ -12,6 +13,7 @@ with open('config.json') as _f:
     config = json.load(_f)
 site_config = config['SITE']
 celery_config = config['AUTO_TEST']
+worker_config = config.get('AUTO_TEST_WORKER')
 
 server_url = site_config['root_url'] + site_config['base_url']
 
@@ -22,6 +24,12 @@ app.conf.update(
     },
     task_track_started=True
 )
+broker_ssl_config = celery_config.get('broker_use_ssl')
+if broker_ssl_config:
+    cert_reqs = broker_ssl_config.get('cert_reqs')
+    if cert_reqs:
+        broker_ssl_config['cert_reqs'] = getattr(ssl, cert_reqs)
+    app.conf.update(broker_use_ssl=broker_ssl_config)
 
 
 def md5sum(file_path: str, block_size: int = 65536):
@@ -35,7 +43,7 @@ def md5sum(file_path: str, block_size: int = 65536):
 
 
 def get_auth_param():
-    return celery_config['worker']['name'], celery_config['worker']['password']
+    return worker_config['name'], worker_config['password']
 
 
 def report_started(submission_id: int, work_id: str, hostname: str, pid: int):

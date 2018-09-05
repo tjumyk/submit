@@ -32,16 +32,22 @@
   },
   "AUTO_TEST":{
     "broker": "amqp://",
+    "broker_use_ssl": {
+      "keyfile": "/var/ssl/private/worker-key.pem",
+      "certfile": "/var/ssl/worker-cert.pem",
+      "ca_certs": "/var/ssl/myca.pem",
+      "cert_reqs": "CERT_REQUIRED"
+    },
     "backend": "redis://",
     "workers": [
       {
         "name": "test_worker",
         "password": "13246543356754321435"
       }
-    ],
-    "worker": {
-      "name": "test_worker",
-      "password": "13246543356754321435"
-    }
+    ]
+  },
+  "AUTO_TEST_WORKER": {
+    "name": "test_worker",
+    "password": "13246543356754321435"
   }
 }
