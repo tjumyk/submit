@@ -12,7 +12,6 @@ with open('config.json') as _f:
     config = json.load(_f)
 site_config = config['SITE']
 celery_config = config['AUTO_TEST']
-auth_param = (celery_config['worker']['name'], celery_config['worker']['password'])
 
 server_url = site_config['root_url'] + site_config['base_url']
 
@@ -35,22 +34,26 @@ def md5sum(file_path: str, block_size: int = 65536):
         return md5.hexdigest()
 
 
+def get_auth_param():
+    return celery_config['worker']['name'], celery_config['worker']['password']
+
+
 def report_started(submission_id: int, work_id: str, hostname: str, pid: int):
     data = {'hostname': hostname, 'pid': pid}
     resp = requests.put('%sapi/submissions/%d/worker-started/%s' % (server_url, submission_id, work_id),
-                        json=data, auth=auth_param)
+                        json=data, auth=get_auth_param())
     resp.raise_for_status()
 
 
 def report_result(submission_id: int, work_id: str, data: dict):
     resp = requests.put('%sapi/submissions/%d/worker-result/%s' % (server_url, submission_id, work_id),
-                        json=data, auth=auth_param)
+                        json=data, auth=get_auth_param())
     resp.raise_for_status()
 
 
 def get_submission(submission_id: int, work_id: str):
     resp = requests.get('%sapi/submissions/%d/worker-get-submission/%s' % (server_url, submission_id, work_id),
-                        auth=auth_param)
+                        auth=get_auth_param())
     resp.raise_for_status()
     return resp.json()
 
@@ -59,7 +62,7 @@ def download_submission_file(submission_id: int, work_id: str, file: dict, local
                              chunk_size: int = 65536):
     resp = requests.get('%sapi/submissions/%d/worker-submission-files/%s/%d' %
                         (server_url, submission_id, work_id, file['id']),
-                        auth=auth_param, stream=True)
+                        auth=get_auth_param(), stream=True)
     resp.raise_for_status()
     with open(local_save_path, 'wb') as f:
         for chunk in resp.iter_content(chunk_size=chunk_size):
@@ -72,7 +75,7 @@ def download_submission_file(submission_id: int, work_id: str, file: dict, local
 def upload_output_files(submission_id: int, work_id: str, files: dict):
     resp = requests.post('%sapi/submissions/%d/worker-output-files/%s' %
                          (server_url, submission_id, work_id),
-                         files=files, auth=auth_param)
+                         files=files, auth=get_auth_param())
     resp.raise_for_status()
 
 
