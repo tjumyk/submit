@@ -45,6 +45,7 @@ export class AdminTaskEditComponent implements OnInit {
   addingSpecialConsideration: boolean;
   newSpecialConsideration: NewSpecialConsiderationForm = new NewSpecialConsiderationForm();
 
+  editingLatePenalty: boolean;
 
   constructor(
     private adminService: AdminService,

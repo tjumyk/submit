@@ -86,9 +86,29 @@
             <label>Close Time</label>
             <input type="datetime-local" name="close_time" [(ngModel)]="form.close_time">
           </div>
-          <div class="field">
-            <label>Late Penalty (per day)</label>
-            <input type="number" step="0.01" min="0" max="1" name="late_penalty" [(ngModel)]="form.late_penalty">
+          <div class="late-penalty-edit-wrapper">
+            <div class="field" [ngClass]="{'error': (f.submitted||latePenaltyModel.dirty||latePenaltyModel.touched) && latePenaltyModel.invalid}">
+              <label>Late Penalty</label>
+              <input #inputLatePenalty type="text" placeholder="Late penalty list" name="late_penalty" maxlength="128" [(ngModel)]="form.late_penalty"
+                     pattern=" *\d+(\.\d+)?( +\d+(\.\d+)?)* *" #latePenaltyModel="ngModel"
+                     (focus)="editingLatePenalty=true" (blur)="editingLatePenalty=false">
+              <div class="errors">
+                <label *ngIf="latePenaltyModel.errors?.pattern">Invalid format</label>
+                <label *ngIf="latePenaltyModel.errors?.maxlength">Late penalty list is too long</label>
+              </div>
+            </div>
+            <div class="ui left rail" [hidden]="!editingLatePenalty">
+              <div class="ui message info">
+                <div class="header">Late Penalty Syntax</div>
+                <ul class="list">
+                  <li>It should be <b>a list of float numbers separated by space characters</b>.</li>
+                  <li>Each number represents a penalty percentage <b>for a day</b>. E.g. "0.4 0.3 0.2 0.1" means 40% deduction for the first day, 30% deduction for the second day and so on.</li>
+                  <li>The accumulative penalty should not be larger than 1.0. Invalid trailing numbers will be fixed or ignored. E.g. "0.5 0.4 0.2 0.1" will be treated as "0.5 0.4 0.1".</li>
+                  <li>Trailing numbers with the same value can be omitted. E.g. "0.3 0.3 0.1 0.1 0.1 0.1" can be shortened as "0.3 0.3 0.1".</li>
+                  <li>Max length: {{inputLatePenalty.maxLength}}</li>
+                </ul>
+              </div>
+            </div>
           </div>
           <div class="field">
             <div class="ui input checkbox" (click)="checkboxIsTeamTask.click()">

@@ -40,6 +40,7 @@ import {TeamSubmissionListComponent} from './team-submission-list/team-submissio
 import {JoinOrCreateTeamComponent} from './join-or-create-team/join-or-create-team.component';
 import {TaskPreviewComponent} from './task-preview/task-preview.component';
 import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-preview.component';
+import { OrdinalPipe } from './ordinal.pipe';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-p
     JoinOrCreateTeamComponent,
     TaskPreviewComponent,
     TaskDetailsPreviewComponent,
+    OrdinalPipe,
   ],
   imports: [
     BrowserModule,

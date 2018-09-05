@@ -61,7 +61,7 @@ export class Task {
   open_time?: string;
   due_time?: string;
   close_time?: string;
-  late_penalty?: number;
+  late_penalty?: string;
 
   is_team_task: boolean;
   team_min_size?: number;

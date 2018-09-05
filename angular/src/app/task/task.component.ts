@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ErrorMessage, SuccessMessage, Task, Term, User} from "../models";
-import {CategoryInfo, TaskService} from "../task.service";
+import {CategoryInfo, LatePenalty, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {TermService} from "../term.service";
@@ -30,6 +30,8 @@ export class TaskComponent implements OnInit, OnDestroy {
   timeTrackerHandler: number;
 
   printTaskTeamSize = TaskService.printTaskTeamSize;
+
+  latePenalty: LatePenalty;
 
   constructor(
     private accountService: AccountService,
@@ -80,6 +82,7 @@ export class TaskComponent implements OnInit, OnDestroy {
     }
 
     this.task = task;
+    this.latePenalty = LatePenalty.parse(task.late_penalty);
     this.category = TaskService.categories[task.type];
 
     const timeTracker = () => {

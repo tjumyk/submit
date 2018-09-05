@@ -203,7 +203,7 @@ class Task(db.Model):
     open_time = db.Column(db.DateTime)
     due_time = db.Column(db.DateTime)
     close_time = db.Column(db.DateTime)
-    late_penalty = db.Column(db.Float)
+    late_penalty = db.Column(db.String(128))
 
     is_team_task = db.Column(db.Boolean, nullable=False, default=False)
     team_min_size = db.Column(db.Integer)
