@@ -73,16 +73,16 @@
                           <ng-container *ngIf="segment.toDay!=null; else endlessSegment">
                               <ng-container *ngIf="segment.fromDay!=segment.toDay; else oneDaySegment">
                                 <div class="header">{{segment.fromDay|ordinal}}-{{segment.toDay|ordinal}} day</div>
-                                <div class="description">{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
+                                <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
                               </ng-container>
                             </ng-container>
                           <ng-template #oneDaySegment>
                             <div class="header">{{segment.fromDay|ordinal}} day</div>
-                            <div class="description">{{segment.penaltyPerDay | percent: '1.0-3'}}</div>
+                            <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}}</div>
                           </ng-template>
                           <ng-template #endlessSegment>
                             <div class="header">{{segment.fromDay|ordinal}} day and later</div>
-                            <div class="description">{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
+                            <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
                           </ng-template>
                         </div>
                       </div>
@@ -90,7 +90,7 @@
                   </div>
                   <ng-template #oneSegment>
                     <span *ngIf="latePenalty.segments[0].penaltyPerDay!=0; else noLatePenalty">
-                      {{latePenalty.segments[0].penaltyPerDay | percent: '1.0-3'}} per day
+                      -{{latePenalty.segments[0].penaltyPerDay | percent: '1.0-3'}} per day
                     </span>
                     <ng-template #noLatePenalty>No late penalty</ng-template>
                   </ng-template>
