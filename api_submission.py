@@ -186,6 +186,7 @@ def do_test(sid, tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@submission_api.route('/<int:sid>/auto-tests/<int:tid>/output-files/<int:fid>/raw')
 @submission_api.route('/<int:sid>/auto-tests/<int:tid>/output-files/<int:fid>/download')
 @requires_login
 def download_auto_test_output_file(sid, tid, fid):
@@ -217,7 +218,8 @@ def download_auto_test_output_file(sid, tid, fid):
             return jsonify(msg='file does not belong to the test'), 400
 
         data_folder = app.config['DATA_FOLDER']
-        return send_from_directory(data_folder, file.save_path, as_attachment=True)
+        as_attachment = request.path.endswith('/download')
+        return send_from_directory(data_folder, file.save_path, as_attachment=as_attachment)
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

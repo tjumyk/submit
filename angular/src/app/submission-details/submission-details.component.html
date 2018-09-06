@@ -108,7 +108,10 @@
                 <td>{{file.created_at | date: 'medium'}}</td>
                 <td>
                   <div class="ui small buttons">
-                    <a class="ui button icon" href="api/submissions/{{submissionId}}/auto-tests/{{test.id}}/output-files/{{file.id}}/download">
+                    <a class="ui button icon" title="View" target="_blank" href="api/submissions/{{submissionId}}/auto-tests/{{test.id}}/output-files/{{file.id}}/raw">
+                      <i class="icon eye"></i>
+                    </a>
+                    <a class="ui button icon" title="Download" href="api/submissions/{{submissionId}}/auto-tests/{{test.id}}/output-files/{{file.id}}/download">
                       <i class="icon download"></i>
                     </a>
                   </div>

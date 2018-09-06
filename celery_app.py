@@ -154,10 +154,10 @@ def run_test(self: Task, submission_id: int):
     if os.path.isfile(dockerfile):
         tag = 'submit-test-%s' % self.request.id
         image, build_logs = docker_client.images.build(path=work_folder, pull=True, tag=tag)
-        files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs))
+        files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
         run_logs = docker_client.containers.run(image.id, remove=True, network_disabled=True,
                                                 stdout=True, stderr=True)
-        files_to_upload['run.log'] = run_logs
+        files_to_upload['run-logs.txt'] = run_logs
     else:
         # Otherwise look for 'run.sh' and run it in the bare environment.
         # Make sure 'run.sh' has the execution permission. (chmod +x)
