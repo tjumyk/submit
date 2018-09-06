@@ -204,10 +204,19 @@ def download_auto_test_output_file(sid, tid, fid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        data_folder = app.config['DATA_FOLDER']
+        test = AutoTestService.get(tid)
+        if test is None:
+            return jsonify(msg='test not found'), 404
+        if test.submission_id != sid:
+            return jsonify(msg='test does not belong to the submission'), 400
+
         file = AutoTestService.get_output_file(fid)
+        if file is None:
+            return jsonify(msg='file not found'), 404
         if file.auto_test_id != tid:
-            return jsonify(msg='file does not belong to test'), 400
+            return jsonify(msg='file does not belong to the test'), 400
+
+        data_folder = app.config['DATA_FOLDER']
         return send_from_directory(data_folder, file.save_path, as_attachment=True)
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
