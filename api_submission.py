@@ -301,11 +301,11 @@ def worker_output_files(sid, wid):
         save_folder = os.path.join('tasks', str(test.submission.task_id), 'auto_tests', str(test.id))
         save_folder_full = os.path.join(data_folder, save_folder)
 
-        if not os.path.lexists(save_folder_full):
-            os.makedirs(save_folder_full)
         for name in request.files:
             AutoTestService.add_output_file(test, name, os.path.join(save_folder, name))
 
+        if not os.path.lexists(save_folder_full):
+            os.makedirs(save_folder_full)
         for name, file in request.files.items():
             file.save(os.path.join(data_folder, save_folder, name))
 
