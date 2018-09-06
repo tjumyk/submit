@@ -1,11 +1,12 @@
 import hashlib
 import json
 import os
+import shutil
 import ssl
 import subprocess
-import time
 
 import celery
+import docker
 import requests
 from celery import Task
 
@@ -30,6 +31,8 @@ if broker_ssl_config:
     if cert_reqs:
         broker_ssl_config['cert_reqs'] = getattr(ssl, cert_reqs)
     app.conf.update(broker_use_ssl=broker_ssl_config)
+
+docker_client = docker.from_env()
 
 
 def md5sum(file_path: str, block_size: int = 65536):
@@ -110,30 +113,72 @@ class MyTask(celery.Task):
 def run_test(self: Task, submission_id: int):
     report_started(submission_id, self.request.id, self.request.hostname, os.getpid())
 
+    # get submission info
     submission = get_submission(submission_id, self.request.id)
-    # TODO recognize task ID of the submission and copy corresponding assets for testing
+    submission_id = submission['id']
+    task_id = submission['task_id']
 
+    # check work folder
     data_folder = config['DATA_FOLDER']
-    exec_folder = os.path.join(data_folder, 'test_environments', self.request.id)
-    if not os.path.lexists(exec_folder):
-        os.makedirs(exec_folder)
+    work_folder = os.path.join(data_folder, 'test_works', self.request.id)
+    if os.path.lexists(work_folder):
+        raise RuntimeError('Work folder already exists')
 
+    # copy test environment to work folder
+    env_folder = os.path.join(data_folder, 'test_environments', str(task_id))
+    if os.path.isdir(env_folder):  # env folder has higher priority than env archive
+        shutil.copytree(env_folder, work_folder)
+    else:
+        env_archive = os.path.join(data_folder, 'test_environments', '%d.zip' % task_id)
+        if os.path.isfile(env_archive):
+            shutil.unpack_archive(env_archive, work_folder)
+        else:
+            raise RuntimeError('Not test environment for task %s' % task_id)
+
+    # download submission files into sub folder 'submission'
+    submission_folder = os.path.join(work_folder, 'submission')
+    if not os.path.lexists(submission_folder):
+        os.mkdir(submission_folder)
     for file in submission['files']:
-        local_save_path = os.path.join(exec_folder, file['requirement']['name'])
+        local_save_path = os.path.join(work_folder, 'submission', file['requirement']['name'])
         download_submission_file(submission_id, self.request.id, file, local_save_path)
 
-    # simulate a time-consuming task
     # TODO timeout mechanism
-    # TODO Docker isolation
     # TODO network/cpu/memory restrictions
-    time.sleep(12)
-    result = subprocess.run(['ls', '-l'], stdout=subprocess.PIPE, check=True)
 
+    result = None
     files_to_upload = {}
-    if result.stdout:
-        files_to_upload['stdout.txt'] = result.stdout
-    if result.stderr:
-        files_to_upload['stderr.txt'] = result.stderr
-    upload_output_files(submission_id, self.request.id, files_to_upload)
 
-    return submission
+    # If 'Dockerfile' exists, build docker image and run it
+    dockerfile = os.path.join(work_folder, 'Dockerfile')
+    if os.path.isfile(dockerfile):
+        tag = 'submit-test-%s' % self.request.id
+        image, build_logs = docker_client.images.build(path=work_folder, pull=True, tag=tag)
+        files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs))
+        run_logs = docker_client.containers.run(image.id, remove=True, network_disabled=True,
+                                                stdout=True, stderr=True)
+        files_to_upload['run.log'] = run_logs
+    else:
+        # Otherwise look for 'run.sh' and run it in the bare environment.
+        # Make sure 'run.sh' has the execution permission. (chmod +x)
+        run_script = os.path.join(work_folder, 'run.sh')
+        if not os.path.isfile(run_script):
+            raise RuntimeError('Start script not found')
+        proc_result = subprocess.run([os.path.abspath(run_script)], cwd=work_folder, stdout=subprocess.PIPE, check=True)
+        if proc_result.stdout:
+            try:
+                last_line = proc_result.stdout.decode().strip().split('\n')[-1].strip()
+                try:
+                    result = json.loads(last_line)
+                except (ValueError, TypeError):
+                    result = last_line
+            except ValueError:
+                pass
+            files_to_upload['stdout.txt'] = proc_result.stdout
+        if proc_result.stderr:
+            files_to_upload['stderr.txt'] = proc_result.stderr
+
+    if files_to_upload:
+        upload_output_files(submission_id, self.request.id, files_to_upload)
+
+    return result
