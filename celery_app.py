@@ -9,7 +9,7 @@ import celery
 import docker
 import requests
 from celery import Task
-from docker.errors import ContainerError
+from docker.errors import ContainerError, BuildError
 
 with open('config.json') as _f:
     config = json.load(_f)
@@ -171,9 +171,16 @@ def run_test(self: Task, submission_id: int):
         dockerfile = os.path.join(work_folder, 'Dockerfile')
         if os.path.isfile(dockerfile):
             # build Docker image
-            tag = 'submit-test-%s' % self.request.id
-            image, build_logs = docker_client.images.build(path=work_folder, tag=tag)
-            files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
+            build_logs = None
+            try:
+                tag = 'submit-test-%s' % self.request.id
+                image, build_logs = docker_client.images.build(path=work_folder, tag=tag)
+            except BuildError as e:
+                build_logs = e.build_log
+                raise
+            finally:
+                if build_logs:
+                    files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
 
             # run a Docker container with this image
             try:
@@ -183,7 +190,7 @@ def run_test(self: Task, submission_id: int):
                 files_to_upload['docker-run-logs.txt'] = logs
                 result = extract_result(logs)
             except ContainerError as e:
-                files_to_upload['docker-run-error.txt'] = e.stderr
+                files_to_upload['docker-run-error.txt'] = e.stderr  # the error does not provide stdout
                 raise RuntimeError('Test command inside Docker returned non-zero exit status %d' % e.exit_status)
             # Notice: image is not removed due to potential conflict (e.g. two tests with exact same submission)
         else:
