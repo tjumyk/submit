@@ -9,6 +9,7 @@ import celery
 import docker
 import requests
 from celery import Task
+from docker.errors import ContainerError
 
 with open('config.json') as _f:
     config = json.load(_f)
@@ -90,6 +91,23 @@ def upload_output_files(submission_id: int, work_id: str, files: dict):
     resp.raise_for_status()
 
 
+def extract_result(raw_output):
+    """
+    Try to parse the last non-empty line from the raw output as the result
+    :param raw_output: raw output from the test script or command inside Docker
+    :return: result if parsed successfully
+    """
+    if not raw_output:
+        return None
+    if isinstance(raw_output, (bytes, bytearray)):
+        raw_output = raw_output.decode()
+    last_line = raw_output.strip().split('\n')[-1].strip()
+    try:
+        return json.loads(last_line)
+    except (ValueError, TypeError):
+        return last_line
+
+
 # noinspection PyAbstractClass
 class MyTask(celery.Task):
     def on_success(self, result, work_id, args, kwargs):
@@ -144,41 +162,48 @@ def run_test(self: Task, submission_id: int):
         download_submission_file(submission_id, self.request.id, file, local_save_path)
 
     # TODO timeout mechanism
-    # TODO network/cpu/memory restrictions
+    # TODO cpu/memory restrictions
 
-    result = None
     files_to_upload = {}
 
-    # If 'Dockerfile' exists, build docker image and run it
-    dockerfile = os.path.join(work_folder, 'Dockerfile')
-    if os.path.isfile(dockerfile):
-        tag = 'submit-test-%s' % self.request.id
-        image, build_logs = docker_client.images.build(path=work_folder, pull=True, tag=tag)
-        files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
-        run_logs = docker_client.containers.run(image.id, remove=True, network_disabled=True,
-                                                stdout=True, stderr=True)
-        files_to_upload['run-logs.txt'] = run_logs
-    else:
-        # Otherwise look for 'run.sh' and run it in the bare environment.
-        # Make sure 'run.sh' has the execution permission. (chmod +x)
-        run_script = os.path.join(work_folder, 'run.sh')
-        if not os.path.isfile(run_script):
-            raise RuntimeError('Start script not found')
-        proc_result = subprocess.run([os.path.abspath(run_script)], cwd=work_folder, stdout=subprocess.PIPE, check=True)
-        if proc_result.stdout:
-            try:
-                last_line = proc_result.stdout.decode().strip().split('\n')[-1].strip()
-                try:
-                    result = json.loads(last_line)
-                except (ValueError, TypeError):
-                    result = last_line
-            except ValueError:
-                pass
-            files_to_upload['stdout.txt'] = proc_result.stdout
-        if proc_result.stderr:
-            files_to_upload['stderr.txt'] = proc_result.stderr
+    try:
+        # If 'Dockerfile' exists, build docker image and run it
+        dockerfile = os.path.join(work_folder, 'Dockerfile')
+        if os.path.isfile(dockerfile):
+            # build Docker image
+            tag = 'submit-test-%s' % self.request.id
+            image, build_logs = docker_client.images.build(path=work_folder, tag=tag)
+            files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
 
-    if files_to_upload:
-        upload_output_files(submission_id, self.request.id, files_to_upload)
+            # run a Docker container with this image
+            try:
+                # logs from stdout and stderr are combined due to the design of the API
+                logs = docker_client.containers.run(image.id, remove=True, network_disabled=True,
+                                                    stdout=True, stderr=True)
+                files_to_upload['docker-run-logs.txt'] = logs
+                result = extract_result(logs)
+            except ContainerError as e:
+                files_to_upload['docker-run-error.txt'] = e.stderr
+                raise RuntimeError('Test command inside Docker returned non-zero exit status %d' % e.exit_status)
+            # Notice: image is not removed due to potential conflict (e.g. two tests with exact same submission)
+        else:
+            # Otherwise look for 'run.sh' and run it in the bare environment.
+            # Make sure 'run.sh' has the execution permission. (chmod +x)
+            run_script = os.path.join(work_folder, 'run.sh')
+            if not os.path.isfile(run_script):
+                raise RuntimeError('Test script not found')
+            proc_result = subprocess.run([os.path.abspath(run_script)], cwd=work_folder,
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if proc_result.stdout:
+                files_to_upload['stdout.txt'] = proc_result.stdout
+            if proc_result.stderr:
+                files_to_upload['stderr.txt'] = proc_result.stderr
+
+            if proc_result.returncode:
+                raise RuntimeError('Test script returned non-zero exit status %d' % proc_result.returncode)
+            result = extract_result(proc_result.stdout)
+    finally:
+        if files_to_upload:
+            upload_output_files(submission_id, self.request.id, files_to_upload)
 
     return result
