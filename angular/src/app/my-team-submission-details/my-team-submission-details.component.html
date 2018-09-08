@@ -75,8 +75,14 @@
             {{test.created_at | date: 'medium'}}
           </div>
           <div class="item">
-            <div class="header">Updated At</div>
-            {{test.modified_at | date: 'medium'}}
+            <div class="header">Started At</div>
+            <span *ngIf="test.started_at; else noStartTime">{{test.started_at | date: 'medium'}}</span>
+            <ng-template #noStartTime>N/A</ng-template>
+          </div>
+          <div class="item">
+            <div class="header">Stopped At</div>
+            <span *ngIf="test.stopped_at; else noStopTime">{{test.stopped_at | date: 'medium'}}</span>
+            <ng-template #noStopTime>N/A</ng-template>
           </div>
         </div>
 

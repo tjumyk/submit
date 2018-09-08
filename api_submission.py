@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from functools import wraps
 
 from flask import Blueprint, jsonify, current_app as app, send_from_directory, request
@@ -268,6 +269,7 @@ def worker_start(sid, wid):
         test.hostname = params.get('hostname')
         test.pid = params.get('pid')
 
+        test.started_at = datetime.utcnow()
         db.session.commit()
         return "", 204
     except AutoTestServiceError as e:
@@ -294,6 +296,7 @@ def worker_result(sid, wid):
         test.exception_message = params.get('exception_message')
         test.exception_traceback = params.get('exception_traceback')
 
+        test.stopped_at = datetime.utcnow()
         db.session.commit()
         return "", 204
     except AutoTestServiceError as e:

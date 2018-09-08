@@ -409,6 +409,8 @@ class AutoTest(db.Model):
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    started_at = db.Column(db.DateTime)
+    stopped_at = db.Column(db.DateTime)
 
     submission = db.relationship('Submission', backref=db.backref('auto_tests'))
 
@@ -419,7 +421,8 @@ class AutoTest(db.Model):
         d = dict(id=self.id, submission_id=self.submission_id,
                  hostname=self.hostname, final_state=self.final_state,
                  exception_class=self.exception_class, exception_message=self.exception_message,
-                 created_at=self.created_at, modified_at=self.modified_at)
+                 created_at=self.created_at, modified_at=self.modified_at,
+                 started_at=self.started_at, stopped_at=self.stopped_at)
         try:
             if self.result is not None:
                 d['result'] = json.loads(self.result)  # try to parse result as JSON string
