@@ -91,6 +91,31 @@ def upload_output_files(submission_id: int, work_id: str, files: dict):
     resp.raise_for_status()
 
 
+def get_run_params(config_file_path: str) -> dict:
+    """
+    Parse a config file and convert the configs into running params. The keys of the config object may be different from
+    the corresponding running params as we simplified them to hide the low-level jargon for easier use.
+    :param config_file_path: a JSON object
+    :return: a dictionary of running params
+    """
+    with open(config_file_path) as f_limits:
+        params = {}
+        for k, v in json.load(f_limits).items():
+            if k == 'auto_remove':
+                params['remove'] = v
+            elif k == 'cpu':
+                period = 100000
+                params['cpu_period'] = period
+                params['cpu_quota'] = int(v * period)
+            elif k == 'memory':
+                params['mem_limit'] = v
+            elif k == 'memory_and_swap':
+                params['memswap_limit'] = v
+            elif k == 'network':
+                params['network_disabled'] = not v
+        return params
+
+
 def extract_result(raw_output):
     """
     Try to parse the last non-empty line from the raw output as the result
@@ -161,15 +186,18 @@ def run_test(self: Task, submission_id: int):
         local_save_path = os.path.join(work_folder, 'submission', file['requirement']['name'])
         download_submission_file(submission_id, self.request.id, file, local_save_path)
 
-    # TODO timeout mechanism
-    # TODO cpu/memory restrictions
-
     files_to_upload = {}
 
     try:
         # If 'Dockerfile' exists, build docker image and run it
         dockerfile = os.path.join(work_folder, 'Dockerfile')
         if os.path.isfile(dockerfile):
+            # get config for running the Docker container
+            run_params = {'remove': True}  # by default, remove container after exit
+            docker_run_config = os.path.join(work_folder, 'docker-run-config.json')
+            if os.path.isfile(docker_run_config):
+                run_params.update(get_run_params(docker_run_config))
+
             # build Docker image
             build_logs = None
             try:
@@ -182,24 +210,33 @@ def run_test(self: Task, submission_id: int):
                 if build_logs:
                     files_to_upload['docker-build-logs.json'] = json.dumps(list(build_logs), indent=2)
 
-            # run a Docker container with this image
+            # run a Docker container with the specified limits and the new image
             try:
                 # logs from stdout and stderr are combined due to the design of the API
-                logs = docker_client.containers.run(image.id, remove=True, network_disabled=True,
-                                                    stdout=True, stderr=True)
-                files_to_upload['docker-run-logs.txt'] = logs
+                logs = docker_client.containers.run(image.id, name=tag, stdout=True, stderr=True, **run_params)
+                if logs:
+                    files_to_upload['docker-run-logs.txt'] = logs
                 result = extract_result(logs)
             except ContainerError as e:
-                files_to_upload['docker-run-error.txt'] = e.stderr  # the error does not provide stdout
+                if e.stderr:
+                    files_to_upload['docker-run-error.txt'] = e.stderr  # the error does not provide stdout
                 raise RuntimeError('Test command inside Docker returned non-zero exit status %d' % e.exit_status)
-            # Notice: image is not removed due to potential conflict (e.g. two tests with exact same submission)
+
+            if run_params.get('remove'):
+                # If container should be removed, also try to remove the image
+                # This operation may fail due to multiple repository references or other running containers
+                try:
+                    docker_client.images.remove(image.id)
+                except docker.errors.APIError as e:
+                    # keep the error message but do not treat it as a failure
+                    files_to_upload['docker-remove-image-error.txt'] = str(e)
         else:
-            # Otherwise look for 'run.sh' and run it in the bare environment.
-            # Make sure 'run.sh' has the execution permission. (chmod +x)
+            # Otherwise look for 'run.sh' and run it in the bare environment, which has no system isolation or
+            # time/resource/network restrictions.
             run_script = os.path.join(work_folder, 'run.sh')
             if not os.path.isfile(run_script):
                 raise RuntimeError('Test script not found')
-            proc_result = subprocess.run([os.path.abspath(run_script)], cwd=work_folder,
+            proc_result = subprocess.run(['bash', os.path.abspath(run_script)], cwd=work_folder,
                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if proc_result.stdout:
                 files_to_upload['stdout.txt'] = proc_result.stdout
