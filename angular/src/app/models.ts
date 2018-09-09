@@ -231,6 +231,8 @@ export class AutoTest {
 
   created_at: string;
   modified_at: string;
+  started_at: string;
+  stopped_at: string;
 
   submission?: Submission;
   output_files?: AutoTestOutputFile[];
@@ -242,6 +244,9 @@ export class AutoTestOutputFile {
 
   path: string;
   save_path: string;
+
+  created_at: string;
+  modified_at: string;
 
   auto_test?: AutoTest;
 }
