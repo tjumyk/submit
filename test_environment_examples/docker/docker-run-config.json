@@ -1,0 +1,7 @@
+{
+  "auto_remove": true,
+  "network": false,
+  "cpu": 2.0,
+  "memory": "1g",
+  "memory_and_swap": "1g"
+}

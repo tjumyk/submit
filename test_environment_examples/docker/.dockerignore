@@ -1,0 +1,7 @@
+# Use this file to instruct the Docker daemon to skip copying the following files or folders into the Docker image
+
+Dockerfile
+.dockerignore
+docker-run-config.json
+
+__pycache__/
