@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import List
+from typing import List, Callable
 from urllib.parse import urlencode
 
 import requests
@@ -13,9 +13,6 @@ _request_user_key = 'oauth_user'
 _session_uid_key = 'uid'
 _session_access_token_key = 'access_token'
 _admin_group_name = 'admin'
-
-# ==== Internal Variables ====
-_login_callback = None
 
 
 # ==== Exceptions ====
@@ -74,6 +71,10 @@ class Group:
 
     def to_dict(self):
         return dict(id=self.id, name=self.name, description=self.description)
+
+
+# ==== Internal Callbacks ====
+_login_callback: Callable[[User], object] = None
 
 
 # ==== Helper functions ====
@@ -271,7 +272,7 @@ def _request_resource(path, access_token, method='get', **kwargs):
     params['oauth_token'] = access_token
     try:
         response = requests.request(method, config_server['url'] + path, params=params, **kwargs)
-    except IOError as e:
+    except IOError:
         raise OAuthAPIError('failed to access OAuth API')
     if response.status_code // 100 != 2:
         raise _parse_response_error(response)
@@ -422,7 +423,7 @@ def get_users() -> List[User]:
     data = _request_resource_json(config['server']['admin_users_api'], _get_access_token())
     user_dicts = data['users']
     group_dicts = data['groups']
-    groups = {g['id']: _parse_group(g) for g in group_dicts}
+    groups = {_g['id']: _parse_group(_g) for _g in group_dicts}
     users = []
     for u in user_dicts:
         user = _parse_user(u)
@@ -435,7 +436,7 @@ def get_users() -> List[User]:
 def get_groups() -> List[Group]:
     config = current_app.config.get(_config_key)
     data = _request_resource_json(config['server']['admin_groups_api'], _get_access_token())
-    return [_parse_group(g) for g in data]
+    return [_parse_group(_g) for _g in data]
 
 
 def add_group(name, description=None) -> Group:
