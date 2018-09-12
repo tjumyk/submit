@@ -35,7 +35,7 @@ WORKDIR /root/test
 COPY ./test /root/test
 
 # Install pip requirements
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Test entry point
 # We use "timeout" as the entry point to limit the execution time as Docker itself does not suppot this natively.
