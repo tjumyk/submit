@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import List, Callable
+from typing import List
 from urllib.parse import urlencode
 
 import requests
@@ -74,7 +74,7 @@ class Group:
 
 
 # ==== Internal Callbacks ====
-_login_callback: Callable[[User], object] = None
+_login_callback = None
 
 
 # ==== Helper functions ====
