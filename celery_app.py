@@ -110,6 +110,8 @@ def get_run_params(config_file_path: str) -> dict:
             elif k == 'memory':
                 params['mem_limit'] = v
             elif k == 'memory_and_swap':
+                # Notice: this limit requires system kernel support and may cause performance degradation.
+                # See this link: https://docs.docker.com/config/containers/resource_constraints/
                 params['memswap_limit'] = v
             elif k == 'network':
                 params['network_disabled'] = not v
