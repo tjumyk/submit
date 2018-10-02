@@ -1,23 +1,28 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgForm} from "@angular/forms";
 import {debounceTime, finalize} from "rxjs/operators";
-import {ErrorMessage, Team, User, UserTeamAssociation} from "../models";
+import {ErrorMessage, Team, User, Task, UserTeamAssociation} from "../models";
 import {NewTeamForm, TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {TeamService} from "../team.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Subject} from "rxjs";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-join-or-create-team',
   templateUrl: './join-or-create-team.component.html',
   styleUrls: ['./join-or-create-team.component.less']
 })
-export class JoinOrCreateTeamComponent implements OnInit {
+export class JoinOrCreateTeamComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
 
   taskId: number;
+  task: Task;
   user: User;
+
+  teamJoinClosed: boolean;
+  timeTrackerHandler: number;
 
   teamAssociation: UserTeamAssociation;
   loadingTeamAssociation: boolean;
@@ -58,14 +63,43 @@ export class JoinOrCreateTeamComponent implements OnInit {
       user => {
         this.user = user;
 
-        this.loadingTeamAssociation = true;
-        this.taskService.getMyTeamAssociation(this.taskId).pipe(
-          finalize(() => this.loadingTeamAssociation = false)
-        ).subscribe(
-          teamAssociation => this.setupTeamAssociation(teamAssociation),
+        let getTask;
+        if (this.route.parent.snapshot.url[0].path == 'tasks-preview') {
+          getTask = this.taskService.getCachedTaskPreview(this.taskId);
+        } else {
+          getTask = this.taskService.getCachedTask(this.taskId);
+        }
+        getTask.subscribe(
+          task => this.setupTask(task),
           error => this.error = error.error
-        )
+        );
       },
+      error => this.error = error.error
+    )
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.timeTrackerHandler);
+  }
+
+  private setupTask(task: Task) {
+    this.task = task;
+
+    const timeTracker = () => {
+      if (!task.team_join_close_time) {
+        this.teamJoinClosed = false
+      } else {
+        this.teamJoinClosed = moment(task.team_join_close_time).isSameOrBefore(moment())
+      }
+    };
+    timeTracker();
+    this.timeTrackerHandler = setInterval(timeTracker, 10000);
+
+    this.loadingTeamAssociation = true;
+    this.taskService.getMyTeamAssociation(this.taskId).pipe(
+      finalize(() => this.loadingTeamAssociation = false)
+    ).subscribe(
+      teamAssociation => this.setupTeamAssociation(teamAssociation),
       error => this.error = error.error
     )
   }

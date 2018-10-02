@@ -33,16 +33,10 @@
     </div>
     <ng-template #noPendingRequest>
       <ng-container *ngIf="!team.is_finalised">
-        <div class="ui message info" *ngIf="beforeOpen; else creatorFinaliseHint">
-          <i class="icon time outline"></i>
-          Please wait for the opening time of this task and then finalise your team.
+        <div class="ui message info">
+          <i class="icon info circle"></i>
+          Please finalise your team when you confirm the member list. Only after the team is finalised, the team members can make submissions for this task.
         </div>
-        <ng-template #creatorFinaliseHint>
-          <div class="ui message info">
-            <i class="icon info circle"></i>
-            Please finalise your team when you confirm the member list. Only after the team is finalised, the team members can make submissions for this task.
-          </div>
-        </ng-template>
       </ng-container>
     </ng-template>
   </div>
@@ -136,21 +130,16 @@
   <div class="ui grid stackable center aligned one column" *ngIf="!team.is_finalised">
     <div class="column team-operations" *ngIf="team.creator_id==user.id">
       <div class="ui buttons two">
-        <a class="ui button primary" (click)="finaliseTeam(btnFinaliseTeam)" #btnFinaliseTeam [ngClass]="{'disabled': beforeOpen || hasPendingRequests()}">
+        <a class="ui button primary" (click)="finaliseTeam(btnFinaliseTeam)" #btnFinaliseTeam [ngClass]="{'disabled': hasPendingRequests()}">
           <i class="icon gavel"></i> Finalise Team
         </a>
         <a class="ui button red" (click)="dismissTeam(btnDismissTeam)" #btnDismissTeam>
           <i class="icon trash"></i> Dismiss Team
         </a>
       </div>
-      <p *ngIf="hasPendingRequests(); else noPendingRequestFinaliseBtnHint">
+      <p *ngIf="hasPendingRequests()">
         <i class="icon info circle"></i> You have to resolve all the pending requests before finalising the team.
       </p>
-      <ng-template #noPendingRequestFinaliseBtnHint>
-        <p *ngIf="beforeOpen">
-          <i class="icon info circle"></i> You are not allowed to finalise your team before the opening time of this task.
-        </p>
-      </ng-template>
     </div>
     <div class="column team-operations" *ngIf="team.creator_id!=user.id && teamAssociation.is_user_agreed && teamAssociation.is_creator_agreed">
       <a class="ui button fluid red" (click)="leaveTeam(btnLeaveTeam)" #btnLeaveTeam><i class="icon sign out"></i> Leave Team</a>

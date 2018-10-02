@@ -103,6 +103,11 @@ export class AdminTaskEditComponent implements OnInit {
     else
       this.form.close_time = task.close_time;
 
+    if (task.team_join_close_time)
+      this.form.team_join_close_time = moment(task.team_join_close_time).format('YYYY-MM-DDTHH:mm');
+    else
+      this.form.team_join_close_time = task.team_join_close_time;
+
     // adjust special consideration form
     if (this.task.is_team_task)
       this.newSpecialConsideration.user_name = null;

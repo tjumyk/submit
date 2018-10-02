@@ -19,7 +19,7 @@
         <li>You can only see limited information about this task in this preview page.</li>
         <ng-container *ngIf="task.is_team_task">
           <li>Team-making is available at any time (click 'My Team' button below). You are free to make your teams now or later.</li>
-          <li>However, team creators are not allowed to finalise their teams before the opening time.</li>
+          <li>However, you are not allowed to join an existing team after the <b>Team Join Close Time</b> (see the details below).</li>
         </ng-container>
         <li>You will be redirected to the full page after the opening time.</li>
       </ul>
@@ -75,7 +75,7 @@
         </div>
         <!--End of Time info-->
 
-        <!--Start of Submission Info-->
+        <!--Start of Team Info-->
         <div class="ui segment">
           <div class="ui list">
             <div class="item">
@@ -96,9 +96,21 @@
                 </div>
               </div>
             </div>
+            <div class="item" *ngIf="task.is_team_task">
+              <i class="icon hand paper outline"></i>
+              <div class="content">
+                <div class="header">Team Join Close Time</div>
+                <div class="description">
+                  <div *ngIf="task.team_join_close_time; else timeTbd">
+                    <div>{{ task.team_join_close_time|date:'medium' }}</div>
+                    <div>({{task._team_join_close_time_from_now}})</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <!--End of Submission Info-->
+        <!--End of Team Info-->
       </div>
 
     </div>

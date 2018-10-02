@@ -66,6 +66,7 @@ export class Task {
   is_team_task: boolean;
   team_min_size?: number;
   team_max_size?: number;
+  team_join_close_time?: string;
   submission_attempt_limit?: number;
   submission_history_limit?: number;
 

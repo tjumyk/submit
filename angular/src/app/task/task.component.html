@@ -114,7 +114,7 @@
         </div>
         <!--End of Time info-->
 
-        <!--Start of Submission Info-->
+        <!-- Start of Team info -->
         <div class="ui segment">
           <div class="ui list">
             <div class="item">
@@ -135,6 +135,25 @@
                 </div>
               </div>
             </div>
+            <div class="item" *ngIf="task.is_team_task">
+              <i class="icon hand paper outline"></i>
+              <div class="content">
+                <div class="header">Team Join Close Time</div>
+                <div class="description">
+                  <div *ngIf="task.team_join_close_time; else timeTbd">
+                    <div>{{ task.team_join_close_time|date:'medium' }}</div>
+                    <div>({{task._team_join_close_time_from_now}})</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Team info -->
+
+        <!--Start of Submission Info-->
+        <div class="ui segment">
+          <div class="ui list">
             <div class="item">
               <i class="icon paper plane outline"></i>
               <div class="content">

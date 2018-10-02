@@ -94,6 +94,8 @@ export class TasksComponent implements OnInit, OnDestroy {
         task['_open_time_from_now'] = task.open_time ? moment(task.open_time).fromNow() : null;
         task['_due_time_from_now'] = task.due_time ? moment(task.due_time).fromNow() : null;
         task['_close_time_from_now'] = task.close_time ? moment(task.close_time).fromNow() : null;
+        task['_team_join_close_time_from_now'] = task.team_join_close_time ?
+          moment(task.team_join_close_time).fromNow() : null;
       }
     };
 

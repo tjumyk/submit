@@ -208,6 +208,7 @@ class Task(db.Model):
     is_team_task = db.Column(db.Boolean, nullable=False, default=False)
     team_min_size = db.Column(db.Integer)
     team_max_size = db.Column(db.Integer)
+    team_join_close_time = db.Column(db.DateTime)
 
     submission_attempt_limit = db.Column(db.Integer)
     submission_history_limit = db.Column(db.Integer)
@@ -229,7 +230,8 @@ class Task(db.Model):
         d = dict(id=self.id, term_id=self.term_id,
                  type=self.type, title=self.title, description=self.description,
                  open_time=self.open_time, due_time=self.due_time,
-                 is_team_task=self.is_team_task, team_min_size=self.team_min_size, team_max_size=self.team_max_size)
+                 is_team_task=self.is_team_task, team_min_size=self.team_min_size, team_max_size=self.team_max_size,
+                 team_join_close_time=self.team_join_close_time)
         if with_term:
             d['term'] = self.term.to_dict()
         if with_details:

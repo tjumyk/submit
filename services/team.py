@@ -163,14 +163,18 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
-        if not TeamService._is_eligible_student(team.task, user):
+        task = team.task
+        if task.team_join_close_time is not None and task.team_join_close_time < datetime.utcnow():
+            raise TeamServiceError('team join has been closed')
+
+        if not TeamService._is_eligible_student(task, user):
             raise TeamServiceError('not eligible student')
 
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
         ass = UserTeamAssociation.query.filter_by(user=user) \
-            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == team.task.id) \
+            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == task.id) \
             .first()
         if ass:
             if ass.team_id == team.id:
@@ -215,14 +219,18 @@ class TeamService:
         if user is None:
             raise TeamServiceError('user is required')
 
-        if not TeamService._is_eligible_student(team.task, user):
+        task = team.task
+        if task.team_join_close_time is not None and task.team_join_close_time < datetime.utcnow():
+            raise TeamServiceError('team join has been closed')
+
+        if not TeamService._is_eligible_student(task, user):
             raise TeamServiceError('not eligible student')
 
         if team.is_finalised:
             raise TeamServiceError('team already finalised')
 
         ass = UserTeamAssociation.query.filter_by(user=user) \
-            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == team.task.id) \
+            .filter(UserTeamAssociation.team_id == Team.id, Team.task_id == task.id) \
             .first()
         if ass:
             if ass.team_id == team.id:
@@ -296,8 +304,6 @@ class TeamService:
 
         members = db.session.query(func.count()).filter(UserTeamAssociation.team_id == team.id).scalar()
         task = team.task
-        if task.open_time is None or task.open_time > datetime.utcnow():
-            raise TeamServiceError('task has not yet open')
         if task.team_min_size is not None and members < task.team_min_size:
             raise TeamServiceError('too few members', 'At least %d members are required' % task.team_min_size)
         if task.team_max_size is not None and members > task.team_max_size:

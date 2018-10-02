@@ -72,6 +72,10 @@
       </div>
     </div>
 
+    <div class="ui message warning" *ngIf="teamJoinClosed">
+      <i class="ui icon exclamation triangle"></i> Team join has been closed.
+    </div>
+
     <table class="ui table unstackable">
       <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th class="collapsing">Operations</th></tr></thead>
       <tbody>
@@ -87,7 +91,7 @@
         <td>{{t.slogan}}</td>
         <td>{{t.total_user_associations}}</td>
         <td class="collapsing">
-          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam><i class="icon hand paper"></i> Join</a>
+          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam [ngClass]="{'disabled': teamJoinClosed}"><i class="icon hand paper"></i> Join</a>
           <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
         </td>
       </tr>

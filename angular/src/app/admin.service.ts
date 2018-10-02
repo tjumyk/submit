@@ -37,6 +37,7 @@ export class UpdateTaskForm{
   is_team_task: boolean;
   team_min_size?: number;
   team_max_size?: number;
+  team_join_close_time?: string;
   submission_attempt_limit?: number;
   submission_history_limit?: number;
   evaluation_method?: string;
@@ -214,6 +215,7 @@ export class AdminService {
     formCopy.open_time = moment(form.open_time).toISOString();
     formCopy.due_time = moment(form.due_time).toISOString();
     formCopy.close_time = moment(form.close_time).toISOString();
+    formCopy.team_join_close_time = moment(form.team_join_close_time).toISOString();
     return this.http.put<Task>(`${this.api}/tasks/${task_id}`, formCopy)
   }
 

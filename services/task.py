@@ -36,6 +36,7 @@ class TaskService:
         'is_team_task',
         'team_min_size',
         'team_max_size',
+        'team_join_close_time',
         'submission_attempt_limit',
         'submission_history_limit',
         'evaluation_method',
@@ -80,7 +81,7 @@ class TaskService:
         for k in kwargs:
             if k not in cls.fields:
                 raise TaskServiceError('invalid field', k)
-            if k in ['open_time', 'due_time', 'close_time']:  # fix datetime
+            if k in ['open_time', 'due_time', 'close_time', 'team_join_close_time']:  # fix datetime
                 v = kwargs[k]
                 if v:
                     kwargs[k] = parser.parse(v).replace(tzinfo=None)  # strip tzinfo from a UTC datetime

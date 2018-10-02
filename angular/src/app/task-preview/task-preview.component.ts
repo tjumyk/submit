@@ -90,6 +90,8 @@ export class TaskPreviewComponent implements OnInit, OnDestroy {
       }
       this.task['_open_time_from_now'] = task.open_time ? moment(task.open_time).fromNow() : null;
       this.task['_due_time_from_now'] = task.due_time ? moment(task.due_time).fromNow() : null;
+      this.task['_team_join_close_time_from_now'] = task.team_join_close_time ?
+        moment(task.team_join_close_time).fromNow() : null;
     };
     timeTracker();
     this.timeTrackerHandler = setInterval(timeTracker, 10000);

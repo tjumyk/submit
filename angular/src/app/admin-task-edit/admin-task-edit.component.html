@@ -126,6 +126,10 @@
               <input type="number" min="1" placeholder="Maximal number of members" name="team_max_size" [(ngModel)]="form.team_max_size" step="1">
             </div>
           </div>
+          <div class="field" *ngIf="form.is_team_task">
+            <label>Team Join Close Time</label>
+            <input type="datetime-local" name="team_join_close_time" [(ngModel)]="form.team_join_close_time">
+          </div>
           <div class="field">
             <label>Submission Attempt Limit</label>
             <input type="number" min="1" placeholder="Maximal number of submission attempts for a user/team" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
