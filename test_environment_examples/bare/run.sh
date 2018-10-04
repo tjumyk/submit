@@ -2,3 +2,4 @@
 
 which python
 pwd
+echo "${RESULT_TAG} good"

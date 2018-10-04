@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import random
 import shutil
 import ssl
 import subprocess
@@ -10,6 +11,8 @@ import docker
 import requests
 from celery import Task
 from docker.errors import ContainerError, BuildError
+
+EXIT_STATUS_TIMEOUT = 124
 
 with open('config.json') as _f:
     config = json.load(_f)
@@ -118,21 +121,31 @@ def get_run_params(config_file_path: str) -> dict:
         return params
 
 
-def extract_result(raw_output):
+def extract_result(raw_output, result_tag):
     """
     Try to parse the last non-empty line from the raw output as the result
     :param raw_output: raw output from the test script or command inside Docker
+    :param result_tag: tag for the result line
     :return: result if parsed successfully
     """
-    if not raw_output:
+    if not raw_output or not result_tag:
         return None
     if isinstance(raw_output, (bytes, bytearray)):
         raw_output = raw_output.decode()
-    last_line = raw_output.strip().split('\n')[-1].strip()
+    lines = raw_output.strip().split('\n')
+
+    result = None
+    for line in lines:
+        line = line.strip()
+        if line and line.startswith(result_tag):
+            result = line[len(result_tag):].strip()
+
+    if result is None:
+        return None
     try:
-        return json.loads(last_line)
+        return json.loads(result)
     except (ValueError, TypeError):
-        return last_line
+        return result
 
 
 # noinspection PyAbstractClass
@@ -191,11 +204,20 @@ def run_test(self: Task, submission_id: int):
     files_to_upload = {}
 
     try:
+        # generate randomized result tag
+        result_tag = '##RESULT%d##' % random.randint(100000, 999999)
+        # generate additional environment variables
+        env_vars = {'RESULT_TAG': result_tag}
+
         # If 'Dockerfile' exists, build docker image and run it
         dockerfile = os.path.join(work_folder, 'Dockerfile')
         if os.path.isfile(dockerfile):
             # get config for running the Docker container
-            run_params = {'remove': True}  # by default, remove container after exit
+
+            run_params = {
+                'remove': True,  # by default, remove container after exit
+                'environment': env_vars
+            }
             docker_run_config = os.path.join(work_folder, 'docker-run-config.json')
             if os.path.isfile(docker_run_config):
                 run_params.update(get_run_params(docker_run_config))
@@ -218,11 +240,13 @@ def run_test(self: Task, submission_id: int):
                 logs = docker_client.containers.run(image.id, name=tag, stdout=True, stderr=True, **run_params)
                 if logs:
                     files_to_upload['docker-run-logs.txt'] = logs
-                result = extract_result(logs)
+                result = extract_result(logs, result_tag)
             except ContainerError as e:
                 if e.stderr:
                     files_to_upload['docker-run-error.txt'] = e.stderr  # the error does not provide stdout
-                raise RuntimeError('Test command inside Docker returned non-zero exit status %d' % e.exit_status)
+                if e.exit_status == EXIT_STATUS_TIMEOUT:
+                    raise TimeoutError('Test command timeout')
+                raise RuntimeError('Test command returned non-zero exit status %d' % e.exit_status)
 
             if run_params.get('remove'):
                 # If container should be removed, also try to remove the image
@@ -239,15 +263,17 @@ def run_test(self: Task, submission_id: int):
             if not os.path.isfile(run_script):
                 raise RuntimeError('Test script not found')
             proc_result = subprocess.run(['bash', os.path.abspath(run_script)], cwd=work_folder,
-                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env_vars)
             if proc_result.stdout:
                 files_to_upload['stdout.txt'] = proc_result.stdout
             if proc_result.stderr:
                 files_to_upload['stderr.txt'] = proc_result.stderr
 
             if proc_result.returncode:
+                if proc_result.returncode == EXIT_STATUS_TIMEOUT:
+                    raise TimeoutError('Test script timeout')
                 raise RuntimeError('Test script returned non-zero exit status %d' % proc_result.returncode)
-            result = extract_result(proc_result.stdout)
+            result = extract_result(proc_result.stdout, result_tag)
     finally:
         if files_to_upload:
             upload_output_files(submission_id, self.request.id, files_to_upload)

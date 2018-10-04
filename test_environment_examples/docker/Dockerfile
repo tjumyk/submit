@@ -28,6 +28,10 @@ RUN wget --quiet -O /usr/local/miniconda.sh https://repo.continuum.io/miniconda/
   && rm /usr/local/miniconda.sh
 ENV PATH /usr/local/miniconda/bin:$PATH
 
+# Create python environment if required
+# RUN conda create -y -n test python=3.6
+# ENV PATH /usr/local/miniconda/envs/test/bin:$PATH
+
 # Set the working directory
 WORKDIR /root/test
 
