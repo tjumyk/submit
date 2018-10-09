@@ -8,7 +8,11 @@
   <tr *ngFor="let team of teams; index as i">
     <td>{{i+1}}</td>
     <td>{{team.id}}</td>
-    <td>{{team.name}}</td>
+    <td>
+      {{team.name}}
+      <i *ngIf="!team.is_finalised; else alreadyFinalised" class="icon lock open green" title="Open"></i>
+      <ng-template #alreadyFinalised><i class="icon lock" title="Finalised"></i></ng-template>
+    </td>
     <td>
       <a href="admin/users/{{team.creator_id}}" target="_blank">
         <img src="{{team.creator.avatar}}?size=64" *ngIf="team.creator.avatar; else defaultAvatar" class="ui image avatar">
