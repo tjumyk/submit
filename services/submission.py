@@ -66,7 +66,8 @@ class SubmissionService:
         query = db.session.query(UserAlias,
                                  sub_query.c.total_submissions,
                                  sub_query.c.last_submit_time) \
-            .filter(sub_query.c.user_id == UserAlias.id)
+            .filter(sub_query.c.user_id == UserAlias.id) \
+            .order_by(sub_query.c.last_submit_time)
         return [UserSubmissionSummary(user, total, last_time) for user, total, last_time in query.all()]
 
     @staticmethod
@@ -87,7 +88,8 @@ class SubmissionService:
         query = db.session.query(Team,
                                  sub_query.c.total_submissions,
                                  sub_query.c.last_submit_time) \
-            .filter(sub_query.c.team_id == Team.id)
+            .filter(sub_query.c.team_id == Team.id) \
+            .order_by(sub_query.c.last_submit_time)
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
