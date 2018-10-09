@@ -262,8 +262,13 @@ def run_test(self: Task, submission_id: int):
             run_script = os.path.join(work_folder, 'run.sh')
             if not os.path.isfile(run_script):
                 raise RuntimeError('Test script not found')
+
+            # make a copy of the current environment and add additional env vars
+            env = os.environ.copy()
+            env.update(env_vars)
+
             proc_result = subprocess.run(['bash', os.path.abspath(run_script)], cwd=work_folder,
-                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env_vars)
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
             if proc_result.stdout:
                 files_to_upload['stdout.txt'] = proc_result.stdout
             if proc_result.stderr:
