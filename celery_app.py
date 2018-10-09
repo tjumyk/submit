@@ -191,7 +191,7 @@ def run_test(self: Task, submission_id: int):
         if os.path.isfile(env_archive):
             shutil.unpack_archive(env_archive, work_folder)
         else:
-            raise RuntimeError('Not test environment for task %s' % task_id)
+            raise RuntimeError('No test environment for task %s' % task_id)
 
     # download submission files into sub folder 'submission'
     submission_folder = os.path.join(work_folder, 'submission')
