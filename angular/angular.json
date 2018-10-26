@@ -51,7 +51,8 @@
               "src/lib/semantic/semantic.min.css",
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [],
+            "i18nLocale": "en-AU"
           },
           "configurations": {
             "production": {
