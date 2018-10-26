@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ErrorMessage, FileRequirement, SubmissionStatus, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
-import {TaskService} from "../task.service";
+import {LatePenalty, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
@@ -17,7 +17,7 @@ export class AttemptEntry {
   templateUrl: './submit.component.html',
   styleUrls: ['./submit.component.less']
 })
-export class SubmitComponent implements OnInit {
+export class SubmitComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
 
   taskId: number;
@@ -34,6 +34,14 @@ export class SubmitComponent implements OnInit {
   isClosed: boolean;
   attemptEntries: AttemptEntry[];
 
+  countDownHours: number;
+  countDownMinutes: number;
+  countDownSeconds: number;
+
+  lateDays: number;
+  latePenalty: number;
+
+  timeTrackerHandler: number;
 
   submitting: boolean;
   files: { [key: number]: File } = {};
@@ -71,6 +79,10 @@ export class SubmitComponent implements OnInit {
     );
   }
 
+  ngOnDestroy() {
+    clearInterval(this.timeTrackerHandler);
+  }
+
   private setupTask(task: Task) {
     this.task = task;
 
@@ -103,8 +115,49 @@ export class SubmitComponent implements OnInit {
   private setupStatus(status: SubmissionStatus) {
     this.status = status;
 
-    this.checkTimeAndReadyToSubmit();
     this.attemptEntries = this.buildAttemptEntries();
+
+    const countDownThreshold = 72 * 60 * 60; // only show the count-down if less than 72 hours left
+    const penalty = LatePenalty.parse(this.task.late_penalty);
+
+    const timeTracker = () => {
+      this.checkTimeAndReadyToSubmit();
+
+      if (this.task.due_time) {
+        let due_moment = moment(this.task.due_time);
+        if (this.status.special_consideration && this.status.special_consideration.due_time_extension)
+          due_moment = due_moment.add(this.status.special_consideration.due_time_extension, 'h');
+
+        let remain = due_moment.diff(moment(), 's');
+        if (remain < 0) {
+          this.countDownHours = null;
+          this.countDownMinutes = null;
+          this.countDownSeconds = null;
+
+          this.lateDays = Math.ceil(-remain / 60 / 60 / 24);
+          if (penalty) {
+            this.latePenalty = penalty.getPenalty(this.lateDays);
+          }
+        } else {
+          this.lateDays = null;
+          this.latePenalty = null;
+
+          if (remain < countDownThreshold) {
+            this.countDownSeconds = remain % 60;
+            remain = Math.floor(remain / 60);
+            this.countDownMinutes = remain % 60;
+            remain = Math.floor(remain / 60);
+            this.countDownHours = remain;
+          } else {
+            this.countDownHours = null;
+            this.countDownMinutes = null;
+            this.countDownSeconds = null;
+          }
+        }
+      }
+    };
+    timeTracker();
+    this.timeTrackerHandler = setInterval(timeTracker, 1000);
   }
 
   private checkTimeAndReadyToSubmit() {

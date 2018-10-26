@@ -77,6 +77,33 @@
       </div>
     </div>
 
+    <div class="ui message warning icon" *ngIf="lateDays!= null">
+      <i class="icon clock"></i>
+      <div class="content">
+        <div class="header">Hey! You are late!</div>
+        Your NEW submission will get a <span *ngIf="latePenalty!=null">{{latePenalty|percent}}</span> deduction on the final marks as being {{lateDays}} <span *ngIf="lateDays>1; else oneDayLate">days</span> late.
+        <ng-template #oneDayLate>day</ng-template>
+      </div>
+    </div>
+
+    <div class="ui segment center aligned" *ngIf="countDownSeconds!=null">
+      <h3>Deadline approaching!</h3>
+      <div class="ui three statistics">
+        <div class="statistic">
+          <div class="value">{{countDownHours|number:'2.0-0'}}</div>
+          <div class="label">hours</div>
+        </div>
+        <div class="statistic">
+          <div class="value">{{countDownMinutes|number:'2.0-0'}}</div>
+          <div class="label">minutes</div>
+        </div>
+        <div class="statistic">
+          <div class="value">{{countDownSeconds|number:'2.0-0'}}</div>
+          <div class="label">seconds</div>
+        </div>
+      </div>
+    </div>
+
     <div class="ui segment" *ngIf="attemptEntries">
       <div class="attempts-bar">
         <div class="items">
@@ -102,7 +129,12 @@
             <label *ngIf="req._form_errors?.size"><i class="icon times"></i> File is too big (at most {{req.size_limit | size}})</label>
           </div>
         </div>
-        <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
+        <ng-container *ngIf="lateDays==null; else lateSubmitBtn">
+          <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
+        </ng-container>
+        <ng-template #lateSubmitBtn>
+          <button type="submit" class="ui yellow button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit Late Submission</button>
+        </ng-template>
       </form>
     </div>
 
