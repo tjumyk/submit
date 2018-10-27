@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <div class="ui message warning icon" *ngIf="lateDays!= null">
+    <div class="ui message warning icon" *ngIf="isReadyToSubmit && lateDays!= null">
       <i class="icon clock"></i>
       <div class="content">
         <div class="header">Hey! You are late!</div>
