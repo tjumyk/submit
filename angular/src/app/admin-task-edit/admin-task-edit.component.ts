@@ -24,7 +24,6 @@ export class AdminTaskEditComponent implements OnInit {
   success: SuccessMessage;
   error: ErrorMessage;
   secondaryError: ErrorMessage;
-  thirdError: ErrorMessage;
   taskId: number;
   task: Task;
   loadingTask: boolean;
@@ -46,6 +45,7 @@ export class AdminTaskEditComponent implements OnInit {
   newSpecialConsideration: NewSpecialConsiderationForm = new NewSpecialConsiderationForm();
 
   editingLatePenalty: boolean;
+  activeTab: string;
 
   constructor(
     private adminService: AdminService,
@@ -53,6 +53,7 @@ export class AdminTaskEditComponent implements OnInit {
     private titleService: TitleService
   ) {
     this.newFileRequirementForm.is_optional = false;
+    this.activeTab = 'basic';
   }
 
   ngOnInit() {
@@ -254,7 +255,7 @@ export class AdminTaskEditComponent implements OnInit {
       finalize(() => this.addingSpecialConsideration = false)
     ).subscribe(
       spec => this.task.special_considerations.push(spec),
-      error => this.thirdError = error.error
+      error => this.secondaryError = error.error
     )
   }
 
@@ -267,7 +268,7 @@ export class AdminTaskEditComponent implements OnInit {
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
       () => this.task.special_considerations.splice(index, 1),
-      error => this.thirdError = error.error
+      error => this.secondaryError = error.error
     )
   }
 

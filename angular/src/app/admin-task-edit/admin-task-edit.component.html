@@ -1,356 +1,393 @@
 <app-error-message [error]="error"></app-error-message>
-<app-success-message [success]="success"></app-success-message>
 
 <div class="ui text loader active" *ngIf="loadingTask">Loading task info...</div>
 
-<div class="ui grid stackable" *ngIf="task">
-  <div class="row">
-    <div class="column">
-      <div class="ui breadcrumb">
-        <a class="section" routerLink="../../courses">Courses</a>
-        <i class="icon right angle divider"></i>
-        <a class="section" routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
-        <i class="icon right angle divider"></i>
-        <a class="section" routerLink="../../terms/{{ task.term.id }}">{{ task.term.year }} Semester {{ task.term.semester }}</a>
-        <i class="icon right angle divider"></i>
-        <div class="section active">{{ task.title }}</div>
+<ng-container *ngIf="task">
+  <!-- Breadcrumb -->
+  <div class="ui breadcrumb">
+    <a class="section" routerLink="../../courses">Courses</a>
+    <i class="icon right angle divider"></i>
+    <a class="section" routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
+    <i class="icon right angle divider"></i>
+    <a class="section" routerLink="../../terms/{{ task.term.id }}">{{ task.term.year }} Semester {{ task.term.semester }}</a>
+    <i class="icon right angle divider"></i>
+    <div class="section active">{{ task.title }}</div>
+  </div>
+  <!-- End of Breadcrumb -->
+
+  <div class="ui segments">
+    <!-- Header -->
+    <div class="ui clearing segment">
+      <a routerLink="/terms/{{task.term_id}}/tasks/{{task.id}}" class="ui right floated button mini">
+        <i class="icon eye"></i> View
+      </a>
+      <div class="ui header left floated">
+        <i class="icon" [ngClass]="categories[task.type].icon"></i>
+        {{  task.title }}
       </div>
     </div>
+    <!-- End of Header -->
+
+    <!-- Basic info -->
+    <div class="ui segment">
+      <div class="ui list horizontal">
+        <div class="item">
+          <div class="header">ID</div>
+          {{ task.id }}
+        </div>
+        <div class="item">
+          <div class="header">Type</div>
+          {{ categories[task.type].name }}
+        </div>
+        <div class="item">
+          <div class="header">Created At</div>
+          {{ task.created_at | date: 'medium'}}
+        </div>
+        <div class="item">
+          <div class="header">Updated At</div>
+          {{ task.modified_at | date: 'medium' }}
+        </div>
+        <div class="item">
+          <div class="header">Course</div>
+          <a routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
+        </div>
+        <div class="item">
+          <div class="header">Term</div>
+          <a routerLink="../../terms/{{ task.term.id }}">{{ task.term.year }} Semester {{ task.term.semester }}</a>
+        </div>
+      </div>
+    </div>
+    <!-- End of Basic info -->
   </div>
 
-  <!-- Left Panel -->
-  <div class="five wide column">
-    <div class="ui segments">
-      <!-- Header -->
-      <div class="ui clearing segment">
-        <a routerLink="/terms/{{task.term_id}}/tasks/{{task.id}}" class="ui right floated button mini">
-          <i class="icon eye"></i> View
+  <app-error-message [error]="secondaryError"></app-error-message>
+  <app-success-message [success]="success"></app-success-message>
+
+  <div class="ui stackable grid">
+    <!-- Left menu -->
+    <div class="five wide column">
+      <div class="ui fluid vertical pointing menu">
+        <a class="item" (click)="activeTab='basic'" [ngClass]="{'active': activeTab=='basic'}">
+          Basic
+          <i class="icon info circle"></i>
         </a>
-        <div class="ui header left floated">
-          <i class="icon" [ngClass]="categories[task.type].icon"></i>
-          {{  task.title }}
-        </div>
-      </div>
-      <!-- End of Header -->
-
-      <!-- Basic info -->
-      <div class="ui segment">
-        <div class="ui list horizontal">
-          <div class="item">
-            <div class="header">ID</div>
-            {{ task.id }}
-          </div>
-          <div class="item">
-            <div class="header">Course</div>
-            <a routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
-          </div>
-          <div class="item">
-            <div class="header">Term</div>
-            <a routerLink="../../terms/{{ task.term.id }}">{{ task.term.year }} Semester {{ task.term.semester }}</a>
-          </div>
-        </div>
-      </div>
-      <!-- End of Basic info -->
-
-      <div class="ui segment">
-        <form class="ui form" [ngClass]="{'loading': updating}" (ngSubmit)="update(f)" #f="ngForm">
-          <div class="field required">
-            <label>Task Type</label>
-            <select name="type" [(ngModel)]="form.type" required>
-              <option value="lab">Lab</option>
-              <option value="assignment">Assignment</option>
-              <option value="project">Project</option>
-            </select>
-          </div>
-          <div class="field required" [ngClass]="{'error': (f.submitted||titleModel.dirty||titleModel.touched) && titleModel.invalid}">
-            <label>Title</label>
-            <input type="text" name="title" [(ngModel)]="form.title" #titleModel="ngModel" placeholder="Title of the task (at most 128 characters)" required maxlength="128">
-            <div class="errors">
-              <label *ngIf="titleModel.errors?.required">Title is required</label>
-              <label *ngIf="titleModel.errors?.maxlength">Title is too long</label>
-            </div>
-          </div>
-          <div class="field">
-            <label>Description (Optional)</label>
-            <textarea name="description" rows="6" [(ngModel)]="form.description" placeholder="Short description of the task"></textarea>
-          </div>
-          <div class="field">
-            <label>Open Time</label>
-            <input type="datetime-local" name="open_time" [(ngModel)]="form.open_time">
-          </div>
-          <div class="field">
-            <label>Due Time</label>
-            <input type="datetime-local" name="due_time" [(ngModel)]="form.due_time">
-          </div>
-          <div class="field">
-            <label>Close Time</label>
-            <input type="datetime-local" name="close_time" [(ngModel)]="form.close_time">
-          </div>
-          <div class="late-penalty-edit-wrapper">
-            <div class="field" [ngClass]="{'error': (f.submitted||latePenaltyModel.dirty||latePenaltyModel.touched) && latePenaltyModel.invalid}">
-              <label>Late Penalty</label>
-              <input #inputLatePenalty type="text" placeholder="Late penalty list" name="late_penalty" maxlength="128" [(ngModel)]="form.late_penalty"
-                     pattern=" *\d+(\.\d+)?( +\d+(\.\d+)?)* *" #latePenaltyModel="ngModel"
-                     (focus)="editingLatePenalty=true" (blur)="editingLatePenalty=false">
-              <div class="errors">
-                <label *ngIf="latePenaltyModel.errors?.pattern">Invalid format</label>
-                <label *ngIf="latePenaltyModel.errors?.maxlength">Late penalty list is too long</label>
-              </div>
-            </div>
-            <div class="ui left rail" [hidden]="!editingLatePenalty">
-              <div class="ui message info">
-                <div class="header">Late Penalty Syntax</div>
-                <ul class="list">
-                  <li>It should be <b>a list of float numbers separated by space characters</b>.</li>
-                  <li>Each number represents a penalty percentage <b>for a day</b>. E.g. "0.4 0.3 0.2 0.1" means 40% deduction for the first day, 30% deduction for the second day and so on.</li>
-                  <li>The accumulative penalty should not be larger than 1.0. Invalid trailing numbers will be fixed or ignored. E.g. "0.5 0.4 0.2 0.1" will be treated as "0.5 0.4 0.1".</li>
-                  <li>Trailing numbers with the same value can be omitted. E.g. "0.3 0.3 0.1 0.1 0.1 0.1" can be shortened as "0.3 0.3 0.1".</li>
-                  <li>Max length: {{inputLatePenalty.maxLength}}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <div class="ui input checkbox" (click)="checkboxIsTeamTask.click()">
-              <input type="checkbox" name="is_team_task" [(ngModel)]="form.is_team_task" class="hidden" #checkboxIsTeamTask>
-              <label>Team task?</label>
-            </div>
-          </div>
-          <div class="fields" *ngIf="form.is_team_task">
-            <div class="eight wide field">
-              <label>Team Min Size</label>
-              <input type="number" min="1" placeholder="Minimal number of members" name="team_min_size" [(ngModel)]="form.team_min_size" step="1">
-            </div>
-            <div class="eight wide field">
-              <label>Team Max Size</label>
-              <input type="number" min="1" placeholder="Maximal number of members" name="team_max_size" [(ngModel)]="form.team_max_size" step="1">
-            </div>
-          </div>
-          <div class="field" *ngIf="form.is_team_task">
-            <label>Team Join Close Time</label>
-            <input type="datetime-local" name="team_join_close_time" [(ngModel)]="form.team_join_close_time">
-          </div>
-          <div class="field">
-            <label>Submission Attempt Limit</label>
-            <input type="number" min="1" placeholder="Maximal number of submission attempts for a user/team" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
-          </div>
-          <div class="field">
-            <label>Submission History Limit</label>
-            <input type="number" min="1" placeholder="Maximal number of submissions history to keep" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
-          </div>
-          <div class="field">
-            <label>Evaluation Method</label>
-            <select name="evaluation_method" [(ngModel)]="form.evaluation_method">
-              <option value="auto_test">Auto Testing</option>
-              <option [ngValue]="null">Offline</option>
-            </select>
-          </div>
-          <div class="field" *ngIf="form.evaluation_method=='auto_test'">
-            <label>Auto Test Trigger</label>
-            <select name="auto_test_trigger" [(ngModel)]="form.auto_test_trigger">
-              <option value="submission">Triggered after each new submission</option>
-              <option [ngValue]="null">Manually triggered</option>
-            </select>
-          </div>
-          <button class="ui button primary fluid" type="submit">Save</button>
-        </form>
+        <a class="item" (click)="activeTab='materials'" [ngClass]="{'active': activeTab=='materials'}">
+          Materials
+          <i class="icon copy"></i>
+        </a>
+        <a class="item" (click)="activeTab='requirements'" [ngClass]="{'active': activeTab=='requirements'}">
+          Requirements
+          <i class="icon copy outline"></i>
+        </a>
+        <a class="item" (click)="activeTab='special_considerations'" [ngClass]="{'active': activeTab=='special_considerations'}">
+          Special Considerations
+          <i class="icon heart outline"></i>
+        </a>
       </div>
     </div>
+    <!-- End of Left menu -->
 
-  </div>
-  <!-- End of Left Panel -->
+    <!-- Right tab container -->
+    <div class="eleven wide column">
+      <!-- Basic tab -->
+      <div class="ui tab" [ngClass]="{'active': activeTab=='basic'}">
+        <div class="ui segment">
+          <form class="ui form" [ngClass]="{'loading': updating}" (ngSubmit)="update(f)" #f="ngForm">
+            <div class="ui stackable grid">
+              <div class="one column row">
+                <div class="column">
+                  <div class="field required">
+                    <label>Task Type</label>
+                    <select name="type" [(ngModel)]="form.type" required>
+                      <option value="lab">Lab</option>
+                      <option value="assignment">Assignment</option>
+                      <option value="project">Project</option>
+                    </select>
+                  </div>
+                  <div class="field required" [ngClass]="{'error': (f.submitted||titleModel.dirty||titleModel.touched) && titleModel.invalid}">
+                    <label>Title</label>
+                    <input type="text" name="title" [(ngModel)]="form.title" #titleModel="ngModel" placeholder="Title of the task (at most 128 characters)" required maxlength="128">
+                    <div class="errors">
+                      <label *ngIf="titleModel.errors?.required">Title is required</label>
+                      <label *ngIf="titleModel.errors?.maxlength">Title is too long</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Description (Optional)</label>
+                    <textarea name="description" rows="6" [(ngModel)]="form.description" placeholder="Short description of the task"></textarea>
+                  </div>
+                </div>
+              </div>
 
-  <!-- Right Panel -->
-  <div class="eleven wide column">
+              <div class="two column row">
+                <div class="column">
+                  <div class="field">
+                    <label>Open Time</label>
+                    <input type="datetime-local" name="open_time" [(ngModel)]="form.open_time">
+                  </div>
+                  <div class="field">
+                    <label>Due Time</label>
+                    <input type="datetime-local" name="due_time" [(ngModel)]="form.due_time">
+                  </div>
+                  <div class="field">
+                    <label>Close Time</label>
+                    <input type="datetime-local" name="close_time" [(ngModel)]="form.close_time">
+                  </div>
+                  <div class="late-penalty-edit-wrapper">
+                    <div class="field" [ngClass]="{'error': (f.submitted||latePenaltyModel.dirty||latePenaltyModel.touched) && latePenaltyModel.invalid}">
+                      <label>Late Penalty</label>
+                      <input #inputLatePenalty type="text" placeholder="Late penalty list" name="late_penalty" maxlength="128" [(ngModel)]="form.late_penalty"
+                             pattern=" *\d+(\.\d+)?( +\d+(\.\d+)?)* *" #latePenaltyModel="ngModel"
+                             (focus)="editingLatePenalty=true" (blur)="editingLatePenalty=false">
+                      <div class="errors">
+                        <label *ngIf="latePenaltyModel.errors?.pattern">Invalid format</label>
+                        <label *ngIf="latePenaltyModel.errors?.maxlength">Late penalty list is too long</label>
+                      </div>
+                    </div>
+                    <div class="ui left rail" [hidden]="!editingLatePenalty">
+                      <div class="ui message info">
+                        <div class="header">Late Penalty Syntax</div>
+                        <ul class="list">
+                          <li>It should be <b>a list of float numbers separated by space characters</b>.</li>
+                          <li>Each number represents a penalty percentage <b>for a day</b>. E.g. "0.4 0.3 0.2 0.1" means 40% deduction for the first day, 30% deduction for the second day and so on.</li>
+                          <li>The accumulative penalty should not be larger than 1.0. Invalid trailing numbers will be fixed or ignored. E.g. "0.5 0.4 0.2 0.1" will be treated as "0.5 0.4 0.1".</li>
+                          <li>Trailing numbers with the same value can be omitted. E.g. "0.3 0.3 0.1 0.1 0.1 0.1" can be shortened as "0.3 0.3 0.1".</li>
+                          <li>Max length: {{inputLatePenalty.maxLength}}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui input checkbox" (click)="checkboxIsTeamTask.click()">
+                      <input type="checkbox" name="is_team_task" [(ngModel)]="form.is_team_task" class="hidden" #checkboxIsTeamTask>
+                      <label>Team task?</label>
+                    </div>
+                  </div>
+                  <div class="fields" *ngIf="form.is_team_task">
+                    <div class="eight wide field">
+                      <label>Team Min Size</label>
+                      <input type="number" min="1" placeholder="Minimal size" name="team_min_size" [(ngModel)]="form.team_min_size" step="1">
+                    </div>
+                    <div class="eight wide field">
+                      <label>Team Max Size</label>
+                      <input type="number" min="1" placeholder="Maximal size" name="team_max_size" [(ngModel)]="form.team_max_size" step="1">
+                    </div>
+                  </div>
+                  <div class="field" *ngIf="form.is_team_task">
+                    <label>Team Join Close Time</label>
+                    <input type="datetime-local" name="team_join_close_time" [(ngModel)]="form.team_join_close_time">
+                  </div>
+                </div>
 
-    <!--Start of Materials-->
-    <div class="ui segment top attached">
-      <h4 class="ui header">
-        <i class="icon copy"></i>
-        Materials
-      </h4>
-    </div>
-    <table class="ui bottom attached table celled unstackable">
-      <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
-      <tbody>
-      <tr *ngFor="let mat of task.materials; index as i">
-        <td>{{ mat.id }}</td>
-        <td>{{ mat.type | titlecase }}</td>
-        <td>{{ mat.name }}</td>
-        <td>{{ mat.modified_at | date: 'short' }}</td>
-        <td>{{ mat.description }}</td>
-        <td>{{ mat.size | size }}</td>
-        <td><span [attr.data-tooltip]="mat.md5" data-position="bottom center">{{ mat.md5 | slice: 0:6}}</span></td>
-        <td>
-          <div class="ui small buttons">
-            <a href="api/admin/materials/{{ mat.id }}/download" class="ui button icon"><i class="icon download"></i></a>
-            <a class="ui button icon primary" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
-            <a class="ui button red icon" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
-          </div>
-          <form class="hidden">
-            <input type="file" (change)="updateMaterial(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
+                <div class="column">
+                  <div class="field">
+                    <label>Submission Attempt Limit</label>
+                    <input type="number" min="1" placeholder="Max submission attempts for a user/team" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
+                  </div>
+                  <div class="field">
+                    <label>Submission History Limit</label>
+                    <input type="number" min="1" placeholder="Max submission histories to keep" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
+                  </div>
+                  <div class="field">
+                    <label>Evaluation Method</label>
+                    <select name="evaluation_method" [(ngModel)]="form.evaluation_method">
+                      <option value="auto_test">Auto Testing</option>
+                      <option [ngValue]="null">Offline</option>
+                    </select>
+                  </div>
+                  <div class="field" *ngIf="form.evaluation_method=='auto_test'">
+                    <label>Auto Test Trigger</label>
+                    <select name="auto_test_trigger" [(ngModel)]="form.auto_test_trigger">
+                      <option value="submission">Triggered after each new submission</option>
+                      <option [ngValue]="null">Manually triggered</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="one column row">
+                <div class="column">
+                  <button class="ui button primary fluid" type="submit">Save</button>
+                </div>
+              </div>
+            </div>
           </form>
-          <div class="ui bottom attached progress" *ngIf="mat['_update_progress']">
-            <div class="bar" [ngStyle]="{'width.%': mat['_update_progress']}"></div>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <!--End of Materials-->
+        </div>
+      </div>
+      <!-- End of Basic tab -->
 
-    <!--Start of Requirements-->
-    <div class="ui segment top attached">
-      <h4 class="ui header">
-        <i class="icon copy outline"></i>
-        Requirements
-      </h4>
-    </div>
-    <table class="ui bottom attached table celled unstackable">
-      <thead><tr><th>ID</th><th>Name</th><th>Updated At</th><th>Description</th><th>Optional?</th><th>Size Limit</th><th>Ops</th></tr></thead>
-      <tbody>
-      <tr *ngFor="let req of task.file_requirements; index as i">
-        <td>{{ req.id }}</td>
-        <td>{{ req.name }}</td>
-        <td>{{ req.modified_at | date: 'short'}}</td>
-        <td>{{ req.description }}</td>
-        <td>{{ req.is_optional }}</td>
-        <td>
-          <span *ngIf="req.size_limit!=null; else sizeNoLimit">{{ req.size_limit | size }}</span>
-          <ng-template #sizeNoLimit>(No limit)</ng-template>
-        </td>
-        <td>
-          <a class="ui button small red icon" (click)="deleteFileRequirement(req, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <!--End of Requirements-->
+      <!-- Materials tab -->
+      <div class="ui tab" [ngClass]="{'active': activeTab=='materials'}">
+        <table class="ui bottom attached table celled unstackable">
+          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let mat of task.materials; index as i">
+            <td>{{ mat.id }}</td>
+            <td>{{ mat.type | titlecase }}</td>
+            <td>{{ mat.name }}</td>
+            <td>{{ mat.modified_at | date: 'short' }}</td>
+            <td>{{ mat.description }}</td>
+            <td>{{ mat.size | size }}</td>
+            <td><span [attr.data-tooltip]="mat.md5" data-position="bottom center">{{ mat.md5 | slice: 0:6}}</span></td>
+            <td>
+              <div class="ui small buttons">
+                <a href="api/admin/materials/{{ mat.id }}/download" class="ui button icon"><i class="icon download"></i></a>
+                <a class="ui button icon primary" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
+                <a class="ui button red icon" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
+              </div>
+              <form class="hidden">
+                <input type="file" (change)="updateMaterial(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
+              </form>
+              <div class="ui bottom attached progress" *ngIf="mat['_update_progress']">
+                <div class="bar" [ngStyle]="{'width.%': mat['_update_progress']}"></div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
 
-    <app-error-message [error]="secondaryError"></app-error-message>
-
-    <div class="ui grid two column stackable">
-      <div class="column">
         <!--Start of New Material-->
-        <div class="ui segments">
-          <div class="ui segment">
-            <h4 class="ui header">
-              <i class="icons">
-                <i class="icon file"></i>
-                <i class="icon plus right bottom corner"></i>
-              </i>
-              New Material
-            </h4>
-          </div>
-          <div class="ui segment">
-            <div class="ui top attached progress" *ngIf="addingMaterial">
-              <div class="bar" [ngStyle]="{'width.%': materialUploadProgress}"></div>
+        <div class="ui centered stackable grid">
+          <div class="ten wide column">
+            <div class="ui segments">
+              <div class="ui segment">
+                <h4 class="ui header">
+                  <i class="icons">
+                    <i class="icon file"></i>
+                    <i class="icon plus right bottom corner"></i>
+                  </i>
+                  New Material
+                </h4>
+              </div>
+              <div class="ui segment">
+                <div class="ui top attached progress" *ngIf="addingMaterial">
+                  <div class="bar" [ngStyle]="{'width.%': materialUploadProgress}"></div>
+                </div>
+                <form class="ui form" [ngClass]="{'loading': addingMaterial}" #fNewMaterial="ngForm" (ngSubmit)="addMaterial(fNewMaterial, inputMaterialFile.files)">
+                  <div class="field required" [ngClass]="{'error': materialTypeModel.invalid && (materialTypeModel.touched || materialTypeModel.dirty || fNewMaterial.submitted)}">
+                    <label>Material Type</label>
+                    <select name="type" [(ngModel)]="newMaterialForm.type" required #materialTypeModel="ngModel">
+                      <option value="specification">Specification</option>
+                      <option value="code">Code</option>
+                      <option value="data">Data</option>
+                      <option value="solution">Solution</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div class="errors">
+                      <label *ngIf="materialTypeModel.errors?.required">Material type is required</label>
+                    </div>
+                  </div>
+                  <div class="field required" [ngClass]="{'error': (materialFileModel.invalid && (materialFileModel.touched || materialFileModel.dirty || fNewMaterial.submitted))}">
+                    <label>File</label>
+                    <input type="file" name="file" (change)="updateFileName(inputMaterialFile.files)" #inputMaterialFile #materialFileModel="ngModel" required [(ngModel)]="materialFakePath">
+                    <div class="errors">
+                      <label *ngIf="materialFileModel.errors?.required">Material file is required</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui input checkbox" (click)="checkboxUseFileName.click()">
+                      <input type="checkbox" class="hidden" tabindex="0" #checkboxUseFileName name="useFileName" [(ngModel)]="materialUseOriginalName">
+                      <label>Use original file name</label>
+                    </div>
+                  </div>
+                  <div class="field required" *ngIf="!materialUseOriginalName" [ngClass]="{'error': materialNameModel.invalid && (fNewMaterial.submitted || materialNameModel.touched || materialNameModel.dirty)}">
+                    <label>File Name</label>
+                    <input type="text" name="name" required maxlength="128" pattern="^[^\s?#/\\|()&]+$"
+                           [(ngModel)]="newMaterialForm.name" #materialNameModel="ngModel">
+                    <div class="errors">
+                      <label *ngIf="materialNameModel.errors?.required">File name is required</label>
+                      <label *ngIf="materialNameModel.errors?.maxlength">File name is too long</label>
+                      <label *ngIf="materialNameModel.errors?.pattern">Invalid name format</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Description (Optional)</label>
+                    <textarea name="description" rows="3" [(ngModel)]="newMaterialForm.description" placeholder="Description of the material"></textarea>
+                  </div>
+                  <button class="ui fluid primary button" type="submit">Add Material</button>
+                </form>
+              </div>
             </div>
-            <form class="ui form" [ngClass]="{'loading': addingMaterial}" #fNewMaterial="ngForm" (ngSubmit)="addMaterial(fNewMaterial, inputMaterialFile.files)">
-              <div class="field required" [ngClass]="{'error': materialTypeModel.invalid && (materialTypeModel.touched || materialTypeModel.dirty || fNewMaterial.submitted)}">
-                <label>Material Type</label>
-                <select name="type" [(ngModel)]="newMaterialForm.type" required #materialTypeModel="ngModel">
-                  <option value="specification">Specification</option>
-                  <option value="code">Code</option>
-                  <option value="data">Data</option>
-                  <option value="solution">Solution</option>
-                  <option value="other">Other</option>
-                </select>
-                <div class="errors">
-                  <label *ngIf="materialTypeModel.errors?.required">Material type is required</label>
-                </div>
-              </div>
-              <div class="field required" [ngClass]="{'error': (materialFileModel.invalid && (materialFileModel.touched || materialFileModel.dirty || fNewMaterial.submitted))}">
-                <label>File</label>
-                <input type="file" name="file" (change)="updateFileName(inputMaterialFile.files)" #inputMaterialFile #materialFileModel="ngModel" required [(ngModel)]="materialFakePath">
-                <div class="errors">
-                  <label *ngIf="materialFileModel.errors?.required">Material file is required</label>
-                </div>
-              </div>
-              <div class="field">
-                <div class="ui input checkbox" (click)="checkboxUseFileName.click()">
-                  <input type="checkbox" class="hidden" tabindex="0" #checkboxUseFileName name="useFileName" [(ngModel)]="materialUseOriginalName">
-                  <label>Use original file name</label>
-                </div>
-              </div>
-              <div class="field required" *ngIf="!materialUseOriginalName" [ngClass]="{'error': materialNameModel.invalid && (fNewMaterial.submitted || materialNameModel.touched || materialNameModel.dirty)}">
-                <label>File Name</label>
-                <input type="text" name="name" required maxlength="128" pattern="^[^\s?#/\\|()&]+$"
-                       [(ngModel)]="newMaterialForm.name" #materialNameModel="ngModel">
-                <div class="errors">
-                  <label *ngIf="materialNameModel.errors?.required">File name is required</label>
-                  <label *ngIf="materialNameModel.errors?.maxlength">File name is too long</label>
-                  <label *ngIf="materialNameModel.errors?.pattern">Invalid name format</label>
-                </div>
-              </div>
-              <div class="field">
-                <label>Description (Optional)</label>
-                <textarea name="description" rows="3" [(ngModel)]="newMaterialForm.description" placeholder="Description of the material"></textarea>
-              </div>
-              <button class="ui fluid primary button" type="submit">Add Material</button>
-            </form>
           </div>
         </div>
         <!--End of New Material-->
       </div>
-      <div class="column">
+      <!-- End of Materials tab -->
+
+      <!-- Requirements tab -->
+      <div class="ui tab" [ngClass]="{'active': activeTab=='requirements'}">
+        <table class="ui bottom attached table celled unstackable">
+          <thead><tr><th>ID</th><th>Name</th><th>Updated At</th><th>Description</th><th>Optional?</th><th>Size Limit</th><th>Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let req of task.file_requirements; index as i">
+            <td>{{ req.id }}</td>
+            <td>{{ req.name }}</td>
+            <td>{{ req.modified_at | date: 'short'}}</td>
+            <td>{{ req.description }}</td>
+            <td>{{ req.is_optional }}</td>
+            <td>
+              <span *ngIf="req.size_limit!=null; else sizeNoLimit">{{ req.size_limit | size }}</span>
+              <ng-template #sizeNoLimit>(No limit)</ng-template>
+            </td>
+            <td>
+              <a class="ui button small red icon" (click)="deleteFileRequirement(req, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
         <!--Start of New Requirement-->
-        <div class="ui segments">
-          <div class="ui segment">
-            <h4 class="ui header">
-              <i class="icons">
-                <i class="icon file outline"></i>
-                <i class="icon plus right bottom corner"></i>
-              </i>
-              New Requirement
-            </h4>
-          </div>
-          <div class="ui segment">
-            <form class="ui form" #fNewFileRequirement="ngForm" (ngSubmit)="addFileRequirement(fNewFileRequirement)" [ngClass]="{'loading': addingFileRequirement}">
-              <div class="field required" [ngClass]="{'error': (fNewFileRequirement.submitted ||fileRequirementNameModel.dirty||fileRequirementNameModel.touched) && fileRequirementNameModel.invalid}">
-                <label>File Name</label>
-                <input type="text" name="name" placeholder="Name of the required file (at most 128 characters)"
-                       [(ngModel)]="newFileRequirementForm.name" #fileRequirementNameModel="ngModel"
-                       required maxlength="128" pattern="^[^\s?#/\\|()&]+$">
-                <div class="errors">
-                  <label *ngIf="fileRequirementNameModel.errors?.required">Name is required</label>
-                  <label *ngIf="fileRequirementNameModel.errors?.maxlength">Name is too long</label>
-                  <label *ngIf="fileRequirementNameModel.errors?.pattern">Invalid name format</label>
-                </div>
+        <div class="ui centered stackable grid">
+          <div class="ten wide column">
+            <div class="ui segments">
+              <div class="ui segment">
+                <h4 class="ui header">
+                  <i class="icons">
+                    <i class="icon file outline"></i>
+                    <i class="icon plus right bottom corner"></i>
+                  </i>
+                  New Requirement
+                </h4>
               </div>
-              <div class="field">
-                <div class="ui input checkbox" (click)="checkboxRequirementIsOptional.click()">
-                  <input type="checkbox" tabindex="0" class="hidden" #checkboxRequirementIsOptional name="is_optional" [(ngModel)]="newFileRequirementForm.is_optional">
-                  <label>Optional</label>
-                </div>
+              <div class="ui segment">
+                <form class="ui form" #fNewFileRequirement="ngForm" (ngSubmit)="addFileRequirement(fNewFileRequirement)" [ngClass]="{'loading': addingFileRequirement}">
+                  <div class="field required" [ngClass]="{'error': (fNewFileRequirement.submitted ||fileRequirementNameModel.dirty||fileRequirementNameModel.touched) && fileRequirementNameModel.invalid}">
+                    <label>File Name</label>
+                    <input type="text" name="name" placeholder="Name of the required file (at most 128 characters)"
+                           [(ngModel)]="newFileRequirementForm.name" #fileRequirementNameModel="ngModel"
+                           required maxlength="128" pattern="^[^\s?#/\\|()&]+$">
+                    <div class="errors">
+                      <label *ngIf="fileRequirementNameModel.errors?.required">Name is required</label>
+                      <label *ngIf="fileRequirementNameModel.errors?.maxlength">Name is too long</label>
+                      <label *ngIf="fileRequirementNameModel.errors?.pattern">Invalid name format</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui input checkbox" (click)="checkboxRequirementIsOptional.click()">
+                      <input type="checkbox" tabindex="0" class="hidden" #checkboxRequirementIsOptional name="is_optional" [(ngModel)]="newFileRequirementForm.is_optional">
+                      <label>Optional</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Size Limit (Unit: Bytes) (Optional)</label>
+                    <input type="number" min="1" name="size_limit" [(ngModel)]="newFileRequirementForm.size_limit" placeholder="Size limit of the uploaded file">
+                  </div>
+                  <div class="field">
+                    <label>Description (Optional)</label>
+                    <textarea name="description" rows="3" [(ngModel)]="newFileRequirementForm.description" placeholder="Description of the file"></textarea>
+                  </div>
+                  <button class="ui fluid primary button" type="submit">Add Requirement</button>
+                </form>
               </div>
-              <div class="field">
-                <label>Size Limit (Unit: Bytes) (Optional)</label>
-                <input type="number" min="1" name="size_limit" [(ngModel)]="newFileRequirementForm.size_limit" placeholder="Size limit of the uploaded file">
-              </div>
-              <div class="field">
-                <label>Description (Optional)</label>
-                <textarea name="description" rows="3" [(ngModel)]="newFileRequirementForm.description" placeholder="Description of the file"></textarea>
-              </div>
-              <button class="ui fluid primary button" type="submit">Add Requirement</button>
-            </form>
+            </div>
           </div>
         </div>
         <!--End of New Requirement-->
       </div>
-    </div>
+      <!-- End of Requirements tab -->
 
-    <app-error-message [error]="thirdError"></app-error-message>
-
-    <div class="ui grid two column stackable">
-      <div class="column">
-        <!--Start of Special Consideration-->
-        <div class="ui segment top attached">
-          <h4 class="ui header">
-            <i class="icon heart outline"></i>
-            Special Considerations
-          </h4>
-        </div>
+      <!-- Special considerations tab -->
+      <div class="ui tab" [ngClass]="{'active': activeTab=='special_considerations'}">
         <table class="ui table unstackable celled bottom attached">
           <thead><tr><th>ID</th><th>User/Team</th><th>Due Time Extension (hours)</th><th>Submission Attempt Limit Extension</th><th>Ops</th></tr></thead>
           <tbody>
@@ -373,53 +410,55 @@
           </tr>
           </tbody>
         </table>
-        <!--End of Special Consideration-->
-      </div>
 
-      <div class="column">
         <!--Start of New Special Consideration-->
-        <div class="ui segments">
-          <div class="ui segment">
-            <h4 class="ui header">
-              <i class="icons">
-                <i class="icon heart outline"></i>
-                <i class="icon right bottom corner plus"></i>
-              </i>
-              New Special Consideration
-            </h4>
-          </div>
-          <div class="ui segment">
-            <form class="ui form" #fNewSpecialConsideration="ngForm" (ngSubmit)="addSpecialConsideration(fNewSpecialConsideration)" [ngClass]="{'loading': addingSpecialConsideration}">
-              <div class="field" *ngIf="!task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || sepcialUserNameModel.dirty || sepcialUserNameModel.touched) && sepcialUserNameModel.invalid}">
-                <label>User Name</label>
-                <input type="text" [(ngModel)]="newSpecialConsideration.user_name" name="user_name" required #sepcialUserNameModel="ngModel" placeholder="Name of user">
-                <div class="errors">
-                  <label *ngIf="sepcialUserNameModel.errors?.required">User name is required</label>
-                </div>
+        <div class="ui centered stackable grid">
+          <div class="ten wide column">
+            <div class="ui segments">
+              <div class="ui segment">
+                <h4 class="ui header">
+                  <i class="icons">
+                    <i class="icon heart outline"></i>
+                    <i class="icon right bottom corner plus"></i>
+                  </i>
+                  New Special Consideration
+                </h4>
               </div>
-              <div class="field" *ngIf="task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || specialTeamNameModel.dirty || specialTeamNameModel.touched) && specialTeamNameModel.invalid}">
-                <label>Team Name</label>
-                <input type="text" [(ngModel)]="newSpecialConsideration.team_name" name="team_name" required #specialTeamNameModel="ngModel" placeholder="Name of team">
-                <div class="errors">
-                  <label *ngIf="specialTeamNameModel.errors?.required">Team name is required</label>
-                </div>
+              <div class="ui segment">
+                <form class="ui form" #fNewSpecialConsideration="ngForm" (ngSubmit)="addSpecialConsideration(fNewSpecialConsideration)" [ngClass]="{'loading': addingSpecialConsideration}">
+                  <div class="field" *ngIf="!task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || sepcialUserNameModel.dirty || sepcialUserNameModel.touched) && sepcialUserNameModel.invalid}">
+                    <label>User Name</label>
+                    <input type="text" [(ngModel)]="newSpecialConsideration.user_name" name="user_name" required #sepcialUserNameModel="ngModel" placeholder="Name of user">
+                    <div class="errors">
+                      <label *ngIf="sepcialUserNameModel.errors?.required">User name is required</label>
+                    </div>
+                  </div>
+                  <div class="field" *ngIf="task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || specialTeamNameModel.dirty || specialTeamNameModel.touched) && specialTeamNameModel.invalid}">
+                    <label>Team Name</label>
+                    <input type="text" [(ngModel)]="newSpecialConsideration.team_name" name="team_name" required #specialTeamNameModel="ngModel" placeholder="Name of team">
+                    <div class="errors">
+                      <label *ngIf="specialTeamNameModel.errors?.required">Team name is required</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Due Time Extension (hours)</label>
+                    <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.due_time_extension" name="due_time_extension" placeholder="Extension of due time (in hours)">
+                  </div>
+                  <div class="field">
+                    <label>Submission Attempt Limit Extension</label>
+                    <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.submission_attempt_limit_extension" name="submission_attempt_limit_extension" placeholder="Extension of submission attempt limit">
+                  </div>
+                  <button type="submit" class="ui button primary fluid">Add Special Consideration</button>
+                </form>
               </div>
-              <div class="field">
-                <label>Due Time Extension (hours)</label>
-                <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.due_time_extension" name="due_time_extension" placeholder="Extension of due time (in hours)">
-              </div>
-              <div class="field">
-                <label>Submission Attempt Limit Extension</label>
-                <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.submission_attempt_limit_extension" name="submission_attempt_limit_extension" placeholder="Extension of submission attempt limit">
-              </div>
-              <button type="submit" class="ui button primary fluid">Add Special Consideration</button>
-            </form>
+            </div>
           </div>
         </div>
         <!--End of New Special Consideration-->
       </div>
+      <!-- End of Special considerations tab -->
     </div>
-
+    <!-- End of Right tab container -->
   </div>
-  <!-- End of Right Panel -->
-</div>
+
+</ng-container>
