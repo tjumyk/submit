@@ -37,7 +37,7 @@
         </div>
         <div class="item">
           <div class="header">Type</div>
-          {{ categories[task.type].name }}
+          {{ task.type | titlecase }}
         </div>
         <div class="item">
           <div class="header">Created At</div>
