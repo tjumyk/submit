@@ -204,6 +204,18 @@
                       <option [ngValue]="null">Manually triggered</option>
                     </select>
                   </div>
+                  <div class="field" *ngIf="form.evaluation_method=='auto_test'">
+                    <label>Auto Test Environment</label>
+                    <select name="auto_test_environment_id" [(ngModel)]="form.auto_test_environment_id">
+                      <option [ngValue]="null">(None)</option>
+                      <ng-container *ngFor="let mat of task.materials">
+                        <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
+                          {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
+                        </option>
+                      </ng-container>
+                    </select>
+                    <p *ngIf="form.auto_test_environment_id==null"><i class="icon exclamation triangle yellow"></i> Please upload the test environment as a new Material or select a test environment from existing Materials</p>
+                  </div>
                 </div>
               </div>
 
@@ -221,14 +233,15 @@
       <!-- Materials tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='materials'}">
         <table class="ui bottom attached table celled unstackable">
-          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Visibility</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Flags</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let mat of task.materials; index as i">
             <td>{{ mat.id }}</td>
             <td>{{ mat.type | titlecase }}</td>
             <td>{{ mat.name }}</td>
-            <td [ngClass]="{'negative': mat.is_private, 'positive': !mat.is_private}">
-              {{ mat.is_private ? "Private": "Public"}}
+            <td>
+              <i class="ui red lock icon" *ngIf="mat.is_private" title="Private"></i>
+              <i class="ui green play icon" *ngIf="mat.id == task.auto_test_environment_id" title="Active Auto Test Environment"></i>
             </td>
             <td>{{ mat.modified_at | date: 'short' }}</td>
             <td>{{ mat.description }}</td>

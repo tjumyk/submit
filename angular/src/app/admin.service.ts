@@ -42,6 +42,7 @@ export class UpdateTaskForm{
   submission_history_limit?: number;
   evaluation_method?: string;
   auto_test_trigger?: string;
+  auto_test_environment_id?: number;
 }
 
 export class NewMaterialForm{

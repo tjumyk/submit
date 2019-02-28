@@ -215,11 +215,12 @@ class Task(db.Model):
 
     evaluation_method = db.Column(db.String(32))
     auto_test_trigger = db.Column(db.String(32))
+    auto_test_environment_id = db.Column(db.Integer, db.ForeignKey('material.id'))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    materials = db.relationship('Material', backref=db.backref('task'))
+    materials = db.relationship('Material', backref=db.backref('task'), foreign_keys='[Material.task_id]')
     file_requirements = db.relationship('FileRequirement', backref=db.backref('task'))
     submissions = db.relationship('Submission', backref=db.backref('task'))
 
@@ -241,6 +242,7 @@ class Task(db.Model):
             d['submission_history_limit'] = self.submission_history_limit
             d['evaluation_method'] = self.evaluation_method
             d['auto_test_trigger'] = self.auto_test_trigger
+            d['auto_test_environment_id'] = self.auto_test_environment_id
             d['materials'] = [m.to_dict() for m in self.materials if not m.is_private or with_private_materials]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
             d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
@@ -351,7 +353,8 @@ class Submission(db.Model):
     def __repr__(self):
         return '<Submission %r>' % self.id
 
-    def to_dict(self, with_files=False, with_submitter=False, with_auto_tests=False, with_advanced_fields=False):
+    def to_dict(self, with_files=False, with_submitter=False, with_auto_tests=False, with_advanced_fields=False,
+                with_auto_test_environment=False):
         d = dict(id=self.id, task_id=self.task_id,
                  submitter_id=self.submitter_id,
                  is_cleared=self.is_cleared,
@@ -363,6 +366,14 @@ class Submission(db.Model):
             d['submitter'] = self.submitter.to_dict() if self.submitter else None
         if with_auto_tests:
             d['auto_tests'] = [t.to_dict() for t in self.auto_tests]
+        if with_auto_test_environment:
+            d['auto_test_environment'] = None
+            task = self.task
+            if task.auto_test_environment_id is not None:
+                for mat in task.materials:  # FIXME inefficient
+                    if mat.id == task.auto_test_environment_id:
+                        d['auto_test_environment'] = mat.to_dict()
+                        break
         return d
 
 

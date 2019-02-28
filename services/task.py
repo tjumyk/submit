@@ -41,6 +41,7 @@ class TaskService:
         'submission_history_limit',
         'evaluation_method',
         'auto_test_trigger',
+        'auto_test_environment_id',
     }
 
     @staticmethod

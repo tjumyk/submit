@@ -72,6 +72,7 @@ export class Task {
 
   evaluation_method?: string;
   auto_test_trigger?: string;
+  auto_test_environment_id?: number;
 
   created_at: string;
   modified_at: string;

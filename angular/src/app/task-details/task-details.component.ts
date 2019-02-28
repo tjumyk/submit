@@ -49,6 +49,11 @@ export class TaskDetailsComponent implements OnInit {
       items: []
     },
     {
+      type: 'test environment',
+      icon: 'terminal',
+      items: []
+    },
+    {
       type: 'solution',
       icon: 'star outline',
       items: []

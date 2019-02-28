@@ -232,7 +232,7 @@ def worker_get_auto_test(sid, wid):
         test = AutoTestService.get_by_submission_work_id(sid, wid)
         if test is None:
             return jsonify(msg='test not found'), 404
-        return jsonify(test.submission.to_dict(with_files=True))
+        return jsonify(test.submission.to_dict(with_files=True, with_auto_test_environment=True))
     except AutoTestServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

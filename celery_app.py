@@ -5,6 +5,7 @@ import random
 import shutil
 import ssl
 import subprocess
+import tempfile
 
 import celery
 import docker
@@ -71,6 +72,30 @@ def get_submission(submission_id: int, work_id: str):
                         auth=get_auth_param())
     resp.raise_for_status()
     return resp.json()
+
+
+def download_material(material: dict, folder: str, chunk_size: int = 65536) -> str:
+    resp = requests.get('%sapi/materials/%d/worker-download' % (server_url, material['id']), auth=get_auth_param(),
+                        stream=True)
+    resp.raise_for_status()
+
+    name = material['name']
+    suffix = name.rsplit('.', 1)[-1]
+
+    ffd = None
+    try:
+        fd, path = tempfile.mkstemp(suffix=suffix, dir=folder)
+        ffd = os.fdopen(fd, 'wb')
+        for chunk in resp.iter_content(chunk_size=chunk_size):
+            if chunk:
+                ffd.write(chunk)
+    finally:
+        if ffd:
+            ffd.close()
+
+    if material['md5'] != md5sum(path):
+        raise RuntimeError('MD5 check of material "%s" failed' % material['name'])
+    return os.path.relpath(path, folder)
 
 
 def download_submission_file(submission_id: int, work_id: str, file: dict, local_save_path: str,
@@ -174,7 +199,11 @@ def run_test(self: Task, submission_id: int):
     # get submission info
     submission = get_submission(submission_id, self.request.id)
     submission_id = submission['id']
-    task_id = submission['task_id']
+    test_environment = submission.get('auto_test_environment')
+    if test_environment is None:
+        raise RuntimeError('Test environment not specified')
+    env_id = test_environment['id']
+    env_md5 = test_environment['md5']
 
     # check work folder
     data_folder = config['DATA_FOLDER']
@@ -182,16 +211,41 @@ def run_test(self: Task, submission_id: int):
     if os.path.lexists(work_folder):
         raise RuntimeError('Work folder already exists')
 
-    # copy test environment to work folder
-    env_folder = os.path.join(data_folder, 'test_environments', str(task_id))
-    if os.path.isdir(env_folder):  # env folder has higher priority than env archive
-        shutil.copytree(env_folder, work_folder)
-    else:
-        env_archive = os.path.join(data_folder, 'test_environments', '%d.zip' % task_id)
-        if os.path.isfile(env_archive):
-            shutil.unpack_archive(env_archive, work_folder)
-        else:
-            raise RuntimeError('No test environment for task %s' % task_id)
+    # check cached test environment
+    env_f = os.path.join(data_folder, 'test_environments')
+    env_meta_path = os.path.join(env_f, '%d.json' % env_id)
+    env_zip_path = None
+
+    if os.path.isfile(env_meta_path):
+        with open(env_meta_path) as f_meta:
+            try:
+                env_meta = json.load(f_meta)
+                if env_meta['md5'] == env_md5:
+                    env_zip_path = env_meta['path']
+            except (TypeError, ValueError, KeyError):
+                pass
+        if env_zip_path and not os.path.isfile(os.path.join(env_f, env_zip_path)):
+            env_zip_path = None
+
+    # download environment if no cache found
+    if not env_zip_path:
+        env_zip_path = download_material(env_id, env_f)
+        try:
+            # use exclusive file lock to avoid race condition
+            lock_path = os.path.join(env_f, "%d.lock" % env_id)
+            with open(lock_path, 'x'):
+                # save meta
+                with open(env_meta_path, 'w') as f_meta:
+                    json.dump({
+                        'path': env_zip_path,
+                        'md5': env_md5
+                    }, f_meta)
+            os.remove(lock_path)
+        except FileExistsError:
+            pass
+
+    # unpack environment zip to work folder
+    shutil.unpack_archive(os.path.join(env_f, env_zip_path), work_folder)
 
     # download submission files into sub folder 'submission'
     submission_folder = os.path.join(work_folder, 'submission')

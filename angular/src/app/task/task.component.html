@@ -192,6 +192,22 @@
                 </div>
               </div>
             </div>
+            <div class="item" *ngIf="task.evaluation_method=='auto_test'">
+              <i class="icon terminal"></i>
+              <div class="content">
+                <div class="header">Auto Test Environment</div>
+                <div class="description">
+                  <ng-container *ngIf="task.auto_test_environment_id!=null; else noAutoTestEnvironment">
+                    <ng-container *ngIf="autoTestEnvironment; else hiddenAutoTestEnvironment">
+                      <a href="api/materials/{{autoTestEnvironment.id}}/download">{{autoTestEnvironment.name}}</a>
+                      <i class="ui red lock icon" *ngIf="autoTestEnvironment.is_private" title="Private"></i>
+                    </ng-container>
+                  </ng-container>
+                  <ng-template #hiddenAutoTestEnvironment>(Hidden)</ng-template>
+                  <ng-template #noAutoTestEnvironment>(None)</ng-template>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <!--End of Submission Info-->

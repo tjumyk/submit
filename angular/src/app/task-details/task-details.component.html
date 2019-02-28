@@ -18,6 +18,7 @@
           <div class="content">
             <div class="header"><a href="api/materials/{{mat.id}}/download">{{mat.name}}</a></div>
             <i class="ui red lock icon" *ngIf="mat.is_private" title="Private"></i>
+            <i class="ui green play icon" *ngIf="mat.id == task.auto_test_environment_id" title="Active Auto Test Environment"></i>
             <div class="metadata">
               <span>Size: {{mat.size|size}}</span>
               <span>MD5:

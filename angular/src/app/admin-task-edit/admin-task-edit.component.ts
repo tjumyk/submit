@@ -88,6 +88,7 @@ export class AdminTaskEditComponent implements OnInit {
 
     this.form.evaluation_method = task.evaluation_method;
     this.form.auto_test_trigger = task.auto_test_trigger;
+    this.form.auto_test_environment_id = task.auto_test_environment_id;
 
     if (task.open_time)
       this.form.open_time = moment(task.open_time).format('YYYY-MM-DDTHH:mm');
