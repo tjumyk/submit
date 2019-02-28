@@ -546,7 +546,7 @@ def download_materials_zip(task_id):
                     with open(zip_meta_path, 'w') as f_meta:
                         json.dump({
                             'zip': zip_file_name,
-                            'items': {m.name: m.md5 for m in task.materials}
+                            'items': zip_items
                         }, f_meta)
                 os.remove(lock_path)
             except FileExistsError:
