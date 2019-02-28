@@ -228,12 +228,12 @@ def admin_task(tid):
             return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            return jsonify(task.to_dict(with_term=True, with_details=True))
+            return jsonify(task.to_dict(with_term=True, with_details=True, with_private_materials=True))
         elif request.method == 'PUT':
             params = request.json
             TaskService.update(task, **params)
             db.session.commit()
-            return jsonify(task.to_dict(with_term=True, with_details=True))
+            return jsonify(task.to_dict(with_term=True, with_details=True, with_private_materials=True))
         else:  # DELETE
             db.session.delete(task)
             db.session.commit()
@@ -269,7 +269,8 @@ def admin_task_materials(tid):
             save_path = os.path.join(sub_folders, file_name)
             full_path = os.path.join(folder, file_name)
 
-            mat = TaskService.add_material(task, material_type, file_name, params.get('description'), save_path)
+            mat = TaskService.add_material(task, material_type, file_name, params.get('description'), save_path,
+                                           params.get('is_private') == 'true')
             file.save(full_path)
             mat.size = os.stat(full_path).st_size
             mat.md5 = md5sum(full_path)
@@ -303,22 +304,31 @@ def admin_material(mid):
             db.session.commit()
             return "", 204
         else:  # PUT
+            params = request.json or request.form.to_dict() or {}
+            allowed_fields = {'is_private', 'description'}
+            for k, v in params.items():
+                if k not in allowed_fields:
+                    return jsonify(msg='invalid field: %s' % k)
+                if k == 'is_private':
+                    if type(v) == str:
+                        v = v == 'true'
+                setattr(material, k, v)
+
             file = request.files.get('file')
-            if file is None:
-                return jsonify(msg='file is required'), 400
+            if file is not None:
+                sub_folders = os.path.join('tasks', str(material.task_id), 'materials', material.type)
+                folder = os.path.join(data_folder, sub_folders)
+                if not os.path.isdir(folder):
+                    os.makedirs(folder)
 
-            sub_folders = os.path.join('tasks', str(material.task_id), 'materials', material.type)
-            folder = os.path.join(data_folder, sub_folders)
-            if not os.path.isdir(folder):
-                os.makedirs(folder)
+                save_path = os.path.join(sub_folders, material.name)
+                full_path = os.path.join(folder, material.name)
 
-            save_path = os.path.join(sub_folders, material.name)
-            full_path = os.path.join(folder, material.name)
+                material.file_path = save_path
+                file.save(full_path)
+                material.size = os.stat(full_path).st_size
+                material.md5 = md5sum(full_path)
 
-            material.file_path = save_path
-            file.save(full_path)
-            material.size = os.stat(full_path).st_size
-            material.md5 = md5sum(full_path)
             db.session.commit()
             return jsonify(material.to_dict(with_advanced_fields=True))
     except TaskServiceError as e:

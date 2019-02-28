@@ -4,7 +4,7 @@ import {
   AdminService,
   NewFileRequirementForm,
   NewMaterialForm,
-  NewSpecialConsiderationForm,
+  NewSpecialConsiderationForm, UpdateMaterialForm,
   UpdateTaskForm
 } from "../admin.service";
 import {ActivatedRoute} from "@angular/router";
@@ -166,7 +166,26 @@ export class AdminTaskEditComponent implements OnInit {
     input.click()
   }
 
-  updateMaterial(material: Material, index: number, btn: HTMLElement, input: HTMLInputElement) {
+  updateMaterialVisibility(material: Material, is_private: boolean, btn: HTMLElement){
+    let form = new UpdateMaterialForm();
+    form.is_private = is_private;
+    form.description = material.description; // keep it untouched
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.updateMaterial(material.id, form).pipe(
+      finalize(() =>{
+        btn.classList.remove('loading', 'disabled');
+      })
+    ).subscribe(
+      mat =>{
+        material.is_private = mat.is_private;
+        material.modified_at = mat.modified_at;
+      },
+      error => this.secondaryError = error.error
+    )
+  }
+
+  updateMaterialFile(material: Material, index: number, btn: HTMLElement, input: HTMLInputElement) {
     if (input.files.length == 0)
       return;
     const file = input.files.item(0);
@@ -176,7 +195,7 @@ export class AdminTaskEditComponent implements OnInit {
     }
 
     btn.classList.add('loading', 'disabled');
-    this.adminService.updateMaterial(material.id, file).pipe(
+    this.adminService.updateMaterialFile(material.id, file).pipe(
       finalize(() => {
         btn.classList.remove('loading', 'disabled');
         input.value = '';

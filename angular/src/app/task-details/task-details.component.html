@@ -17,6 +17,7 @@
         <li class="item" *ngFor="let mat of category.items">
           <div class="content">
             <div class="header"><a href="api/materials/{{mat.id}}/download">{{mat.name}}</a></div>
+            <i class="ui red lock icon" *ngIf="mat.is_private" title="Private"></i>
             <div class="metadata">
               <span>Size: {{mat.size|size}}</span>
               <span>MD5:

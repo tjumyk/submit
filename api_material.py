@@ -26,6 +26,8 @@ def material_download(mid):
             return jsonify(msg='access forbidden'), 403
 
         if 'admin' not in roles and 'tutor' not in roles:
+            if material.is_private:
+                return jsonify(msg='access forbidden'), 403
             if not task.open_time or task.open_time > datetime.utcnow():
                 return jsonify(msg='task has not yet open'), 403
 

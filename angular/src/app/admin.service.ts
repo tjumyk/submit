@@ -48,6 +48,12 @@ export class NewMaterialForm{
   type: string;
   name: string;
   description?: string;
+  is_private: boolean;
+}
+
+export class UpdateMaterialForm{
+  description: string;
+  is_private: boolean;
 }
 
 export class NewFileRequirementForm{
@@ -228,17 +234,22 @@ export class AdminService {
     data.append('type', form.type);
     data.append('name', form.name);
     data.append('file', file);
+    data.append('is_private', form.is_private ? 'true': 'false');
     if(form.description)
       data.append('description', form.description);
     const req = new HttpRequest('POST', `${this.api}/tasks/${task_id}/materials`, data, {reportProgress: true});
     return this.http.request(req);
   }
 
-  updateMaterial(material_id: number, file: File): Observable<HttpEvent<any>>{
+  updateMaterialFile(material_id: number, file: File): Observable<HttpEvent<any>>{
     const data = new FormData();
     data.append('file', file);
     const req = new HttpRequest('PUT', `${this.api}/materials/${material_id}`, data, {reportProgress: true});
     return this.http.request(req);
+  }
+
+  updateMaterial(material_id: number, form: UpdateMaterialForm): Observable<Material>{
+    return this.http.put<Material>(`${this.api}/materials/${material_id}`, form);
   }
 
   deleteMaterial(material_id: number): Observable<any>{

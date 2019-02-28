@@ -55,10 +55,12 @@ def do_task(tid):
         if preview_mode:
             return jsonify(task.to_dict())
         else:  # getting task details requires either admin/tutor role or after the opening time
+            with_private_materials = True
             if 'admin' not in roles and 'tutor' not in roles:
+                with_private_materials = False
                 if not task.open_time or task.open_time > datetime.utcnow():
                     return jsonify(msg='task has not yet open'), 403
-            return jsonify(task.to_dict(with_details=True))
+            return jsonify(task.to_dict(with_details=True, with_private_materials=with_private_materials))
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -493,6 +495,8 @@ def download_materials_zip(task_id):
 
                     match = True
                     for mat in task.materials:
+                        if mat.is_private:  # skip any private materials as tmp folder is unsafe
+                            continue
                         if zip_items.pop(mat.name) != mat.md5:
                             match = False
                             break
@@ -513,6 +517,8 @@ def download_materials_zip(task_id):
                 zip_file_name = os.path.relpath(zip_file_path, tmp_dir)
                 with zipfile.ZipFile(ffd, 'w', zipfile.ZIP_DEFLATED) as f_zip:
                     for mat in task.materials:
+                        if mat.is_private:  # skip any private materials as tmp folder is unsafe
+                            continue
                         f_zip.write(os.path.join(data_folder, mat.file_path),
                                     os.path.join('materials', mat.type, mat.name))
             finally:

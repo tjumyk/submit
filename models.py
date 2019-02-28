@@ -226,7 +226,7 @@ class Task(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.title
 
-    def to_dict(self, with_term=False, with_details=False):
+    def to_dict(self, with_term=False, with_details=False, with_private_materials=False):
         d = dict(id=self.id, term_id=self.term_id,
                  type=self.type, title=self.title, description=self.description,
                  open_time=self.open_time, due_time=self.due_time,
@@ -241,7 +241,7 @@ class Task(db.Model):
             d['submission_history_limit'] = self.submission_history_limit
             d['evaluation_method'] = self.evaluation_method
             d['auto_test_trigger'] = self.auto_test_trigger
-            d['materials'] = [m.to_dict() for m in self.materials]
+            d['materials'] = [m.to_dict() for m in self.materials if not m.is_private or with_private_materials]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
             d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
             d['created_at'] = self.created_at
@@ -290,6 +290,7 @@ class Material(db.Model):
 
     type = db.Column(db.String(32), nullable=False)
     name = db.Column(db.String(128), nullable=False)
+    is_private = db.Column(db.Boolean, nullable=False, default=False)
     description = db.Column(db.String(256))
     file_path = db.Column(db.String(128), nullable=False, unique=True)
     size = db.Column(db.Integer)
@@ -303,6 +304,7 @@ class Material(db.Model):
 
     def to_dict(self, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id, type=self.type, name=self.name, description=self.description,
+                 is_private=self.is_private,
                  size=self.size, md5=self.md5,
                  created_at=self.created_at,
                  modified_at=self.modified_at)

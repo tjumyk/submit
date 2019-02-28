@@ -102,7 +102,7 @@ class TaskService:
         return old
 
     @classmethod
-    def add_material(cls, task, _type, name, description, file_path):
+    def add_material(cls, task, _type, name, description, file_path, is_private):
         if task is None:
             raise TaskServiceError('task is required')
         if not _type:
@@ -111,6 +111,8 @@ class TaskService:
             raise TaskServiceError('name is required')
         if not file_path:
             raise TaskServiceError('file path is required')
+        if is_private is None:
+            raise TaskServiceError('is_private is required')
 
         if len(_type) > cls.material_type_max_length:
             raise TaskServiceError('type is too long')
@@ -128,7 +130,8 @@ class TaskService:
             raise TaskServiceError('duplicate name')
         if db.session.query(func.count()).filter(Material.file_path == file_path).scalar():  # check in global scope
             raise TaskServiceError('duplicate file path')
-        mat = Material(task=task, type=_type, name=name, description=description, file_path=file_path)
+        mat = Material(task=task, type=_type, name=name, description=description, file_path=file_path,
+                       is_private=is_private)
         db.session.add(mat)
         return mat
 

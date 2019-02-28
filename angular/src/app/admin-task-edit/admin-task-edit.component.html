@@ -219,24 +219,29 @@
       <!-- Materials tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='materials'}">
         <table class="ui bottom attached table celled unstackable">
-          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Visibility</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let mat of task.materials; index as i">
             <td>{{ mat.id }}</td>
             <td>{{ mat.type | titlecase }}</td>
             <td>{{ mat.name }}</td>
+            <td [ngClass]="{'negative': mat.is_private, 'positive': !mat.is_private}">
+              {{ mat.is_private ? "Private": "Public"}}
+            </td>
             <td>{{ mat.modified_at | date: 'short' }}</td>
             <td>{{ mat.description }}</td>
             <td>{{ mat.size | size }}</td>
             <td><span [attr.data-tooltip]="mat.md5" data-position="bottom center">{{ mat.md5 | slice: 0:6}}</span></td>
             <td>
               <div class="ui small buttons">
+                <a class="ui button red icon" (click)="updateMaterialVisibility(mat, true, btnMakeMaterialPrivate)" #btnMakeMaterialPrivate *ngIf="!mat.is_private"><i class="icon lock"></i></a>
+                <a class="ui button green icon" (click)="updateMaterialVisibility(mat, false, btnMakeMaterialPublic)" #btnMakeMaterialPublic *ngIf="mat.is_private"><i class="icon lock open"></i></a>
                 <a href="api/admin/materials/{{ mat.id }}/download" class="ui button icon"><i class="icon download"></i></a>
                 <a class="ui button icon primary" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
                 <a class="ui button red icon" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
               </div>
               <form class="hidden">
-                <input type="file" (change)="updateMaterial(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
+                <input type="file" (change)="updateMaterialFile(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
               </form>
               <div class="ui bottom attached progress" *ngIf="mat['_update_progress']">
                 <div class="bar" [ngStyle]="{'width.%': mat['_update_progress']}"></div>
@@ -282,6 +287,12 @@
                     <input type="file" name="file" (change)="updateFileName(inputMaterialFile.files)" #inputMaterialFile #materialFileModel="ngModel" required [(ngModel)]="materialFakePath">
                     <div class="errors">
                       <label *ngIf="materialFileModel.errors?.required">Material file is required</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="ui input checkbox" (click)="checkboxMaterialIsPrivate.click()">
+                      <input type="checkbox" tabindex="0" class="hidden" #checkboxMaterialIsPrivate name="is_private" [(ngModel)]="newMaterialForm.is_private">
+                      <label>Private</label>
                     </div>
                   </div>
                   <div class="field">

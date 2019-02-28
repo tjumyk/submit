@@ -88,6 +88,7 @@ export class Material {
 
   type: string;
   name: string;
+  is_private: boolean;
   description?: string;
 
   created_at: string;
