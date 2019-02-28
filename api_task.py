@@ -475,18 +475,29 @@ def download_materials_zip(task_id):
         if not roles:
             return jsonify(msg='access forbidden'), 403
 
+        include_private = request.args.get('include_private') == 'true'
         if 'admin' not in roles and 'tutor' not in roles:
+            if include_private:
+                return jsonify(msg='access forbidden'), 403
             if not task.open_time or task.open_time > datetime.utcnow():
                 return jsonify(msg='task has not yet open'), 403
 
         tmp_dir = os.path.join(tempfile.gettempdir(), 'submit-material-zips')
-        if not os.path.lexists(tmp_dir):
-            os.makedirs(tmp_dir)
+        tmp_dir_required_mode = 0o700
+        if os.path.lexists(tmp_dir):
+            mode = os.stat(tmp_dir).st_mode & 0o777
+            if mode != tmp_dir_required_mode:
+                return jsonify(msg='tmp folder has incorrect mode: %s' % oct(mode)), 500
+        else:
+            os.makedirs(tmp_dir, mode=tmp_dir_required_mode)
 
         zip_file_name = None
 
         # try to get cached zip file
-        zip_meta_path = os.path.join(tmp_dir, "%d.json" % task_id)
+        if include_private:
+            zip_meta_path = os.path.join(tmp_dir, "%d-private.json" % task_id)
+        else:
+            zip_meta_path = os.path.join(tmp_dir, "%d.json" % task_id)
         if os.path.isfile(zip_meta_path):
             with open(zip_meta_path) as f_meta:
                 try:
@@ -495,7 +506,7 @@ def download_materials_zip(task_id):
 
                     match = True
                     for mat in task.materials:
-                        if mat.is_private:  # skip any private materials as tmp folder is unsafe
+                        if mat.is_private and not include_private:
                             continue
                         if zip_items.pop(mat.name) != mat.md5:
                             match = False
@@ -510,6 +521,7 @@ def download_materials_zip(task_id):
         if not zip_file_name:
             # make zip
             data_folder = app.config['DATA_FOLDER']
+            zip_items = {}
             ffd = None
             try:
                 fd, zip_file_path = tempfile.mkstemp(suffix='.zip', dir=tmp_dir)
@@ -517,10 +529,11 @@ def download_materials_zip(task_id):
                 zip_file_name = os.path.relpath(zip_file_path, tmp_dir)
                 with zipfile.ZipFile(ffd, 'w', zipfile.ZIP_DEFLATED) as f_zip:
                     for mat in task.materials:
-                        if mat.is_private:  # skip any private materials as tmp folder is unsafe
+                        if mat.is_private and not include_private:
                             continue
                         f_zip.write(os.path.join(data_folder, mat.file_path),
                                     os.path.join('materials', mat.type, mat.name))
+                        zip_items[mat.name] = mat.md5
             finally:
                 if ffd:
                     ffd.close()
