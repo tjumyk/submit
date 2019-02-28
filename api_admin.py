@@ -308,7 +308,7 @@ def admin_material(mid):
             allowed_fields = {'is_private', 'description'}
             for k, v in params.items():
                 if k not in allowed_fields:
-                    return jsonify(msg='invalid field: %s' % k)
+                    return jsonify(msg='invalid field', detail=k), 400
                 if k == 'is_private':
                     if type(v) == str:
                         v = v == 'true'
