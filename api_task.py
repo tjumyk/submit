@@ -558,6 +558,6 @@ def download_materials_zip(task_id):
         zip_attachment_name = '%s-%dS%s-%s.zip' % (course.code, term.year, term.semester, task.title)
         zip_attachment_name = zip_attachment_name.replace(' ', '_')
         return send_from_directory(tmp_dir, zip_file_name, as_attachment=True,
-                                   attachment_filename=zip_attachment_name)
+                                   attachment_filename=zip_attachment_name, cache_timeout=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
