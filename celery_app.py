@@ -229,7 +229,7 @@ def run_test(self: Task, submission_id: int):
 
     # download environment if no cache found
     if not env_zip_path:
-        env_zip_path = download_material(env_id, env_f)
+        env_zip_path = download_material(test_environment, env_f)
         try:
             # use exclusive file lock to avoid race condition
             lock_path = os.path.join(env_f, "%d.lock" % env_id)
