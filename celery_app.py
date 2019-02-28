@@ -217,8 +217,8 @@ def run_test(self: Task, submission_id: int):
         raise RuntimeError('Work folder already exists')
 
     # check cached test environment
-    env_f = os.path.join(data_folder, 'test_environments')
-    env_meta_path = os.path.join(env_f, '%d.json' % env_id)
+    env_folder = os.path.join(data_folder, 'test_environments')
+    env_meta_path = os.path.join(env_folder, '%d.json' % env_id)
     env_zip_path = None
 
     if os.path.isfile(env_meta_path):
@@ -229,15 +229,15 @@ def run_test(self: Task, submission_id: int):
                     env_zip_path = env_meta['path']
             except (TypeError, ValueError, KeyError):
                 pass
-        if env_zip_path and not os.path.isfile(os.path.join(env_f, env_zip_path)):
+        if env_zip_path and not os.path.isfile(os.path.join(env_folder, env_zip_path)):
             env_zip_path = None
 
     # download environment if no cache found
     if not env_zip_path:
-        env_zip_path = download_material(test_environment, env_f)
+        env_zip_path = download_material(test_environment, env_folder)
         try:
             # use exclusive file lock to avoid race condition
-            lock_path = os.path.join(env_f, "%d.lock" % env_id)
+            lock_path = os.path.join(env_folder, "%d.lock" % env_id)
             with open(lock_path, 'x'):
                 # save meta
                 with open(env_meta_path, 'w') as f_meta:
@@ -250,7 +250,7 @@ def run_test(self: Task, submission_id: int):
             pass
 
     # unpack environment zip to work folder
-    shutil.unpack_archive(os.path.join(env_f, env_zip_path), work_folder)
+    shutil.unpack_archive(os.path.join(env_folder, env_zip_path), work_folder)
 
     # download submission files into sub folder 'submission'
     submission_folder = os.path.join(work_folder, 'submission')
