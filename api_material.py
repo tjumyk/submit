@@ -32,7 +32,7 @@ def material_download(mid):
             if not task.open_time or task.open_time > datetime.utcnow():
                 return jsonify(msg='task has not yet open'), 403
 
-        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True)
+        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, cache_timeout=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
