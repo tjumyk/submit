@@ -128,7 +128,7 @@ export class AdminTaskEditComponent implements OnInit {
         this.setTask(task);
         this.success = {msg: 'Updated task successfully'};
       },
-      error => this.error = error.error
+      error => this.secondaryError = error.error
     )
   }
 
@@ -212,7 +212,7 @@ export class AdminTaskEditComponent implements OnInit {
             this.success = {msg: `Updated material "${material.name}" successfully`}
         }
       },
-      error => this.error = error.error
+      error => this.secondaryError = error.error
     )
   }
 
