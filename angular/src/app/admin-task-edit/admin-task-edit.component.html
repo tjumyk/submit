@@ -65,7 +65,7 @@
 
   <div class="ui stackable grid">
     <!-- Left menu -->
-    <div class="five wide column">
+    <div class="four wide column">
       <div class="ui fluid vertical pointing menu">
         <a class="item" (click)="activeTab='basic'" [ngClass]="{'active': activeTab=='basic'}">
           Basic
@@ -88,37 +88,39 @@
     <!-- End of Left menu -->
 
     <!-- Right tab container -->
-    <div class="eleven wide column">
+    <div class="twelve wide column">
       <!-- Basic tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='basic'}">
         <div class="ui segment">
           <form class="ui form" [ngClass]="{'loading': updating}" (ngSubmit)="update(f)" #f="ngForm">
-            <div class="ui stackable grid">
-              <div class="one column row">
-                <div class="column">
-                  <div class="field required">
-                    <label>Task Type</label>
-                    <select name="type" [(ngModel)]="form.type" required>
-                      <option value="lab">Lab</option>
-                      <option value="assignment">Assignment</option>
-                      <option value="project">Project</option>
-                    </select>
-                  </div>
-                  <div class="field required" [ngClass]="{'error': (f.submitted||titleModel.dirty||titleModel.touched) && titleModel.invalid}">
-                    <label>Title</label>
-                    <input type="text" name="title" [(ngModel)]="form.title" #titleModel="ngModel" placeholder="Title of the task (at most 128 characters)" required maxlength="128">
-                    <div class="errors">
-                      <label *ngIf="titleModel.errors?.required">Title is required</label>
-                      <label *ngIf="titleModel.errors?.maxlength">Title is too long</label>
-                    </div>
-                  </div>
-                  <div class="field">
-                    <label>Description (Optional)</label>
-                    <textarea name="description" rows="6" [(ngModel)]="form.description" placeholder="Short description of the task"></textarea>
+            <div class="fields">
+              <div class="three wide field">
+                <div class="field required">
+                  <label>Task Type</label>
+                  <select name="type" [(ngModel)]="form.type" required>
+                    <option value="lab">Lab</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="project">Project</option>
+                  </select>
+                </div>
+              </div>
+              <div class="thirteen wide field">
+                <div class="field required" [ngClass]="{'error': (f.submitted||titleModel.dirty||titleModel.touched) && titleModel.invalid}">
+                  <label>Title</label>
+                  <input type="text" name="title" [(ngModel)]="form.title" #titleModel="ngModel" placeholder="Title of the task (at most 128 characters)" required maxlength="128">
+                  <div class="errors">
+                    <label *ngIf="titleModel.errors?.required">Title is required</label>
+                    <label *ngIf="titleModel.errors?.maxlength">Title is too long</label>
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="field">
+              <label>Description (Optional)</label>
+              <textarea name="description" rows="6" [(ngModel)]="form.description" placeholder="Short description of the task"></textarea>
+            </div>
 
+            <div class="ui stackable grid">
               <div class="two column row">
                 <div class="column">
                   <div class="field">
@@ -275,6 +277,7 @@
                       <option value="specification">Specification</option>
                       <option value="code">Code</option>
                       <option value="data">Data</option>
+                      <option value="test environment">Test Environment</option>
                       <option value="solution">Solution</option>
                       <option value="other">Other</option>
                     </select>
