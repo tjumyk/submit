@@ -4,7 +4,7 @@
 <div class="ui active text loader" *ngIf="loadingCourse">Loading course info...</div>
 
 <div class="ui grid stackable two column" *ngIf="course">
-  <div class="row">
+  <div class="one column row">
     <div class="column">
       <div class="ui breadcrumb">
         <a class="section" routerLink="..">Courses</a>
@@ -13,67 +13,70 @@
       </div>
     </div>
   </div>
-  <!-- Left Panel -->
-  <div class="column">
-    <div class="ui segments">
-      <!--Header-->
-      <div class="ui segment">
-        <div class="ui header">
-          <i class="icon book"></i>
-          {{course.code}}
-        </div>
-      </div>
-      <!--End of Header-->
 
-      <!-- Basic Info -->
-      <div class="ui segment">
-        <div class="ui list horizontal">
-          <div class="item">
-            <div class="header">ID</div>
-            {{course.id}}
-          </div>
-          <div class="item">
-            <div class="header">Code</div>
+  <div class="one column row">
+    <div class="column">
+      <div class="ui segments">
+        <!--Header-->
+        <div class="ui segment">
+          <div class="ui header">
+            <i class="icon book"></i>
             {{course.code}}
           </div>
-          <div class="item">
-            <div class="header">Name</div>
-            {{course.name}}
-          </div>
-          <div class="item">
-            <div class="header">Tutor Group</div>
-            <a target="_blank" href="admin/groups/{{ course.tutor_group.id }}">{{ course.tutor_group.name }}</a>
+        </div>
+        <!--End of Header-->
+
+        <!-- Basic Info -->
+        <div class="ui segment">
+          <div class="ui list horizontal">
+            <div class="item">
+              <div class="header">ID</div>
+              {{course.id}}
+            </div>
+            <div class="item">
+              <div class="header">Code</div>
+              {{course.code}}
+            </div>
+            <div class="item">
+              <div class="header">Name</div>
+              {{course.name}}
+            </div>
+            <div class="item">
+              <div class="header">Tutor Group</div>
+              <a target="_blank" href="admin/groups/{{ course.tutor_group.id }}">{{ course.tutor_group.name }}</a>
+            </div>
           </div>
         </div>
+        <!-- End of Basic Info -->
       </div>
-      <!-- End of Basic Info -->
-
-      <!--Icon Upload-->
-      <div class="ui segment">
-        <div class="ui center aligned grid">
-          <div class="column">
-            <form class="ui form" [ngClass]="{'loading': uploadingIcon}">
-              <div class="field">
-                <label>Icon</label>
-                <input type="file" hidden name="icon" #icon_input [accept]="iconValidator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
-                <img class="ui small centered image" [src]="course.icon" *ngIf="course.icon">
-                <div class="text muted" *ngIf="!course.icon">(No icon)</div>
-              </div>
-              <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
-              <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB</p>
-            </form>
-          </div>
-        </div>
-      </div>
-      <!--End of Icon Upload-->
-
     </div>
+  </div>
+
+  <!-- Left Panel -->
+  <div class="column">
+    <!--Icon Upload-->
+    <div class="ui segment">
+      <div class="ui center aligned grid">
+        <div class="column">
+          <form class="ui form" [ngClass]="{'loading': uploadingIcon}">
+            <div class="field">
+              <label>Icon</label>
+              <input type="file" hidden name="icon" #icon_input [accept]="iconValidator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
+              <img class="ui small centered image" [src]="course.icon" *ngIf="course.icon">
+              <div class="text muted" *ngIf="!course.icon">(No icon)</div>
+            </div>
+            <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
+            <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB</p>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--End of Icon Upload-->
   </div>
   <!-- End of Left Panel -->
 
   <!--Right Panel-->
   <div class="column">
-
     <!--Terms-->
     <div class="ui top attached segment">
       <div class="ui header">
