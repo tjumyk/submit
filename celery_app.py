@@ -80,7 +80,12 @@ def download_material(material: dict, folder: str, chunk_size: int = 65536) -> s
     resp.raise_for_status()
 
     name = material['name']
-    suffix = name.rsplit('.', 1)[-1]
+    name_parts = name.rsplit('.', 2)
+    if len(name_parts) > 1:
+        name_parts[0] = ''
+        suffix = '.'.join(name_parts)
+    else:
+        suffix = None
 
     ffd = None
     try:
