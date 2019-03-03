@@ -199,8 +199,7 @@
                 <div class="description">
                   <ng-container *ngIf="task.auto_test_environment_id!=null; else noAutoTestEnvironment">
                     <ng-container *ngIf="autoTestEnvironment; else hiddenAutoTestEnvironment">
-                      <a href="api/materials/{{autoTestEnvironment.id}}/download">{{autoTestEnvironment.name}}</a>
-                      <i class="ui red lock icon" *ngIf="autoTestEnvironment.is_private" title="Private"></i>
+                      {{ autoTestEnvironment.name + (autoTestEnvironment.is_private ? ' (private)' : ' (public)')}}
                     </ng-container>
                   </ng-container>
                   <ng-template #hiddenAutoTestEnvironment>(Hidden)</ng-template>
