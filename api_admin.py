@@ -398,7 +398,7 @@ def admin_material_validate_test_environment(mid):
                     with open(requirements_txt) as f_requirements_txt:
                         for line in f_requirements_txt:
                             line = line.strip()
-                            if not line:
+                            if not line or line[0] == '#':  # empty line or comment
                                 continue
                             requirements.append(line)
                         info['pip_requirements'] = requirements
