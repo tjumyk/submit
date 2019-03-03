@@ -1,7 +1,10 @@
 import os
+import shutil
+import tempfile
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
+import celery_app
 from models import db
 from oauth import requires_admin
 from services.account import AccountService, AccountServiceError
@@ -344,6 +347,65 @@ def admin_material_download(mid):
             return jsonify(msg='material not found'), 404
 
         return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, cache_timeout=0)
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/materials/<int:mid>/validate-test-environment')
+@requires_admin
+def admin_material_validate_test_environment(mid):
+    try:
+        material = TaskService.get_material(mid)
+        if material is None:
+            return jsonify(msg='material not found'), 404
+
+        tmp_dir = os.path.join(tempfile.mkdtemp(prefix='submit-material-validate'))
+        full_path = os.path.join(app.config['DATA_FOLDER'], material.file_path)
+
+        info = {}
+        archive_ok = False
+        try:
+            shutil.unpack_archive(full_path, tmp_dir)
+            archive_ok = True
+        except IOError as e:
+            info['error'] = dict(msg='invalid archive', detail=str(e))
+
+        if archive_ok:
+            dockerfile = os.path.join(tmp_dir, 'Dockerfile')
+            if os.path.exists(dockerfile):
+                info['type'] = 'docker'
+
+                with open(dockerfile) as f_dockerfile:
+                    for line in f_dockerfile:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        if line.startswith('ENTRYPOINT'):
+                            info['docker_entry_point'] = line[len('ENTRYPOINT'):]
+                        if line.startswith('CMD'):
+                            info['docker_cmd'] = line[len('CMD'):]
+
+                docker_run_config = os.path.join(tmp_dir, 'docker-run-config.json')
+                if os.path.exists(docker_run_config):
+                    info['docker_run_config'] = celery_app.get_run_params(docker_run_config)
+
+                requirements_txt = os.path.join(tmp_dir, 'test', 'requirements.txt')
+                if os.path.exists(requirements_txt):
+                    requirements = []
+                    with open(requirements_txt) as f_requirements_txt:
+                        for line in f_requirements_txt:
+                            line = line.strip()
+                            if not line:
+                                continue
+                            requirements.append(line)
+                        info['pip_requirements'] = requirements
+            elif os.path.exists(os.path.join(tmp_dir, 'run.sh')):
+                info['type'] = 'direct-run'
+            else:
+                info['error'] = dict(msg='Dockerfile or run.sh not found')
+
+        shutil.rmtree(tmp_dir)
+        return jsonify(info)
     except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

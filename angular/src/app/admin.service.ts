@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, FileRequirement, Group, Material, SpecialConsideration, Task, Term, User} from "./models";
+import {Course, ErrorMessage, FileRequirement, Group, Material, SpecialConsideration, Task, Term, User} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
 import * as moment from"moment";
@@ -69,6 +69,15 @@ export class NewSpecialConsiderationForm{
   team_name?:number;
   due_time_extension?: number;
   submission_attempt_limit_extension?: number;
+}
+
+export class TestEnvironmentValidationResult{
+  type?: string;
+  docker_entry_point?: string;
+  docker_cmd?: string;
+  docker_run_config?: {};
+  pip_requirements?: string[];
+  error?: ErrorMessage;
 }
 
 @Injectable({
@@ -255,6 +264,10 @@ export class AdminService {
 
   deleteMaterial(material_id: number): Observable<any>{
     return this.http.delete(`${this.api}/materials/${material_id}`)
+  }
+
+  validateTestEnvironment(material_id: number): Observable<TestEnvironmentValidationResult>{
+    return this.http.get(`${this.api}/materials/${material_id}/validate-test-environment`);
   }
 
   addFileRequirement(task_id: number, form:NewFileRequirementForm):Observable<FileRequirement>{

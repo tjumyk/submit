@@ -186,6 +186,42 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
+  validateTestEnvironment(material: Material, btn: HTMLElement){
+    btn.classList.add('loading', 'disabled');
+    this.adminService.validateTestEnvironment(material.id).pipe(
+      finalize(() =>{
+        btn.classList.remove('loading', 'disabled');
+      })
+    ).subscribe(
+      result=>{
+        if(result.error){
+          this.secondaryError = result.error
+        }else{
+          let txt = 'Name: ' + material.name;
+          txt += '\nType: ' + result.type;
+          if(result.docker_entry_point)
+            txt += '\nDocker ENTRYPOINT: ' + result.docker_entry_point;
+          if(result.docker_cmd)
+            txt += '\nDocker CMD: ' + result.docker_cmd;
+          if(result.docker_run_config){
+            txt += '\nDocker Run Config:\n';
+            txt += JSON.stringify(result.docker_run_config, null, 4)
+          }
+          if(result.pip_requirements){
+            if(result.pip_requirements.length){
+              txt += '\nPip requirements:\n';
+              txt += result.pip_requirements.join('\n');
+            }else{
+              txt += '\nPip requirements: (Empty)\n';
+            }
+          }
+          alert(txt)
+        }
+      },
+      error => this.secondaryError = error.error
+    )
+  }
+
   updateMaterialFile(material: Material, index: number, btn: HTMLElement, input: HTMLInputElement) {
     if (input.files.length == 0)
       return;
