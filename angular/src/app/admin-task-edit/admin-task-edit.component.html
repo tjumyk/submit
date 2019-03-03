@@ -249,11 +249,12 @@
             <td><span [attr.data-tooltip]="mat.md5" data-position="bottom center">{{ mat.md5 | slice: 0:6}}</span></td>
             <td>
               <div class="ui small buttons">
-                <a class="ui button red icon" (click)="updateMaterialVisibility(mat, true, btnMakeMaterialPrivate)" #btnMakeMaterialPrivate *ngIf="!mat.is_private"><i class="icon lock"></i></a>
-                <a class="ui button green icon" (click)="updateMaterialVisibility(mat, false, btnMakeMaterialPublic)" #btnMakeMaterialPublic *ngIf="mat.is_private"><i class="icon lock open"></i></a>
-                <a href="api/admin/materials/{{ mat.id }}/download" class="ui button icon"><i class="icon download"></i></a>
-                <a class="ui button icon primary" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
-                <a class="ui button red icon" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
+                <a class="ui button red icon" title="Make Private" (click)="updateMaterialVisibility(mat, true, btnMakeMaterialPrivate)" #btnMakeMaterialPrivate *ngIf="!mat.is_private"><i class="icon lock"></i></a>
+                <a class="ui button green icon" title="Make Public" (click)="updateMaterialVisibility(mat, false, btnMakeMaterialPublic)" #btnMakeMaterialPublic *ngIf="mat.is_private"><i class="icon lock open"></i></a>
+                <a href="api/admin/materials/{{ mat.id }}/download" title="Download" class="ui button icon"><i class="icon download"></i></a>
+                <a class="ui button icon primary" title="Update" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
+                <a class="ui button red icon" title="Delete" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
+                <a class="ui button icon" title="Validate Test Environment" (click)="validateTestEnvironment(mat, btnValidateTestEnvironment)" #btnValidateTestEnvironment *ngIf="mat.type=='test environment'"><i class="icon question"></i></a>
               </div>
               <form class="hidden">
                 <input type="file" (change)="updateMaterialFile(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
