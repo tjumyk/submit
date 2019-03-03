@@ -209,10 +209,10 @@ export class AdminTaskEditComponent implements OnInit {
           }
           if(result.pip_requirements){
             if(result.pip_requirements.length){
-              txt += '\nPip requirements:\n';
+              txt += '\nPip Requirements:\n';
               txt += result.pip_requirements.join('\n');
             }else{
-              txt += '\nPip requirements: (Empty)\n';
+              txt += '\nPip Requirements: (Empty)\n';
             }
           }
           alert(txt)
