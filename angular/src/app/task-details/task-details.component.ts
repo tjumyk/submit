@@ -26,6 +26,7 @@ export class TaskDetailsComponent implements OnInit {
   term: Term;
   accessRoles: Set<string>;
 
+  hasPrivateMaterial: boolean = false;
   materialCategories: MaterialCategory[];
   materialCategoriesTemplate: MaterialCategory[] = [
     {
@@ -96,7 +97,10 @@ export class TaskDetailsComponent implements OnInit {
     this.task = task;
 
     const categories: { [key: string]: Material[] } = {};
+    this.hasPrivateMaterial = false;
     for (let mat of task.materials) {
+      if(mat.is_private)
+        this.hasPrivateMaterial = true;
       let list = categories[mat.type];
       if (list == null) {
         categories[mat.type] = list = [];

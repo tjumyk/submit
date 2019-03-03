@@ -555,7 +555,10 @@ def download_materials_zip(task_id):
         # build attachment name
         term = task.term
         course = term.course
-        zip_attachment_name = '%s-%dS%s-%s.zip' % (course.code, term.year, term.semester, task.title)
+        zip_attachment_name = '%s-%dS%s-%s' % (course.code, term.year, term.semester, task.title)
+        if include_private:
+            zip_attachment_name += '-private'
+        zip_attachment_name += '.zip'
         zip_attachment_name = zip_attachment_name.replace(' ', '_')
         return send_from_directory(tmp_dir, zip_file_name, as_attachment=True,
                                    attachment_filename=zip_attachment_name, cache_timeout=0)
