@@ -359,8 +359,11 @@ def admin_material_validate_test_environment(mid):
         if material is None:
             return jsonify(msg='material not found'), 404
 
-        tmp_dir = os.path.join(tempfile.mkdtemp(prefix='submit-material-validate'))
         full_path = os.path.join(app.config['DATA_FOLDER'], material.file_path)
+        if md5sum(full_path) != material.md5:
+            return jsonify(msg='md5 does not match'), 500
+
+        tmp_dir = os.path.join(tempfile.mkdtemp(prefix='submit-material-validate'))
 
         info = {}
         archive_ok = False
