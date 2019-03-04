@@ -1,3 +1,6 @@
 [submodule "auth_connect"]
 	path = auth_connect
 	url = ../auth_connect.git
+[submodule "testbot"]
+	path = testbot
+	url = ../submit-testbot.git

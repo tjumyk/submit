@@ -3,9 +3,9 @@ from typing import Optional
 from celery.result import AsyncResult
 from sqlalchemy import func
 
-import celery_app
 from error import BasicError
 from models import AutoTest, Submission, AutoTestOutputFile, db
+from testbot import bot
 
 
 class AutoTestServiceError(BasicError):
@@ -51,7 +51,7 @@ class AutoTestService:
     def get_result(test: AutoTest) -> AsyncResult:
         if test is None:
             raise AutoTestServiceError('auto_test is required')
-        return celery_app.run_test.AsyncResult(test.work_id)
+        return bot.run_test.AsyncResult(test.work_id)
 
     @staticmethod
     def result_to_dict(result: AsyncResult, with_advanced_fields=False) -> dict:

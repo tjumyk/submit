@@ -1,18 +1,18 @@
 import os
+import re
 import shutil
 import tempfile
-import re
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
-import celery_app
-from models import db
 from auth_connect.oauth import requires_admin
+from models import db
 from services.account import AccountService, AccountServiceError
 from services.course import CourseService, CourseServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
+from testbot import bot
 from utils.upload import handle_upload, handle_post_upload, UploadError, md5sum
 
 admin_api = Blueprint('admin_api', __name__)
@@ -396,7 +396,7 @@ def admin_material_validate_test_environment(mid):
 
                 docker_run_config = os.path.join(tmp_dir, 'docker-run-config.json')
                 if os.path.exists(docker_run_config):
-                    info['docker_run_config'] = celery_app.get_run_params(docker_run_config)
+                    info['docker_run_config'] = bot.get_run_params(docker_run_config)
 
                 requirements_txt = os.path.join(tmp_dir, 'test', 'requirements.txt')
                 if os.path.exists(requirements_txt):

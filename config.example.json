@@ -45,9 +45,5 @@
         "password": "13246543356754321435"
       }
     ]
-  },
-  "AUTO_TEST_WORKER": {
-    "name": "test_worker",
-    "password": "13246543356754321435"
   }
 }
