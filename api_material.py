@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, send_from_directory, current_app as app
 
 from api_submission import requires_worker
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.task import TaskService, TaskServiceError
 from services.term import TermService, TermServiceError

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
 from models import db
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.team import TeamService, TeamServiceError
 from utils.upload import handle_upload, handle_post_upload, UploadError

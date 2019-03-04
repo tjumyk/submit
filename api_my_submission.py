@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, send_from_directory, current_app as app
 
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError

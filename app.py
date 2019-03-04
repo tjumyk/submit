@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 
-import oauth
 from api_account import account_api
 from api_admin import admin_api
 from api_course import course_api
@@ -11,6 +10,7 @@ from api_submission import submission_api
 from api_task import task_api
 from api_team import team_api
 from api_term import term_api
+from auth_connect import oauth
 from models import db
 from services.account import AccountService, AccountServiceError
 from utils import upload

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.course import CourseService, CourseServiceError
 from services.term import TermService, TermServiceError
 

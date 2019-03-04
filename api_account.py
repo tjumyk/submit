@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService
 
 account_api = Blueprint('account_api', __name__)

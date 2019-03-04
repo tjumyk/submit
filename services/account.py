@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from sqlalchemy import or_, func
 
-import oauth
+from auth_connect import oauth
 from error import BasicError
 from models import db, UserAlias, GroupAlias
 

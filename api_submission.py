@@ -6,7 +6,7 @@ from functools import wraps
 from flask import Blueprint, jsonify, current_app as app, send_from_directory, request
 
 from models import db
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError

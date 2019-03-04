@@ -10,7 +10,7 @@ from typing import Optional
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
 from models import db, SpecialConsideration, UserTeamAssociation
-from oauth import requires_login
+from auth_connect.oauth import requires_login
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError

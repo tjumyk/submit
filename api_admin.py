@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request, current_app as app, send_from_dir
 
 import celery_app
 from models import db
-from oauth import requires_admin
+from auth_connect.oauth import requires_admin
 from services.account import AccountService, AccountServiceError
 from services.course import CourseService, CourseServiceError
 from services.task import TaskService, TaskServiceError

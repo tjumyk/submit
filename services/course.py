@@ -1,6 +1,5 @@
 from typing import Optional, List
 
-import oauth
 from sqlalchemy import or_, func
 
 from error import BasicError
