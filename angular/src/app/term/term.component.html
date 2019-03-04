@@ -18,9 +18,9 @@
         </h2>
 
         <div class="ui menu stackable">
+          <a class="item" routerLink="/"><i class="icon home"></i> Home</a>
           <a routerLink="tasks" class="item" routerLinkActive="active"><i class="icon tasks"></i> Tasks</a>
           <div class="right menu">
-            <a routerLink="/" class="item"><i class="icon reply"></i> Return to Home</a>
             <a routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" class="item"><i class="icon cogs"></i>Management</a>
             <a class="item" *ngIf="user" href="account/profile" target="_blank">
               <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
