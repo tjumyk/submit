@@ -73,6 +73,7 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     clearInterval(this.timeTrackerHandler);
+    clearInterval(this.autoTestsTrackerHandler);
   }
 
   private setupSubmission(submission: Submission){
