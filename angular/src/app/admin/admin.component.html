@@ -6,10 +6,18 @@
       <div class="sub header">System Management</div>
     </div>
   </h1>
+  <app-error-message [error]="error"></app-error-message>
   <div class="ui menu stackable">
     <a class="item" routerLink="/"><i class="icon home"></i> Home</a>
     <a class="item" routerLink="courses" routerLinkActive="active"><i class="icon book"></i> Courses</a>
     <a class="item" routerLink="accounts" routerLinkActive="active"><i class="icon users"></i> Accounts</a>
+    <div class="right menu">
+      <a class="item" *ngIf="user" href="account/profile" target="_blank">
+        <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
+        <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+        {{ user.nickname || user.name }}
+      </a>
+    </div>
   </div>
   <router-outlet></router-outlet>
 </div>
