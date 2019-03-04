@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+import re
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
@@ -378,6 +379,7 @@ def admin_material_validate_test_environment(mid):
             if os.path.exists(dockerfile):
                 info['type'] = 'docker'
 
+                conda_installer = re.compile(r'((Ana|Mini)conda[\d\w\-._]+)\.sh')
                 with open(dockerfile) as f_dockerfile:
                     for line in f_dockerfile:
                         line = line.strip()
@@ -385,8 +387,12 @@ def admin_material_validate_test_environment(mid):
                             continue
                         if line.startswith('ENTRYPOINT'):
                             info['docker_entry_point'] = line[len('ENTRYPOINT'):]
-                        if line.startswith('CMD'):
+                        elif line.startswith('CMD'):
                             info['docker_cmd'] = line[len('CMD'):]
+                        elif line.startswith('RUN'):
+                            match = conda_installer.search(line)
+                            if match:
+                                info['conda_version'] = match.group(1)
 
                 docker_run_config = os.path.join(tmp_dir, 'docker-run-config.json')
                 if os.path.exists(docker_run_config):

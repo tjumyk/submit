@@ -73,6 +73,7 @@ export class NewSpecialConsiderationForm{
 
 export class TestEnvironmentValidationResult{
   type?: string;
+  conda_version?: string;
   docker_entry_point?: string;
   docker_cmd?: string;
   docker_run_config?: {};

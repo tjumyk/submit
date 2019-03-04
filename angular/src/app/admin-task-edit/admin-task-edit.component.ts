@@ -200,6 +200,8 @@ export class AdminTaskEditComponent implements OnInit {
         }else{
           let txt = 'Name: ' + material.name;
           txt += '\nType: ' + result.type;
+          if(result.conda_version)
+            txt += '\nConda Version: ' + result.conda_version;
           if(result.docker_entry_point)
             txt += '\nDocker ENTRYPOINT: ' + result.docker_entry_point;
           if(result.docker_cmd)
