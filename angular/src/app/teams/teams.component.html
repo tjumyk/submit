@@ -25,7 +25,7 @@
     <td>
       <div class="ui buttons mini">
         <a class="ui button icon" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
-        <a *ngIf="accessRoles.has('admin')" class="ui button icon red" title="Delete" (click)="deleteTeam(team, i, btnDeleteTeam)" #btnDeleteTeam><i class="icon trash"></i></a>
+        <a *ngIf="isAdmin" class="ui button icon red" title="Delete" (click)="deleteTeam(team, i, btnDeleteTeam)" #btnDeleteTeam><i class="icon trash"></i></a>
       </div>
     </td>
   </tr>

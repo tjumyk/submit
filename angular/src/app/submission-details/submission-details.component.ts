@@ -1,10 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AutoTest, ErrorMessage, Submission, Task} from "../models";
+import {AutoTest, ErrorMessage, Submission, Task, User} from "../models";
 import {SubmissionService} from "../submission.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
 import {TaskService} from "../task.service";
+import {AdminService} from "../admin.service";
+import {AccountService} from "../account.service";
 
 @Component({
   selector: 'app-submission-details',
@@ -13,6 +15,9 @@ import {TaskService} from "../task.service";
 })
 export class SubmissionDetailsComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
+
+  user: User;
+  isAdmin: boolean = false;
 
   taskId: number;
   task: Task;
@@ -32,6 +37,8 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private taskService: TaskService,
     private submissionService: SubmissionService,
+    private accountService: AccountService,
+    private adminService: AdminService,
     private route: ActivatedRoute
   ) {
     this.getStatusColor = submissionService.getAutoTestStatusColor
@@ -42,15 +49,23 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
     this.userId = parseInt(this.route.snapshot.paramMap.get('user_id'));
     this.submissionId = parseInt(this.route.snapshot.paramMap.get('submission_id'));
 
-    this.taskService.getCachedTask(this.taskId).subscribe(
-      task => {
-        this.task = task;
+    this.accountService.getCurrentUser().subscribe(
+      user=>{
+        this.user = user;
+        this.isAdmin = AccountService.isAdmin(user);
 
-        this.loadingSubmission = true;
-        this.submissionService.getSubmission(this.submissionId).pipe(
-          finalize(() => this.loadingSubmission = false)
-        ).subscribe(
-          submission => this.setupSubmission(submission),
+        this.taskService.getCachedTask(this.taskId).subscribe(
+          task => {
+            this.task = task;
+
+            this.loadingSubmission = true;
+            this.submissionService.getSubmission(this.submissionId).pipe(
+              finalize(() => this.loadingSubmission = false)
+            ).subscribe(
+              submission => this.setupSubmission(submission),
+              error => this.error = error.error
+            )
+          },
           error => this.error = error.error
         )
       },
@@ -114,7 +129,7 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
 
   runAutoTest() {
     this.requestingRunAutoTest = true;
-    this.submissionService.runAutoTest(this.submissionId).pipe(
+    this.adminService.runAutoTest(this.submissionId).pipe(
       finalize(() => this.requestingRunAutoTest = false)
     ).subscribe(
       test => this.autoTests.push(test),
@@ -127,7 +142,7 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
       return;
 
     btn.classList.add('loading', 'disabled');
-    this.submissionService.deleteAutoTest(this.submissionId, test.id).pipe(
+    this.adminService.deleteAutoTest(this.submissionId, test.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
       () => {

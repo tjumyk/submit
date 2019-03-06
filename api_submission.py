@@ -84,34 +84,6 @@ def submission_file_download(sid, fid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@submission_api.route('/<int:sid>/run-auto-test')
-@requires_login
-def run_test(sid):
-    try:
-        user = AccountService.get_current_user()
-        if user is None:
-            return jsonify(msg='user info required'), 500
-        submission = SubmissionService.get(sid)
-        if submission is None:
-            return jsonify(msg='submission not found'), 404
-        roles = TermService.get_access_roles(submission.task.term, user)
-
-        # role check
-        if not roles:
-            return jsonify(msg='access forbidden'), 403
-        if 'admin' not in roles and 'tutor' not in roles:
-            return jsonify(msg='only for admins or tutors'), 403
-
-        test, result = SubmissionService.run_auto_test(submission)
-        db.session.commit()
-
-        test_obj = test.to_dict(with_advanced_fields=True)
-        test_obj.update(AutoTestService.result_to_dict(result, with_advanced_fields=True))  # merge temporary result
-        return jsonify(test_obj), 201
-    except (SubmissionServiceError, TermServiceError) as e:
-        return jsonify(msg=e.msg, detail=e.detail), 400
-
-
 @submission_api.route('/<int:sid>/auto-tests')
 @requires_login
 def test_and_results(sid):
@@ -141,49 +113,6 @@ def test_and_results(sid):
 
         return jsonify(tests)
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
-        return jsonify(msg=e.msg, detail=e.detail), 400
-
-
-@submission_api.route('/<int:sid>/auto-tests/<int:tid>', methods=['DELETE'])
-@requires_login
-def do_test(sid, tid):
-    try:
-        user = AccountService.get_current_user()
-        if user is None:
-            return jsonify(msg='user info required'), 500
-        submission = SubmissionService.get(sid)
-        if submission is None:
-            return jsonify(msg='submission not found'), 404
-        roles = TermService.get_access_roles(submission.task.term, user)
-
-        # role check
-        if not roles:
-            return jsonify(msg='access forbidden'), 403
-        if 'admin' not in roles and 'tutor' not in roles:
-            return jsonify(msg='only for admins or tutors'), 403
-
-        test = AutoTestService.get(tid)
-
-        data_folder = app.config['DATA_FOLDER']
-        for file in test.output_files:
-            save_path_full = os.path.join(data_folder, file.save_path)
-            if os.path.lexists(save_path_full):
-                os.remove(save_path_full)
-        if test.output_files:  # try to remove parent folder if empty now
-            folder_path = os.path.dirname(test.output_files[0].save_path)
-            folder_path_full = os.path.join(data_folder, folder_path)
-            if os.path.lexists(folder_path_full) and not os.listdir(folder_path_full):
-                os.rmdir(folder_path_full)
-
-        result = AutoTestService.get_result(test)
-        result.forget()  # remove temporary result from storage (if any)
-
-        for file in test.output_files:
-            db.session.delete(file)
-        db.session.delete(test)
-        db.session.commit()
-        return "", 204
-    except (SubmissionServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

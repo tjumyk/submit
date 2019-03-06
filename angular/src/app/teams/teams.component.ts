@@ -16,9 +16,9 @@ export class TeamsComponent implements OnInit {
   error: ErrorMessage;
 
   user: User;
+  isAdmin: boolean = false;
   termId: number;
   term: Term;
-  accessRoles: Set<string>;
   taskId: number;
   teams: Team[];
   loadingTeams: boolean;
@@ -39,11 +39,11 @@ export class TeamsComponent implements OnInit {
     this.accountService.getCurrentUser().subscribe(
       user => {
         this.user = user;
+        this.isAdmin = AccountService.isAdmin(user);
 
         this.termService.getCachedTerm(this.termId).subscribe(
           term => {
             this.term = term;
-            this.accessRoles = TermService.getAccessRoles(this.term, this.user);
 
             this.loadingTeams = true;
             this.taskService.getTeams(this.taskId).pipe(

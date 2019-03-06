@@ -1,7 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
-import {Course, ErrorMessage, FileRequirement, Group, Material, SpecialConsideration, Task, Term, User} from "./models";
+import {
+  AutoTest,
+  Course,
+  ErrorMessage,
+  FileRequirement,
+  Group,
+  Material,
+  SpecialConsideration,
+  Task,
+  Term,
+  User
+} from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
 import * as moment from"moment";
@@ -289,5 +300,13 @@ export class AdminService {
 
   deleteTeam(team_id: number):Observable<any>{
     return this.http.delete(`${this.api}/teams/${team_id}`)
+  }
+
+  runAutoTest(id: number): Observable<AutoTest> {
+    return this.http.get<AutoTest>(`${this.api}/submissions/${id}/run-auto-test`)
+  }
+
+  deleteAutoTest(id: number, tid: number): Observable<any> {
+    return this.http.delete(`${this.api}/submissions/${id}/auto-tests/${tid}`)
   }
 }

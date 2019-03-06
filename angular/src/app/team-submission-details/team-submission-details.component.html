@@ -56,7 +56,7 @@
 
     <ng-container *ngIf="autoTests">
       <div class="ui segment" *ngFor="let test of autoTests">
-        <a class="ui right corner red label" (click)="deleteAutoTest(test, btnDeleteAutoTest)" #btnDeleteAutoTest>
+        <a class="ui right corner red label" (click)="deleteAutoTest(test, btnDeleteAutoTest)" #btnDeleteAutoTest *ngIf="isAdmin">
           <i class="icon trash"></i>
         </a>
         <div class="ui list horizontal">
@@ -140,7 +140,7 @@
       </div>
     </ng-container>
 
-    <button class="ui button" (click)="runAutoTest()" [ngClass]="{'disabled loading': requestingRunAutoTest}">
+    <button class="ui button" (click)="runAutoTest()" [ngClass]="{'disabled loading': requestingRunAutoTest}" *ngIf="isAdmin">
       <i class="icon play"></i>
       Run Test
     </button>

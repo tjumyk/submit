@@ -39,14 +39,6 @@ export class SubmissionService {
     return this.http.get<Submission>(`${this.myTeamApi}/${id}`)
   }
 
-  runAutoTest(id: number): Observable<AutoTest> {
-    return this.http.get<AutoTest>(`${this.api}/${id}/run-auto-test`)
-  }
-
-  deleteAutoTest(id: number, tid: number): Observable<any> {
-    return this.http.delete(`${this.api}/${id}/auto-tests/${tid}`)
-  }
-
   getAutoTestAndResults(id: number): Observable<AutoTest[]> {
     return this.http.get<AutoTest[]>(`${this.api}/${id}/auto-tests`)
   }
