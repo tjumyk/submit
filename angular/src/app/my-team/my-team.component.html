@@ -116,7 +116,7 @@
       </td>
       <td *ngIf="team.creator_id==user.id && !team.is_finalised">
         <div class="ui small buttons" *ngIf="ass.user_id != user.id && ass.is_creator_agreed && ass.is_user_agreed">
-          <a class="ui icon button red" (click)="kickOut(ass.user, btnKickOut)" #btnKickOut><i class="icon times"></i> Kick Out</a>
+          <a class="ui icon button red" (click)="kickOut(ass.user, btnKickOut)" #btnKickOut><i class="icon times"></i> Remove</a>
         </div>
         <div class="ui small buttons" *ngIf="!ass.is_creator_agreed">
           <a class="ui icon button green" (click)="acceptJoin(ass.user, btnAcceptJoin)" #btnAcceptJoin><i class="icon check"></i> Accept</a>
