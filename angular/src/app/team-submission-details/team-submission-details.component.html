@@ -3,12 +3,19 @@
 <div class="ui text loader active" *ngIf="loadingSubmission">Loading submission info...</div>
 
 <div *ngIf="submission">
-  <div class="ui breadcrumb">
-    <a class="section" routerLink="../..">Submissions</a>
-    <i class="icon right angle divider"></i>
-    <a class="section" routerLink="..">{{team.name}}</a>
-    <i class="icon right angle divider"></i>
-    <div class="active section">Submission {{submission.id}}</div>
+  <div class="ui grid stackable two column">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a class="section" routerLink="../..">Submissions</a>
+        <i class="icon right angle divider"></i>
+        <a class="section" routerLink="..">{{team.name}}</a>
+        <i class="icon right angle divider"></i>
+        <div class="active section">Submission {{submission.id}}</div>
+      </div>
+    </div>
+    <div class="column right aligned">
+      <a class="ui button mini" routerLink="../../../teams/{{teamId}}">Team Info</a>
+    </div>
   </div>
 
   <div class="ui segment">

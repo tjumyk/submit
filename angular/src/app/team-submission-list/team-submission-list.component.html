@@ -2,10 +2,17 @@
 <div class="ui loader text active" *ngIf="loadingSubmissions">Loading team submissions...</div>
 
 <div *ngIf="submissions">
-  <div class="ui breadcrumb">
-    <a routerLink="..">Submissions</a>
-    <i class="icon right angle divider"></i>
-    <div class="section active">{{team.name}}</div>
+  <div class="ui grid stackable two column">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a routerLink="..">Submissions</a>
+        <i class="icon right angle divider"></i>
+        <div class="section active">{{team.name}}</div>
+      </div>
+    </div>
+    <div class="column right aligned">
+      <a class="ui button mini" routerLink="../../teams/{{teamId}}">Team Info</a>
+    </div>
   </div>
 
   <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
