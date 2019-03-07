@@ -3,6 +3,32 @@
 
 <div *ngIf="userSummaries">
   <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
+
+  <div class="ui segment">
+    <div class="ui grid stackable">
+      <div class="column eleven wide">
+        <div class="ui statistics mini">
+          <div class="statistic">
+            <div class="value"><i class="icon paper plane outline"></i> {{totalSubmissions}}</div>
+            <div class="label">Submissions</div>
+          </div>
+          <div class="statistic">
+            <div class="value"><i class="icon user"></i> {{totalSubmittedUsers}}</div>
+            <div class="label">Submitted Users</div>
+          </div>
+        </div>
+      </div>
+      <div class="column five wide">
+        <div class="ui fluid action input" #inputSubmissionIDWrapper>
+          <input type="text" placeholder="Find submission by ID" #inputSubmissionID (keyup)="bindEnter($event, btnGoToSubmission)">
+          <button class="ui icon button" (click)="goToSubmission(inputSubmissionID.value, btnGoToSubmission, inputSubmissionIDWrapper)" #btnGoToSubmission>
+            <i class="icon crosshairs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>User</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
     <tbody>

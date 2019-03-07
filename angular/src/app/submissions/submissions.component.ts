@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Submission, Task, Team, TeamSubmissionSummary, UserSubmissionSummary} from "../models";
+import {ErrorMessage, Task, UserSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
+import {SubmissionService} from "../submission.service";
 
 @Component({
   selector: 'app-submissions',
@@ -16,12 +17,15 @@ export class SubmissionsComponent implements OnInit {
   taskId: number;
   task: Task;
   userSummaries: UserSubmissionSummary[];
-  teamSummaries: TeamSubmissionSummary[];
+  totalSubmissions: number;
+  totalSubmittedUsers: number;
   loadingSummaries: boolean;
 
   constructor(
     private accountService: AccountService,
     private taskService: TaskService,
+    private submissionService: SubmissionService,
+    private router: Router,
     private route: ActivatedRoute
   ) {
   }
@@ -37,12 +41,47 @@ export class SubmissionsComponent implements OnInit {
         this.taskService.getUserSubmissionSummaries(this.taskId).pipe(
           finalize(() => this.loadingSummaries = false)
         ).subscribe(
-          summaries => this.userSummaries = summaries,
+          summaries => {
+            this.userSummaries = summaries;
+
+            this.totalSubmissions = 0;
+            this.totalSubmittedUsers = 0;
+            for (let item of summaries) {
+              this.totalSubmissions += item.total_submissions;
+              this.totalSubmittedUsers += 1;
+            }
+          },
           error => this.error = error.error
         )
       },
       error => this.error = error.error
     );
 
+  }
+
+  goToSubmission(subId: string, btn: HTMLElement, inputDiv: HTMLElement) {
+    let id = parseInt(subId);
+    if (isNaN(id))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    inputDiv.classList.add('disabled');
+    this.submissionService.getSubmission(id).pipe(
+      finalize(() => {
+        btn.classList.remove('loading', 'disabled');
+        inputDiv.classList.remove('disabled');
+      })
+    ).subscribe(
+      submission => {
+        this.router.navigate([`${submission.submitter_id}/${submission.id}`], {relativeTo: this.route})
+      },
+      error => this.error = error.error
+    )
+  }
+
+  bindEnter(event: KeyboardEvent, btn: HTMLElement) {
+    if (event.keyCode == 13) {// Enter key
+      btn.click()
+    }
   }
 }

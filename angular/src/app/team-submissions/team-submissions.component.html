@@ -2,6 +2,31 @@
 <div class="ui loader text active" *ngIf="loadingSummaries">Loading submission summaries...</div>
 
 <div *ngIf="teamSummaries">
+  <div class="ui segment">
+    <div class="ui grid stackable">
+      <div class="eleven wide column">
+        <div class="ui statistics mini">
+          <div class="statistic">
+            <div class="value"><i class="icon paper plane outline"></i> {{totalSubmissions}}</div>
+            <div class="label">Submissions</div>
+          </div>
+          <div class="statistic">
+            <div class="value"><i class="icon users"></i> {{totalSubmittedTeams}}</div>
+            <div class="label">Submitted Teams</div>
+          </div>
+        </div>
+      </div>
+      <div class="five wide column">
+        <div class="ui action input fluid" #inputSubmissionIDWrapper>
+          <input type="text" placeholder="Find submission by ID" #inputSubmissionID (keyup)="bindEnter($event, btnGoToSubmission)">
+          <button class="ui icon button" (click)="goToSubmission(inputSubmissionID.value, btnGoToSubmission, inputSubmissionIDWrapper)" #btnGoToSubmission>
+            <i class="icon crosshairs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>Team ID</th><th>Team Name</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
     <tbody>

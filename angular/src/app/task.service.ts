@@ -277,6 +277,10 @@ export class TaskService {
     return this.http.get<UserTeamAssociation>(`${this.api}/${task_id}/my-team-association`)
   }
 
+  getTeamAssociation(task_id: number, user_id: number): Observable<UserTeamAssociation> {
+    return this.http.get<UserTeamAssociation>(`${this.api}/${task_id}/team-association/${user_id}`)
+  }
+
   getTeams(task_id: number): Observable<Team[]> {
     return this.http.get<[Team, number][]>(`${this.api}/${task_id}/teams`).pipe(
       map(records => {
