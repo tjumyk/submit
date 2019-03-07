@@ -1,4 +1,4 @@
-Member leave: {member_name}
+Member Leave: {member_name}
 Hi {recipient_name},
 
 {member_name} has left your team, {team.name}, for {task.title}.
