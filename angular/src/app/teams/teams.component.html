@@ -15,7 +15,7 @@
             <div class="value"><i class="icon user"></i> {{totalUsersInTeams}}</div>
             <div class="label">Users in teams</div>
           </div>
-          <div class="statistic">
+          <div class="statistic" *ngIf="teamFreeUsers">
             <div class="value"><i class="icon user outline"></i> {{teamFreeUsers.length}}</div>
             <div class="label">Users not in teams</div>
           </div>
@@ -54,7 +54,8 @@
     </tbody>
   </table>
 
-  <div *ngIf="teamFreeUsers.length">
+  <div class="ui loader active text inline centered" *ngIf="loadingTeamFreeUsers">Loading users not in teams...</div>
+  <div *ngIf="teamFreeUsers && teamFreeUsers.length">
     <h4 class="ui horizontal divider header">
       <i class="icon user outline"></i>
       Users not in teams
