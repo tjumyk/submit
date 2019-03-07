@@ -18,7 +18,6 @@ export class SubmissionsComponent implements OnInit {
   task: Task;
   userSummaries: UserSubmissionSummary[];
   totalSubmissions: number;
-  totalSubmittedUsers: number;
   loadingSummaries: boolean;
 
   constructor(
@@ -45,10 +44,8 @@ export class SubmissionsComponent implements OnInit {
             this.userSummaries = summaries;
 
             this.totalSubmissions = 0;
-            this.totalSubmittedUsers = 0;
             for (let item of summaries) {
               this.totalSubmissions += item.total_submissions;
-              this.totalSubmittedUsers += 1;
             }
           },
           error => this.error = error.error

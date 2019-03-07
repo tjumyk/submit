@@ -19,7 +19,6 @@ export class TeamSubmissionsComponent implements OnInit {
   task: Task;
   teamSummaries: TeamSubmissionSummary[];
   totalSubmissions: number;
-  totalSubmittedTeams: number;
   loadingSummaries: boolean;
 
   constructor(
@@ -46,10 +45,8 @@ export class TeamSubmissionsComponent implements OnInit {
             this.teamSummaries = summaries;
 
             this.totalSubmissions = 0;
-            this.totalSubmittedTeams = 0;
             for (let item of summaries) {
               this.totalSubmissions += item.total_submissions;
-              this.totalSubmittedTeams += 1;
             }
           },
           error => this.error = error.error
