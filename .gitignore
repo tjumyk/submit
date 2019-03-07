@@ -9,3 +9,4 @@ static/
 data/
 test.db
 results.sqlite
+mailbox/

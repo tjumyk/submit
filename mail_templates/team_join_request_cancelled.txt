@@ -1,0 +1,8 @@
+Request Cancelled by {requester_name}
+Hi {recipient_name},
+
+{requester_name} has cancelled the request to join your team, {team.name}, for {task.title}.
+
+You don't need to do anything for this incident.
+
+{site[name]}

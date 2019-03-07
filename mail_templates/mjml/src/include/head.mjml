@@ -1,0 +1,14 @@
+<mj-font name="Lato" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin"/>
+<mj-style inline="inline">
+  .link {
+      color: #4183c4;
+      text-decoration: none;
+  }
+</mj-style>
+<mj-attributes>
+    <mj-body background-color="#eee"/>
+    <mj-text padding="0"/>
+    <mj-button background-color='#2185d0'/>
+    <mj-divider padding='10px 0' border-width='1px' border-color='#dedede'/>
+    <mj-all font-family="Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;" line-height='20px' font-size='14px'/>
+</mj-attributes>

@@ -1,0 +1,21 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./include/head.mjml"/>
+  </mj-head>
+  
+  <mj-body>
+    <mj-include path="./include/header.mjml" />
+    
+    <mj-section background-color='#fff' padding='20px'>
+      <mj-column>
+        <mj-text>
+          <h2>Hi {{recipient_name}},</h2>
+          <p><b>{{member_name}}</b> has <b>left</b> your team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>. </p>
+          <p>You don't need to do anything for this incident.</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <mj-include path="./include/footer.mjml" />
+  </mj-body>
+</mjml>

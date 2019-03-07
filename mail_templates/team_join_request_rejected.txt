@@ -1,0 +1,10 @@
+Request Rejected: {team.name}
+Hi {recipient_name},
+
+{operator_name} has rejected your request to join the team, {team.name}, for {task.title}.
+
+Please try to join another team or create your own team.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team/
+
+{site[name]}

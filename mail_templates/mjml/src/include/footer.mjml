@@ -1,0 +1,12 @@
+<mj-section>
+  <mj-column>
+    <mj-text align="center">
+    	<a class='link' href='https://kg.cse.unsw.edu.au/'>Home</a> |
+      <a class='link' href='https://kg.cse.unsw.edu.au/id/'>Identity System</a> |
+      <a class='link' href='https://kg.cse.unsw.edu.au/submit/'>Submission System</a>
+    </mj-text>
+    <mj-text align="center" color='#5f5f5f'>
+      &copy; UNSW Knowledge Graph Group. All rights reserved.
+    </mj-text>
+  </mj-column>
+</mj-section>

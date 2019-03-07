@@ -1,0 +1,12 @@
+Request Accepted: {team.name}
+Hi {recipient_name},
+
+{operator_name} has accepted your request to join the team, {team.name}, for {task.title}.
+
+Before you can submit anything, your team must be finalised by the team creator. You may click the following button or open 'My Team' tab in the task page to check the current status of your team. You will also receive a notification when your team is finalised.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team/
+
+Besides, you are free to leave this team and join/create another team, as long as this team is not finalised.
+
+{site[name]}
