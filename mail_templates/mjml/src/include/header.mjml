@@ -1,7 +1,7 @@
 <mj-section>
 
   <mj-column>
-    <mj-image src='http://localhost:8888/static/assets/logo-64.png' width='64px'></mj-image>
+    <mj-image src='{{site[root_url]}}{{site[base_url]}}static/assets/logo-64.png' width='64px'></mj-image>
     <mj-text align='center' font-size='24px' line-height='34.28px' font-weight='700' color='#1f1f1f' >			
       {{term.course.id}} {{term.course.name}}
     </mj-text>
