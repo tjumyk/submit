@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from email.headerregistry import Address
 from email.message import EmailMessage
@@ -42,7 +43,10 @@ def send_emails(to_list, template, **kwargs):
     msg.set_content(temp['text'].format(**kwargs))
     temp_html = temp.get('html')
     if temp_html:
-        msg.add_alternative(temp_html.format(**kwargs))
+        # In html templates, double curly-braces are used for string interpolation to avoid conflict with css and js
+        # functions
+        html = re.sub(r"(\{\{[^}]+\}\})", lambda m: m.group(1)[1:-1].format(**kwargs), temp_html)
+        msg.add_alternative(html, subtype='html')
 
     mock_folder = app.config['MAIL'].get('mock_folder')
     if mock_folder:
@@ -51,7 +55,7 @@ def send_emails(to_list, template, **kwargs):
             if not os.path.isdir(folder):
                 os.makedirs(folder)
             with open(os.path.join(folder, '%f.txt' % time.time()), 'w') as f:
-                f.write("From: %s\nSubject: %s\n\n%s" % (str(msg['From']), msg['Subject'], msg.get_content()))
+                f.write("From: %s\nSubject: %s\n\n%s" % (str(msg['From']), msg['Subject'], msg.get_body()))
     else:
         p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
         p.communicate(msg.as_bytes())
