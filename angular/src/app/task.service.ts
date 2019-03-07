@@ -295,6 +295,10 @@ export class TaskService {
     )
   }
 
+  getTeamFreeUsers(task_id: number): Observable<User[]> {
+    return this.http.get<User[]>(`${this.api}/${task_id}/team_free_users`)
+  }
+
   addTeam(task_id: number, form: NewTeamForm): Observable<Team> {
     return this.http.post<Team>(`${this.api}/${task_id}/teams`, form)
   }

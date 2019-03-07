@@ -442,6 +442,29 @@ def do_teams(task_id):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:task_id>/team_free_users', methods=['GET'])
+@requires_login
+def team_free_users(task_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        return jsonify([u.to_dict(with_groups=False) for u in TeamService.get_free_users_for_task(task)])
+    except (TaskServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:task_id>/my-team-association', methods=['GET'])
 @requires_login
 def my_team_association(task_id):

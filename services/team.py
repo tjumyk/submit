@@ -1,12 +1,12 @@
 import re
+from datetime import datetime
 from typing import Optional, List, Tuple
 
-from datetime import datetime
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, exists, not_
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Team, db, UserTeamAssociation, UserAlias, Task
+from models import Team, db, UserTeamAssociation, UserAlias, Task, Term, user_groups_alias
 
 
 class TeamServiceError(BasicError):
@@ -56,6 +56,16 @@ class TeamService:
             .options(joinedload(Team.creator)) \
             .order_by(Team.id) \
             .all()
+
+    @staticmethod
+    def get_free_users_for_task(task) -> List[UserAlias]:
+        if task is None:
+            raise TeamServiceError('task is required')
+        return db.session.query(UserAlias) \
+            .filter(task.term_id == Term.id,
+                    Term.student_group_id == user_groups_alias.c.group_id,
+                    UserAlias.id == user_groups_alias.c.user_id,
+                    not_(exists().where(UserTeamAssociation.user_id == UserAlias.id)))
 
     @staticmethod
     def get_team_association(task: Task, user: UserAlias) -> Optional[UserTeamAssociation]:

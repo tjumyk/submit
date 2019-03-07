@@ -2,32 +2,79 @@
 <div class="ui loader active text" *ngIf="loadingTeams">Loading teams...</div>
 
 <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
-<table class="ui table unstackable" *ngIf="teams">
-  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
-  <tbody>
-  <tr *ngFor="let team of teams; index as i">
-    <td>{{i+1}}</td>
-    <td>{{team.id}}</td>
-    <td>{{team.name}}</td>
-    <td>
-      <i *ngIf="!team.is_finalised; else alreadyFinalised" class="icon lock open green" title="Open"></i>
-      <ng-template #alreadyFinalised><i class="icon lock" title="Finalised"></i></ng-template>
-    </td>
-    <td>
-      <a href="admin/users/{{team.creator_id}}" target="_blank">
-        <img src="{{team.creator.avatar}}?size=64" *ngIf="team.creator.avatar; else defaultAvatar" class="ui image avatar">
-        <span *ngIf="team.creator.nickname; else nameOnly">{{team.creator.nickname}} ({{team.creator.name}})</span>
-      </a>
-      <ng-template #nameOnly>{{team.creator.name}}</ng-template>
-    </td>
-    <td>{{team.slogan}}</td>
-    <td>{{team.total_user_associations}}</td>
-    <td>
-      <div class="ui buttons mini">
-        <a class="ui button icon" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
-        <a *ngIf="isAdmin" class="ui button icon red" title="Delete" (click)="deleteTeam(team, i, btnDeleteTeam)" #btnDeleteTeam><i class="icon trash"></i></a>
+<div *ngIf="teams">
+  <div class="ui segment">
+    <div class="ui grid stackable">
+      <div class="eleven wide column">
+        <div class="ui statistics mini">
+          <div class="statistic">
+            <div class="value"><i class="icon users"></i> {{teams.length}}</div>
+            <div class="label">Teams</div>
+          </div>
+          <div class="statistic">
+            <div class="value"><i class="icon user"></i> {{totalUsersInTeams}}</div>
+            <div class="label">Users in teams</div>
+          </div>
+          <div class="statistic">
+            <div class="value"><i class="icon user outline"></i> {{teamFreeUsers.length}}</div>
+            <div class="label">Users not in teams</div>
+          </div>
+        </div>
       </div>
-    </td>
-  </tr>
-  </tbody>
-</table>
+    </div>
+  </div>
+
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let team of teams; index as i">
+      <td>{{i+1}}</td>
+      <td>{{team.id}}</td>
+      <td>{{team.name}}</td>
+      <td>
+        <i *ngIf="!team.is_finalised; else alreadyFinalised" class="icon lock open green" title="Open"></i>
+        <ng-template #alreadyFinalised><i class="icon lock" title="Finalised"></i></ng-template>
+      </td>
+      <td>
+        <a href="admin/users/{{team.creator_id}}" target="_blank">
+          <img src="{{team.creator.avatar}}?size=64" *ngIf="team.creator.avatar; else defaultAvatar" class="ui image avatar">
+          <span *ngIf="team.creator.nickname; else nameOnly">{{team.creator.nickname}} ({{team.creator.name}})</span>
+        </a>
+        <ng-template #nameOnly>{{team.creator.name}}</ng-template>
+      </td>
+      <td>{{team.slogan}}</td>
+      <td>{{team.total_user_associations}}</td>
+      <td>
+        <div class="ui buttons mini">
+          <a class="ui button icon" title="Details" routerLink="{{team.id}}"><i class="icon ellipsis horizontal"></i></a>
+          <a *ngIf="isAdmin" class="ui button icon red" title="Delete" (click)="deleteTeam(team, i, btnDeleteTeam)" #btnDeleteTeam><i class="icon trash"></i></a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="teamFreeUsers.length">
+    <h4 class="ui horizontal divider header">
+      <i class="icon user outline"></i>
+      Users not in teams
+    </h4>
+    <table class="ui table unstackable">
+      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Nickname</th><th>Email</th><th>Operations</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let user of teamFreeUsers; index as i">
+        <td>{{i+1}}</td>
+        <td>{{user.id}}</td>
+        <td>{{user.name}}</td>
+        <td>{{user.nickname}}</td>
+        <td>{{user.email}}</td>
+        <td>
+          <div class="ui small buttons">
+            <a target="_blank" href="admin/users/{{ user.id }}" class="ui button icon"><i class="icon edit"></i></a>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

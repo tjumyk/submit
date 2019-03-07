@@ -6,6 +6,7 @@ import {finalize} from "rxjs/operators";
 import {AdminService} from "../admin.service";
 import {TermService} from "../term.service";
 import {AccountService} from "../account.service";
+import {zip} from "rxjs";
 
 @Component({
   selector: 'app-teams',
@@ -21,6 +22,8 @@ export class TeamsComponent implements OnInit {
   term: Term;
   taskId: number;
   teams: Team[];
+  teamFreeUsers: User[];
+  totalUsersInTeams: number;
   loadingTeams: boolean;
 
   constructor(
@@ -46,10 +49,18 @@ export class TeamsComponent implements OnInit {
             this.term = term;
 
             this.loadingTeams = true;
-            this.taskService.getTeams(this.taskId).pipe(
+            zip(this.taskService.getTeams(this.taskId), this.taskService.getTeamFreeUsers(this.taskId)).pipe(
               finalize(() => this.loadingTeams = false)
             ).subscribe(
-              teams => this.teams = teams,
+              ([teams, freeUsers]) => {
+                this.teams = teams;
+                this.teamFreeUsers = freeUsers;
+
+                this.totalUsersInTeams = 0;
+                for(let team of teams){
+                  this.totalUsersInTeams += team.total_user_associations
+                }
+              },
               error => this.error = error.error
             )
           },
