@@ -1,5 +1,5 @@
 Team Finalised: {team.name}
-Hi all,
+Hi,
 
 {operator_name} has finalised your team, {team.name}, for {task.title}.
 
@@ -9,6 +9,6 @@ The task must be open.
 Your team has not reached the submission attempt limit.
 If all of the above conditions are satisfied, please click the following button or open the 'New Submission' tab in the task page to submit your work.
 
-{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/submit/
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/submit
 
 {site[name]}

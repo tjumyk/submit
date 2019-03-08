@@ -13,7 +13,7 @@
           <p><b>{{operator_name}}</b> has <b>rejected</b> your request to join the team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>.</p>
           <p>Please try to join another team or create your own team.</p>
         </mj-text>
-        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team/'>Join or Create a Team</mj-button>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team'>Join or Create a Team</mj-button>
       </mj-column>
     </mj-section>
     

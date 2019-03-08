@@ -1,0 +1,10 @@
+Task Due in {due_hours}h: {task.title}
+Hi,
+
+We kindly remind you that your team has not submitted anything for {task.title} but it will be due in {due_hours} hours.
+
+If you have the latest work done by your team, please click the following button or open the 'New Submission' tab in the task page to submit it.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/submit
+
+{site[name]}

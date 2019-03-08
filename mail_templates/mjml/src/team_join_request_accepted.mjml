@@ -13,7 +13,7 @@
           <p><b>{{operator_name}}</b> has <b>accepted</b> your request to join the team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>.</p>
           <p>Before you can submit anything, your team must be <b>finalised</b> by the team creator. You may click the following button or open 'My Team' tab in the task page to check the current status of your team. You will also receive a notification when your team is finalised.</p>
         </mj-text>
-        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team/'>My Team Status</mj-button>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team'>My Team Status</mj-button>
         <mj-text>
           <p>Besides, you are free to leave this team and join/create another team, as long as this team is not finalised.</p>
         </mj-text>

@@ -10,10 +10,10 @@
       <mj-column>
         <mj-text>
           <h2>Hi,</h2>
-          <p><b>{{operator_name}}</b> has <b>dismissed</b> the team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>. </p>
-         <p>Please try to join another team or create your own team.</p>
+          <p><b>{{task.title}}</b> is open now.</p>
+          <p>Please click the following button or open the task page to see the details.</p>
         </mj-text>
-        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team'>Join or Create a Team</mj-button>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}'>{{task.title}}</mj-button>
       </mj-column>
     </mj-section>
     

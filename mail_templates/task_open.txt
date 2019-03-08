@@ -1,0 +1,10 @@
+Task Open: {task.title}
+Hi,
+
+{task.title} is open now.
+
+Please click the following button or open the task page to see the details.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}
+
+{site[name]}
