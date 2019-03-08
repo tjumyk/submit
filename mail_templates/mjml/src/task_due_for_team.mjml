@@ -11,7 +11,7 @@
         <mj-text>
           <h2>Hi,</h2>
           <p>We kindly remind you that your team has not submitted anything for <b>{{task.title}}</b> but it will be due in <b>{{due_hours}}</b> hours.</p>
-          <p>If you have the latest work done by your team, please click the following button or open the 'New Submission' tab in the task page to submit it.</p>
+          <p>If you have the latest code or files made by your team, please click the following button or open the 'New Submission' tab in the task page to submit them.</p>
         </mj-text>
         <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/submit'>Submit My Team's Work</mj-button>
       </mj-column>

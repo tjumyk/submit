@@ -3,7 +3,7 @@ Hi,
 
 We kindly remind you that your team has not submitted anything for {task.title} but it will be due in {due_hours} hours.
 
-If you have the latest work done by your team, please click the following button or open the 'New Submission' tab in the task page to submit it.
+If you have the latest code or files made by your team, please click the following button or open the 'New Submission' tab in the task page to submit them.
 
 {site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/submit
 

@@ -1,0 +1,23 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./include/head.mjml"/>
+  </mj-head>
+  
+  <mj-body>
+    <mj-include path="./include/header.mjml" />
+    
+    <mj-section background-color='#fff' padding='20px'>
+      <mj-column>
+        <mj-text>
+          <h2>Hi,</h2>
+          <p>We kindly remind you that you have not joined or created a team for <b>{{task.title}}</b> but it will be due in <b>{{due_hours}}</b> hours.</p>
+          <p>Since <b>{{task.title}}</b> is a team task, you have to be in a team to submit your work.</p>
+          <p>Please click the following button or open the 'My Team' tab in the task page to join or create a team.</p>
+        </mj-text>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team'>Join or Create a Team</mj-button>
+      </mj-column>
+    </mj-section>
+    
+    <mj-include path="./include/footer.mjml" />
+  </mj-body>
+</mjml>

@@ -1,0 +1,12 @@
+Task Due in {due_hours}h: {task.title}
+Hi,
+
+We kindly remind you that you have not joined or created a team for {task.title} but it will be due in {due_hours} hours.
+
+Since {task.title} is a team task, you have to be in a team to submit your work.
+
+Please click the following button or open the 'My Team' tab in the task page to join or create a team.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team
+
+{site[name]}
