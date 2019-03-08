@@ -12,7 +12,7 @@ from server import app
 from services.task import TaskService
 from utils.mail import send_email
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 worker_config = app.config['PERIOD_WORKER']
