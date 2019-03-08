@@ -192,17 +192,15 @@
                 </div>
               </div>
             </div>
-            <div class="item" *ngIf="task.evaluation_method=='auto_test'">
+            <div class="item" *ngIf="task.evaluation_method=='auto_test'
+              && (task.auto_test_environment_id!=null && autoTestEnvironment || task.auto_test_environment_id==null)">
               <i class="icon terminal"></i>
               <div class="content">
                 <div class="header">Auto Test Environment</div>
                 <div class="description">
                   <ng-container *ngIf="task.auto_test_environment_id!=null; else noAutoTestEnvironment">
-                    <ng-container *ngIf="autoTestEnvironment; else hiddenAutoTestEnvironment">
-                      {{ autoTestEnvironment.name + (autoTestEnvironment.is_private ? ' (private)' : ' (public)')}}
-                    </ng-container>
+                    {{ autoTestEnvironment.name + (autoTestEnvironment.is_private ? ' (private)' : ' (public)')}}
                   </ng-container>
-                  <ng-template #hiddenAutoTestEnvironment>(Hidden)</ng-template>
                   <ng-template #noAutoTestEnvironment>(None)</ng-template>
                 </div>
               </div>
