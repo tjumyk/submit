@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="five wide column">
-        <div class="ui action input fluid" #inputTeamUserIDWrapper *ngIf="teamFreeUsers">
+        <div class="ui action input fluid" #inputTeamUserIDWrapper>
           <input type="text" placeholder="Find team by user ID/name" #inputTeamUserID (keyup)="bindEnter($event, btnGoToTeamUser)">
           <button class="ui button icon" (click)="goToTeamUser(inputTeamUserID.value, btnGoToTeamUser, inputTeamUserIDWrapper)" #btnGoToTeamUser><i class="icon crosshairs"></i></button>
         </div>
