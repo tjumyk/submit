@@ -484,7 +484,7 @@ def my_team_association(task_id):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@task_api.route('/<int:task_id>/team-association/<int:uid>', methods=['GET'])
+@task_api.route('/<int:task_id>/team-associations/<int:uid>', methods=['GET'])
 @requires_login
 def team_association(task_id, uid):
     try:
@@ -503,6 +503,37 @@ def team_association(task_id, uid):
             return jsonify(msg='only for admins or tutors'), 403
 
         target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='user not found'), 404
+        ass = TeamService.get_team_association(task, target_user)
+        if not ass:
+            return "", 204
+        return jsonify(ass.to_dict(with_team=True))
+    except (TaskServiceError, TeamServiceError, TermServiceError, AccountServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/team-association-by-user-name/<string:name>', methods=['GET'])
+@requires_login
+def team_association_by_user_name(task_id, name):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 403
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        target_user = AccountService.get_user_by_name(name)
+        if target_user is None:
+            return jsonify(msg='user not found'), 404
         ass = TeamService.get_team_association(task, target_user)
         if not ass:
             return "", 204

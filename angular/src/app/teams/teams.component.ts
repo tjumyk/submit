@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Team, Term, User} from "../models";
 import {TaskService} from "../task.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {AdminService} from "../admin.service";
 import {TermService} from "../term.service";
@@ -31,6 +31,7 @@ export class TeamsComponent implements OnInit {
     private taskService: TaskService,
     private termService: TermService,
     private adminService: AdminService,
+    private router: Router,
     private route: ActivatedRoute
   ) {
   }
@@ -89,6 +90,40 @@ export class TeamsComponent implements OnInit {
       () => this.teams.splice(index, 1),
       error => this.error = error.error
     )
+  }
+
+  goToTeamUser(userKey: string, btn: HTMLElement, inputDiv: HTMLElement){
+    let uid = parseInt(userKey);
+    let query = null;
+    if(isNaN(uid))
+      query = this.taskService.getTeamAssociationByUserName(this.taskId, userKey);
+    else
+      query = this.taskService.getTeamAssociation(this.taskId, uid);
+
+    btn.classList.add('loading', 'disabled');
+    inputDiv.classList.add('disabled');
+    query.pipe(
+      finalize(()=>{
+        btn.classList.remove('loading', 'disabled');
+        inputDiv.classList.remove('disabled');
+      })
+    ).subscribe(
+      ass=>{
+        if(ass){
+          this.router.navigate([`${ass.team_id}`], {relativeTo: this.route})
+        }else{
+          this.error = {msg:'User is not in any team'}
+        }
+      },
+      error=>this.error = error.error
+    )
+
+  }
+
+  bindEnter(event: KeyboardEvent, btn: HTMLElement) {
+    if (event.keyCode == 13) {// Enter key
+      btn.click()
+    }
   }
 
 }
