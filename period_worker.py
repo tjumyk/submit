@@ -86,8 +86,6 @@ def _process_task_open(task):
     process_name = 'Task Open: %r at %s' % (task, task.open_time)
     mark_name = 'task_open_%d_%s.mark' % (task.id, str(task.open_time).replace(' ', '_'))
     work_folder = worker_config['work_folder']
-    if not os.path.exists(work_folder):
-        os.makedirs(work_folder, mode=0o700)
     mark_path = os.path.join(work_folder, mark_name)
     try:
         with open(mark_path, 'x'):
@@ -105,8 +103,6 @@ def _process_task_team_join_close(task, close_hours):
     process_name = 'Task Team Join Close: %r at %s' % (task, task.team_join_close_time)
     mark_name = 'task_team_join_close_%d_%s.mark' % (task.id, str(task.team_join_close_time).replace(' ', '_'))
     work_folder = worker_config['work_folder']
-    if not os.path.exists(work_folder):
-        os.makedirs(work_folder, mode=0o700)
     mark_path = os.path.join(work_folder, mark_name)
     try:
         with open(mark_path, 'x'):
@@ -123,8 +119,6 @@ def _process_task_due(task, due_hours):
     process_name = 'Task Due in %d Hours: %r at %s' % (due_hours, task, task.due_time)
     mark_name = 'task_due_%d_%dh_%s.mark' % (task.id, due_hours, str(task.due_time).replace(' ', '_'))
     work_folder = worker_config['work_folder']
-    if not os.path.exists(work_folder):
-        os.makedirs(work_folder, mode=0o700)
     mark_path = os.path.join(work_folder, mark_name)
     try:
         with open(mark_path, 'x'):
@@ -152,7 +146,33 @@ def _process_task_due(task, due_hours):
 
 def main():
     logger.info('Staring Period Worker...')
+
+    # check config
+    work_folder = worker_config['work_folder']
     period = worker_config['period']
+    expire = worker_config['expire']
+    due_notify_hours = worker_config['due_notify_hours']
+    team_join_close_notify_hours = worker_config['team_join_close_notify_hours']
+    max_recipients_per_mail = worker_config['max_recipients_per_mail']
+    if not os.path.exists(work_folder):
+        os.makedirs(work_folder, mode=0o700)
+    assert period > 0
+    assert expire > period
+    assert type(due_notify_hours) == list
+    assert type(team_join_close_notify_hours) == list
+    assert type(max_recipients_per_mail) == int and max_recipients_per_mail > 0
+
+    # align to whole minutes
+    now_second = datetime.now().second
+    if now_second > 5:
+        wait_seconds = 60 - now_second + 1
+        logger.info('Waiting for %d seconds to align to whole minutes...', wait_seconds)
+        try:
+            time.sleep(wait_seconds)
+        except KeyboardInterrupt:
+            return
+
+    logger.info('Starting main loop [period=%d, expire=%d]...', period, expire)
     while True:
         try:
             start_time = time.time()
