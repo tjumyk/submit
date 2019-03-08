@@ -78,7 +78,7 @@ def _process_task_open(task):
     mark_name = 'task_open_%d_%s.mark' % (task.id, str(task.open_time).replace(' ', '_'))
     work_folder = worker_config['work_folder']
     if not os.path.exists(work_folder):
-        os.makedirs(work_folder)
+        os.makedirs(work_folder, mode=0o700)
     mark_path = os.path.join(work_folder, mark_name)
     try:
         with open(mark_path, 'x'):
@@ -97,7 +97,7 @@ def _process_task_due(task, due_hours):
     mark_name = 'task_due_%d_%dh_%s.mark' % (task.id, due_hours, str(task.due_time).replace(' ', '_'))
     work_folder = worker_config['work_folder']
     if not os.path.exists(work_folder):
-        os.makedirs(work_folder)
+        os.makedirs(work_folder, mode=0o700)
     mark_path = os.path.join(work_folder, mark_name)
     try:
         with open(mark_path, 'x'):
