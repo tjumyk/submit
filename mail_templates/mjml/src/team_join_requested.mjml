@@ -13,7 +13,7 @@
           <p><b>{{requester_name}}</b> has <b>requested</b> to join your team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>. </p>
           <p>Please click the following button or open 'My Team' tab in the task page to process this request.</p>
         </mj-text>
-        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team/'>Process Request</mj-button>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team'>Process Request</mj-button>
       </mj-column>
     </mj-section>
     

@@ -10,13 +10,8 @@
       <mj-column>
         <mj-text>
           <h2>Hi,</h2>
-          <p><b>{{operator_name}}</b> has <b>finalised</b> your team, <b>{{team.name}}</b>, for <b>{{task.title}}</b>.</p>
-          <p>To submit your work, </p>
-          <ul>
-            <li>The task must be <b>open</b>.</li>
-            <li>Your team has not reached the <b>submission attempt limit</b>.</li>
-          </ul>
-          <p>If all of the above conditions are satisfied, please click the following button or open the 'New Submission' tab in the task page to submit your work.</p>
+          <p>We kindly remind you that you have not submitted anything for <b>{{task.title}}</b> but it will be due in <b>{{due_hours}}</b> hours.</p>
+          <p>Please click the following button or open the 'New Submission' tab in the task page to submit your work.</p>
         </mj-text>
         <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/submit'>Submit My Work</mj-button>
       </mj-column>

@@ -5,7 +5,8 @@ from dateutil import parser
 from sqlalchemy import func
 
 from error import BasicError
-from models import Task, db, Material, FileRequirement, SpecialConsideration, UserAlias, Team
+from models import Task, db, Material, FileRequirement, SpecialConsideration, UserAlias, Team, user_groups_alias, Term, \
+    Submission, UserTeamAssociation
 
 
 class TaskServiceError(BasicError):
@@ -243,3 +244,36 @@ class TaskService:
                                     submission_attempt_limit_extension=submission_attempt_limit_extension)
         db.session.add(spec)
         return spec
+
+    @staticmethod
+    def get_users_no_submission(task: Task):
+        if task is None:
+            raise TaskServiceError('task is required')
+        if task.is_team_task:
+            raise TaskServiceError('only for non-team task')
+
+        q1 = db.session.query(UserAlias) \
+            .filter(UserAlias.id == user_groups_alias.user_id,
+                    user_groups_alias.group_id == Term.student_group_id,
+                    Term.id == task.term_id)
+        q2 = db.session.query(UserAlias) \
+            .filter(UserAlias.id == Submission.submitter_id,
+                    Submission.task_id == task.id)
+        return q1.except_(q2).all()
+
+    @staticmethod
+    def get_teams_no_submission(task: Task):
+        if task is None:
+            raise TaskServiceError('task is required')
+        if not task.is_team_task:
+            raise TaskServiceError('only for team task')
+
+        q1 = db.session.query(Team) \
+            .filter(Team.task_id == task.id)
+        q2 = db.session.query(Team) \
+            .filter(UserTeamAssociation.team_id == Team.id,
+                    UserTeamAssociation.user_id == Submission.submitter_id,
+                    Team.task_id == task.id,
+                    Submission.task_id == task.id)
+        return q1.except_(q2).all()
+

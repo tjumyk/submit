@@ -1,10 +1,10 @@
 Team Dismissed: {team.name}
-Hi all,
+Hi,
 
 {operator_name} has dismissed the team, {team.name}, for {task.title}.
 
 Please try to join another team or create your own team.
 
-{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team/
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team
 
 {site[name]}
