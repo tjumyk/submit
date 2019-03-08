@@ -45,5 +45,8 @@
         "password": "13246543356754321435"
       }
     ]
+  },
+  "PERIOD_WORKER": {
+    "work_folder": "/tmp/submit_period_work"
   }
 }
