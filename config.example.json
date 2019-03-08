@@ -47,6 +47,10 @@
     ]
   },
   "PERIOD_WORKER": {
-    "work_folder": "/tmp/submit_period_work"
+    "work_folder": "/tmp/submit_period_work",
+    "period": 60,
+    "expire": 600,
+    "due_notify_hours": [24],
+    "max_recipients_per_mail": 100
   }
 }

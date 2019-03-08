@@ -36,18 +36,14 @@ class DelayedKeyboardInterrupt(object):
             self.old_handler(*self.signal_received)
 
 
-period = 5  # period in seconds
-expire_time = 600  # in seconds
-due_notify_hours = [24]
-max_recipients_per_mail = 100
-
-
 def _exec_work():
     now = datetime.utcnow()
+    expire = worker_config['expire']
+    due_notify_hours = worker_config['due_notify_hours']
     with app.test_request_context():
         for task in db.session.query(Task) \
                 .filter(Task.open_time < now,
-                        Task.open_time > now - timedelta(seconds=expire_time),
+                        Task.open_time > now - timedelta(seconds=expire),
                         or_(Task.close_time.is_(None), Task.close_time > now)) \
                 .all():
             _process_task_open(task)
@@ -55,7 +51,7 @@ def _exec_work():
             for task in db.session.query(Task) \
                     .filter(Task.open_time < now,
                             Task.due_time < now + timedelta(hours=due_hours),
-                            Task.due_time > now + timedelta(hours=due_hours) - timedelta(seconds=expire_time),
+                            Task.due_time > now + timedelta(hours=due_hours) - timedelta(seconds=expire),
                             or_(Task.close_time.is_(None), Task.close_time > now),
                             ) \
                     .all():
@@ -64,6 +60,7 @@ def _exec_work():
 
 def _send_email_bcc_batched(template, bcc_list, mail_args):
     total_bcc = len(bcc_list)
+    max_recipients_per_mail = worker_config['max_recipients_per_mail']
     batches = math.ceil(total_bcc / max_recipients_per_mail)
     logger.info('Sending "%s" emails to %d users in %d batches (batch size: %d)...'
                 % (template, total_bcc, batches, max_recipients_per_mail))
@@ -120,6 +117,8 @@ def _process_task_due(task, due_hours):
 
 
 def main():
+    logger.info('Staring Period Worker...')
+    period = worker_config['period']
     while True:
         try:
             start_time = time.time()
