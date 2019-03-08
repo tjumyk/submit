@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import Optional, List, Tuple
 
-from sqlalchemy import or_, func, exists, not_
+from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
@@ -61,11 +61,15 @@ class TeamService:
     def get_free_users_for_task(task) -> List[UserAlias]:
         if task is None:
             raise TeamServiceError('task is required')
-        return db.session.query(UserAlias) \
+        q1 = db.session.query(UserAlias) \
             .filter(task.term_id == Term.id,
                     Term.student_group_id == user_groups_alias.c.group_id,
-                    UserAlias.id == user_groups_alias.c.user_id,
-                    not_(exists().where(UserTeamAssociation.user_id == UserAlias.id)))
+                    UserAlias.id == user_groups_alias.c.user_id)
+        q2 = db.session.query(UserAlias) \
+            .filter(UserTeamAssociation.user_id == UserAlias.id,
+                    UserTeamAssociation.team_id == Team.id,
+                    Team.task_id == task.id)
+        return q1.except_(q2).all()
 
     @staticmethod
     def get_team_association(task: Task, user: UserAlias) -> Optional[UserTeamAssociation]:
