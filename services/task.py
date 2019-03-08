@@ -253,8 +253,8 @@ class TaskService:
             raise TaskServiceError('only for non-team task')
 
         q1 = db.session.query(UserAlias) \
-            .filter(UserAlias.id == user_groups_alias.user_id,
-                    user_groups_alias.group_id == Term.student_group_id,
+            .filter(UserAlias.id == user_groups_alias.c.user_id,
+                    user_groups_alias.c.group_id == Term.student_group_id,
                     Term.id == task.term_id)
         q2 = db.session.query(UserAlias) \
             .filter(UserAlias.id == Submission.submitter_id,
