@@ -154,7 +154,8 @@
                           <li>Each number represents a penalty percentage <b>for a day</b>. E.g. "0.4 0.3 0.2 0.1" means 40% deduction for the first day, 30% deduction for the second day and so on.</li>
                           <li>The accumulative penalty should not be larger than 1.0. Invalid trailing numbers will be fixed or ignored. E.g. "0.5 0.4 0.2 0.1" will be treated as "0.5 0.4 0.1".</li>
                           <li>Trailing numbers with the same value can be omitted. E.g. "0.3 0.3 0.1 0.1 0.1 0.1" can be shortened as "0.3 0.3 0.1".</li>
-                          <li>Max length: {{inputLatePenalty.maxLength}}</li>
+                          <li>"0" means no late penalty.</li>
+                          <li>Max length: {{inputLatePenalty.maxLength}}.</li>
                         </ul>
                       </div>
                     </div>
