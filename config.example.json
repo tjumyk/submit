@@ -51,6 +51,7 @@
     "period": 60,
     "expire": 600,
     "due_notify_hours": [24],
+    "team_join_close_notify_hours": [24],
     "max_recipients_per_mail": 100
   }
 }

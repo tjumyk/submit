@@ -10,6 +10,7 @@ from sqlalchemy import or_
 from models import Task, db
 from server import app
 from services.task import TaskService
+from services.team import TeamService
 from utils.mail import send_email
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -40,6 +41,7 @@ def _exec_work():
     now = datetime.utcnow()
     expire = worker_config['expire']
     due_notify_hours = worker_config['due_notify_hours']
+    team_join_close_notify_hours = worker_config['team_join_close_notify_hours']
     with app.test_request_context():
         for task in db.session.query(Task) \
                 .filter(Task.open_time < now,
@@ -47,6 +49,16 @@ def _exec_work():
                         or_(Task.close_time.is_(None), Task.close_time > now)) \
                 .all():
             _process_task_open(task)
+        for close_hours in team_join_close_notify_hours:
+            for task in db.session.query(Task) \
+                    .filter(Task.is_team_task.is_(True),
+                            Task.open_time < now,
+                            Task.team_join_close_time < now + timedelta(hours=close_hours),
+                            Task.team_join_close_time > now + timedelta(hours=close_hours) - timedelta(seconds=expire),
+                            or_(Task.close_time.is_(None), Task.close_time > now),
+                            ) \
+                    .all():
+                _process_task_team_join_close(task, close_hours)
         for due_hours in due_notify_hours:
             for task in db.session.query(Task) \
                     .filter(Task.open_time < now,
@@ -89,6 +101,24 @@ def _process_task_open(task):
         logger.info('[Process Skipped] %s. Mark File: %s' % (process_name, mark_name))
 
 
+def _process_task_team_join_close(task, close_hours):
+    process_name = 'Task Team Join Close: %r at %s' % (task, task.team_join_close_time)
+    mark_name = 'task_team_join_close_%d_%s.mark' % (task.id, str(task.team_join_close_time).replace(' ', '_'))
+    work_folder = worker_config['work_folder']
+    if not os.path.exists(work_folder):
+        os.makedirs(work_folder, mode=0o700)
+    mark_path = os.path.join(work_folder, mark_name)
+    try:
+        with open(mark_path, 'x'):
+            logger.info('[Process Started] %s' % process_name)
+            mail_args = dict(site=app.config['SITE'], term=task.term, task=task, close_hours=close_hours)
+            bcc_list = [(u.name, u.email) for u in TeamService.get_free_users_for_task(task)]
+            _send_email_bcc_batched('task_team_join_close', bcc_list, mail_args)
+            logger.info('[Process Finished] %s' % process_name)
+    except FileExistsError:
+        logger.info('[Process Skipped] %s. Mark File: %s' % (process_name, mark_name))
+
+
 def _process_task_due(task, due_hours):
     process_name = 'Task Due in %d Hours: %r at %s' % (due_hours, task, task.due_time)
     mark_name = 'task_due_%d_%dh_%s.mark' % (task.id, due_hours, str(task.due_time).replace(' ', '_'))
@@ -99,14 +129,18 @@ def _process_task_due(task, due_hours):
     try:
         with open(mark_path, 'x'):
             logger.info('[Process Started] %s' % process_name)
-            term = task.term
 
-            mail_args = dict(site=app.config['SITE'], term=term, task=task, due_hours=due_hours)
+            mail_args = dict(site=app.config['SITE'], term=task.term, task=task, due_hours=due_hours)
             if task.is_team_task:
+                # lazy teams
                 lazy_teams = TaskService.get_teams_no_submission(task)
                 user_list = (ass.user for team in lazy_teams for ass in team.user_associations)
                 bcc_list = [(u.name, u.email) for u in user_list]
                 _send_email_bcc_batched('task_due_for_team', bcc_list, mail_args)
+
+                # lazier users who even have no teams
+                bcc_list = [(u.name, u.email) for u in TeamService.get_free_users_for_task(task)]
+                _send_email_bcc_batched('task_due_for_no_team', bcc_list, mail_args)
             else:
                 lazy_users = TaskService.get_users_no_submission(task)
                 bcc_list = [(u.name, u.email) for u in lazy_users]
