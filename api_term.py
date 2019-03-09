@@ -40,6 +40,6 @@ def term_tasks(term_id):
             return jsonify(msg='access forbidden'), 403
 
         # Notice: must not expose task details in this api because there's no time check here
-        return jsonify([t.to_dict(with_details=False, with_private_materials=False) for t in term.tasks])
+        return jsonify([t.to_dict(with_details=False, with_advanced_fields=False) for t in term.tasks])
     except TermServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

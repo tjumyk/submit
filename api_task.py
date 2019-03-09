@@ -55,12 +55,12 @@ def do_task(tid):
         if preview_mode:
             return jsonify(task.to_dict())
         else:  # getting task details requires either admin/tutor role or after the opening time
-            with_private_materials = True
+            with_advanced_fields = True
             if 'admin' not in roles and 'tutor' not in roles:
-                with_private_materials = False
+                with_advanced_fields = False  # getting advanced fields requires admin or tutor role
                 if not task.open_time or task.open_time > datetime.utcnow():
                     return jsonify(msg='task has not yet open'), 403
-            return jsonify(task.to_dict(with_details=True, with_private_materials=with_private_materials))
+            return jsonify(task.to_dict(with_details=True, with_advanced_fields=with_advanced_fields))
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

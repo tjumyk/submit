@@ -234,12 +234,12 @@ def admin_task(tid):
             return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            return jsonify(task.to_dict(with_term=True, with_details=True, with_private_materials=True))
+            return jsonify(task.to_dict(with_term=True, with_details=True, with_advanced_fields=True))
         elif request.method == 'PUT':
             params = request.json
             TaskService.update(task, **params)
             db.session.commit()
-            return jsonify(task.to_dict(with_term=True, with_details=True, with_private_materials=True))
+            return jsonify(task.to_dict(with_term=True, with_details=True, with_advanced_fields=True))
         else:  # DELETE
             db.session.delete(task)
             db.session.commit()
