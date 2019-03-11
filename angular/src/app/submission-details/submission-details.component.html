@@ -36,10 +36,16 @@
       <td>{{file.size | size}}</td>
       <td><span [attr.data-tooltip]="file.md5" data-position="bottom center">{{file.md5|slice:0:6}}</span></td>
       <td>
-        <a class="ui mini icon button" href="api/submissions/{{submissionId}}/files/{{file.id}}/download"
-           title="Download">
-          <i class="icon download"></i>
-        </a>
+        <div class="ui mini buttons">
+          <a class="ui icon button" href="api/submissions/{{submissionId}}/files/{{file.id}}/raw" target="_blank"
+             title="View">
+            <i class="icon eye"></i>
+          </a>
+          <a class="ui icon button" href="api/submissions/{{submissionId}}/files/{{file.id}}/download"
+             title="Download">
+            <i class="icon download"></i>
+          </a>
+        </div>
       </td>
     </tr>
     </tbody>

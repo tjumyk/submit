@@ -56,6 +56,7 @@ def do_submission(sid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@submission_api.route('/<int:sid>/files/<int:fid>/raw')
 @submission_api.route('/<int:sid>/files/<int:fid>/download')
 @requires_login
 def submission_file_download(sid, fid):
@@ -79,7 +80,8 @@ def submission_file_download(sid, fid):
             return jsonify(msg='only for admins or tutors'), 403
 
         data_folder = app.config['DATA_FOLDER']
-        return send_from_directory(data_folder, file.path, as_attachment=True)
+        as_attachment = request.path.endswith('/download')
+        return send_from_directory(data_folder, file.path, as_attachment=as_attachment)
     except (SubmissionServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
