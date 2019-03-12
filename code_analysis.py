@@ -5,10 +5,6 @@ from typing import Optional
 
 import astunparse
 
-from models import SubmissionFile, db, Submission
-from server import app
-
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -103,11 +99,7 @@ class CodeSegmentIndex:
 
             return dump, height, total_nodes
 
-        try:
-            root = ast.parse(code)
-        except SyntaxError:
-            logger.warning('Syntax Error in (uid: %s, fid/sid: %s)' % (user_id, file_id))
-            return
+        root = ast.parse(code)
         _iterate_node(root)
 
     def process_file(self, user_id, file_id, file_path: str):
@@ -157,26 +149,36 @@ class CodeSegmentIndex:
             cls.pretty_print_result(r)
 
 
-def process_submissions(task_id: int, requirement_id: int, min_index_height: int):
+def test_process_submissions(task_id: int, requirement_id: int, min_index_height: int):
+    from models import SubmissionFile, db, Submission
+    from server import app
     with app.test_request_context():
         index = CodeSegmentIndex(min_index_height=min_index_height)
         data_folder = app.config['DATA_FOLDER']
-        file_count = 0
         user_set = set()
+        valid_file_count = 0
+        syntax_error_count = 0
         for sid, uid, path in db.session.query(Submission.id, Submission.submitter_id, SubmissionFile.path) \
                 .filter(SubmissionFile.requirement_id == requirement_id,
                         SubmissionFile.submission_id == Submission.id,
                         Submission.task_id == task_id) \
                 .all():
-            index.process_file(uid, sid, os.path.join(data_folder, path))
-            file_count += 1
             user_set.add(uid)
-        logger.info('Processed users: %d files: %d' % (len(user_set), file_count))
+            try:
+                index.process_file(uid, sid, os.path.join(data_folder, path))
+            except SyntaxError:
+                logger.warning('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
+                syntax_error_count += 1
+                continue
+            valid_file_count += 1
+        logger.info('Processed users: %d, valid files: %d, syntax errors: %d' %
+                    (len(user_set), valid_file_count, syntax_error_count))
         return index
 
 
 def test():
-    index = process_submissions(1, 1, 5)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    index = test_process_submissions(1, 1, 5)
     results = index.get_duplicates(max_occ_users=100)
     index.pretty_print_results(results)
 
