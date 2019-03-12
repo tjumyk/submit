@@ -7,3 +7,5 @@ Pillow
 celery[redis]
 docker
 astunparse
+python-magic
+

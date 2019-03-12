@@ -211,6 +211,7 @@ def task_anti_plagiarism(task_id, requirement_id):
         user_set = set()
         valid_file_count = 0
         syntax_error_count = 0
+        io_error_count = 0
 
         for sid, uid, file in SubmissionService.get_files(requirement_id):
             user_set.add(uid)
@@ -220,9 +221,13 @@ def task_anti_plagiarism(task_id, requirement_id):
                 logger.warning('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
                 syntax_error_count += 1
                 continue
+            except IOError:
+                logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
+                io_error_count += 1
+                continue
             valid_file_count += 1
-        logger.info('Processed users: %d, valid files: %d, syntax errors: %d' %
-                    (len(user_set), valid_file_count, syntax_error_count))
+        logger.info('Processed users: %d, valid files: %d, syntax errors: %d, io errors: %d' %
+                    (len(user_set), valid_file_count, syntax_error_count, io_error_count))
 
         results = index.get_duplicates()[0:100]  # return top 100 results
         with StringIO() as buffer:

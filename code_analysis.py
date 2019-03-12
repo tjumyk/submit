@@ -5,6 +5,7 @@ import sys
 from typing import Optional
 
 import astunparse
+import magic
 
 logger = logging.getLogger(__name__)
 
@@ -104,8 +105,16 @@ class CodeSegmentIndex:
         _iterate_node(root)
 
     def process_file(self, user_id, file_id, file_path: str):
-        with open(file_path) as f:
-            code = f.read()
+        with open(file_path, 'rb') as f:
+            buffer = f.read()
+        encoding = magic.Magic(mime_encoding=True).from_buffer(buffer)
+        if encoding == 'binary':
+            raise IOError('binary file detected: uid=%s, fid/sid=%s, path=%s' % (user_id, file_id, file_path))
+        try:
+            code = buffer.decode(encoding)
+        except (ValueError, LookupError):
+            raise IOError('failed to decode file with %s encoding: uid=%s, fid/sid=%s, path=%s'
+                          % (encoding, user_id, file_id, file_path))
         self.process_code(user_id, file_id, code)
 
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
