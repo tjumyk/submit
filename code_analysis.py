@@ -116,7 +116,7 @@ class CodeSegmentIndex:
         self.process_code(user_id, file_id, code)
 
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
-                       min_total_nodes: int = 1, max_total_nodes: int = None,
+                       min_total_nodes: int = None, max_total_nodes: int = None,
                        min_height: int = None, max_height: int = None,
                        sort_by: str = 'total_nodes'):
         results = []
