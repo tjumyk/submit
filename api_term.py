@@ -1,9 +1,7 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
-from models import db
 from auth_connect.oauth import requires_login
 from services.account import AccountService
-from services.team import TeamServiceError, TeamService
 from services.term import TermService, TermServiceError
 
 term_api = Blueprint('term_api', __name__)
@@ -40,6 +38,7 @@ def term_tasks(term_id):
             return jsonify(msg='access forbidden'), 403
 
         # Notice: must not expose task details in this api because there's no time check here
-        return jsonify([t.to_dict(with_details=False, with_advanced_fields=False) for t in term.tasks])
+        return jsonify([t.to_dict(with_details=False, with_advanced_fields=False)
+                        for t in sorted(term.tasks, key=lambda t: t.id)])
     except TermServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
