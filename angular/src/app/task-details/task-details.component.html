@@ -54,6 +54,10 @@
       <li class="item" *ngFor="let req of task.file_requirements">
         <div class="content">
           <div class="header">{{req.name}}</div>
+          <a href="api/tasks/{{task.id}}/anti-plagiarism/{{req.id}}" target="_blank"
+             *ngIf="req.name.endsWith('.py') && (accessRoles.has('admin') || accessRoles.has('tutor'))" title="Anti-Plagiarism">
+            <i class="ui red shield alternate icon"></i>
+          </a>
           <div class="metadata">
             <span *ngIf="req.is_optional">(Optional)</span>
             <span *ngIf="req.size_limit!=null; else noSizeLimit">Up to {{req.size_limit | size}}</span>

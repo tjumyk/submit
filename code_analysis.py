@@ -1,6 +1,7 @@
 import ast
 import logging
 import os
+import sys
 from typing import Optional
 
 import astunparse
@@ -131,22 +132,22 @@ class CodeSegmentIndex:
         return results
 
     @staticmethod
-    def pretty_print_result(result):
+    def pretty_print_result(result, file=sys.stdout):
         segment, occ_users = result
-        print('%-18s%-22s%s' % ('User ID', 'File/Submission ID', 'Location'))
+        print('%-18s%-22s%s' % ('User ID', 'File/Submission ID', 'Location'), file=file)
         for uid, occ_user_items in occ_users.items():
-            print(uid)
+            print(uid, file=file)
             for occ in occ_user_items:
-                print('%-18s%-22sLine %s, Col %s' % ('', occ.file_id, occ.lineno, occ.col_offset))
-        print('AST Nodes: %d, Height: %d' % (segment.total_nodes, segment.height))
-        print(astunparse.unparse(segment.node))
+                print('%-18s%-22sLine %s, Col %s' % ('', occ.file_id, occ.lineno, occ.col_offset), file=file)
+        print('AST Nodes: %d, Height: %d' % (segment.total_nodes, segment.height), file=file)
+        print(astunparse.unparse(segment.node), file=file)
 
     @classmethod
-    def pretty_print_results(cls, results):
-        print('Total Results: %d' % len(results))
+    def pretty_print_results(cls, results, file=sys.stdout):
+        print('Total Results: %d' % len(results), file=file)
         for i, r in enumerate(results):
-            print('--------------------------- #%-2s ---------------------------' % (i + 1))
-            cls.pretty_print_result(r)
+            print('--------------------------- #%-2s ---------------------------' % (i + 1), file=file)
+            cls.pretty_print_result(r, file=file)
 
 
 def test_process_submissions(task_id: int, requirement_id: int, min_index_height: int):

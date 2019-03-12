@@ -93,6 +93,13 @@ class SubmissionService:
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
+    def get_files(requirement_id: int) -> List[Tuple[int, int, SubmissionFile]]:
+        return db.session.query(Submission.id, Submission.submitter_id, SubmissionFile)\
+            .filter(SubmissionFile.requirement_id == requirement_id,
+                    Submission.id == SubmissionFile.submission_id)\
+            .all()
+
+    @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
         if task is None:
             raise SubmissionServiceError('task is required')

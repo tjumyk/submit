@@ -172,7 +172,7 @@ class TaskService:
         return req
 
     @staticmethod
-    def get_file_requirement(_id):
+    def get_file_requirement(_id) -> Optional[FileRequirement]:
         if _id is None:
             raise TaskServiceError('id is required')
         if type(_id) is not int:
@@ -276,4 +276,3 @@ class TaskService:
                     Team.task_id == task.id,
                     Submission.task_id == task.id)
         return q1.except_(q2).all()
-

@@ -1,16 +1,19 @@
 import json
+import logging
 import os
 import shutil
 import tempfile
 import time
 import zipfile
 from datetime import datetime
+from io import StringIO
 from typing import Optional
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
-from models import db, SpecialConsideration, UserTeamAssociation
 from auth_connect.oauth import requires_login
+from code_analysis import CodeSegmentIndex
+from models import db, SpecialConsideration, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
@@ -20,6 +23,7 @@ from services.term import TermService, TermServiceError
 from utils.upload import md5sum
 
 task_api = Blueprint('task_api', __name__)
+logger = logging.getLogger(__name__)
 
 
 class SubmissionStatus:
@@ -172,6 +176,59 @@ def get_user(task_id, uid):
 
         return jsonify(target_user.to_dict())
     except AccountServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/anti-plagiarism/<int:requirement_id>')
+@requires_login
+def task_anti_plagiarism(task_id, requirement_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 500
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        requirement = TaskService.get_file_requirement(requirement_id)
+        if requirement is None:
+            return jsonify(msg='requirement not found'), 404
+        if requirement.task_id != task_id:
+            return jsonify(msg='requirement does not belong to this task'), 400
+        if not requirement.name.endswith('.py'):
+            return jsonify(msg='file type not supported'), 400
+
+        index = CodeSegmentIndex(min_index_height=5)
+        data_folder = app.config['DATA_FOLDER']
+        user_set = set()
+        valid_file_count = 0
+        syntax_error_count = 0
+
+        for sid, uid, file in SubmissionService.get_files(requirement_id):
+            user_set.add(uid)
+            try:
+                index.process_file(uid, sid, os.path.join(data_folder, file.path))
+            except SyntaxError:
+                logger.warning('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
+                syntax_error_count += 1
+                continue
+            valid_file_count += 1
+        logger.info('Processed users: %d, valid files: %d, syntax errors: %d' %
+                    (len(user_set), valid_file_count, syntax_error_count))
+
+        results = index.get_duplicates()[0:100]  # return top 100 results
+        with StringIO() as buffer:
+            index.pretty_print_results(results, file=buffer)
+            return buffer.getvalue(), {'Content-Type': 'text/plain'}
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
