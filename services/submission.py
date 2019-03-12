@@ -6,11 +6,11 @@ from celery.result import AsyncResult
 from sqlalchemy import desc, func
 from werkzeug.datastructures import FileStorage
 
-from testbot import bot
 from error import BasicError
 from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest
 from services.auto_test import AutoTestService
 from services.task import TaskService
+from testbot import bot
 
 
 class SubmissionServiceError(BasicError):
@@ -93,13 +93,6 @@ class SubmissionService:
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
-    def get_files(requirement_id: int) -> List[Tuple[int, int, SubmissionFile]]:
-        return db.session.query(Submission.id, Submission.submitter_id, SubmissionFile)\
-            .filter(SubmissionFile.requirement_id == requirement_id,
-                    Submission.id == SubmissionFile.submission_id)\
-            .all()
-
-    @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
         if task is None:
             raise SubmissionServiceError('task is required')
@@ -153,6 +146,13 @@ class SubmissionService:
         if type(_id) is not int:
             raise SubmissionServiceError('id must be an integer')
         return SubmissionFile.query.get(_id)
+
+    @staticmethod
+    def get_files(requirement_id: int) -> List[Tuple[int, int, SubmissionFile]]:
+        return db.session.query(Submission.id, Submission.submitter_id, SubmissionFile) \
+            .filter(SubmissionFile.requirement_id == requirement_id,
+                    Submission.id == SubmissionFile.submission_id) \
+            .all()
 
     @staticmethod
     def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str]) \
