@@ -8,6 +8,8 @@
   "MAIL": {
     "display_name": "submit@UNSWKG",
     "from": "admin@unswkg",
+    "reply_to_name": "Do Not Reply",
+    "reply_to": "noreply@example.com",
     "mock_folder": "mailbox"
   },
   "SITE": {

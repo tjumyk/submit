@@ -60,6 +60,13 @@ def prepare_email(template: str, to_list: List[Tuple[str, str]], cc_list: List[T
     msg = EmailMessage()
     from_user, from_domain = mail_config['from'].split('@', 1)
     msg['From'] = Address(mail_config['display_name'], from_user, from_domain)
+
+    reply_to_address = mail_config.get('reply_to')
+    if reply_to_address:
+        reply_to_user, reply_to_domain = reply_to_address.split('@', 1)
+        reply_to_name = mail_config.get('reply_to_name') or ''
+        msg['Reply-To'] = Address(reply_to_name, reply_to_user, reply_to_domain)
+
     if to_list:
         msg['To'] = _make_recipient_header(to_list)
     if cc_list:
