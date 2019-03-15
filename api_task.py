@@ -216,7 +216,7 @@ def task_anti_plagiarism(task_id, requirement_id):
         for sid, uid, file in SubmissionService.get_files(requirement_id):
             user_set.add(uid)
             try:
-                index.process_file(uid, sid, os.path.join(data_folder, file.path))
+                index.process_file(uid, sid, os.path.join(data_folder, file.path), file.md5)
             except SyntaxError:
                 logger.warning('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
                 syntax_error_count += 1

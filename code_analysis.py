@@ -7,6 +7,8 @@ from typing import Optional
 import astunparse
 import magic
 
+from utils.upload import md5sum
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,15 +34,16 @@ class CodeSegment:
 
 
 class CodeOccurrence:
-    def __init__(self, user_id, file_id, lineno: Optional[int], col_offset: Optional[int]):
+    def __init__(self, user_id, file_id, file_md5: str, lineno: Optional[int], col_offset: Optional[int]):
         self.user_id = user_id
         self.file_id = file_id
+        self.file_md5 = file_md5
         self.lineno = lineno
         self.col_offset = col_offset
 
     def __repr__(self):
-        return '<CodeOccurrence user=%s, file=%s, line=%s, col=%s>' % \
-               (self.user_id, self.file_id, self.lineno, self.col_offset)
+        return '<CodeOccurrence user=%s, file=%s, md5=%s, line=%s, col=%s>' % \
+               (self.user_id, self.file_id, self.file_md5, self.lineno, self.col_offset)
 
 
 class CodeSegmentIndex:
@@ -57,7 +60,7 @@ class CodeSegmentIndex:
             occ_users[occurrence.user_id] = occ_user_items = []
         occ_user_items.append(occurrence)
 
-    def process_code(self, user_id, file_id, code: str):
+    def process_code(self, user_id, file_id, code: str, file_md5: str):
         def _iterate_node(node):
             height = 1
             total_nodes = 1
@@ -81,7 +84,7 @@ class CodeSegmentIndex:
                             col_offset = node_dump
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, lineno, col_offset))
+                              CodeOccurrence(user_id, file_id, file_md5, lineno, col_offset))
             elif isinstance(node, list):
                 items = []
                 for x in node:
@@ -92,19 +95,19 @@ class CodeSegmentIndex:
                 dump = '[%s]' % ', '.join(items)
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, None, None))
+                              CodeOccurrence(user_id, file_id, file_md5, None, None))
             else:
                 dump = repr(node)
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, None, None))
+                              CodeOccurrence(user_id, file_id, file_md5, None, None))
 
             return dump, height, total_nodes
 
         root = ast.parse(code)
         _iterate_node(root)
 
-    def process_file(self, user_id, file_id, file_path: str):
+    def process_file(self, user_id, file_id, file_path: str, file_md5: str = None):
         with open(file_path, 'rb') as f:
             buffer = f.read()
         encoding = magic.Magic(mime_encoding=True).from_buffer(buffer)
@@ -115,7 +118,9 @@ class CodeSegmentIndex:
         except (ValueError, LookupError):
             raise IOError('failed to decode file with %s encoding: uid=%s, fid/sid=%s, path=%s'
                           % (encoding, user_id, file_id, file_path))
-        self.process_code(user_id, file_id, code)
+        if not file_md5:  # if no md5 given, compute it now
+            file_md5 = md5sum(file_path)
+        self.process_code(user_id, file_id, code, file_md5)
 
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
                        min_total_nodes: int = None, max_total_nodes: int = None,
@@ -143,11 +148,13 @@ class CodeSegmentIndex:
     @staticmethod
     def pretty_print_result(result, file=sys.stdout):
         segment, occ_users = result
-        print('%-18s%-22s%s' % ('User ID', 'File/Submission ID', 'Location'), file=file)
+        print('%-18s%-22s%-8s%s' % ('User ID', 'File/Submission ID', 'MD5', 'Location'), file=file)
         for uid, occ_user_items in occ_users.items():
             print(uid, file=file)
             for occ in occ_user_items:
-                print('%-18s%-22sLine %s, Col %s' % ('', occ.file_id, occ.lineno, occ.col_offset), file=file)
+                md5_short = occ.file_md5[:6] if occ.file_md5 else occ.file_md5
+                print('%-18s%-22s%-8sLine %s, Col %s' % ('', occ.file_id, md5_short, occ.lineno, occ.col_offset),
+                      file=file)
         print('AST Nodes: %d, Height: %d' % (segment.total_nodes, segment.height), file=file)
         print(astunparse.unparse(segment.node), file=file)
 
