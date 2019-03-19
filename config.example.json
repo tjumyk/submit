@@ -10,7 +10,11 @@
     "from": "admin@unswkg",
     "reply_to_name": "Do Not Reply",
     "reply_to": "noreply@example.com",
-    "mock_folder": "mailbox"
+    "mock_folder": null,
+    "mail_catcher": {
+      "host": "127.0.0.1",
+      "port": 1025
+    }
   },
   "SITE": {
     "name": "UNSWKG Submit",

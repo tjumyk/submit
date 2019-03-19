@@ -1,5 +1,6 @@
 import os
 import re
+import smtplib
 import time
 from email.headerregistry import Address
 from email.message import EmailMessage
@@ -40,7 +41,10 @@ class PreparedEmail:
         self.bcc_list = bcc_list
 
     def send(self):
-        mock_folder = app.config['MAIL'].get('mock_folder')
+        mail_config = app.config['MAIL']
+
+        # use mock folder?
+        mock_folder = mail_config.get('mock_folder')
         if mock_folder:
             if self.to_list:
                 _send_mock_folder(self.msg, 'To', self.to_list, mock_folder)
@@ -48,9 +52,18 @@ class PreparedEmail:
                 _send_mock_folder(self.msg, 'Cc', self.cc_list, mock_folder)
             if self.bcc_list:
                 _send_mock_folder(self.msg, 'Bcc', self.bcc_list, mock_folder)
-        else:
-            p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
-            p.communicate(self.msg.as_bytes())
+            return
+
+        # use mail_catcher? (https://github.com/sj26/mailcatcher)
+        mail_catcher_config = mail_config.get('mail_catcher')
+        if mail_catcher_config:
+            with smtplib.SMTP(host=mail_catcher_config.get('host'), port=mail_catcher_config.get('port')) as smtp:
+                smtp.send_message(self.msg)
+            return
+
+        # use sendmail directly
+        p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
+        p.communicate(self.msg.as_bytes())
 
 
 def prepare_email(template: str, to_list: List[Tuple[str, str]], cc_list: List[Tuple[str, str]] = None,
