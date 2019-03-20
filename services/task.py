@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from error import BasicError
 from models import Task, db, Material, FileRequirement, SpecialConsideration, UserAlias, Team, user_groups_alias, Term, \
-    Submission, UserTeamAssociation
+    Submission, UserTeamAssociation, AutoTestConfig
 
 
 class TaskServiceError(BasicError):
@@ -40,9 +40,25 @@ class TaskService:
         'team_join_close_time',
         'submission_attempt_limit',
         'submission_history_limit',
-        'evaluation_method',
-        'auto_test_trigger',
-        'auto_test_environment_id',
+        'evaluation_method'
+    }
+
+    auto_test_config_fields = {
+        'name',
+        'type',
+        'description',
+        'is_enabled',
+        'is_private',
+        'priority',
+        'trigger',
+        'docker_auto_remove',
+        'docker_cpus',
+        'docker_memory',
+        'docker_network',
+        'result_render_html',
+        'result_conclusion_type',
+        'result_conclusion_path',
+        'results_conclusion_accumulate_method',
     }
 
     @staticmethod
@@ -145,6 +161,113 @@ class TaskService:
             raise TaskServiceError('id must be an integer')
 
         return Material.query.get(_id)
+
+    @classmethod
+    def add_auto_test_config(cls, task, **kwargs):
+        if task is None:
+            raise TaskServiceError('task is required')
+        name = kwargs.pop('name', None)
+        if not name:
+            raise TaskServiceError('name is required')
+        _type = kwargs.pop('type', None)
+        if not _type:
+            raise TaskServiceError('type is required')
+
+        if len(name) > 128:
+            raise TaskServiceError('name too long')
+
+        config = AutoTestConfig(task_id=task.id, name=name, type=_type)
+
+        environment = kwargs.pop('environment', None)
+        if environment:
+            if environment.task_id != task.id:
+                raise TaskServiceError('environment material does not belong to this task')
+            config.environment_id = environment.id
+        else:
+            config.environment_id = None
+
+        for k, v in kwargs.items():
+            if k not in cls.auto_test_config_fields:
+                raise TaskServiceError('invalid field: %s' % k)
+            if k == 'description':
+                if v and len(v) > 256:
+                    raise TaskServiceError('description too long')
+            elif k == 'result_conclusion_path':
+                if v and len(v) > 128:
+                    raise TaskServiceError('result conclusion path too long')
+
+            setattr(config, k, v)
+
+        cls._check_auto_test_config(config)
+
+        if db.session.query(func.count()).filter(AutoTestConfig.task_id == task.id,
+                                                 AutoTestConfig.name == name).scalar():
+            raise TaskServiceError('duplicate name')
+
+        db.session.add(config)
+        return config
+
+    @classmethod
+    def update_auto_test_config(cls, config: AutoTestConfig, **kwargs):
+        if config is None:
+            raise TaskServiceError('auto test config is required')
+
+        environment = kwargs.pop('environment', None)
+        if environment:
+            if environment.task_id != config.task_id:
+                raise TaskServiceError('environment material does not belong to this task')
+            config.environment_id = environment.id
+        else:
+            config.environment_id = None
+
+        for k, v in kwargs.items():
+            if k not in cls.auto_test_config_fields:
+                raise TaskServiceError('invalid field: %s' % k)
+            if k == 'name':
+                if not v:
+                    raise TaskServiceError('name is required')
+                if len(v) > 128:
+                    raise TaskServiceError('name too long')
+            elif k == 'type':
+                if not v:
+                    raise TaskServiceError('type is required')
+            elif k == 'description':
+                if v and len(v) > 256:
+                    raise TaskServiceError('description too long')
+            elif k == 'result_conclusion_path':
+                if v and len(v) > 128:
+                    raise TaskServiceError('result conclusion path too long')
+            setattr(config, k, v)
+        cls._check_auto_test_config(config)
+
+        if db.session.query(func.count()).filter(AutoTestConfig.task_id == config.task_id,
+                                                 AutoTestConfig.name == config.name,
+                                                 AutoTestConfig.id != config.id).scalar():
+            raise TaskServiceError('duplicate name')
+
+        return config
+
+    @staticmethod
+    def _check_auto_test_config(config: AutoTestConfig):
+        if config.type in {'run-script', 'docker'} and not config.environment_id:
+            raise TaskServiceError('no test environment specified')
+
+        con_type = config.result_conclusion_type
+        acc_method = config.results_conclusion_accumulate_method
+        if (con_type in {'int', 'float'} and acc_method not in {'last', 'first', 'highest', 'lowest', 'average'}) or \
+                (con_type == 'bool' and acc_method not in {'last', 'first', 'and', 'or'}) or \
+                (con_type in {'string', 'json'} and acc_method not in {'last', 'first'}):
+            raise TaskServiceError('invalid accumulate method',
+                                   'conclusion type: %s, accumulate method: %s' % (con_type, acc_method))
+
+    @staticmethod
+    def get_auto_test_config(_id):
+        if _id is None:
+            raise TaskServiceError('id is required')
+        if type(_id) is not int:
+            raise TaskServiceError('id must be an integer')
+
+        return AutoTestConfig.query.get(_id)
 
     @classmethod
     def add_file_requirement(cls, task, name, description, is_optional, size_limit):

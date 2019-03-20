@@ -32,7 +32,6 @@ export class TaskComponent implements OnInit, OnDestroy {
   printTaskTeamSize = TaskService.printTaskTeamSize;
 
   latePenalty: LatePenalty;
-  autoTestEnvironment: Material;
 
   constructor(
     private accountService: AccountService,
@@ -85,16 +84,6 @@ export class TaskComponent implements OnInit, OnDestroy {
     this.task = task;
     this.latePenalty = LatePenalty.parse(task.late_penalty);
     this.category = TaskService.categories[task.type];
-
-    // find auto test environment if exists and visible
-    if(task.auto_test_environment_id != null){
-      for(let mat of task.materials){
-        if(mat.id == task.auto_test_environment_id){
-          this.autoTestEnvironment = mat;
-          break;
-        }
-      }
-    }
 
     const timeTracker = () => {
       this.beforeOpen = !task.open_time || !moment(task.open_time).isSameOrBefore(moment.now());

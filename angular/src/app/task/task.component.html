@@ -182,29 +182,6 @@
                 </div>
               </div>
             </div>
-            <div class="item" *ngIf="task.evaluation_method=='auto_test'">
-              <i class="icon play circle outline"></i>
-              <div class="content">
-                <div class="header">Auto Test Trigger</div>
-                <div class="description">
-                  <span *ngIf="task.auto_test_trigger=='submission'">Triggered after each new submission</span>
-                  <span *ngIf="!task.auto_test_trigger">Manually triggered</span>
-                </div>
-              </div>
-            </div>
-            <div class="item" *ngIf="task.evaluation_method=='auto_test'
-              && (task.auto_test_environment_id!=null && autoTestEnvironment || task.auto_test_environment_id==null)">
-              <i class="icon terminal"></i>
-              <div class="content">
-                <div class="header">Auto Test Environment</div>
-                <div class="description">
-                  <ng-container *ngIf="task.auto_test_environment_id!=null; else noAutoTestEnvironment">
-                    {{ autoTestEnvironment.name + (autoTestEnvironment.is_private ? ' (private)' : ' (public)')}}
-                  </ng-container>
-                  <ng-template #noAutoTestEnvironment>(None)</ng-template>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <!--End of Submission Info-->

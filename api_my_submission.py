@@ -66,6 +66,8 @@ def auto_test_and_results(sid):
 
         tests = []
         for test in submission.auto_tests:
+            if test.config.is_private:  # skip private tests
+                continue
             test_obj = test.to_dict()
             if not test.final_state:  # running tests
                 result_obj = AutoTestService.result_to_dict(AutoTestService.get_result(test))

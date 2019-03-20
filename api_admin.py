@@ -456,6 +456,64 @@ def admin_file_requirement(rid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin_api.route('/tasks/<int:tid>/auto-test-configs', methods=['GET', 'POST'])
+@requires_admin
+def admin_task_auto_test_configs(tid):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        if request.method == 'GET':
+            return jsonify(c.to_dict(with_advanced_fields=True) for c in task.auto_test_configs)
+        else:  # POST
+            params = request.json
+
+            env_id = params.pop('environment_id', None)
+            if env_id:
+                env = TaskService.get_material(env_id)
+                if env is None:
+                    return jsonify(msg='environment material not found')
+                params['environment'] = env
+
+            config = TaskService.add_auto_test_config(task, **params)
+
+            db.session.commit()
+            return jsonify(config.to_dict(with_advanced_fields=True)), 201
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/auto-test-configs/<int:cid>', methods=['PUT', 'DELETE'])
+@requires_admin
+def admin_task_auto_test_config(cid):
+    try:
+        config = TaskService.get_auto_test_config(cid)
+        if config is None:
+            return jsonify(msg='auto test config not found'), 404
+
+        if request.method == 'PUT':
+            params = request.json
+
+            env_id = params.pop('environment_id', None)
+            if env_id:
+                env = TaskService.get_material(env_id)
+                if env is None:
+                    return jsonify(msg='environment material not found')
+                params['environment'] = env
+
+            config = TaskService.update_auto_test_config(config, **params)
+
+            db.session.commit()
+            return jsonify(config.to_dict(with_advanced_fields=True))
+        else:  # DELETE
+            db.session.delete(config)
+            db.session.commit()
+            return "", 204
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin_api.route('/teams/<int:team_id>', methods=['GET', 'PUT', 'DELETE'])
 @requires_admin
 def admin_team(team_id):
@@ -539,15 +597,18 @@ def admin_special_consideration(spec_id):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/submissions/<int:sid>/run-auto-test')
+@admin_api.route('/submissions/<int:sid>/run-auto-test/<int:cid>')
 @requires_admin
-def admin_run_test(sid):
+def admin_run_test(sid, cid):
     try:
         submission = SubmissionService.get(sid)
         if submission is None:
             return jsonify(msg='submission not found'), 404
+        config = TaskService.get_auto_test_config(cid)
+        if config is None:
+            return jsonify(msg='auto test config not found'), 404
 
-        test, result = SubmissionService.run_auto_test(submission)
+        test, result = SubmissionService.run_auto_test(submission, config)
         db.session.commit()
 
         test_obj = test.to_dict(with_advanced_fields=True)

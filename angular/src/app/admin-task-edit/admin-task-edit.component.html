@@ -79,6 +79,10 @@
           Requirements
           <i class="icon copy outline"></i>
         </a>
+        <a class="item" (click)="activeTab='auto_test_configs'; editingAutoTestConfig=null" [ngClass]="{'active': activeTab=='auto_test_configs'}">
+          Auto Test Configurations
+          <i class="icon terminal"></i>
+        </a>
         <a class="item" (click)="activeTab='special_considerations'" [ngClass]="{'active': activeTab=='special_considerations'}">
           Special Considerations
           <i class="icon heart outline"></i>
@@ -198,25 +202,6 @@
                       <option [ngValue]="null">Offline</option>
                     </select>
                   </div>
-                  <div class="field" *ngIf="form.evaluation_method=='auto_test'">
-                    <label>Auto Test Trigger</label>
-                    <select name="auto_test_trigger" [(ngModel)]="form.auto_test_trigger">
-                      <option value="submission">Triggered after each new submission</option>
-                      <option [ngValue]="null">Manually triggered</option>
-                    </select>
-                  </div>
-                  <div class="field" *ngIf="form.evaluation_method=='auto_test'">
-                    <label>Auto Test Environment</label>
-                    <select name="auto_test_environment_id" [(ngModel)]="form.auto_test_environment_id">
-                      <option [ngValue]="null">(None)</option>
-                      <ng-container *ngFor="let mat of task.materials">
-                        <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
-                          {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
-                        </option>
-                      </ng-container>
-                    </select>
-                    <p *ngIf="form.auto_test_environment_id==null"><i class="icon exclamation triangle yellow"></i> Please upload the test environment as a new Material or select a test environment from existing Materials</p>
-                  </div>
                 </div>
               </div>
 
@@ -255,7 +240,6 @@
                 <a href="api/admin/materials/{{ mat.id }}/download" title="Download" class="ui button icon"><i class="icon download"></i></a>
                 <a class="ui button icon primary" title="Update" (click)="updateMaterialSelectFile(mat, inputFileUpdateMaterial)" #btnUpdateMaterial><i class="icon upload"></i></a>
                 <a class="ui button red icon" title="Delete" (click)="deleteMaterial(mat, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></a>
-                <a class="ui button icon" title="Validate Test Environment" (click)="validateTestEnvironment(mat, btnValidateTestEnvironment)" #btnValidateTestEnvironment *ngIf="mat.type=='test environment'"><i class="icon question"></i></a>
               </div>
               <form class="hidden">
                 <input type="file" (change)="updateMaterialFile(mat, i, btnUpdateMaterial, inputFileUpdateMaterial)" #inputFileUpdateMaterial>
@@ -414,6 +398,259 @@
         <!--End of New Requirement-->
       </div>
       <!-- End of Requirements tab -->
+
+      <!-- AutoTestConfig tab -->
+      <div class="ui tab" [ngClass]="{'active': activeTab=='auto_test_configs'}">
+        <ng-container *ngIf="task.evaluation_method=='auto_test'; else noAutoTestEvaluation">
+          <div class="ui menu secondary pointing">
+            <a class="item" (click)="editingAutoTestConfig=null"  [ngClass]="{'active': editingAutoTestConfig==null}">Configurations</a>
+            <a class="item active" *ngIf="editingAutoTestConfig">Editing: {{editingAutoTestConfig.name}}</a>
+          </div>
+
+          <ng-container *ngIf="!editingAutoTestConfig; else editAutoTestConfigPanel">
+            <table class="ui bottom attached table celled unstackable">
+              <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Flags</th><th>Updated At</th><th>Description</th><th>Ops</th></tr></thead>
+              <tbody>
+              <tr *ngFor="let config of task.auto_test_configs; index as i">
+                <td>{{ config.id }}</td>
+                <td>{{ config.name }}</td>
+                <td>{{ config.type}}</td>
+                <td>
+                  <i title="Enabled" class="icon green play circle" *ngIf="config.is_enabled; else auto_test_config_disabled"></i>
+                  <i title="Private" class="icon red lock" *ngIf="config.is_private; else auto_test_config_private"></i>
+                  <ng-template #auto_test_config_disabled>
+                    <i title="Disabled" class="icon red times circle"></i>
+                  </ng-template>
+                  <ng-template #auto_test_config_private>
+                    <i title="Public" class="icon green lock open"></i>
+                  </ng-template>
+                </td>
+                <td>{{ config.modified_at | date: 'short' }}</td>
+                <td>{{ config.description }}</td>
+                <td>
+                  <a class="ui button small icon" (click)="editAutoTestConfig(config)"><i class="icon edit"></i></a>
+                  <a class="ui button small red icon" (click)="deleteAutoTestConfig(config, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+            <!-- Start of New AutoTestConfig -->
+            <div class="ui centered stackable grid">
+              <div class="ten wide column">
+                <div class="ui segments">
+                  <div class="ui segment">
+                    <h4 class="ui header">
+                      <i class="icons">
+                        <i class="icon terminal"></i>
+                        <i class="icon plus right bottom corner"></i>
+                      </i>
+                      New Configuration
+                    </h4>
+                  </div>
+                  <div class="ui segment">
+                    <form class="ui form" #fNewAutoTestConfig="ngForm" (ngSubmit)="addAutoTestConfig(fNewAutoTestConfig)" [ngClass]="{'loading': addingAutoTestConfig}">
+                      <div class="field required" [ngClass]="{'error': (fNewAutoTestConfig.submitted ||autoTestConfigNameModel.dirty||autoTestConfigNameModel.touched) && autoTestConfigNameModel.invalid}">
+                        <label>Name</label>
+                        <input type="text" name="name" placeholder="Name (at most 128 characters)"
+                               [(ngModel)]="newAutoTestConfigForm.name" #autoTestConfigNameModel="ngModel"
+                               required maxlength="128">
+                        <div class="errors">
+                          <label *ngIf="autoTestConfigNameModel.errors?.required">Name is required</label>
+                          <label *ngIf="autoTestConfigNameModel.errors?.maxlength">Name is too long</label>
+                        </div>
+                      </div>
+                      <div class="field required" [ngClass]="{'error': (autoTestConfigTypeModel.touched || autoTestConfigTypeModel.dirty || fNewAutoTestConfig.submitted) && autoTestConfigTypeModel.invalid}">
+                        <label>Type</label>
+                        <select name="type" [(ngModel)]="newAutoTestConfigForm.type" required #autoTestConfigTypeModel="ngModel">
+                          <option value="docker">Docker</option>
+                          <option value="run-script">Run Script</option>
+                        </select>
+                        <div class="errors">
+                          <label *ngIf="autoTestConfigTypeModel.errors?.required">Type is required</label>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <div class="ui input checkbox" (click)="checkboxAutoTestConfigIsEnabled.click()">
+                          <input type="checkbox" tabindex="0" class="hidden" #checkboxAutoTestConfigIsEnabled name="is_enabled" [(ngModel)]="newAutoTestConfigForm.is_enabled">
+                          <label>Enabled?</label>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <div class="ui input checkbox" (click)="checkboxAutoTestConfigIsPrivate.click()">
+                          <input type="checkbox" tabindex="0" class="hidden" #checkboxAutoTestConfigIsPrivate name="is_private" [(ngModel)]="newAutoTestConfigForm.is_private">
+                          <label>Private?</label>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label>Description (Optional)</label>
+                        <textarea name="description" rows="3" [(ngModel)]="newAutoTestConfigForm.description" placeholder="Description (at most 256 characters)"></textarea>
+                      </div>
+                      <div *ngIf="newAutoTestConfigForm.type=='docker' || newAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (autoTestConfigEnvironmentId.touched || autoTestConfigEnvironmentId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigEnvironmentId.invalid}">
+                        <label>Test Environment</label>
+                        <select name="environment_id" [(ngModel)]="newAutoTestConfigForm.environment_id" required #autoTestConfigEnvironmentId="ngModel">
+                          <ng-container *ngFor="let mat of task.materials">
+                            <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
+                              {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
+                            </option>
+                          </ng-container>
+                        </select>
+                        <div class="errors">
+                          <label *ngIf="autoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
+                        </div>
+                      </div>
+                      <button class="ui fluid primary button" type="submit">Add Configuration</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End of New AutoTestConfig -->
+          </ng-container>
+
+          <ng-template #editAutoTestConfigPanel>
+            <form class="ui form" #fUpdateAutoTestConfig="ngForm" (ngSubmit)="updateAutoTestConfig(fUpdateAutoTestConfig)" [ngClass]="{'loading': updatingAutoTestConfig}">
+              <div class="field required" [ngClass]="{'error': (fUpdateAutoTestConfig.submitted ||updateAutoTestConfigNameModel.dirty||updateAutoTestConfigNameModel.touched) && updateAutoTestConfigNameModel.invalid}">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="Name (at most 128 characters)"
+                       [(ngModel)]="updateAutoTestConfigForm.name" #updateAutoTestConfigNameModel="ngModel"
+                       required maxlength="128">
+                <div class="errors">
+                  <label *ngIf="updateAutoTestConfigNameModel.errors?.required">Name is required</label>
+                  <label *ngIf="updateAutoTestConfigNameModel.errors?.maxlength">Name is too long</label>
+                </div>
+              </div>
+              <div class="field required" [ngClass]="{'error': (updateAutoTestConfigTypeModel.touched || updateAutoTestConfigTypeModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigTypeModel.invalid}">
+                <label>Type</label>
+                <select name="type" [(ngModel)]="updateAutoTestConfigForm.type" required #updateAutoTestConfigTypeModel="ngModel">
+                  <option value="docker">Docker</option>
+                  <option value="run-script">Run Script</option>
+                </select>
+                <div class="errors">
+                  <label *ngIf="updateAutoTestConfigTypeModel.errors?.required">Type is required</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigIsEnabled.click()">
+                  <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigIsEnabled name="is_enabled" [(ngModel)]="updateAutoTestConfigForm.is_enabled">
+                  <label>Enabled?</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigIsPrivate.click()">
+                  <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigIsPrivate name="is_private" [(ngModel)]="updateAutoTestConfigForm.is_private">
+                  <label>Private?</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Description</label>
+                <textarea name="description" rows="3" [(ngModel)]="updateAutoTestConfigForm.description" placeholder="Description (at most 256 characters)"></textarea>
+              </div>
+              <div class="field required" [ngClass]="{'error': (updateAutoTestConfigPriorityModel.touched || updateAutoTestConfigPriorityModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigPriorityModel.invalid}">
+                <label>Priority</label>
+                <input type="number" required min="0" max="255" step="1" [(ngModel)]="updateAutoTestConfigForm.priority" name="priority" #updateAutoTestConfigPriorityModel="ngModel" placeholder="An integer. Larger value means higher priority.">
+                <div class="errors">
+                  <label *ngIf="updateAutoTestConfigPriorityModel.errors?.required">Priority is required</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Trigger</label>
+                <select name="trigger" [(ngModel)]="updateAutoTestConfigForm.trigger">
+                  <option [ngValue]="null">No Trigger (start tests manually)</option>
+                  <option value="after_submit">After Submission</option>
+                  <option value="after_task_due">After Task Due</option>
+                  <option value="after_task_close">After Task Close</option>
+                </select>
+              </div>
+
+              <div *ngIf="updateAutoTestConfigForm.type=='docker' || updateAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (updateAutoTestConfigEnvironmentId.touched || updateAutoTestConfigEnvironmentId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigEnvironmentId.invalid}">
+                <label>Test Environment</label>
+                <select name="environment_id" [(ngModel)]="updateAutoTestConfigForm.environment_id" required #updateAutoTestConfigEnvironmentId="ngModel">
+                  <ng-container *ngFor="let mat of task.materials">
+                    <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
+                      {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
+                    </option>
+                  </ng-container>
+                </select>
+                <div class="errors">
+                  <label *ngIf="updateAutoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
+                </div>
+              </div>
+
+              <ng-container *ngIf="updateAutoTestConfigForm.type=='docker'">
+                <div class="field">
+                  <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigDockerAutoRemove.click()">
+                    <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigDockerAutoRemove name="docker_auto_remove" [(ngModel)]="updateAutoTestConfigForm.docker_auto_remove">
+                    <label>Docker Auto Remove?</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigDockerNetwork.click()">
+                    <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigDockerNetwork name="docker_network" [(ngModel)]="updateAutoTestConfigForm.docker_network">
+                    <label>Docker Network Access Allowed?</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Docker CPUs</label>
+                  <input type="number" min="1" name="docker_cpus" [(ngModel)]="updateAutoTestConfigForm.docker_cpus" placeholder="Limit number of CPUs (can be a float number). Empty field means no limit on cpu.">
+                </div>
+                <div class="field">
+                  <label>Docker Memory (unit: MB)</label>
+                  <input type="number" step="1" min="1" name="docker_memory" [(ngModel)]="updateAutoTestConfigForm.docker_memory" placeholder="Limit size of memory (must be an integer). Empty field means no limit on memory.">
+                </div>
+              </ng-container>
+
+              <div class="field">
+                <label>Result Render HTML</label>
+                <textarea name="result_render_html" rows="6" [(ngModel)]="updateAutoTestConfigForm.result_render_html" placeholder="HTML for rendering test results. If this is empty, the raw result will be displayed."></textarea>
+              </div>
+              <div class="field">
+                <label>Result Conclusion Type</label>
+                <select name="result_conclusion_type" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_type">
+                  <optgroup label="Numeric">
+                    <option value="int">Integer</option>
+                    <option value="float">Float</option>
+                    <option value="bool">Boolean</option>
+                  </optgroup>
+                  <optgroup label="Text/Object">
+                    <option value="string">String</option>
+                    <option value="json">JSON</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="field">
+                <label>Result Conclusion Path</label>
+                <input type="text" name="result_conclusion_path" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_path" placeholder="Path of the conclusion in the result object. Empty path means the whole result is the conclusion.">
+              </div>
+              <div class="field">
+                <label>Result Conclusion Accumulate Method</label>
+                <select name="results_conclusion_accumulate_method" [(ngModel)]="updateAutoTestConfigForm.results_conclusion_accumulate_method">
+                  <option value="first">Use First Submission</option>
+                  <option value="last">Use Last Submission</option>
+                  <ng-container *ngIf="updateAutoTestConfigForm.result_conclusion_type=='int' || updateAutoTestConfigForm.result_conclusion_type=='float'">
+                    <option value="highest" >Use Highest Submission</option>
+                    <option value="lowest">Use Lowest Submission</option>
+                    <option value="average">Use Average Among Submissions</option>
+                  </ng-container>
+                  <ng-container *ngIf="updateAutoTestConfigForm.result_conclusion_type=='bool'">
+                    <option value="and">Use Logical AND among Submission</option>
+                    <option value="or">Use Logical OR among Submission</option>
+                  </ng-container>
+                </select>
+              </div>
+              <button class="ui fluid primary button" type="submit">Update Configuration</button>
+            </form>
+          </ng-template>
+        </ng-container>
+
+        <ng-template #noAutoTestEvaluation>
+          <div class="ui info message">
+            <div class="header"><i class="icon circle info"></i> Auto Test Evaluation is disabled</div>
+            <p>Please choose <b>Auto Testing</b> as the evaluation method in the basic settings first.</p>
+          </div>
+        </ng-template>
+      </div>
+      <!-- End of AutoTestConfig tab -->
 
       <!-- Special considerations tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='special_considerations'}">

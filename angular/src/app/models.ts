@@ -71,8 +71,6 @@ export class Task {
   submission_history_limit?: number;
 
   evaluation_method?: string;
-  auto_test_trigger?: string;
-  auto_test_environment_id?: number;
 
   created_at: string;
   modified_at: string;
@@ -80,6 +78,7 @@ export class Task {
   term?: Term;
   materials?: Material[];
   file_requirements?: FileRequirement[];
+  auto_test_configs?: AutoTestConfig[];
   special_considerations?: SpecialConsideration[];
 }
 
@@ -216,9 +215,40 @@ export class SubmissionStatus {
   special_consideration?: SpecialConsideration;
 }
 
+export class AutoTestConfig {
+  id: number;
+  name: string;
+  type: string;
+  description?: string;
+
+  task_id: number;
+  is_enabled: boolean;
+  is_private: boolean;
+  priority: number;
+
+  trigger?: string;
+  environment_id?: number;
+  docker_auto_remove: boolean;
+  docker_cpus?: number;
+  docker_memory?: number;
+  docker_network: boolean;
+
+  result_render_html?: string;
+  result_conclusion_type: string;
+  result_conclusion_path?: string;
+  results_conclusion_accumulate_method: string;
+
+  created_at: string;
+  modified_at: string;
+
+  task?: Task;
+  environment?: Material;
+}
+
 export class AutoTest {
   id: number;
   submission_id: number;
+  config_id: number;
 
   work_id: string;
 
@@ -238,6 +268,7 @@ export class AutoTest {
   stopped_at: string;
 
   submission?: Submission;
+  config?: AutoTestConfig;
   output_files?: AutoTestOutputFile[];
 }
 

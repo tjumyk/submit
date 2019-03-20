@@ -1,10 +1,21 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, FileRequirement, Material, SpecialConsideration, SuccessMessage, Task} from "../models";
+import {
+  AutoTestConfig,
+  ErrorMessage,
+  FileRequirement,
+  Material,
+  SpecialConsideration,
+  SuccessMessage,
+  Task
+} from "../models";
 import {
   AdminService,
+  NewAutoTestConfigForm,
   NewFileRequirementForm,
   NewMaterialForm,
-  NewSpecialConsiderationForm, UpdateMaterialForm,
+  NewSpecialConsiderationForm,
+  UpdateAutoTestConfigForm,
+  UpdateMaterialForm,
   UpdateTaskForm
 } from "../admin.service";
 import {ActivatedRoute} from "@angular/router";
@@ -41,6 +52,12 @@ export class AdminTaskEditComponent implements OnInit {
   addingFileRequirement: boolean;
   newFileRequirementForm: NewFileRequirementForm = new NewFileRequirementForm();
 
+  addingAutoTestConfig: boolean;
+  newAutoTestConfigForm: NewAutoTestConfigForm = new NewAutoTestConfigForm();
+  editingAutoTestConfig: AutoTestConfig;
+  updatingAutoTestConfig: boolean;
+  updateAutoTestConfigForm: UpdateAutoTestConfigForm = new UpdateAutoTestConfigForm();
+
   addingSpecialConsideration: boolean;
   newSpecialConsideration: NewSpecialConsiderationForm = new NewSpecialConsiderationForm();
 
@@ -55,6 +72,7 @@ export class AdminTaskEditComponent implements OnInit {
     this.newFileRequirementForm.is_optional = false;
     this.activeTab = 'basic';
     this.newMaterialForm.is_private = true;
+    this.newAutoTestConfigForm.is_enabled = true;
   }
 
   ngOnInit() {
@@ -88,8 +106,6 @@ export class AdminTaskEditComponent implements OnInit {
     this.form.submission_history_limit = task.submission_history_limit;
 
     this.form.evaluation_method = task.evaluation_method;
-    this.form.auto_test_trigger = task.auto_test_trigger;
-    this.form.auto_test_environment_id = task.auto_test_environment_id;
 
     if (task.open_time)
       this.form.open_time = moment(task.open_time).format('YYYY-MM-DDTHH:mm');
@@ -301,6 +317,76 @@ export class AdminTaskEditComponent implements OnInit {
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
       () => this.task.file_requirements.splice(index, 1),
+      error => this.secondaryError = error.error
+    )
+  }
+
+  addAutoTestConfig(f: NgForm) {
+    if (f.invalid)
+      return;
+
+    this.addingAutoTestConfig = true;
+    this.adminService.addAutoTestConfig(this.taskId, this.newAutoTestConfigForm).pipe(
+      finalize(() => this.addingAutoTestConfig = false)
+    ).subscribe(
+      config => this.task.auto_test_configs.push(config),
+      error => this.secondaryError = error.error
+    )
+  }
+
+  editAutoTestConfig(config: AutoTestConfig) {
+    this.editingAutoTestConfig = config;
+
+    this.updateAutoTestConfigForm.name = config.name;
+    this.updateAutoTestConfigForm.type = config.type;
+    this.updateAutoTestConfigForm.description = config.description;
+    this.updateAutoTestConfigForm.is_enabled = config.is_enabled;
+    this.updateAutoTestConfigForm.is_private = config.is_private;
+    this.updateAutoTestConfigForm.priority = config.priority;
+    this.updateAutoTestConfigForm.trigger = config.trigger;
+    this.updateAutoTestConfigForm.environment_id = config.environment_id;
+    this.updateAutoTestConfigForm.docker_auto_remove = config.docker_auto_remove;
+    this.updateAutoTestConfigForm.docker_cpus = config.docker_cpus;
+    this.updateAutoTestConfigForm.docker_memory = config.docker_memory;
+    this.updateAutoTestConfigForm.docker_network = config.docker_network;
+    this.updateAutoTestConfigForm.result_render_html = config.result_render_html;
+    this.updateAutoTestConfigForm.result_conclusion_type = config.result_conclusion_type;
+    this.updateAutoTestConfigForm.result_conclusion_path = config.result_conclusion_path;
+    this.updateAutoTestConfigForm.results_conclusion_accumulate_method = config.results_conclusion_accumulate_method;
+  }
+
+  updateAutoTestConfig(f: NgForm) {
+    if (f.invalid)
+      return;
+
+    this.updatingAutoTestConfig = true;
+    this.adminService.updateAutoTestConfig(this.editingAutoTestConfig.id, this.updateAutoTestConfigForm).pipe(
+      finalize(() => this.updatingAutoTestConfig = false)
+    ).subscribe(
+      config => {
+        let i = 0;
+        for (let _config of this.task.auto_test_configs) {
+          if (_config.id == this.editingAutoTestConfig.id) {
+            this.task.auto_test_configs.splice(i, 1, config);
+            break
+          }
+          ++i;
+        }
+        this.success = {msg: `Updated auto test configuration "${config.name}" successfully`}
+      },
+      error => this.secondaryError = error.error
+    )
+  }
+
+  deleteAutoTestConfig(config: AutoTestConfig, index: number, btn: HTMLElement) {
+    if (!confirm(`Really want to delete requirement "${config.name}"?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteAutoTestConfig(config.id).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => this.task.auto_test_configs.splice(index, 1),
       error => this.secondaryError = error.error
     )
   }

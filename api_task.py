@@ -435,8 +435,11 @@ def task_my_submissions(tid):
             db.session.commit()
 
             # start auto test if required
-            if task.evaluation_method == 'auto_test' and task.auto_test_trigger == 'submission':
-                SubmissionService.run_auto_test(new_submission)
+            if task.evaluation_method == 'auto_test':
+                for config in task.auto_test_configs:
+                    if config.trigger != 'after_submit':
+                        continue
+                    SubmissionService.run_auto_test(new_submission, config)
                 db.session.commit()  # have to commit again
 
             return jsonify(new_submission.to_dict()), 201

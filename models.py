@@ -214,8 +214,6 @@ class Task(db.Model):
     submission_history_limit = db.Column(db.Integer)
 
     evaluation_method = db.Column(db.String(32))
-    auto_test_trigger = db.Column(db.String(32))
-    auto_test_environment_id = db.Column(db.Integer, db.ForeignKey('material.id'))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -241,10 +239,10 @@ class Task(db.Model):
             d['submission_attempt_limit'] = self.submission_attempt_limit
             d['submission_history_limit'] = self.submission_history_limit
             d['evaluation_method'] = self.evaluation_method
-            d['auto_test_trigger'] = self.auto_test_trigger
-            d['auto_test_environment_id'] = self.auto_test_environment_id
             d['materials'] = [m.to_dict() for m in self.materials if not m.is_private or with_advanced_fields]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
+            d['auto_test_configs'] = [c.to_dict(with_advanced_fields=with_advanced_fields)
+                                      for c in self.auto_test_configs if not c.is_private or with_advanced_fields]
         if with_advanced_fields:
             d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
             d['created_at'] = self.created_at
@@ -408,9 +406,63 @@ class SubmissionFile(db.Model):
         return d
 
 
+class AutoTestConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    type = db.Column(db.String(32), nullable=False)
+
+    description = db.Column(db.String(256))
+    is_enabled = db.Column(db.Boolean, nullable=False, default=True)
+    is_private = db.Column(db.Boolean, nullable=False, default=False)
+    priority = db.Column(db.Integer, nullable=False, default=0)
+
+    # execution config
+    trigger = db.Column(db.String(32))
+    environment_id = db.Column(db.Integer, db.ForeignKey('material.id'))
+    docker_auto_remove = db.Column(db.Boolean, nullable=False, default=True)
+    docker_cpus = db.Column(db.Float)
+    docker_memory = db.Column(db.Integer)
+    docker_network = db.Column(db.Boolean, nullable=False, default=False)
+
+    # result handling
+    result_render_html = db.Column(db.Text)
+    result_conclusion_type = db.Column(db.String(16), nullable=False, default='json')
+    result_conclusion_path = db.Column(db.String(128))
+    results_conclusion_accumulate_method = db.Column(db.String(32), nullable=False, default='last')
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    task = db.relationship('Task', backref=db.backref('auto_test_configs'))
+    exec_env = db.relationship('Material', backref=db.backref('auto_test_configs'))
+
+    def __repr__(self):
+        return '<AutoTestConfig %r>' % self.id
+
+    def to_dict(self, with_advanced_fields=False) -> dict:
+        d = dict(id=self.id, name=self.name, type=self.type, description=self.description,
+                 task_id=self.task_id, is_enabled=self.is_enabled, is_private=self.is_private, priority=self.priority,
+                 trigger=self.trigger, environment_id=self.environment_id,
+                 result_render_html=self.result_render_html, result_conclusion_type=self.result_conclusion_type,
+                 result_conclusion_path=self.result_conclusion_path,
+                 results_conclusion_accumulate_method=self.results_conclusion_accumulate_method)
+
+        if with_advanced_fields:
+            d['docker_auto_remove'] = self.docker_auto_remove
+            d['docker_cpus'] = self.docker_cpus
+            d['docker_memory'] = self.docker_memory
+            d['docker_network'] = self.docker_network
+            d['created_at'] = self.created_at
+            d['modified_at'] = self.modified_at
+
+        return d
+
+
 class AutoTest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
+    config_id = db.Column(db.Integer, db.ForeignKey('auto_test_config.id'), nullable=False)
 
     work_id = db.Column(db.String(36), nullable=False)
 
@@ -429,12 +481,13 @@ class AutoTest(db.Model):
     stopped_at = db.Column(db.DateTime)
 
     submission = db.relationship('Submission', backref=db.backref('auto_tests'))
+    config = db.relationship('AutoTestConfig', backref=db.backref('tests'))
 
     def __repr__(self):
         return '<AutoTest %r>' % self.id
 
     def to_dict(self, with_submission=False, with_advanced_fields=False):
-        d = dict(id=self.id, submission_id=self.submission_id,
+        d = dict(id=self.id, submission_id=self.submission_id, config_id=self.config_id,
                  hostname=self.hostname, final_state=self.final_state,
                  exception_class=self.exception_class, exception_message=self.exception_message,
                  created_at=self.created_at, modified_at=self.modified_at,

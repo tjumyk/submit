@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
 import {
-  AutoTest,
+  AutoTest, AutoTestConfig,
   Course,
   ErrorMessage,
   FileRequirement,
@@ -52,8 +52,6 @@ export class UpdateTaskForm{
   submission_attempt_limit?: number;
   submission_history_limit?: number;
   evaluation_method?: string;
-  auto_test_trigger?: string;
-  auto_test_environment_id?: number;
 }
 
 export class NewMaterialForm{
@@ -73,6 +71,36 @@ export class NewFileRequirementForm{
   is_optional: boolean;
   size_limit?:number;
   description?:string;
+}
+
+export class NewAutoTestConfigForm{
+  name: string;
+  type: string;
+  environment_id?: number;
+  description?: string;
+  is_enabled: boolean;
+  is_private: boolean;
+}
+
+export class UpdateAutoTestConfigForm{
+  name: string;
+  type: string;
+  description?: string;
+  is_enabled: boolean;
+  is_private: boolean;
+
+  priority: number;
+  trigger?: string;
+  environment_id?: number;
+  docker_auto_remove: boolean;
+  docker_cpus?: number;
+  docker_memory?: number;
+  docker_network: boolean;
+
+  result_render_html?: string;
+  result_conclusion_type: string;
+  result_conclusion_path?: string;
+  results_conclusion_accumulate_method: string;
 }
 
 export class NewSpecialConsiderationForm{
@@ -280,6 +308,18 @@ export class AdminService {
 
   validateTestEnvironment(material_id: number): Observable<TestEnvironmentValidationResult>{
     return this.http.get(`${this.api}/materials/${material_id}/validate-test-environment`);
+  }
+
+  addAutoTestConfig(task_id: number, form: NewAutoTestConfigForm): Observable<AutoTestConfig>{
+    return this.http.post<AutoTestConfig>(`${this.api}/tasks/${task_id}/auto-test-configs`, form)
+  }
+
+  updateAutoTestConfig(config_id: number, form: UpdateAutoTestConfigForm): Observable<AutoTestConfig>{
+    return this.http.put<AutoTestConfig>(`${this.api}/auto-test-configs/${config_id}`, form)
+  }
+
+  deleteAutoTestConfig(config_id: number): Observable<any>{
+    return this.http.delete(`${this.api}/auto-test-configs/${config_id}`)
   }
 
   addFileRequirement(task_id: number, form:NewFileRequirementForm):Observable<FileRequirement>{

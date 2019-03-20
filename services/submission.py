@@ -7,7 +7,7 @@ from sqlalchemy import desc, func
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
-from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest
+from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest, AutoTestConfig
 from services.auto_test import AutoTestService
 from services.task import TaskService
 from testbot import bot
@@ -278,13 +278,15 @@ class SubmissionService:
         return file_paths
 
     @staticmethod
-    def run_auto_test(submission: Submission) -> Tuple[AutoTest, AsyncResult]:
+    def run_auto_test(submission: Submission, config: AutoTestConfig) -> Tuple[AutoTest, AsyncResult]:
         if submission is None:
             raise SubmissionServiceError('submission is required')
+        if config is None:
+            raise SubmissionServiceError('auto test config is required')
 
         if submission.task.evaluation_method != 'auto_test':
             raise SubmissionServiceError('evaluation method is not auto testing')
 
-        result = bot.run_test.apply_async((submission.id,), countdown=3)  # wait 3 seconds to allow db commit
+        result = bot.run_test.apply_async((submission.id, config.id), countdown=3)  # wait 3 seconds to allow db commit
         test = AutoTestService.add(submission, result.id)
         return test, result
