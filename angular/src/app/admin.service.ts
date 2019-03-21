@@ -342,8 +342,8 @@ export class AdminService {
     return this.http.delete(`${this.api}/teams/${team_id}`)
   }
 
-  runAutoTest(id: number): Observable<AutoTest> {
-    return this.http.get<AutoTest>(`${this.api}/submissions/${id}/run-auto-test`)
+  runAutoTest(submission_id: number, config_id: number): Observable<AutoTest> {
+    return this.http.get<AutoTest>(`${this.api}/submissions/${submission_id}/run-auto-test/${config_id}`)
   }
 
   deleteAutoTest(id: number, tid: number): Observable<any> {

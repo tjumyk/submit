@@ -352,8 +352,7 @@ class Submission(db.Model):
     def __repr__(self):
         return '<Submission %r>' % self.id
 
-    def to_dict(self, with_files=False, with_submitter=False, with_auto_tests=False, with_advanced_fields=False,
-                with_auto_test_environment=False):
+    def to_dict(self, with_files=False, with_submitter=False, with_auto_tests=False, with_advanced_fields=False):
         d = dict(id=self.id, task_id=self.task_id,
                  submitter_id=self.submitter_id,
                  is_cleared=self.is_cleared,
@@ -365,14 +364,6 @@ class Submission(db.Model):
             d['submitter'] = self.submitter.to_dict() if self.submitter else None
         if with_auto_tests:
             d['auto_tests'] = [t.to_dict() for t in self.auto_tests]
-        if with_auto_test_environment:
-            d['auto_test_environment'] = None
-            task = self.task
-            if task.auto_test_environment_id is not None:
-                for mat in task.materials:  # FIXME inefficient
-                    if mat.id == task.auto_test_environment_id:
-                        d['auto_test_environment'] = mat.to_dict()
-                        break
         return d
 
 
@@ -435,19 +426,20 @@ class AutoTestConfig(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     task = db.relationship('Task', backref=db.backref('auto_test_configs'))
-    exec_env = db.relationship('Material', backref=db.backref('auto_test_configs'))
+    environment = db.relationship('Material', backref=db.backref('auto_test_configs'))
 
     def __repr__(self):
         return '<AutoTestConfig %r>' % self.id
 
-    def to_dict(self, with_advanced_fields=False) -> dict:
+    def to_dict(self, with_environment=False, with_advanced_fields=False) -> dict:
         d = dict(id=self.id, name=self.name, type=self.type, description=self.description,
                  task_id=self.task_id, is_enabled=self.is_enabled, is_private=self.is_private, priority=self.priority,
                  trigger=self.trigger, environment_id=self.environment_id,
                  result_render_html=self.result_render_html, result_conclusion_type=self.result_conclusion_type,
                  result_conclusion_path=self.result_conclusion_path,
                  results_conclusion_accumulate_method=self.results_conclusion_accumulate_method)
-
+        if with_environment:
+            d['environment'] = self.environment.to_dict() if self.environment_id is not None else None
         if with_advanced_fields:
             d['docker_auto_remove'] = self.docker_auto_remove
             d['docker_cpus'] = self.docker_cpus

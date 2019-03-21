@@ -2,6 +2,5 @@
 
 Dockerfile
 .dockerignore
-docker-run-config.json
 
 __pycache__/

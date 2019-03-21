@@ -198,8 +198,8 @@
                   <div class="field">
                     <label>Evaluation Method</label>
                     <select name="evaluation_method" [(ngModel)]="form.evaluation_method">
-                      <option value="auto_test">Auto Testing</option>
                       <option [ngValue]="null">Offline</option>
+                      <option value="auto_test">Auto Testing</option>
                     </select>
                   </div>
                 </div>
@@ -572,8 +572,6 @@
                 <select name="trigger" [(ngModel)]="updateAutoTestConfigForm.trigger">
                   <option [ngValue]="null">No Trigger (start tests manually)</option>
                   <option value="after_submit">After Submission</option>
-                  <option value="after_task_due">After Task Due</option>
-                  <option value="after_task_close">After Task Close</option>
                 </select>
               </div>
 

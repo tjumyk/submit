@@ -1,6 +1,0 @@
-{
-  "auto_remove": true,
-  "network": false,
-  "cpu": 2.0,
-  "memory": "4g"
-}

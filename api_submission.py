@@ -156,14 +156,16 @@ def download_auto_test_output_file(sid, tid, fid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@submission_api.route('/<int:sid>/worker-get-submission/<string:wid>')
+@submission_api.route('/<int:sid>/worker-get-submission-and-config/<string:wid>')
 @requires_worker
-def worker_get_auto_test(sid, wid):
+def worker_get_submission_and_config(sid, wid):
     try:
         test = AutoTestService.get_by_submission_work_id(sid, wid)
         if test is None:
             return jsonify(msg='test not found'), 404
-        return jsonify(test.submission.to_dict(with_files=True, with_auto_test_environment=True))
+        submission_dict = test.submission.to_dict(with_files=True)
+        config_dict = test.config.to_dict(with_environment=True, with_advanced_fields=True)
+        return jsonify(dict(submission=submission_dict, config=config_dict))
     except AutoTestServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

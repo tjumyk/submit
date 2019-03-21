@@ -4,7 +4,7 @@ from celery.result import AsyncResult
 from sqlalchemy import func
 
 from error import BasicError
-from models import AutoTest, Submission, AutoTestOutputFile, db
+from models import AutoTest, Submission, AutoTestOutputFile, db, AutoTestConfig
 from testbot import bot
 
 
@@ -32,8 +32,10 @@ class AutoTestService:
         return AutoTest.query.filter_by(submission_id=submission_id, work_id=work_id).first()
 
     @staticmethod
-    def add(submission: Submission, work_id: str) -> AutoTest:
-        return AutoTest(submission=submission, work_id=work_id)
+    def add(submission: Submission, config: AutoTestConfig, work_id: str) -> AutoTest:
+        test = AutoTest(submission=submission, config=config, work_id=work_id)
+        db.session.add(test)
+        return test
 
     @staticmethod
     def add_output_file(test: AutoTest, path: str, save_path: str) -> AutoTestOutputFile:

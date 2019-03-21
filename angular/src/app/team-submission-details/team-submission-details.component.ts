@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AutoTest, ErrorMessage, Submission, Task, Team, User} from "../models";
+import {AutoTest, AutoTestConfig, ErrorMessage, Submission, Task, Team, User} from "../models";
 import {SubmissionService} from "../submission.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -35,6 +35,7 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
   autoTestsTrackerHandler: number;
   autoTests: AutoTest[];
   getStatusColor: (string) => string;
+  selectedAutoTestConfigId: number;
   requestingRunAutoTest: boolean;
 
   constructor(
@@ -140,7 +141,7 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
 
   runAutoTest() {
     this.requestingRunAutoTest = true;
-    this.adminService.runAutoTest(this.submissionId).pipe(
+    this.adminService.runAutoTest(this.submissionId, this.selectedAutoTestConfigId).pipe(
       finalize(() => this.requestingRunAutoTest = false)
     ).subscribe(
       test => this.autoTests.push(test),

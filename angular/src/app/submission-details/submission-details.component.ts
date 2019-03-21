@@ -32,6 +32,7 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
   autoTestsTrackerHandler: number;
   autoTests: AutoTest[];
   getStatusColor: (string) => string;
+  selectedAutoTestConfigId: number;
   requestingRunAutoTest: boolean;
 
   constructor(
@@ -129,7 +130,7 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
 
   runAutoTest() {
     this.requestingRunAutoTest = true;
-    this.adminService.runAutoTest(this.submissionId).pipe(
+    this.adminService.runAutoTest(this.submissionId, this.selectedAutoTestConfigId).pipe(
       finalize(() => this.requestingRunAutoTest = false)
     ).subscribe(
       test => this.autoTests.push(test),

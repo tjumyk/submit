@@ -436,9 +436,14 @@ def task_my_submissions(tid):
 
             # start auto test if required
             if task.evaluation_method == 'auto_test':
+                configs_to_run = []
                 for config in task.auto_test_configs:
                     if not config.is_enabled or config.trigger != 'after_submit':
                         continue
+                    configs_to_run.append(config)
+                configs_to_run.sort(key=lambda c: c.priority, reverse=True)
+                # TODO how to use global priority control in Celery?
+                for config in configs_to_run:
                     SubmissionService.run_auto_test(new_submission, config)
                 db.session.commit()  # have to commit again
 
