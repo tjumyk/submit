@@ -4,7 +4,7 @@ from celery.result import AsyncResult
 from sqlalchemy import func
 
 from error import BasicError
-from models import AutoTest, Submission, AutoTestOutputFile, db, AutoTestConfig
+from models import AutoTest, Submission, AutoTestOutputFile, db, AutoTestConfig, EXCEPTION_MESSAGE_SAFE_LENGTH
 from testbot import bot
 
 
@@ -66,7 +66,11 @@ class AutoTestService:
             elif result.state == 'FAILURE':
                 exception = result.result
                 d['exception_class'] = type(exception).__name__
-                d['exception_message'] = str(exception)
+                # limit the length of message to avoid 'Exception Attack'
+                exception_message = str(exception)
+                if not with_advanced_fields and len(exception_message) > EXCEPTION_MESSAGE_SAFE_LENGTH:
+                    exception_message = exception_message[0: EXCEPTION_MESSAGE_SAFE_LENGTH] + '...'
+                d['exception_message'] = exception_message
                 if with_advanced_fields:
                     d['exception_traceback'] = result.traceback
             elif result.state == 'STARTED':

@@ -9,6 +9,8 @@ user_groups_alias = db.Table('user_groups_alias',
                              db.Column('user_id', db.Integer, db.ForeignKey('user_alias.id'), primary_key=True),
                              db.Column('group_id', db.Integer, db.ForeignKey('group_alias.id'), primary_key=True))
 
+EXCEPTION_MESSAGE_SAFE_LENGTH = 32
+
 
 class UserAlias(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -481,9 +483,16 @@ class AutoTest(db.Model):
     def to_dict(self, with_submission=False, with_advanced_fields=False):
         d = dict(id=self.id, submission_id=self.submission_id, config_id=self.config_id,
                  hostname=self.hostname, final_state=self.final_state,
-                 exception_class=self.exception_class, exception_message=self.exception_message,
+                 exception_class=self.exception_class,
                  created_at=self.created_at, modified_at=self.modified_at,
                  started_at=self.started_at, stopped_at=self.stopped_at)
+
+        # limit the length of message to avoid 'Exception Attack'
+        exception_message = self.exception_message
+        if not with_advanced_fields and exception_message and len(exception_message) > EXCEPTION_MESSAGE_SAFE_LENGTH:
+            exception_message = exception_message[0: EXCEPTION_MESSAGE_SAFE_LENGTH] + '...'
+        d['exception_message'] = exception_message
+
         try:
             if self.result is not None:
                 d['result'] = json.loads(self.result)  # try to parse result as JSON string
