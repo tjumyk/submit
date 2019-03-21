@@ -112,8 +112,8 @@ def auto_test_and_results(sid):
             return jsonify(msg="not your team's submission"), 403
 
         tests = []
-        for test in submission.auto_tests:
-            if test.config.is_private:  # skip private tests
+        for config, test in SubmissionService.get_last_auto_tests(submission):
+            if config.is_private:  # skip private tests
                 continue
             test_obj = test.to_dict()
             if not test.final_state:  # running tests
