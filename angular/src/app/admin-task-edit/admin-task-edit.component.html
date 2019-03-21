@@ -219,15 +219,17 @@
       <!-- Materials tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='materials'}">
         <table class="ui bottom attached table celled unstackable">
-          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Flags</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Visibility</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let mat of task.materials; index as i">
             <td>{{ mat.id }}</td>
             <td>{{ mat.type | titlecase }}</td>
             <td>{{ mat.name }}</td>
             <td>
-              <i class="ui red lock icon" *ngIf="mat.is_private" title="Private"></i>
-              <i class="ui green play icon" *ngIf="mat.id == task.auto_test_environment_id" title="Active Auto Test Environment"></i>
+              <i class="ui red lock icon" *ngIf="mat.is_private; else materialIsPublic" title="Private"></i>
+              <ng-template #materialIsPublic>
+                <i class="ui green lock open icon" title="Public"></i>
+              </ng-template>
             </td>
             <td>{{ mat.modified_at | date: 'short' }}</td>
             <td>{{ mat.description }}</td>
@@ -409,7 +411,7 @@
 
           <ng-container *ngIf="!editingAutoTestConfig; else editAutoTestConfigPanel">
             <table class="ui bottom attached table celled unstackable">
-              <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Flags</th><th>Updated At</th><th>Description</th><th>Ops</th></tr></thead>
+              <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Flags</th><th>Updated At</th><th>Trigger</th><th>Description</th><th>Ops</th></tr></thead>
               <tbody>
               <tr *ngFor="let config of task.auto_test_configs; index as i">
                 <td>{{ config.id }}</td>
@@ -426,6 +428,12 @@
                   </ng-template>
                 </td>
                 <td>{{ config.modified_at | date: 'short' }}</td>
+                <td>
+                  <div *ngIf="config.trigger==null">No Trigger</div>
+                  <div *ngIf="config.trigger=='after_submit'">After Submission</div>
+                  <div *ngIf="config.trigger=='after_task_due'">After Task Due</div>
+                  <div *ngIf="config.trigger=='after_task_close'">After Task Close</div>
+                </td>
                 <td>{{ config.description }}</td>
                 <td>
                   <a class="ui button small icon" (click)="editAutoTestConfig(config)"><i class="icon edit"></i></a>
@@ -510,6 +518,8 @@
 
           <ng-template #editAutoTestConfigPanel>
             <form class="ui form" #fUpdateAutoTestConfig="ngForm" (ngSubmit)="updateAutoTestConfig(fUpdateAutoTestConfig)" [ngClass]="{'loading': updatingAutoTestConfig}">
+              <!-- Start Basic Section -->
+              <h3 class="ui dividing header">Basic</h3>
               <div class="field required" [ngClass]="{'error': (fUpdateAutoTestConfig.submitted ||updateAutoTestConfigNameModel.dirty||updateAutoTestConfigNameModel.touched) && updateAutoTestConfigNameModel.invalid}">
                 <label>Name</label>
                 <input type="text" name="name" placeholder="Name (at most 128 characters)"
@@ -546,6 +556,10 @@
                 <label>Description</label>
                 <textarea name="description" rows="3" [(ngModel)]="updateAutoTestConfigForm.description" placeholder="Description (at most 256 characters)"></textarea>
               </div>
+              <!-- End Basic Section -->
+
+              <!-- Start Execution Section -->
+              <h3 class="ui dividing header">Execution</h3>
               <div class="field required" [ngClass]="{'error': (updateAutoTestConfigPriorityModel.touched || updateAutoTestConfigPriorityModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigPriorityModel.invalid}">
                 <label>Priority</label>
                 <input type="number" required min="0" max="255" step="1" [(ngModel)]="updateAutoTestConfigForm.priority" name="priority" #updateAutoTestConfigPriorityModel="ngModel" placeholder="An integer. Larger value means higher priority.">
@@ -563,9 +577,9 @@
                 </select>
               </div>
 
-              <div *ngIf="updateAutoTestConfigForm.type=='docker' || updateAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (updateAutoTestConfigEnvironmentId.touched || updateAutoTestConfigEnvironmentId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigEnvironmentId.invalid}">
+              <div *ngIf="updateAutoTestConfigForm.type=='docker' || updateAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (updateAutoTestConfigEnvironmentId.touched || updateAutoTestConfigEnvironmentId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigEnvironmentId.invalid, 'disabled': validatingTestEnvironment}">
                 <label>Test Environment</label>
-                <select name="environment_id" [(ngModel)]="updateAutoTestConfigForm.environment_id" required #updateAutoTestConfigEnvironmentId="ngModel">
+                <select name="environment_id" [(ngModel)]="updateAutoTestConfigForm.environment_id" required #updateAutoTestConfigEnvironmentId="ngModel" (change)="validateTestEnvironment(updateAutoTestConfigForm.environment_id)">
                   <ng-container *ngFor="let mat of task.materials">
                     <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
                       {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
@@ -576,6 +590,34 @@
                   <label *ngIf="updateAutoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
                 </div>
               </div>
+
+              <div class="ui text loader active inline centered" *ngIf="validatingTestEnvironment">Validating Environment...</div>
+
+              <ng-container *ngIf="testEnvValidationResult">
+                <div *ngIf="!testEnvValidationResult.error && testEnvValidationResult.type==updateAutoTestConfigForm.type; else testUpdateEnvValidateError" class="ui message">
+                  <div class="header">Environment Information</div>
+                  <ul class="list">
+                    <li><b>Type:</b> {{testEnvValidationResult.type}}</li>
+                    <li *ngIf="testEnvValidationResult.conda_version"><b>Conda Version:</b> {{testEnvValidationResult.conda_version}}</li>
+                    <li *ngIf="testEnvValidationResult.docker_entry_point"><b>Docker ENTRYPOINT:</b> {{testEnvValidationResult.docker_entry_point}}</li>
+                    <li *ngIf="testEnvValidationResult.docker_cmd"><b>Docker CMD:</b> {{testEnvValidationResult.docker_cmd}}</li>
+                    <li *ngIf="testEnvValidationResult.pip_requirements"><b>Pip Requirements:</b> <span class="ui label" *ngFor="let req of testEnvValidationResult.pip_requirements">{{req}}</span></li>
+                  </ul>
+                </div>
+                <ng-template #testUpdateEnvValidateError>
+                  <div class="ui warning message" style="display: block" *ngIf="testEnvValidationResult.error; else testUpdateEnvValidateOtherError" >
+                    <div class="header"><i class="icon exclamation triangle"></i> {{testEnvValidationResult.error.msg}}</div>
+                    <p>{{testEnvValidationResult.error.detail}}</p>
+                  </div>
+                  <ng-template #testUpdateEnvValidateOtherError>
+                    <div class="ui warning message" style="display: block" *ngIf="testEnvValidationResult.type!=updateAutoTestConfigForm.type">
+                      <div class="header"><i class="icon exclamation triangle"></i> Environment Type mismatch</div>
+                      <p>The environment type is {{testEnvValidationResult.type}} but the type of this config is {{updateAutoTestConfigForm.type}}.</p>
+                    </div>
+                  </ng-template>
+                </ng-template>
+              </ng-container>
+
 
               <ng-container *ngIf="updateAutoTestConfigForm.type=='docker'">
                 <div class="field">
@@ -599,7 +641,10 @@
                   <input type="number" step="1" min="1" name="docker_memory" [(ngModel)]="updateAutoTestConfigForm.docker_memory" placeholder="Limit size of memory (must be an integer). Empty field means no limit on memory.">
                 </div>
               </ng-container>
+              <!-- End Execution Section -->
 
+              <!-- Start Result Processing Section -->
+              <h3 class="ui dividing header">Result Processing</h3>
               <div class="field">
                 <label>Result Render HTML</label>
                 <textarea name="result_render_html" rows="6" [(ngModel)]="updateAutoTestConfigForm.result_render_html" placeholder="HTML for rendering test results. If this is empty, the raw result will be displayed."></textarea>

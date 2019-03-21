@@ -14,6 +14,7 @@ import {
   NewFileRequirementForm,
   NewMaterialForm,
   NewSpecialConsiderationForm,
+  TestEnvironmentValidationResult,
   UpdateAutoTestConfigForm,
   UpdateMaterialForm,
   UpdateTaskForm
@@ -57,6 +58,9 @@ export class AdminTaskEditComponent implements OnInit {
   editingAutoTestConfig: AutoTestConfig;
   updatingAutoTestConfig: boolean;
   updateAutoTestConfigForm: UpdateAutoTestConfigForm = new UpdateAutoTestConfigForm();
+
+  validatingTestEnvironment: boolean;
+  testEnvValidationResult: TestEnvironmentValidationResult;
 
   addingSpecialConsideration: boolean;
   newSpecialConsideration: NewSpecialConsiderationForm = new NewSpecialConsiderationForm();
@@ -203,40 +207,13 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
-  validateTestEnvironment(material: Material, btn: HTMLElement){
-    btn.classList.add('loading', 'disabled');
-    this.adminService.validateTestEnvironment(material.id).pipe(
-      finalize(() =>{
-        btn.classList.remove('loading', 'disabled');
-      })
+  validateTestEnvironment(material_id: number) {
+    this.testEnvValidationResult = null;
+    this.validatingTestEnvironment = true;
+    this.adminService.validateTestEnvironment(material_id).pipe(
+      finalize(() => this.validatingTestEnvironment = false)
     ).subscribe(
-      result=>{
-        if(result.error){
-          this.secondaryError = result.error
-        }else{
-          let txt = 'Name: ' + material.name;
-          txt += '\nType: ' + result.type;
-          if(result.conda_version)
-            txt += '\nConda Version: ' + result.conda_version;
-          if(result.docker_entry_point)
-            txt += '\nDocker ENTRYPOINT: ' + result.docker_entry_point;
-          if(result.docker_cmd)
-            txt += '\nDocker CMD: ' + result.docker_cmd;
-          if(result.docker_run_config){
-            txt += '\nDocker Run Config:\n';
-            txt += JSON.stringify(result.docker_run_config, null, 4)
-          }
-          if(result.pip_requirements){
-            if(result.pip_requirements.length){
-              txt += '\nPip Requirements:\n';
-              txt += result.pip_requirements.join('\n');
-            }else{
-              txt += '\nPip Requirements: (Empty)\n';
-            }
-          }
-          alert(txt)
-        }
-      },
+      result => this.testEnvValidationResult = result,
       error => this.secondaryError = error.error
     )
   }
@@ -337,22 +314,25 @@ export class AdminTaskEditComponent implements OnInit {
   editAutoTestConfig(config: AutoTestConfig) {
     this.editingAutoTestConfig = config;
 
-    this.updateAutoTestConfigForm.name = config.name;
-    this.updateAutoTestConfigForm.type = config.type;
-    this.updateAutoTestConfigForm.description = config.description;
-    this.updateAutoTestConfigForm.is_enabled = config.is_enabled;
-    this.updateAutoTestConfigForm.is_private = config.is_private;
-    this.updateAutoTestConfigForm.priority = config.priority;
-    this.updateAutoTestConfigForm.trigger = config.trigger;
-    this.updateAutoTestConfigForm.environment_id = config.environment_id;
-    this.updateAutoTestConfigForm.docker_auto_remove = config.docker_auto_remove;
-    this.updateAutoTestConfigForm.docker_cpus = config.docker_cpus;
-    this.updateAutoTestConfigForm.docker_memory = config.docker_memory;
-    this.updateAutoTestConfigForm.docker_network = config.docker_network;
-    this.updateAutoTestConfigForm.result_render_html = config.result_render_html;
-    this.updateAutoTestConfigForm.result_conclusion_type = config.result_conclusion_type;
-    this.updateAutoTestConfigForm.result_conclusion_path = config.result_conclusion_path;
-    this.updateAutoTestConfigForm.results_conclusion_accumulate_method = config.results_conclusion_accumulate_method;
+    let form = this.updateAutoTestConfigForm;
+    form.name = config.name;
+    form.type = config.type;
+    form.description = config.description;
+    form.is_enabled = config.is_enabled;
+    form.is_private = config.is_private;
+    form.priority = config.priority;
+    form.trigger = config.trigger;
+    form.environment_id = config.environment_id;
+    form.docker_auto_remove = config.docker_auto_remove;
+    form.docker_cpus = config.docker_cpus;
+    form.docker_memory = config.docker_memory;
+    form.docker_network = config.docker_network;
+    form.result_render_html = config.result_render_html;
+    form.result_conclusion_type = config.result_conclusion_type;
+    form.result_conclusion_path = config.result_conclusion_path;
+    form.results_conclusion_accumulate_method = config.results_conclusion_accumulate_method;
+
+    this.validateTestEnvironment(config.environment_id)
   }
 
   updateAutoTestConfig(f: NgForm) {
