@@ -14,7 +14,6 @@ from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
-from testbot import bot
 from utils.upload import handle_upload, handle_post_upload, UploadError, md5sum
 
 admin_api = Blueprint('admin_api', __name__)
@@ -396,10 +395,6 @@ def admin_material_validate_test_environment(mid):
                             if match:
                                 info['conda_version'] = match.group(1)
 
-                docker_run_config = os.path.join(tmp_dir, 'docker-run-config.json')
-                if os.path.exists(docker_run_config):
-                    info['docker_run_config'] = bot.get_run_params(docker_run_config)
-
                 requirements_txt = os.path.join(tmp_dir, 'test', 'requirements.txt')
                 if os.path.exists(requirements_txt):
                     requirements = []
@@ -411,7 +406,7 @@ def admin_material_validate_test_environment(mid):
                             requirements.append(line)
                         info['pip_requirements'] = requirements
             elif os.path.exists(os.path.join(tmp_dir, 'run.sh')):
-                info['type'] = 'direct-run'
+                info['type'] = 'run-script'
             else:
                 info['error'] = dict(msg='Dockerfile or run.sh not found')
 
