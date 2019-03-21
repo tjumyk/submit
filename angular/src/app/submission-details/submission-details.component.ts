@@ -35,6 +35,9 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
   selectedAutoTestConfigId: number;
   requestingRunAutoTest: boolean;
 
+  printConclusion: (test:AutoTest)=>any;
+  renderResultHTML: (test:AutoTest)=>string;
+
   constructor(
     private taskService: TaskService,
     private submissionService: SubmissionService,
@@ -42,7 +45,9 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private route: ActivatedRoute
   ) {
-    this.getStatusColor = submissionService.getAutoTestStatusColor
+    this.getStatusColor = submissionService.getAutoTestStatusColor;
+    this.printConclusion = AdminService.printConclusion;
+    this.renderResultHTML = AdminService.renderResultHTML;
   }
 
   ngOnInit() {
@@ -115,7 +120,17 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
           return; // skip request if all (current) works finished
 
         this.submissionService.getAutoTestAndResults(this.submissionId).subscribe(
-          tests => this.autoTests = tests,
+          tests => {
+            for(let test of tests){
+              for(let config of this.task.auto_test_configs){
+                if(config.id == test.config_id){
+                  test.config = config;
+                  break;
+                }
+              }
+            }
+            this.autoTests = tests;
+          },
           error => {
             this.error = error.error;
             clearInterval(this.autoTestsTrackerHandler);  // stop further requests if error occurs
@@ -133,7 +148,15 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
     this.adminService.runAutoTest(this.submissionId, this.selectedAutoTestConfigId).pipe(
       finalize(() => this.requestingRunAutoTest = false)
     ).subscribe(
-      test => this.autoTests.push(test),
+      test => {
+        for(let config of this.task.auto_test_configs){
+          if(config.id == test.config_id){
+            test.config = config;
+            break;
+          }
+        }
+        this.autoTests.push(test);
+      },
       error => this.error = error.error
     )
   }

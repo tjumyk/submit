@@ -5,6 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
 import {TaskService} from "../task.service";
+import {AdminService} from "../admin.service";
 
 @Component({
   selector: 'app-my-team-submission-details',
@@ -28,12 +29,17 @@ export class MyTeamSubmissionDetailsComponent implements OnInit, OnDestroy {
   autoTests: AutoTest[];
   getStatusColor: (string) => string;
 
+  printConclusion: (test:AutoTest)=>any;
+  renderResultHTML: (test:AutoTest)=>string;
+
   constructor(
     private taskService: TaskService,
     private submissionService: SubmissionService,
     private route: ActivatedRoute
   ) {
-    this.getStatusColor = submissionService.getAutoTestStatusColor
+    this.getStatusColor = submissionService.getAutoTestStatusColor;
+    this.printConclusion = AdminService.printConclusion;
+    this.renderResultHTML = AdminService.renderResultHTML;
   }
 
   ngOnInit() {
@@ -95,7 +101,17 @@ export class MyTeamSubmissionDetailsComponent implements OnInit, OnDestroy {
           return; // skip request if all (current) works finished
 
         this.submissionService.getMyTeamAutoTestAndResults(this.submissionId).subscribe(
-          tests => this.autoTests = tests,
+          tests => {
+            for(let test of tests){
+              for(let config of this.task.auto_test_configs){
+                if(config.id == test.config_id){
+                  test.config = config;
+                  break;
+                }
+              }
+            }
+            this.autoTests = tests;
+          },
           error => {
             this.error = error.error;
             clearInterval(this.autoTestsTrackerHandler);  // stop further requests

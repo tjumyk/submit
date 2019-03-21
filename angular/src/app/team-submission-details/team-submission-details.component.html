@@ -78,6 +78,17 @@
             {{test.id}}
           </div>
           <div class="item">
+            <div class="header">Config</div>
+            <span *ngIf="test.config">{{test.config.name}}</span>
+            (ID: {{test.config_id}})
+            <span *ngIf="test.config">
+              <i title="Private" class="icon red lock" *ngIf="test.config.is_private; else auto_test_config_private"></i>
+              <ng-template #auto_test_config_private>
+                <i title="Public" class="icon green lock open"></i>
+              </ng-template>
+            </span>
+          </div>
+          <div class="item">
             <div class="header">Work ID</div>
             {{test.work_id}}
           </div>
@@ -123,7 +134,22 @@
           </div>
           <div *ngIf="test.result != null">
             <div class="ui divider horizontal">Result</div>
-            <pre class="code">{{test.result|json}}</pre>
+            <p *ngIf="test.config">
+              <b>Conclusion:</b> {{printConclusion(test)}}
+            </p>
+            <ng-container *ngIf="test.config && test.config.result_render_html && printConclusion(test) != null; else noHTMLRender">
+              <div class="ui menu secondary pointing">
+                <a class="item" (click)="test._view_raw=false" [ngClass]="{'active': !test._view_raw}">Rendered</a>
+                <a class="item" (click)="test._view_raw=true" [ngClass]="{'active': test._view_raw}">Raw</a>
+              </div>
+              <div class="ui tab" [ngClass]="{'active': !test._view_raw}" [innerHTML]="renderResultHTML(test)"></div>
+              <div class="ui tab" [ngClass]="{'active': test._view_raw}">
+                <pre class="code">{{test.result|json}}</pre>
+              </div>
+            </ng-container>
+            <ng-template #noHTMLRender>
+              <pre class="code">{{test.result|json}}</pre>
+            </ng-template>
           </div>
           <div *ngIf="test.output_files.length">
             <div class="ui divider horizontal">Output Files</div>

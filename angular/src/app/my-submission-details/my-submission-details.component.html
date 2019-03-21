@@ -55,6 +55,11 @@
             {{test.id}}
           </div>
           <div class="item">
+            <div class="header">Config</div>
+            <span *ngIf="test.config">{{test.config.name}}</span>
+            (ID: {{test.config_id}})
+          </div>
+          <div class="item">
             <div class="header">Worker</div>
             <span *ngIf="test.hostname; else noWorker">{{test.hostname}}</span>
             <ng-template #noWorker>(None)</ng-template>
@@ -88,7 +93,12 @@
           </div>
           <div *ngIf="test.result != null">
             <div class="ui divider horizontal">Result</div>
-            <pre class="code">{{test.result|json}}</pre>
+            <ng-container *ngIf="test.config && test.config.result_render_html && printConclusion(test) != null; else noHTMLRender">
+              <div [innerHTML]="renderResultHTML(test)"></div>
+            </ng-container>
+            <ng-template #noHTMLRender>
+              <pre class="code">{{test.result|json}}</pre>
+            </ng-template>
           </div>
         </ng-container>
       </div>
