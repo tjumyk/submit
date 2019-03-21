@@ -195,6 +195,11 @@ class TaskService:
             elif k == 'result_conclusion_path':
                 if v and len(v) > 128:
                     raise TaskServiceError('result conclusion path too long')
+            elif k == 'priority':
+                if type(v) is not int:
+                    raise TaskServiceError('priority must be an integer')
+                if v < 0 or v > 255:
+                    raise TaskServiceError('priority must be between 0 and 255')
 
             setattr(config, k, v)
 
@@ -237,6 +242,11 @@ class TaskService:
             elif k == 'result_conclusion_path':
                 if v and len(v) > 128:
                     raise TaskServiceError('result conclusion path too long')
+            elif k == 'priority':
+                if type(v) is not int:
+                    raise TaskServiceError('priority must be an integer')
+                if v < 0 or v > 255:
+                    raise TaskServiceError('priority must be between 0 and 255')
             setattr(config, k, v)
         cls._check_auto_test_config(config)
 
