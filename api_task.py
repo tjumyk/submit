@@ -437,7 +437,7 @@ def task_my_submissions(tid):
             # start auto test if required
             if task.evaluation_method == 'auto_test':
                 for config in task.auto_test_configs:
-                    if config.trigger != 'after_submit':
+                    if not config.is_enabled or config.trigger != 'after_submit':
                         continue
                     SubmissionService.run_auto_test(new_submission, config)
                 db.session.commit()  # have to commit again
