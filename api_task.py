@@ -143,9 +143,15 @@ def task_user_submissions(tid, uid):
 
         # allow access even before the opening time
 
-        return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, target_user,
-                                                                                     include_cleared=True)])
-    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError) as e:
+        ret = []
+        for submission, last_tests in \
+                SubmissionService.get_for_task_and_user(task, target_user,
+                                                        include_cleared=True, include_private_tests=True):
+            submission_dict = submission.to_dict()
+            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
+            ret.append(submission_dict)
+        return jsonify(ret)
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -320,8 +326,13 @@ def task_team_submissions(tid, team_id):
 
         # allow access even before the opening time
 
-        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team,
-                                                                                               include_cleared=True)])
+        ret = []
+        for submission, last_tests in \
+                SubmissionService.get_for_team(team, include_cleared=True, include_private_tests=True):
+            submission_dict = submission.to_dict(with_submitter=True)
+            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
+            ret.append(submission_dict)
+        return jsonify(ret)
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -347,7 +358,13 @@ def task_my_submissions(tid):
         if request.method == 'GET':
             if not task.open_time or datetime.utcnow() < task.open_time:
                 return jsonify(msg='task has not yet open'), 403
-            return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
+
+            ret = []
+            for submission, last_tests in SubmissionService.get_for_task_and_user(task, user):
+                submission_dict = submission.to_dict()
+                submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
+                ret.append(submission_dict)
+            return jsonify(ret)
         else:  # POST
             # time check will be done in SubmissionService.add method
 
@@ -483,7 +500,12 @@ def task_my_team_submissions(tid):
         if not task.open_time or datetime.utcnow() < task.open_time:
             return jsonify(msg='task has not yet open'), 403
 
-        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team)])
+        ret = []
+        for submission, last_tests in SubmissionService.get_for_team(team):
+            submission_dict = submission.to_dict(with_submitter=True)
+            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
+            ret.append(submission_dict)
+        return jsonify(ret)
     except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
