@@ -26,19 +26,12 @@ export class MySubmissionDetailsComponent implements OnInit, OnDestroy {
 
   autoTestsTrackerHandler: number;
   autoTests: AutoTest[];
-  getStatusColor: (string) => string;
-
-  printConclusion: (test: AutoTest) => any;
-  renderResultHTML: (test: AutoTest) => string;
 
   constructor(
     private taskService: TaskService,
     private submissionService: SubmissionService,
     private route: ActivatedRoute
   ) {
-    this.getStatusColor = submissionService.getAutoTestStatusColor;
-    this.printConclusion = test => submissionService.printConclusion(test);
-    this.renderResultHTML = test => submissionService.renderResultHTML(test);
   }
 
   ngOnInit() {

@@ -34,12 +34,8 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
 
   autoTestsTrackerHandler: number;
   autoTests: AutoTest[];
-  getStatusColor: (string) => string;
   selectedAutoTestConfigId: number;
   requestingRunAutoTest: boolean;
-
-  printConclusion: (test:AutoTest)=>any;
-  renderResultHTML: (test:AutoTest)=>string;
 
   constructor(
     private taskService: TaskService,
@@ -49,9 +45,6 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private route: ActivatedRoute
   ) {
-    this.getStatusColor = submissionService.getAutoTestStatusColor;
-    this.printConclusion = test => submissionService.printConclusion(test);
-    this.renderResultHTML = test => submissionService.renderResultHTML(test);
   }
 
   ngOnInit() {
@@ -172,26 +165,15 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
     )
   }
 
-  deleteAutoTest(test: AutoTest, btn: HTMLElement) {
-    if (!confirm(`Really want to delete test ${test.id}?`))
-      return;
-
-    btn.classList.add('loading', 'disabled');
-    this.adminService.deleteAutoTest(this.submissionId, test.id).pipe(
-      finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => {
-        let index = 0;
-        for (let _test of this.autoTests) {  // use id match to avoid async update issue
-          if (_test.id == test.id) {
-            this.autoTests.splice(index, 1);
-            break;
-          }
-          ++index;
-        }
-      },
-      error => this.error = error.error
-    )
+  onAutoTestDeleted(test: AutoTest) {
+    let index = 0;
+    for (let _test of this.autoTests) {  // use id match to avoid async update issue
+      if (_test.id == test.id) {
+        this.autoTests.splice(index, 1);
+        break;
+      }
+      ++index;
+    }
   }
 
 }

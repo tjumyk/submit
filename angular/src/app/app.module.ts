@@ -41,6 +41,8 @@ import {JoinOrCreateTeamComponent} from './join-or-create-team/join-or-create-te
 import {TaskPreviewComponent} from './task-preview/task-preview.component';
 import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-preview.component';
 import { OrdinalPipe } from './ordinal.pipe';
+import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component';
+import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-test-advanced-card.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +82,8 @@ import { OrdinalPipe } from './ordinal.pipe';
     TaskPreviewComponent,
     TaskDetailsPreviewComponent,
     OrdinalPipe,
+    AutoTestCardComponent,
+    AutoTestAdvancedCardComponent,
   ],
   imports: [
     BrowserModule,
