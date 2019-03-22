@@ -5,8 +5,8 @@
   </div>
   <div class="item">
     <div class="header">Config</div>
-    <span *ngIf="config">{{config.name}}</span>
-    (ID: {{test.config_id}})
+    <span *ngIf="config; else noConfigData">{{config.name}}</span>
+    <ng-template #noConfigData>(ID: {{test.config_id}})</ng-template>
   </div>
   <div class="item">
     <div class="header">Worker</div>
