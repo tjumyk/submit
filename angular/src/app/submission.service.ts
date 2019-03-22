@@ -16,17 +16,6 @@ export class SubmissionService {
   ) {
   }
 
-  getAutoTestStatusColor(status: string): string{
-    switch (status) {
-      case 'STARTED': return '#21ba45';
-      case 'SUCCESS': return '#21ba45';
-      case 'RETRY': return '#fbbd08';
-      case 'FAILURE': return '#db2828';
-      case 'REVOKED': return '#db2828';
-      default: return 'rgba(0,0,0,.87)';
-    }
-  }
-
   getSubmission(id: number): Observable<Submission> {
     return this.http.get<Submission>(`${this.api}/${id}`)
   }
@@ -51,8 +40,25 @@ export class SubmissionService {
     return this.http.get<AutoTest[]>(`${this.myTeamApi}/${id}/auto-tests`)
   }
 
+  getAutoTestStatusColor(status: string): string {
+    switch (status) {
+      case 'STARTED':
+        return '#21ba45';
+      case 'SUCCESS':
+        return '#21ba45';
+      case 'RETRY':
+        return '#fbbd08';
+      case 'FAILURE':
+        return '#db2828';
+      case 'REVOKED':
+        return '#db2828';
+      default:
+        return 'rgba(0,0,0,.87)';
+    }
+  }
+
   /* Utility for AutoTests */
-  evaluateObjectPath(obj, path: string){
+  evaluateObjectPath(obj, path: string) {
     let ret = obj;
     if (path) {
       for (let segment of path.split('.')) {
@@ -64,7 +70,7 @@ export class SubmissionService {
     return ret;
   };
 
-  extractConclusion(test:AutoTest, config?: AutoTestConfig){
+  extractConclusion(test: AutoTest, config?: AutoTestConfig) {
     if (!test)
       return null;
     if (!config)
@@ -75,7 +81,7 @@ export class SubmissionService {
     return this.evaluateObjectPath(test.result, config.result_conclusion_path);
   };
 
-  printConclusion(test: AutoTest, config?: AutoTestConfig){
+  printConclusion(test: AutoTest, config?: AutoTestConfig) {
     if (!test)
       return null;
     if (!config)
