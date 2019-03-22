@@ -53,7 +53,24 @@ export class SubmissionService {
       case 'REVOKED':
         return '#db2828';
       default:
-        return 'rgba(0,0,0,.87)';
+        return '#1b1c1d';
+    }
+  }
+
+  getAutoTestStatusClass(status: string): string {
+    switch (status) {
+      case 'STARTED':
+        return 'green';
+      case 'SUCCESS':
+        return 'green';
+      case 'RETRY':
+        return 'yellow';
+      case 'FAILURE':
+        return 'red';
+      case 'REVOKED':
+        return 'red';
+      default:
+        return 'black';
     }
   }
 
