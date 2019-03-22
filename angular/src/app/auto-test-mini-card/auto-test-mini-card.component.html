@@ -1,0 +1,13 @@
+<ng-container *ngIf="(test.final_state || test.state) == 'FAILURE' || (test.final_state || test.state) == 'SUCCESS'; else otherState">
+  <div *ngIf="test.exception_class" [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
+    {{test.exception_class}}
+  </div>
+  <div *ngIf="test.result != null" class="detail">
+    {{printConclusion(test, config)}}
+  </div>
+</ng-container>
+<ng-template #otherState>
+  <div [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
+    {{test.final_state || test.state}}
+  </div>
+</ng-template>

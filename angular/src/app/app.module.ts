@@ -42,6 +42,7 @@ import {TaskPreviewComponent} from './task-preview/task-preview.component';
 import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-preview.component';
 import { OrdinalPipe } from './ordinal.pipe';
 import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component';
+import { AutoTestMiniCardComponent } from './auto-test-mini-card/auto-test-mini-card.component';
 import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-test-advanced-card.component';
 
 @NgModule({
@@ -83,6 +84,7 @@ import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-te
     TaskDetailsPreviewComponent,
     OrdinalPipe,
     AutoTestCardComponent,
+    AutoTestMiniCardComponent,
     AutoTestAdvancedCardComponent,
   ],
   imports: [
