@@ -299,11 +299,10 @@ class SubmissionService:
         if submission is None:
             raise SubmissionServiceError('submission is required')
 
-        sub_query = db.session.query(AutoTestConfig.id.label('config_id'), func.max(AutoTest.id).label('last_test_id')) \
-            .filter(AutoTest.config_id == AutoTestConfig.id,
-                    AutoTest.submission_id == submission.id) \
-            .group_by(AutoTestConfig.id).subquery()
+        sub_query = db.session.query(func.max(AutoTest.id).label('last_test_id')) \
+            .filter(AutoTest.submission_id == submission.id) \
+            .group_by(AutoTest.config_id).subquery()
         return db.session.query(AutoTestConfig, AutoTest) \
-            .filter(AutoTestConfig.id == sub_query.c.config_id,
-                    AutoTest.id == sub_query.c.last_test_id)\
-            .order_by(AutoTestConfig.id).all()
+            .filter(AutoTestConfig.id == AutoTest.config_id,
+                    AutoTest.id == sub_query.c.last_test_id) \
+            .order_by(AutoTest.config_id).all()
