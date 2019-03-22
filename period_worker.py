@@ -51,7 +51,7 @@ def _exec_work():
             _process_task_open(task)
         for close_hours in team_join_close_notify_hours:
             for task in db.session.query(Task) \
-                    .filter(Task.is_team_task.is_(True),
+                    .filter(Task.is_team_task == True,
                             Task.open_time < now,
                             Task.team_join_close_time < now + timedelta(hours=close_hours),
                             Task.team_join_close_time > now + timedelta(hours=close_hours) - timedelta(seconds=expire),
