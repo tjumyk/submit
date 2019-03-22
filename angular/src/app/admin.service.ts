@@ -349,40 +349,4 @@ export class AdminService {
   deleteAutoTest(id: number, tid: number): Observable<any> {
     return this.http.delete(`${this.api}/submissions/${id}/auto-tests/${tid}`)
   }
-
-  /* Utility for AutoTests */
-  static evaluatePath(obj, path: string){
-    let ret = obj;
-    if(path){
-      for(let segment of path.split('.')){
-        if(typeof ret != 'object')
-          return null;
-        ret = ret[segment]
-      }
-    }
-    return ret;
-  }
-
-  static printConclusion(test: AutoTest){
-    let config = test.config;
-    if(!config)
-      return null;
-
-    let conclusion = AdminService.evaluatePath(test.result, config.result_conclusion_path);
-    if(config.result_conclusion_type == 'json')
-      conclusion = JSON.stringify(conclusion);
-    return conclusion;
-  }
-
-  static renderResultHTML(test: AutoTest){
-    let config = test.config;
-    if(!config)
-      return '';
-
-    let html = config.result_render_html;
-    html = html.replace(/{{([^}]*)}}/g, (match, path)=>{
-      return AdminService.evaluatePath(test.result, path)
-    });
-    return html;
-  }
 }

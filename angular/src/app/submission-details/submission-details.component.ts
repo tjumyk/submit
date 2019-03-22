@@ -46,8 +46,8 @@ export class SubmissionDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {
     this.getStatusColor = submissionService.getAutoTestStatusColor;
-    this.printConclusion = AdminService.printConclusion;
-    this.renderResultHTML = AdminService.renderResultHTML;
+    this.printConclusion = test => submissionService.printConclusion(test);
+    this.renderResultHTML = test => submissionService.renderResultHTML(test);
   }
 
   ngOnInit() {

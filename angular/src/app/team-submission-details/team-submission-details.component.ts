@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AutoTest, AutoTestConfig, ErrorMessage, Submission, Task, Team, User} from "../models";
+import {AutoTest, ErrorMessage, Submission, Task, Team, User} from "../models";
 import {SubmissionService} from "../submission.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -50,8 +50,8 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {
     this.getStatusColor = submissionService.getAutoTestStatusColor;
-    this.printConclusion = AdminService.printConclusion;
-    this.renderResultHTML = AdminService.renderResultHTML;
+    this.printConclusion = test => submissionService.printConclusion(test);
+    this.renderResultHTML = test => submissionService.renderResultHTML(test);
   }
 
   ngOnInit() {
