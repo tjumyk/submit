@@ -1,3 +1,4 @@
+# Note: Celery does not support 3.7 now
 python-dateutil
 flask
 flask-sqlalchemy
