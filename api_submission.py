@@ -106,12 +106,7 @@ def test_and_results(sid):
 
         tests = []
         for test in submission.auto_tests:
-            test_obj = test.to_dict(with_advanced_fields=True)
-            if not test.final_state:  # running tests
-                result = AutoTestService.get_result(test)
-                result_obj = AutoTestService.result_to_dict(result, with_advanced_fields=True)
-                test_obj.update(result_obj)  # merge temporary result
-            tests.append(test_obj)
+            tests.append(AutoTestService.test_to_dict(test, with_advanced_fields=True))
 
         return jsonify(tests)
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:

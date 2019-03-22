@@ -79,3 +79,14 @@ class AutoTestService:
                 if with_advanced_fields:
                     d['pid'] = worker_info.get('pid')
         return d
+
+    @classmethod
+    def test_to_dict(cls, test: AutoTest, with_advanced_fields=False) ->dict:
+        """
+        Get a dumped dictionary with additional information from the temporary result
+        """
+        test_obj = test.to_dict(with_advanced_fields=with_advanced_fields)
+        if not test.final_state:  # running tests
+            result_obj = cls.result_to_dict(cls.get_result(test), with_advanced_fields=with_advanced_fields)
+            test_obj.update(result_obj)  # merge temporary result
+        return test_obj

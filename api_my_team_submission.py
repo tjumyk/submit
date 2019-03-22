@@ -115,11 +115,7 @@ def auto_test_and_results(sid):
         for config, test in SubmissionService.get_last_auto_tests(submission):
             if config.is_private:  # skip private tests
                 continue
-            test_obj = test.to_dict()
-            if not test.final_state:  # running tests
-                result_obj = AutoTestService.result_to_dict(AutoTestService.get_result(test))
-                test_obj.update(result_obj)  # merge temporary result
-            tests.append(test_obj)
+            tests.append(AutoTestService.test_to_dict(test))
 
         return jsonify(tests)
     except (SubmissionServiceError, TeamServiceError, AutoTestServiceError) as e:
