@@ -436,8 +436,10 @@
                 </td>
                 <td>{{ config.description }}</td>
                 <td>
-                  <a class="ui button small icon" (click)="editAutoTestConfig(config)"><i class="icon edit"></i></a>
-                  <a class="ui button small red icon" (click)="deleteAutoTestConfig(config, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
+                  <div class="ui small buttons">
+                    <a class="ui button icon" (click)="editAutoTestConfig(config)"><i class="icon edit"></i></a>
+                    <a class="ui button red icon" (click)="deleteAutoTestConfig(config, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
+                  </div>
                 </td>
               </tr>
               </tbody>
