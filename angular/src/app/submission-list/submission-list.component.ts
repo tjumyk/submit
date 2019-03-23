@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Submission, SubmissionStatus, Task, User} from "../models";
 import {AccountService} from "../account.service";
-import {TaskService} from "../task.service";
+import {LastAutoTestsMap, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 
@@ -23,6 +23,8 @@ export class SubmissionListComponent implements OnInit {
   loadingUser: boolean;
   loadingStatus: boolean;
   loadingSubmissions: boolean;
+  lastAutoTests: LastAutoTestsMap;
+  loadingLastAutoTests: boolean;
 
   constructor(
     private accountService: AccountService,
@@ -57,7 +59,17 @@ export class SubmissionListComponent implements OnInit {
                 this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
                   finalize(() => this.loadingSubmissions = false)
                 ).subscribe(
-                  submissions => this.submissions = submissions,
+                  submissions => {
+                    this.submissions = submissions;
+
+                    this.loadingLastAutoTests = true;
+                    this.taskService.getUserSubmissionLastAutoTests(this.taskId, this.userId).pipe(
+                      finalize(()=>this.loadingLastAutoTests=false)
+                    ).subscribe(
+                      tests=>this.lastAutoTests = tests,
+                      error=>this.error = error.error
+                    )
+                  },
                   error => this.error = error.error
                 )
               },

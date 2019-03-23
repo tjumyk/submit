@@ -1,9 +1,7 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {AutoTest, Submission, SubmissionStatus, Task} from "../models";
-import {LatePenalty} from "../task.service";
+import {LastAutoTestsMap, LatePenalty} from "../task.service";
 import * as moment from "moment";
-
-type LastAutoTestsMap = { [sid: number]: { [cid: number]: AutoTest } };
 
 @Component({
   selector: 'app-submissions-table',
@@ -14,9 +12,9 @@ export class SubmissionsTableComponent implements OnInit, OnChanges {
   @Input() task: Task;
   @Input() status: SubmissionStatus;
   @Input() submissions: Submission[];
-  @Input() lastAutoTest: LastAutoTestsMap;
+  @Input() lastAutoTests: LastAutoTestsMap;
 
-  attemptOffset: number;
+  rowOffset: number;
 
   constructor() {
   }
@@ -45,9 +43,9 @@ export class SubmissionsTableComponent implements OnInit, OnChanges {
 
     // decide attempt offset
     if (this.task.submission_history_limit != null) {
-      this.attemptOffset = Math.max(0, this.status.attempts - this.submissions.length)
+      this.rowOffset = Math.max(0, this.status.attempts - this.submissions.length)
     } else {
-      this.attemptOffset = 0;
+      this.rowOffset = 0;
     }
 
     // compute penalty

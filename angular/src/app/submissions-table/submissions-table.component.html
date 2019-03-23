@@ -1,14 +1,20 @@
-<div class="ui message info" *ngIf="attemptOffset">
+<div class="ui message info" *ngIf="rowOffset">
   <i class="icon info circle"></i>
   Older submissions have been removed due to the history limit of this task.
 </div>
 
 <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
 <table class="ui table unstackable" *ngIf="submissions">
-  <thead><tr><th>#</th><th>ID</th><th *ngIf="task.is_team_task">Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
+  <thead>
+  <tr>
+    <th>#</th><th>ID</th><th *ngIf="task.is_team_task">Submitter</th><th>Submitted At</th>
+    <th *ngFor="let config of task.auto_test_configs">{{config.name}}</th>
+    <th>Operations</th>
+  </tr>
+  </thead>
   <tbody>
   <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'submission-cleared': sub.is_cleared}">
-    <td>{{ i + 1 + attemptOffset }}</td>
+    <td>{{ i + 1 + rowOffset }}</td>
     <td>{{sub.id}}</td>
     <td *ngIf="task.is_team_task">
       <img src="{{sub.submitter.avatar}}?size=64" *ngIf="sub.submitter.avatar; else defaultAvatar" class="ui image avatar">
@@ -24,6 +30,12 @@
           <div class="detail" *ngIf="sub['_latePenalty']">-{{sub['_latePenalty'] | percent:'1.0-3'}}</div>
         </div>
       </div>
+    </td>
+    <td *ngFor="let config of task.auto_test_configs">
+      <ng-container *ngIf="lastAutoTests && lastAutoTests[sub.id] && lastAutoTests[sub.id][config.id]">
+        <!-- TODO Avoid looking up dictionary again-->
+        <app-auto-test-mini-card [config]="config" [test]="lastAutoTests[sub.id][config.id]"></app-auto-test-mini-card>
+      </ng-container>
     </td>
     <td>
       <a class="ui button mini icon" routerLink="{{sub.id}}" title="Details" *ngIf="!sub.is_cleared"><i class="icon ellipsis horizontal"></i></a>
