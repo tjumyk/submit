@@ -212,25 +212,32 @@ class SubmissionService:
                 results = [bool(r) for r in results]
             elif conclusion_type == 'string':
                 results = [str(r) for r in results]
+            elif conclusion_type == 'json':
+                pass
+            else:
+                raise SubmissionServiceError('unknown result conclusion type: %s' % conclusion_type)
         except ValueError as e:
             raise SubmissionServiceError('failed to convert conclusion to type %s'
                                          % conclusion_type, str(e))
 
         acc_method = config.results_conclusion_accumulate_method
-        if acc_method == 'last':
-            return results[-1]
-        if acc_method == 'first':
-            return results[0]
-        if acc_method == 'highest':
-            return max(results)
-        if acc_method == 'lowest':
-            return min(results)
-        if acc_method == 'average':
-            return sum(results) / len(results)
-        if acc_method == 'and':
-            return all(results)
-        if acc_method == 'or':
-            return any(results)
+        try:
+            if acc_method == 'last':
+                return results[-1]
+            if acc_method == 'first':
+                return results[0]
+            if acc_method == 'highest':
+                return max(results)
+            if acc_method == 'lowest':
+                return min(results)
+            if acc_method == 'average':
+                return sum(results) / len(results)
+            if acc_method == 'and':
+                return all(results)
+            if acc_method == 'or':
+                return any(results)
+        except TypeError as e:
+            raise SubmissionServiceError('failed to accumulate conclusions with method: %s' % acc_method, str(e))
         raise SubmissionServiceError('unknown result conclusion accumulate method: %s' % acc_method)
 
     @staticmethod
