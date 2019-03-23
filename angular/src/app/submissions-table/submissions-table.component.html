@@ -1,0 +1,33 @@
+<div class="ui message info" *ngIf="attemptOffset">
+  <i class="icon info circle"></i>
+  Older submissions have been removed due to the history limit of this task.
+</div>
+
+<ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
+<table class="ui table unstackable" *ngIf="submissions">
+  <thead><tr><th>#</th><th>ID</th><th *ngIf="task.is_team_task">Submitter</th><th>Submitted At</th><th>Operations</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let sub of submissions; index as i" [ngClass]="{'submission-cleared': sub.is_cleared}">
+    <td>{{ i + 1 + attemptOffset }}</td>
+    <td>{{sub.id}}</td>
+    <td *ngIf="task.is_team_task">
+      <img src="{{sub.submitter.avatar}}?size=64" *ngIf="sub.submitter.avatar; else defaultAvatar" class="ui image avatar">
+      <span *ngIf="sub.submitter.nickname; else nameOnly">{{sub.submitter.nickname}} ({{sub.submitter.name}})</span>
+      <ng-template #nameOnly>{{sub.submitter.name}}</ng-template>
+    </td>
+    <td>
+      {{sub.created_at | date: 'medium'}}
+      <div *ngIf="sub['_lateDays']">
+        <div class="ui label small red" >
+          {{sub['_lateDays']}} <span *ngIf="sub['_lateDays']>1; else oneDay">days</span> late
+          <ng-template #oneDay>day</ng-template>
+          <div class="detail" *ngIf="sub['_latePenalty']">-{{sub['_latePenalty'] | percent:'1.0-3'}}</div>
+        </div>
+      </div>
+    </td>
+    <td>
+      <a class="ui button mini icon" routerLink="{{sub.id}}" title="Details" *ngIf="!sub.is_cleared"><i class="icon ellipsis horizontal"></i></a>
+    </td>
+  </tr>
+  </tbody>
+</table>

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Submission, Task, Team} from "../models";
+import {ErrorMessage, Submission, SubmissionStatus, Task, Team} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
@@ -19,7 +19,10 @@ export class TeamSubmissionListComponent implements OnInit {
   task: Task;
   teamId: number;
   team: Team;
+  status: SubmissionStatus;
   submissions: Submission[];
+  loadingTeam: boolean;
+  loadingStatus: boolean;
   loadingSubmissions: boolean;
 
   constructor(
@@ -38,16 +41,28 @@ export class TeamSubmissionListComponent implements OnInit {
       task => {
         this.task = task;
 
-        this.teamService.getTeam(this.teamId).subscribe(
+        this.loadingTeam = true;
+        this.teamService.getTeam(this.teamId).pipe(
+          finalize(() => this.loadingTeam = false)
+        ).subscribe(
           team => {
             this.team = team;
 
-            this.loadingSubmissions = true;
-            this.taskService.getTeamSubmissions(this.taskId, this.teamId).pipe(
-              finalize(() => this.loadingSubmissions = false)
+            this.loadingStatus = true;
+            this.taskService.getTeamSubmissionStatus(this.taskId, this.teamId).pipe(
+              finalize(() => this.loadingStatus = false)
             ).subscribe(
-              submissions => this.submissions = submissions,
-              error => this.error = error.error
+              status => {
+                this.status = status;
+
+                this.loadingSubmissions = true;
+                this.taskService.getTeamSubmissions(this.taskId, this.teamId).pipe(
+                  finalize(() => this.loadingSubmissions = false)
+                ).subscribe(
+                  submissions => this.submissions = submissions,
+                  error => this.error = error.error
+                )
+              }
             )
           }
         )

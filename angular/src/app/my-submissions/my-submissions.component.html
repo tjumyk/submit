@@ -2,30 +2,4 @@
 <div class="ui loader text active" *ngIf="loadingStatus">Loading status...</div>
 <div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
 
-<div class="ui message info" *ngIf="attemptOffset">
-  <i class="icon info circle"></i>
-  Older submissions have been removed due to the history limit of this task.
-</div>
-
-<table class="ui table unstackable" *ngIf="submissions">
-  <thead><tr><th>#</th><th>ID</th><th>Submitted At</th><th>Operations</th></tr></thead>
-  <tbody>
-  <tr *ngFor="let sub of submissions; index as i">
-    <td>{{ i + 1 + attemptOffset }}</td>
-    <td>{{sub.id}}</td>
-    <td>
-      {{sub.created_at | date: 'medium'}}
-      <div *ngIf="sub['_lateDays']">
-        <div class="ui label small red" >
-          {{sub['_lateDays']}} <span *ngIf="sub['_lateDays']>1; else oneDay">days</span> late
-          <ng-template #oneDay>day</ng-template>
-          <div class="detail" *ngIf="sub['_latePenalty']">-{{sub['_latePenalty'] | percent:'1.0-3'}}</div>
-        </div>
-      </div>
-    </td>
-    <td>
-      <a class="ui button mini icon" routerLink="{{sub.id}}" title="Details"><i class="icon ellipsis horizontal"></i></a>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<app-submissions-table [task]="task" [status]="status" [submissions]="submissions"></app-submissions-table>

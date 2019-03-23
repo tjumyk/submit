@@ -44,6 +44,7 @@ import { OrdinalPipe } from './ordinal.pipe';
 import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component';
 import { AutoTestMiniCardComponent } from './auto-test-mini-card/auto-test-mini-card.component';
 import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-test-advanced-card.component';
+import { SubmissionsTableComponent } from './submissions-table/submissions-table.component';
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-te
     AutoTestCardComponent,
     AutoTestMiniCardComponent,
     AutoTestAdvancedCardComponent,
+    SubmissionsTableComponent,
   ],
   imports: [
     BrowserModule,

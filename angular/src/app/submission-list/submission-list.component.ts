@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Submission, Task, User} from "../models";
+import {ErrorMessage, Submission, SubmissionStatus, Task, User} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
@@ -18,8 +18,10 @@ export class SubmissionListComponent implements OnInit {
   task: Task;
   userId: number;
   user: User;
+  status: SubmissionStatus;
   submissions: Submission[];
   loadingUser: boolean;
+  loadingStatus: boolean;
   loadingSubmissions: boolean;
 
   constructor(
@@ -44,11 +46,21 @@ export class SubmissionListComponent implements OnInit {
           user => {
             this.user = user;
 
-            this.loadingSubmissions = true;
-            this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
-              finalize(() => this.loadingSubmissions = false)
+            this.loadingStatus = true;
+            this.taskService.getUserSubmissionStatus(this.taskId, this.userId).pipe(
+              finalize(() => this.loadingStatus = false)
             ).subscribe(
-              submissions => this.submissions = submissions,
+              status => {
+                this.status = status;
+
+                this.loadingSubmissions = true;
+                this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
+                  finalize(() => this.loadingSubmissions = false)
+                ).subscribe(
+                  submissions => this.submissions = submissions,
+                  error => this.error = error.error
+                )
+              },
               error => this.error = error.error
             )
           },
