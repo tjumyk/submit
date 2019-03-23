@@ -1,4 +1,6 @@
+import json
 import os
+from collections import defaultdict
 from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 
@@ -105,7 +107,8 @@ class SubmissionService:
 
     @classmethod
     def get_last_auto_tests_for_task_and_user(cls, task: Task, user: UserAlias, include_cleared=False,
-                                              include_private_tests=False) \
+                                              include_private_tests=False, only_for_first_submission=False,
+                                              only_for_last_submission=False) \
             -> Dict[int, Dict[int, AutoTest]]:
         if task is None:
             raise SubmissionServiceError('task is required')
@@ -118,11 +121,22 @@ class SubmissionService:
         ]
         if not include_cleared:
             filters.append(Submission.is_cleared == False)
-        sub_query = db.session.query(Submission.id.label('submission_id'),
-                                     func.max(AutoTest.id).label('last_test_id')) \
-            .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
-            .filter(*filters) \
-            .group_by(Submission.id, AutoTest.config_id).subquery()
+        if only_for_first_submission or only_for_last_submission:
+            if only_for_first_submission and only_for_last_submission:
+                raise SubmissionServiceError('cannot select both first-only and last-only submission')
+            agg_method = func.max if only_for_last_submission else func.min
+            sub_sub_query = db.session.query(agg_method(Submission.id).label('submission_id')) \
+                .filter(*filters).subquery()
+            sub_query = db.session.query(sub_sub_query.c.submission_id.label('submission_id'),
+                                         func.max(AutoTest.id).label('last_test_id')) \
+                .outerjoin(AutoTest, AutoTest.submission_id == sub_sub_query.c.submission_id) \
+                .group_by(sub_sub_query.c.submission_id, AutoTest.config_id).subquery()
+        else:
+            sub_query = db.session.query(Submission.id.label('submission_id'),
+                                         func.max(AutoTest.id).label('last_test_id')) \
+                .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
+                .filter(*filters) \
+                .group_by(Submission.id, AutoTest.config_id).subquery()
         results = db.session.query(sub_query.c.submission_id, AutoTest) \
             .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id) \
             .all()
@@ -145,6 +159,95 @@ class SubmissionService:
                 last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
         return last_tests
+
+    @classmethod
+    def get_auto_test_conclusions_for_task_and_user(cls, task: Task, user: UserAlias, include_private_tests=False) \
+            -> Dict[int, object]:
+        configs = task.auto_test_configs
+
+        last_submission_only = True
+        first_submission_only = True
+        for config in configs:
+            acc_method = config.results_conclusion_accumulate_method
+            if acc_method != 'last':
+                last_submission_only = False
+            if acc_method != 'first':
+                first_submission_only = False
+        last_tests = cls.get_last_auto_tests_for_task_and_user(task, user, include_cleared=False,
+                                                               include_private_tests=include_private_tests,
+                                                               only_for_first_submission=first_submission_only,
+                                                               only_for_last_submission=last_submission_only)
+        # re-structure dict
+        test_results = defaultdict(list)
+        for sid, tests in last_tests.items():
+            for cid, test in tests.items():
+                test_results[cid].append(test)
+
+        ret = {}
+        for config in configs:
+            tests = test_results.get(config.id)
+            if not tests:
+                continue  # no tests
+            conclusion = cls.extract_auto_test_conclusion(config, tests)
+            ret[config.id] = conclusion
+        return ret
+
+    @classmethod
+    def extract_auto_test_conclusion(cls, config: AutoTestConfig, tests: List[AutoTest]):
+        if not config:
+            raise SubmissionServiceError('auto test config is required')
+        if not tests:
+            raise SubmissionServiceError('at least one auto test is required')
+
+        results = [cls.evaluate_object_path(t.result, config.result_conclusion_path) for t in tests]
+
+        conclusion_type = config.result_conclusion_type
+        try:
+            # type conversion
+            if conclusion_type == 'int':
+                results = [int(r) for r in results]
+            elif conclusion_type == 'float':
+                results = [float(r) for r in results]
+            elif conclusion_type == 'bool':
+                results = [bool(r) for r in results]
+            elif conclusion_type == 'string':
+                results = [str(r) for r in results]
+        except ValueError as e:
+            raise SubmissionServiceError('failed to convert conclusion to type %s'
+                                         % conclusion_type, str(e))
+
+        acc_method = config.results_conclusion_accumulate_method
+        if acc_method == 'last':
+            return results[-1]
+        if acc_method == 'first':
+            return results[0]
+        if acc_method == 'highest':
+            return max(results)
+        if acc_method == 'lowest':
+            return min(results)
+        if acc_method == 'average':
+            return sum(results) / len(results)
+        if acc_method == 'and':
+            return all(results)
+        if acc_method == 'or':
+            return any(results)
+        raise SubmissionServiceError('unknown result conclusion accumulate method: %s' % acc_method)
+
+    @staticmethod
+    def evaluate_object_path(obj: str, path: str):
+        try:
+            ret = json.loads(obj)
+        except ValueError as e:
+            raise SubmissionServiceError('result is not a valid JSON object', str(e))
+        if path:
+            for segment in path.split('.'):
+                if not segment:
+                    raise SubmissionServiceError('invalid result path', 'empty segment found')
+                if type(ret) is not dict:
+                    raise SubmissionServiceError('failed to evaluate path on result',
+                                                 'tried to get value of key "%s" on non-dict object' % segment)
+                ret = ret[segment]
+        return ret
 
     @staticmethod
     def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
@@ -171,7 +274,8 @@ class SubmissionService:
         return query.order_by(Submission.id).all()
 
     @staticmethod
-    def get_last_auto_tests_for_team(team: Team, include_cleared=False, include_private_tests=False) \
+    def get_last_auto_tests_for_team(team: Team, include_cleared=False, include_private_tests=False,
+                                     only_for_first_submission=False, only_for_last_submission=False) \
             -> Dict[int, Dict[int, AutoTest]]:
         if team is None:
             raise SubmissionServiceError('team is required')
@@ -183,11 +287,22 @@ class SubmissionService:
         ]
         if not include_cleared:
             filters.append(Submission.is_cleared == False)
-        sub_query = db.session.query(Submission.id.label('submission_id'),
-                                     func.max(AutoTest.id).label('last_test_id')) \
-            .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
-            .filter(*filters).group_by(Submission.id, AutoTest.config_id) \
-            .subquery()
+        if only_for_first_submission or only_for_last_submission:
+            if only_for_first_submission and only_for_last_submission:
+                raise SubmissionServiceError('cannot select both first-only and last-only submission')
+            agg_method = func.max if only_for_last_submission else func.min
+            sub_sub_query = db.session.query(agg_method(Submission.id).label('submission_id')) \
+                .filter(*filters).subquery()
+            sub_query = db.session.query(sub_sub_query.c.submission_id.label('submission_id'),
+                                         func.max(AutoTest.id).label('last_test_id')) \
+                .outerjoin(AutoTest, AutoTest.submission_id == sub_sub_query.c.submission_id) \
+                .group_by(sub_sub_query.c.submission_id, AutoTest.config_id).subquery()
+        else:
+            sub_query = db.session.query(Submission.id.label('submission_id'),
+                                         func.max(AutoTest.id).label('last_test_id')) \
+                .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
+                .filter(*filters).group_by(Submission.id, AutoTest.config_id) \
+                .subquery()
         results = db.session.query(sub_query.c.submission_id, AutoTest) \
             .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id) \
             .all()
@@ -210,6 +325,38 @@ class SubmissionService:
                 last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
         return last_tests
+
+    @classmethod
+    def get_auto_test_conclusions_for_team(cls, team: Team, include_private_tests=False) \
+            -> Dict[int, object]:
+        configs = team.task.auto_test_configs
+
+        last_submission_only = True
+        first_submission_only = True
+        for config in configs:
+            acc_method = config.results_conclusion_accumulate_method
+            if acc_method != 'last':
+                last_submission_only = False
+            if acc_method != 'first':
+                first_submission_only = False
+        last_tests = cls.get_last_auto_tests_for_team(team, include_cleared=False,
+                                                      include_private_tests=include_private_tests,
+                                                      only_for_first_submission=first_submission_only,
+                                                      only_for_last_submission=last_submission_only)
+        # re-structure dict
+        test_results = defaultdict(list)
+        for sid, tests in last_tests.items():
+            for cid, test in tests.items():
+                test_results[cid].append(test)
+
+        ret = {}
+        for config in configs:
+            tests = test_results.get(config.id)
+            if not tests:
+                continue  # no tests
+            conclusion = cls.extract_auto_test_conclusion(config, tests)
+            ret[config.id] = conclusion
+        return ret
 
     @staticmethod
     def count_for_team(team: Team, include_cleared=False) -> int:
