@@ -19,6 +19,7 @@ export class AutoTestAdvancedCardComponent implements OnInit {
   @Output() error: EventEmitter<ErrorMessage> = new EventEmitter();
 
   getStatusColor: (status: string) => string;
+  extractConclusion: (test: AutoTest, config: AutoTestConfig) => any;
   printConclusion: (test: AutoTest, config: AutoTestConfig) => any;
   renderResultHTML: (test: AutoTest, config: AutoTestConfig) => string;
 
@@ -28,6 +29,7 @@ export class AutoTestAdvancedCardComponent implements OnInit {
   ) {
     /* use closures to avoid scope error */
     this.getStatusColor = status => submissionService.getAutoTestStatusColor(status);
+    this.extractConclusion = (test, config) => submissionService.extractConclusion(test, config);
     this.printConclusion = (test, config) => submissionService.printConclusion(test, config);
     this.renderResultHTML = (test, config) => submissionService.renderResultHTML(test, config);
   }

@@ -79,6 +79,8 @@ export class SubmissionService {
     let ret = obj;
     if (path) {
       for (let segment of path.split('.')) {
+        if (!segment)
+          return null; // unexpected empty segment
         if (typeof ret != 'object')
           return null;
         ret = ret[segment]
@@ -122,9 +124,8 @@ export class SubmissionService {
       return '';
 
     let html = config.result_render_html;
-    let evaluatePath = this.evaluateObjectPath;
     html = html.replace(/{{([^}]*)}}/g, (match, path) => {
-      return evaluatePath(test.result, path)
+      return this.evaluateObjectPath(test.result, path)
     });
     return html;
   }

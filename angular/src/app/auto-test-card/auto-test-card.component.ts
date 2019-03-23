@@ -13,7 +13,7 @@ export class AutoTestCardComponent implements OnInit {
   @Input() config: AutoTestConfig;
 
   getStatusColor: (status: string) => string;
-  printConclusion: (test: AutoTest, config: AutoTestConfig) => any;
+  extractConclusion: (test: AutoTest, config: AutoTestConfig) => any;
   renderResultHTML: (test: AutoTest, config: AutoTestConfig) => string;
 
   constructor(
@@ -21,7 +21,7 @@ export class AutoTestCardComponent implements OnInit {
   ) {
     /* use closures to avoid scope error */
     this.getStatusColor = status => submissionService.getAutoTestStatusColor(status);
-    this.printConclusion = (test, config) => submissionService.printConclusion(test, config);
+    this.extractConclusion = (test, config) => submissionService.extractConclusion(test, config);
     this.renderResultHTML = (test, config) => submissionService.renderResultHTML(test, config);
   }
 

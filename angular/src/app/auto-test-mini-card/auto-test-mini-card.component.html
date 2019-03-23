@@ -2,7 +2,7 @@
   <div *ngIf="test.exception_class" [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
     {{test.exception_class}}
   </div>
-  <div *ngIf="test.result != null" class="detail">
+  <div *ngIf="test.result != null">
     {{printConclusion(test, config)}}
   </div>
 </ng-container>

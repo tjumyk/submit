@@ -43,7 +43,7 @@
   <div *ngIf="test.result != null">
     <div class="ui divider horizontal">Result</div>
     <ng-container
-      *ngIf="config && config.result_render_html && printConclusion(test, config) != null; else noHTMLRender">
+      *ngIf="config && config.result_render_html && extractConclusion(test, config) != null; else noHTMLRender">
       <div [innerHTML]="renderResultHTML(test, config)"></div>
     </ng-container>
     <ng-template #noHTMLRender>
