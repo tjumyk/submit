@@ -143,14 +143,40 @@ def task_user_submissions(tid, uid):
 
         # allow access even before the opening time
 
-        ret = []
-        for submission, last_tests in \
-                SubmissionService.get_for_task_and_user(task, target_user,
-                                                        include_cleared=True, include_private_tests=True):
-            submission_dict = submission.to_dict()
-            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
-            ret.append(submission_dict)
-        return jsonify(ret)
+        return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, target_user,
+                                                                                     include_cleared=True)])
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/user-submissions/<int:uid>/last-auto-tests')
+@requires_login
+def task_user_submissions_last_auto_tests(tid, uid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
+
+        # allow access even before the opening time
+
+        last_tests = SubmissionService.get_last_auto_tests_for_task_and_user(task, target_user, include_cleared=True,
+                                                                             include_private_tests=True)
+        return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
+                        for sid, tests in last_tests.items()})
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -326,14 +352,43 @@ def task_team_submissions(tid, team_id):
 
         # allow access even before the opening time
 
-        ret = []
-        for submission, last_tests in \
-                SubmissionService.get_for_team(team, include_cleared=True, include_private_tests=True):
-            submission_dict = submission.to_dict(with_submitter=True)
-            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
-            ret.append(submission_dict)
-        return jsonify(ret)
+        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team,
+                                                                                               include_cleared=True)])
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/team-submissions/<int:team_id>/last-auto-tests')
+@requires_login
+def task_team_submissions_last_auto_tests(tid, team_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        team = TeamService.get(team_id)
+        if team is None:
+            return jsonify(msg='target team not found'), 404
+        if team.task_id != tid:
+            return jsonify(msg='target team does not belong to this task'), 400
+
+        # allow access even before the opening time
+
+        last_tests = SubmissionService.get_last_auto_tests_for_team(team, include_cleared=True,
+                                                                    include_private_tests=True)
+        return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
+                        for sid, tests in last_tests.items()})
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -358,13 +413,7 @@ def task_my_submissions(tid):
         if request.method == 'GET':
             if not task.open_time or datetime.utcnow() < task.open_time:
                 return jsonify(msg='task has not yet open'), 403
-
-            ret = []
-            for submission, last_tests in SubmissionService.get_for_task_and_user(task, user):
-                submission_dict = submission.to_dict()
-                submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
-                ret.append(submission_dict)
-            return jsonify(ret)
+            return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
         else:  # POST
             # time check will be done in SubmissionService.add method
 
@@ -470,6 +519,34 @@ def task_my_submissions(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/my-submissions/last-auto-tests')
+@requires_login
+def task_my_submissions_last_auto_tests(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'student' not in roles:
+            return jsonify(msg='only for students'), 403
+
+        if not task.open_time or datetime.utcnow() < task.open_time:
+            return jsonify(msg='task has not yet open'), 403
+
+        last_tests = SubmissionService.get_last_auto_tests_for_task_and_user(task, user)
+        return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
+                        for sid, tests in last_tests.items()})
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:tid>/my-team-submissions', methods=['GET'])
 @requires_login
 def task_my_team_submissions(tid):
@@ -500,13 +577,45 @@ def task_my_team_submissions(tid):
         if not task.open_time or datetime.utcnow() < task.open_time:
             return jsonify(msg='task has not yet open'), 403
 
-        ret = []
-        for submission, last_tests in SubmissionService.get_for_team(team):
-            submission_dict = submission.to_dict(with_submitter=True)
-            submission_dict['last_auto_tests'] = {k: AutoTestService.test_to_dict(v) for k, v in last_tests.items()}
-            ret.append(submission_dict)
-        return jsonify(ret)
+        return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team)])
     except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/my-team-submissions/last-auto-tests')
+@requires_login
+def task_my_team_submissions_last_auto_tests(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'student' not in roles:
+            return jsonify(msg='only for students'), 403
+
+        # team check
+        ass = TeamService.get_team_association(task, user)
+        if not ass:
+            return jsonify(msg='user not in a team'), 403
+        team = ass.team
+        if not team.is_finalised:
+            return jsonify(msg='team is not finalised'), 403
+
+        # time check
+        if not task.open_time or datetime.utcnow() < task.open_time:
+            return jsonify(msg='task has not yet open'), 403
+
+        last_tests = SubmissionService.get_last_auto_tests_for_team(team)
+        return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
+                        for sid, tests in last_tests.items()})
+    except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

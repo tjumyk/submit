@@ -92,9 +92,21 @@ class SubmissionService:
             .order_by(sub_query.c.last_submit_time)
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
+    @staticmethod
+    def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+        if user is None:
+            raise SubmissionServiceError('user is required')
+        query = Submission.query.with_parent(task).with_parent(user)
+        if not include_cleared:
+            query = query.filter_by(is_cleared=False)
+        return query.order_by(Submission.id).all()
+
     @classmethod
-    def get_for_task_and_user(cls, task: Task, user: UserAlias, include_cleared=False, include_private_tests=False) \
-            -> List[Tuple[Submission, Dict[int, AutoTest]]]:
+    def get_last_auto_tests_for_task_and_user(cls, task: Task, user: UserAlias, include_cleared=False,
+                                              include_private_tests=False) \
+            -> Dict[int, Dict[int, AutoTest]]:
         if task is None:
             raise SubmissionServiceError('task is required')
         if user is None:
@@ -111,10 +123,9 @@ class SubmissionService:
             .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
             .filter(*filters) \
             .group_by(Submission.id, AutoTest.config_id).subquery()
-        results = db.session.query(Submission, AutoTest, sub_query.c.last_test_id) \
+        results = db.session.query(sub_query.c.submission_id, AutoTest) \
             .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id) \
-            .filter(Submission.id == sub_query.c.submission_id) \
-            .order_by(Submission.id, AutoTest.config_id).all()
+            .all()
 
         public_config_ids = None
         if not include_private_tests:  # have to run another query to get public config ids
@@ -123,19 +134,17 @@ class SubmissionService:
                 .all()
             public_config_ids = set(r[0] for r in id_results)
 
-        submissions = {}
         last_tests = {}
-        for submission, test, _ in results:
-            submissions[submission.id] = submission
+        for submission_id, test in results:
             if test is None:
                 continue  # no test for this submission (we are using outer-join)
             if not include_private_tests and test.config_id not in public_config_ids:
                 continue  # skip private tests
-            tests = last_tests.get(submission.id)
+            tests = last_tests.get(submission_id)
             if tests is None:
-                last_tests[submission.id] = tests = {}
+                last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
-        return [(s, last_tests.get(s.id, {})) for s in submissions.values()]
+        return last_tests
 
     @staticmethod
     def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
@@ -151,8 +160,19 @@ class SubmissionService:
         return query.scalar()
 
     @staticmethod
-    def get_for_team(team: Team, include_cleared=False, include_private_tests=False) \
-            -> List[Tuple[Submission, Dict[int, AutoTest]]]:
+    def get_for_team(team: Team, include_cleared=False) -> List[Submission]:
+        if team is None:
+            raise SubmissionServiceError('team is required')
+        query = Submission.query.filter(Submission.submitter_id == UserTeamAssociation.user_id,
+                                        UserTeamAssociation.team_id == team.id,
+                                        Submission.task_id == team.task_id)
+        if not include_cleared:
+            query = query.filter_by(is_cleared=False)
+        return query.order_by(Submission.id).all()
+
+    @staticmethod
+    def get_last_auto_tests_for_team(team: Team, include_cleared=False, include_private_tests=False) \
+            -> Dict[int, Dict[int, AutoTest]]:
         if team is None:
             raise SubmissionServiceError('team is required')
 
@@ -168,10 +188,9 @@ class SubmissionService:
             .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
             .filter(*filters).group_by(Submission.id, AutoTest.config_id) \
             .subquery()
-        results = db.session.query(Submission, AutoTest, sub_query.c.last_test_id) \
+        results = db.session.query(sub_query.c.submission_id, AutoTest) \
             .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id) \
-            .filter(Submission.id == sub_query.c.submission_id) \
-            .order_by(Submission.id, AutoTest.config_id).all()
+            .all()
 
         public_config_ids = None
         if not include_private_tests:  # have to run another query to get public config ids
@@ -180,19 +199,17 @@ class SubmissionService:
                 .all()
             public_config_ids = set(r[0] for r in id_results)
 
-        submissions = {}
         last_tests = {}
-        for submission, test, _ in results:
-            submissions[submission.id] = submission
+        for submission_id, test in results:
             if test is None:
                 continue  # no test for this submission (we are using outer-join)
             if not include_private_tests and test.config_id not in public_config_ids:
                 continue  # skip private tests
-            tests = last_tests.get(submission.id)
+            tests = last_tests.get(submission_id)
             if tests is None:
-                last_tests[submission.id] = tests = {}
+                last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
-        return [(s, last_tests.get(s.id, {})) for s in submissions.values()]
+        return last_tests
 
     @staticmethod
     def count_for_team(team: Team, include_cleared=False) -> int:
