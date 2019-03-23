@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Submission, Team} from "../models";
+import {ErrorMessage, Submission, Task, Team} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
@@ -16,6 +16,7 @@ export class TeamSubmissionListComponent implements OnInit {
   error: ErrorMessage;
 
   taskId: number;
+  task: Task;
   teamId: number;
   team: Team;
   submissions: Submission[];
@@ -33,19 +34,26 @@ export class TeamSubmissionListComponent implements OnInit {
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
     this.teamId = parseInt(this.route.snapshot.paramMap.get('team_id'));
 
-    this.teamService.getTeam(this.teamId).subscribe(
-      team => {
-        this.team = team;
+    this.taskService.getCachedTask(this.taskId).subscribe(
+      task => {
+        this.task = task;
 
-        this.loadingSubmissions = true;
-        this.taskService.getTeamSubmissions(this.taskId, this.teamId).pipe(
-          finalize(() => this.loadingSubmissions = false)
-        ).subscribe(
-          submissions => this.submissions = submissions,
-          error => this.error = error.error
+        this.teamService.getTeam(this.teamId).subscribe(
+          team => {
+            this.team = team;
+
+            this.loadingSubmissions = true;
+            this.taskService.getTeamSubmissions(this.taskId, this.teamId).pipe(
+              finalize(() => this.loadingSubmissions = false)
+            ).subscribe(
+              submissions => this.submissions = submissions,
+              error => this.error = error.error
+            )
+          }
         )
-      }
-    )
+      },
+      error => this.error = error.error
+    );
   }
 
 }

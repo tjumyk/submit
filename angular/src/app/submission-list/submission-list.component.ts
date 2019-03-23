@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Submission, Task, User} from "../models";
 import {AccountService} from "../account.service";
 import {TaskService} from "../task.service";
@@ -15,6 +15,7 @@ export class SubmissionListComponent implements OnInit {
   error: ErrorMessage;
 
   taskId: number;
+  task: Task;
   userId: number;
   user: User;
   submissions: Submission[];
@@ -25,29 +26,37 @@ export class SubmissionListComponent implements OnInit {
     private accountService: AccountService,
     private taskService: TaskService,
     private route: ActivatedRoute
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
     this.userId = parseInt(this.route.snapshot.paramMap.get('user_id'));
 
-    this.loadingUser = true;
-    this.taskService.getUser(this.taskId, this.userId).pipe(
-      finalize(()=>this.loadingUser=false)
-    ).subscribe(
-      user=>{
-        this.user = user;
+    this.taskService.getCachedTask(this.taskId).subscribe(
+      task => {
+        this.task = task;
 
-        this.loadingSubmissions = true;
-        this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
-          finalize(()=>this.loadingSubmissions=false)
+        this.loadingUser = true;
+        this.taskService.getUser(this.taskId, this.userId).pipe(
+          finalize(() => this.loadingUser = false)
         ).subscribe(
-          submissions=>this.submissions=submissions,
-          error=>this.error=error.error
+          user => {
+            this.user = user;
+
+            this.loadingSubmissions = true;
+            this.taskService.getUserSubmissions(this.taskId, this.userId).pipe(
+              finalize(() => this.loadingSubmissions = false)
+            ).subscribe(
+              submissions => this.submissions = submissions,
+              error => this.error = error.error
+            )
+          },
+          error => this.error = error.error
         )
       },
-      error=>this.error=error.error
-    )
+      error => this.error = error.error
+    );
   }
 
 }
