@@ -203,11 +203,13 @@ def get_user(task_id, uid):
             return jsonify(msg='only for admins or tutors'), 403
 
         target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
         if 'student' not in TermService.get_access_roles(task.term, target_user):
-            return jsonify(msg='only student info allowed')
+            return jsonify(msg='only student info allowed'), 403
 
         return jsonify(target_user.to_dict())
-    except AccountServiceError as e:
+    except (AccountServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
