@@ -307,6 +307,14 @@ export class TaskService {
     return this.http.post<Team>(`${this.api}/${task_id}/teams`, form)
   }
 
+  getUserSubmissionStatus(task_id: number, user_id: number): Observable<SubmissionStatus> {
+    return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/submission-status/${user_id}`)
+  }
+
+  getTeamSubmissionStatus(task_id: number, team_id: number): Observable<SubmissionStatus> {
+    return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/team-submission-status/${team_id}`)
+  }
+
   getMySubmissionStatus(task_id: number): Observable<SubmissionStatus> {
     return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/my-submission-status`)
   }

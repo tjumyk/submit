@@ -91,6 +91,24 @@ class TeamService:
         return None
 
     @staticmethod
+    def get_team_association_directly(team: Team, user: UserAlias) -> Optional[UserTeamAssociation]:
+        """
+        Notice: not necessarily member of returned teams
+        """
+        if team is None:
+            raise TeamServiceError('team is required')
+        if user is None:
+            raise TeamServiceError('user is required')
+
+        results = UserTeamAssociation.query.with_parent(team) \
+            .with_parent(user).all()
+        if results:
+            if len(results) > 1:
+                raise TeamServiceError('user has multiple association with this team')
+            return results[0]
+        return None
+
+    @staticmethod
     def add(task: Task, creator: UserAlias, name: str, slogan: Optional[str]) -> Team:
         if task is None:
             raise TeamServiceError('task is required')

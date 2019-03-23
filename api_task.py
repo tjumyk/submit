@@ -206,7 +206,7 @@ def get_user(task_id, uid):
         if target_user is None:
             return jsonify(msg='target user not found'), 404
         if 'student' not in TermService.get_access_roles(task.term, target_user):
-            return jsonify(msg='only student info allowed'), 403
+            return jsonify(msg='target user is not a student of this task'), 403
 
         return jsonify(target_user.to_dict())
     except (AccountServiceError, TermServiceError) as e:
@@ -268,6 +268,77 @@ def task_anti_plagiarism(task_id, requirement_id):
             index.pretty_print_results(results, file=buffer)
             return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/submission-status/<int:uid>')
+@requires_login
+def task_user_submission_status(tid, uid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        target_user = AccountService.get_user(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
+        if 'student' not in TermService.get_access_roles(task.term, target_user):
+            return jsonify(msg='target user is not a student of this task'), 403
+
+        attempts = SubmissionService.count_for_task_and_user(task, target_user, include_cleared=True)
+        special = TaskService.get_special_consideration_for_task_user(task, target_user)
+        status = SubmissionStatus(attempts, None, special)
+        return jsonify(status.to_dict())
+    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/team-submission-status/<int:team_id>')
+@requires_login
+def task_team_submission_status(task_id, team_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        team = TeamService.get(team_id)
+        if team is None:
+            return jsonify(msg='team not found'), 404
+        if team.task_id != task_id:
+            return jsonify(msg='team does not belong to this task'), 400
+
+        # although seems redundant, we still get the association between this team and the team creator to make the
+        # returned result consistent with other apis
+        ass = TeamService.get_team_association_directly(team, team.creator)
+
+        if team.is_finalised:
+            attempts = SubmissionService.count_for_team(team, include_cleared=True)
+            special = TaskService.get_special_consideration_for_team(team)
+            status = SubmissionStatus(attempts, ass, special)
+        else:
+            status = SubmissionStatus(None, ass, None)
+        return jsonify(status.to_dict())
+    except (TaskServiceError, TermServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
