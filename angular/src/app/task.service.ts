@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
+  AutoTest,
   Submission,
   SubmissionStatus,
   Task,
@@ -12,6 +13,8 @@ import {
   UserTeamAssociation
 } from './models';
 import {map, tap} from "rxjs/operators";
+
+export type LastAutoTestsMap = { [sid: number]: { [cid: number]: AutoTest } };
 
 export class CategoryInfo {
   name: string;
@@ -257,6 +260,10 @@ export class TaskService {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/user-submissions/${user_id}`)
   }
 
+  getUserSubmissionLastAutoTests(task_id: number, user_id: number): Observable<LastAutoTestsMap> {
+    return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/user-submissions/${user_id}/last-auto-tests`)
+  }
+
   getUser(task_id: number, user_id: number): Observable<User> {
     return this.http.get<User>(`${this.api}/${task_id}/users/${user_id}`)
   }
@@ -265,12 +272,24 @@ export class TaskService {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/team-submissions/${team_id}`)
   }
 
+  getTeamSubmissionLastAutoTests(task_id: number, team_id: number): Observable<LastAutoTestsMap> {
+    return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/team-submissions/${team_id}/last-auto-tests`)
+  }
+
   getMySubmissions(task_id: number): Observable<Submission[]> {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/my-submissions`)
   }
 
+  getMySubmissionLastAutoTests(task_id: number): Observable<LastAutoTestsMap> {
+    return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/my-submissions/last-auto-tests`)
+  }
+
   getMyTeamSubmissions(task_id: number): Observable<Submission[]> {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/my-team-submissions`)
+  }
+
+  getMyTeamSubmissionLastAutoTests(task_id: number): Observable<LastAutoTestsMap> {
+    return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/my-team-submissions/last-auto-tests`)
   }
 
   getMyTeamAssociation(task_id: number): Observable<UserTeamAssociation> {
