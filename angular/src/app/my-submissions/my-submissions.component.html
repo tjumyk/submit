@@ -2,4 +2,5 @@
 <div class="ui loader text active" *ngIf="loadingStatus">Loading status...</div>
 <div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
 
+<app-auto-test-conclusion-card [task]="task" [conclusions]="autoTestConclusions"></app-auto-test-conclusion-card>
 <app-submissions-table [task]="task" [status]="status" [submissions]="submissions" [lastAutoTests]="lastAutoTests"></app-submissions-table>

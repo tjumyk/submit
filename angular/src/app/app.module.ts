@@ -45,6 +45,7 @@ import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component
 import { AutoTestMiniCardComponent } from './auto-test-mini-card/auto-test-mini-card.component';
 import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-test-advanced-card.component';
 import { SubmissionsTableComponent } from './submissions-table/submissions-table.component';
+import { AutoTestConclusionCardComponent } from './auto-test-conclusion-card/auto-test-conclusion-card.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,7 @@ import { SubmissionsTableComponent } from './submissions-table/submissions-table
     AutoTestMiniCardComponent,
     AutoTestAdvancedCardComponent,
     SubmissionsTableComponent,
+    AutoTestConclusionCardComponent,
   ],
   imports: [
     BrowserModule,
