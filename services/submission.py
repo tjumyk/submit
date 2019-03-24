@@ -188,72 +188,7 @@ class SubmissionService:
             tests = test_results.get(config.id)
             if not tests:
                 continue  # no tests
-            conclusion = cls.extract_auto_test_conclusion(config, tests)
-            ret[config.id] = conclusion
-        return ret
-
-    @classmethod
-    def extract_auto_test_conclusion(cls, config: AutoTestConfig, tests: List[AutoTest]):
-        if not config:
-            raise SubmissionServiceError('auto test config is required')
-        if not tests:
-            raise SubmissionServiceError('at least one auto test is required')
-
-        results = [cls.evaluate_object_path(t.result, config.result_conclusion_path) for t in tests]
-
-        conclusion_type = config.result_conclusion_type
-        try:
-            # type conversion
-            if conclusion_type == 'int':
-                results = [int(r) for r in results]
-            elif conclusion_type == 'float':
-                results = [float(r) for r in results]
-            elif conclusion_type == 'bool':
-                results = [bool(r) for r in results]
-            elif conclusion_type == 'string':
-                results = [str(r) for r in results]
-            elif conclusion_type == 'json':
-                pass
-            else:
-                raise SubmissionServiceError('unknown result conclusion type: %s' % conclusion_type)
-        except ValueError as e:
-            raise SubmissionServiceError('failed to convert conclusion to type %s'
-                                         % conclusion_type, str(e))
-
-        acc_method = config.results_conclusion_accumulate_method
-        try:
-            if acc_method == 'last':
-                return results[-1]
-            if acc_method == 'first':
-                return results[0]
-            if acc_method == 'highest':
-                return max(results)
-            if acc_method == 'lowest':
-                return min(results)
-            if acc_method == 'average':
-                return sum(results) / len(results)
-            if acc_method == 'and':
-                return all(results)
-            if acc_method == 'or':
-                return any(results)
-        except TypeError as e:
-            raise SubmissionServiceError('failed to accumulate conclusions with method: %s' % acc_method, str(e))
-        raise SubmissionServiceError('unknown result conclusion accumulate method: %s' % acc_method)
-
-    @staticmethod
-    def evaluate_object_path(obj: str, path: str):
-        try:
-            ret = json.loads(obj)
-        except ValueError as e:
-            raise SubmissionServiceError('result is not a valid JSON object', str(e))
-        if path:
-            for segment in path.split('.'):
-                if not segment:
-                    raise SubmissionServiceError('invalid result path', 'empty segment found')
-                if type(ret) is not dict:
-                    raise SubmissionServiceError('failed to evaluate path on result',
-                                                 'tried to get value of key "%s" on non-dict object' % segment)
-                ret = ret[segment]
+            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests)
         return ret
 
     @staticmethod
@@ -361,8 +296,7 @@ class SubmissionService:
             tests = test_results.get(config.id)
             if not tests:
                 continue  # no tests
-            conclusion = cls.extract_auto_test_conclusion(config, tests)
-            ret[config.id] = conclusion
+            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests)
         return ret
 
     @staticmethod
@@ -544,3 +478,88 @@ class SubmissionService:
             .filter(AutoTestConfig.id == AutoTest.config_id,
                     AutoTest.id == sub_query.c.last_test_id) \
             .order_by(AutoTest.config_id).all()
+
+    @classmethod
+    def extract_conclusion_from_auto_tests(cls, config: AutoTestConfig, tests: List[AutoTest]):
+        if config is None:
+            raise SubmissionServiceError('auto test config is required')
+        if tests is None:
+            raise SubmissionServiceError('auto test list is required')
+        if not tests:
+            return None
+
+        conclusion_type = config.result_conclusion_type
+        acc_method = config.results_conclusion_accumulate_method
+
+        if acc_method == 'first' or acc_method == 'last':
+            # strictly use the first or last submission, no matter whether the test is successful or not
+            target_test = tests[0] if acc_method == 'first' else tests[-1]
+            if target_test.final_state != 'SUCCESS':
+                return None
+            candidate_tests = [target_test]  # remove all the other candidates
+        else:
+            # like the NULL handling in database, we filter out non-successful tests before arithmetic aggregation
+            candidate_tests = [t for t in tests if t.final_state == 'SUCCESS']
+            if not candidate_tests:  # no successful test
+                return None
+        conclusions = [cls.extract_result_conclusion(t.result, config.result_conclusion_path) for t in candidate_tests]
+        conclusions = cls.convert_result_conclusions_type(conclusions, conclusion_type)
+        return cls.accumulate_result_conclusions(conclusions, acc_method)
+
+    @staticmethod
+    def convert_result_conclusions_type(conclusions, _type):
+        try:
+            if _type == 'int':
+                return [int(c) for c in conclusions]
+            if _type == 'float':
+                return [float(c) for c in conclusions]
+            if _type == 'bool':
+                return [bool(c) for c in conclusions]
+            if _type == 'string':
+                return [str(c) for c in conclusions]
+            if _type == 'json':
+                return conclusions
+            raise SubmissionServiceError('unknown conclusion type: %s' % _type)
+        except (TypeError, ValueError) as e:
+            raise SubmissionServiceError('failed to convert conclusions to type %s'
+                                         % _type, str(e))
+
+    @staticmethod
+    def accumulate_result_conclusions(conclusions, accumulate_method):
+        try:
+            if accumulate_method == 'last':
+                return conclusions[-1]
+            if accumulate_method == 'first':
+                return conclusions[0]
+            if accumulate_method == 'highest':
+                return max(conclusions)
+            if accumulate_method == 'lowest':
+                return min(conclusions)
+            if accumulate_method == 'average':
+                return sum(conclusions) / len(conclusions)
+            if accumulate_method == 'and':
+                return all(conclusions)
+            if accumulate_method == 'or':
+                return any(conclusions)
+        except TypeError as e:
+            raise SubmissionServiceError('failed to accumulate conclusions with method: %s' % accumulate_method, str(e))
+        raise SubmissionServiceError('unknown conclusion accumulate method: %s' % accumulate_method)
+
+    @staticmethod
+    def extract_result_conclusion(result: Optional[str], conclusion_path: Optional[str]):
+        if not result:
+            ret = None
+        else:
+            try:
+                ret = json.loads(result)
+            except (ValueError, TypeError) as e:
+                raise SubmissionServiceError('result is not a valid JSON object', str(e))
+        if conclusion_path:
+            for segment in conclusion_path.split('.'):
+                if not segment:
+                    raise SubmissionServiceError('invalid result path', 'empty segment found')
+                if type(ret) is not dict:
+                    raise SubmissionServiceError('failed to evaluate path on result',
+                                                 'tried to get value of key "%s" on non-dict object' % segment)
+                ret = ret[segment]
+        return ret
