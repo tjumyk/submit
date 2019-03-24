@@ -15,8 +15,16 @@ from services.auto_test import AutoTestService
 from services.task import TaskService
 from testbot import bot
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class SubmissionServiceError(BasicError):
+    pass
+
+
+class AutoTestConclusionExtractionError(BasicError):
     pass
 
 
@@ -276,7 +284,11 @@ class SubmissionService:
                 # will get the result from the last submission *that has an AutoTest*.
                 ret[config.id] = None
                 continue
-            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+            try:
+                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+            except AutoTestConclusionExtractionError as e:
+                ret[config.id] = None
+                logger.warning('%s: %s' % (e.msg, e.detail))
         return ret
 
     @staticmethod
@@ -660,8 +672,8 @@ class SubmissionService:
                 return conclusions
             raise SubmissionServiceError('unknown conclusion type: %s' % _type)
         except (TypeError, ValueError) as e:
-            raise SubmissionServiceError('failed to convert conclusions to type %s'
-                                         % _type, str(e))
+            raise AutoTestConclusionExtractionError('failed to convert conclusions to type %s'
+                                                    % _type, str(e))
 
     @staticmethod
     def accumulate_result_conclusions(conclusions, accumulate_method):
@@ -681,7 +693,8 @@ class SubmissionService:
             if accumulate_method == 'or':
                 return any(conclusions)
         except TypeError as e:
-            raise SubmissionServiceError('failed to accumulate conclusions with method: %s' % accumulate_method, str(e))
+            raise AutoTestConclusionExtractionError('failed to accumulate conclusions with method: %s'
+                                                    % accumulate_method, str(e))
         raise SubmissionServiceError('unknown conclusion accumulate method: %s' % accumulate_method)
 
     @staticmethod
@@ -692,16 +705,17 @@ class SubmissionService:
             try:
                 ret = json.loads(result)
             except (ValueError, TypeError) as e:
-                raise SubmissionServiceError('result is not a valid JSON object', str(e))
+                raise AutoTestConclusionExtractionError('result is not a valid JSON object', str(e))
         if conclusion_path:
             for segment in conclusion_path.split('.'):
                 if not segment:
                     raise SubmissionServiceError('invalid result path', 'empty segment found')
                 if type(ret) is not dict:
-                    raise SubmissionServiceError('failed to evaluate path on result',
-                                                 'tried to get value of key "%s" on non-dict object' % segment)
+                    raise AutoTestConclusionExtractionError('failed to evaluate path on result',
+                                                            'tried to get value of key "%s" on non-dict object'
+                                                            % segment)
                 try:
                     ret = ret[segment]
                 except KeyError as e:
-                    raise SubmissionServiceError('failed to evaluate path on result', str(e))
+                    raise AutoTestConclusionExtractionError('failed to evaluate path on result', str(e))
         return ret
