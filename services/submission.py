@@ -1,7 +1,8 @@
 import json
+import math
 import os
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Tuple
 
 from celery.result import AsyncResult
@@ -43,6 +44,62 @@ class TeamSubmissionSummary:
                  total_submissions=self.total_submissions,
                  last_submit_time=self.last_submit_time)
         return d
+
+
+class LatePenalty:
+    """
+    In this implementation, I just store the cut numbers as-is because I'm lazy now. A better implementation is to store
+    the segments (from_day, to_day, penalty). The front-end is using the latter implementation for better UI
+    presentation.
+    """
+
+    def __init__(self, repr_string: str = None):
+        self._cuts = []
+
+        if repr_string:
+            self._cuts = self._parse(repr_string)
+
+    @staticmethod
+    def _parse(repr_string: str):
+        try:
+            raw_cuts = [float(c) for c in repr_string.strip().split()]
+        except ValueError as e:
+            raise ValueError('Invalid format in late penalty string', str(e))
+        if any(c < 0 for c in raw_cuts):
+            raise ValueError('Invalid format in late penalty string', 'negative number found')
+
+        cuts = []
+        index = 0
+        num_raw_cuts = len(raw_cuts)
+        total = 0
+        while True:
+            cut = raw_cuts[index]
+            if index == num_raw_cuts - 1 and cut < 1e-6:  # no further penalty
+                break
+            if total + cut > 1.0:  # fix overflow
+                cut = round((1.0 - total) * 10000) / 10000  # remove long tails due to precision loss
+                if cut > 0:
+                    total += cut
+                    cuts.append(cut)
+                break
+            total += cut
+            cuts.append(cut)
+            if index < num_raw_cuts - 1:  # otherwise keep using the last cut
+                index += 1
+
+        return cuts
+
+    def __repr__(self):
+        return '<LatePenalty %s>' % ' '.join(str(c) for c in self._cuts)
+
+    def compute_penalty(self, late: timedelta):
+        if not self._cuts:  # no late penalty
+            return 0
+        seconds = late.total_seconds()
+        if seconds <= 0:
+            return 0
+        days = math.ceil(seconds / (3600 * 24))
+        return sum(self._cuts[0:days])
 
 
 class SubmissionService:
@@ -95,7 +152,8 @@ class SubmissionService:
         return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
 
     @staticmethod
-    def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> List[Submission]:
+    def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False, submitted_after: datetime = None) \
+            -> List[Submission]:
         if task is None:
             raise SubmissionServiceError('task is required')
         if user is None:
@@ -103,6 +161,8 @@ class SubmissionService:
         query = Submission.query.with_parent(task).with_parent(user)
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
+        if submitted_after is not None:
+            query = query.filter(Submission.created_at > submitted_after)
         return query.order_by(Submission.id).all()
 
     @classmethod
@@ -150,19 +210,20 @@ class SubmissionService:
 
         last_tests = {}
         for submission_id, test in results:
+            tests = last_tests.get(submission_id)
+            if tests is None:
+                last_tests[submission_id] = tests = {}  # make sure all submission_ids are in last_tests even if no test
             if test is None:
                 continue  # no test for this submission (we are using outer-join)
             if not include_private_tests and test.config_id not in public_config_ids:
                 continue  # skip private tests
-            tests = last_tests.get(submission_id)
-            if tests is None:
-                last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
         return last_tests
 
     @classmethod
     def get_auto_test_conclusions_for_task_and_user(cls, task: Task, user: UserAlias, include_private_tests=False) \
             -> Dict[int, object]:
+        late_penalty = LatePenalty(task.late_penalty)
         configs = task.auto_test_configs
 
         last_submission_only = True
@@ -177,6 +238,20 @@ class SubmissionService:
                                                                include_private_tests=include_private_tests,
                                                                only_for_first_submission=first_submission_only,
                                                                only_for_last_submission=last_submission_only)
+
+        # get due time (with special consideration if any)
+        due_time = task.due_time
+        special = TaskService.get_special_consideration_for_task_user(task, user)
+        if special and special.due_time_extension:
+            due_time += timedelta(hours=special.due_time_extension)
+
+        # compute penalties if any
+        submission_late_penalties = {}
+        for submission in cls.get_for_task_and_user(task, user, include_cleared=False, submitted_after=due_time):
+            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+            if penalty:
+                submission_late_penalties[submission.id] = penalty
+
         # re-structure dict
         test_results = defaultdict(list)
         for sid, tests in last_tests.items():
@@ -187,8 +262,18 @@ class SubmissionService:
         for config in configs:
             tests = test_results.get(config.id)
             if not tests:
-                continue  # no tests
-            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests)
+                continue  # no tests for this config
+            if config.results_conclusion_accumulate_method == 'first' \
+                    and not last_tests[min(last_tests.keys())].get(config.id) \
+                    or config.results_conclusion_accumulate_method == 'last' \
+                    and not last_tests[max(last_tests.keys())].get(config.id):
+                # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
+                # return None now.
+                # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
+                # will get the result from the last submission *that has an AutoTest*.
+                ret[config.id] = None
+            else:
+                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
         return ret
 
     @staticmethod
@@ -205,7 +290,7 @@ class SubmissionService:
         return query.scalar()
 
     @staticmethod
-    def get_for_team(team: Team, include_cleared=False) -> List[Submission]:
+    def get_for_team(team: Team, include_cleared=False, submitted_after: datetime = None) -> List[Submission]:
         if team is None:
             raise SubmissionServiceError('team is required')
         query = Submission.query.filter(Submission.submitter_id == UserTeamAssociation.user_id,
@@ -213,6 +298,8 @@ class SubmissionService:
                                         Submission.task_id == team.task_id)
         if not include_cleared:
             query = query.filter_by(is_cleared=False)
+        if submitted_after is not None:
+            query = query.filter(Submission.created_at > submitted_after)
         return query.order_by(Submission.id).all()
 
     @staticmethod
@@ -258,20 +345,22 @@ class SubmissionService:
 
         last_tests = {}
         for submission_id, test in results:
+            tests = last_tests.get(submission_id)
+            if tests is None:
+                last_tests[submission_id] = tests = {}  # make sure all submission_ids are in last_tests even if no test
             if test is None:
                 continue  # no test for this submission (we are using outer-join)
             if not include_private_tests and test.config_id not in public_config_ids:
                 continue  # skip private tests
-            tests = last_tests.get(submission_id)
-            if tests is None:
-                last_tests[submission_id] = tests = {}
             tests[test.config_id] = test
         return last_tests
 
     @classmethod
     def get_auto_test_conclusions_for_team(cls, team: Team, include_private_tests=False) \
             -> Dict[int, object]:
-        configs = team.task.auto_test_configs
+        task = team.task
+        late_penalty = LatePenalty(task.late_penalty)
+        configs = task.auto_test_configs
 
         last_submission_only = True
         first_submission_only = True
@@ -285,6 +374,20 @@ class SubmissionService:
                                                       include_private_tests=include_private_tests,
                                                       only_for_first_submission=first_submission_only,
                                                       only_for_last_submission=last_submission_only)
+
+        # get due time (with special consideration if any)
+        due_time = task.due_time
+        special = TaskService.get_special_consideration_for_team(team)
+        if special and special.due_time_extension:
+            due_time += timedelta(hours=special.due_time_extension)
+
+        # compute penalties if any
+        submission_late_penalties = {}
+        for submission in cls.get_for_team(team, include_cleared=False, submitted_after=due_time):
+            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+            if penalty:
+                submission_late_penalties[submission.id] = penalty
+
         # re-structure dict
         test_results = defaultdict(list)
         for sid, tests in last_tests.items():
@@ -295,8 +398,18 @@ class SubmissionService:
         for config in configs:
             tests = test_results.get(config.id)
             if not tests:
-                continue  # no tests
-            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests)
+                continue  # no tests for this config
+            if config.results_conclusion_accumulate_method == 'first' \
+                    and not last_tests[min(last_tests.keys())].get(config.id) \
+                    or config.results_conclusion_accumulate_method == 'last' \
+                    and not last_tests[max(last_tests.keys())].get(config.id):
+                # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
+                # return None now.
+                # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
+                # will get the result from the last submission *that has an AutoTest*.
+                ret[config.id] = None
+            else:
+                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
         return ret
 
     @staticmethod
@@ -480,7 +593,8 @@ class SubmissionService:
             .order_by(AutoTest.config_id).all()
 
     @classmethod
-    def extract_conclusion_from_auto_tests(cls, config: AutoTestConfig, tests: List[AutoTest]):
+    def extract_conclusion_from_auto_tests(cls, config: AutoTestConfig, tests: List[AutoTest],
+                                           submission_penalties: Dict[int, float] = None):
         if config is None:
             raise SubmissionServiceError('auto test config is required')
         if tests is None:
@@ -491,8 +605,11 @@ class SubmissionService:
         conclusion_type = config.result_conclusion_type
         acc_method = config.results_conclusion_accumulate_method
 
+        tests.sort(key=lambda t: t.submission_id)  # ensure the order
+
         if acc_method == 'first' or acc_method == 'last':
-            # strictly use the first or last submission, no matter whether the test is successful or not
+            # strictly use the test of the first or last submission in the given test list,
+            # no matter whether the test is successful or not
             target_test = tests[0] if acc_method == 'first' else tests[-1]
             if target_test.final_state != 'SUCCESS':
                 return None
@@ -502,8 +619,21 @@ class SubmissionService:
             candidate_tests = [t for t in tests if t.final_state == 'SUCCESS']
             if not candidate_tests:  # no successful test
                 return None
+
         conclusions = [cls.extract_result_conclusion(t.result, config.result_conclusion_path) for t in candidate_tests]
         conclusions = cls.convert_result_conclusions_type(conclusions, conclusion_type)
+
+        if submission_penalties is not None and conclusion_type in {'int', 'float'}:
+            # TODO add an option to use late_penalty or not for this AutoTestConfig
+            penalties = [submission_penalties.get(t.submission_id) for t in candidate_tests]
+            conclusions = [c if p is None or p == 0 else c * (1 - p) for c, p in zip(conclusions, penalties)]
+            if conclusion_type == 'int':  # round the numbers to integers
+                # TODO add options to use round/ceil/floor
+                conclusions = [round(c) for c in conclusions]
+            else:  # float
+                # TODO add options to set the precision
+                conclusions = [round(c * 100) / 100 for c in conclusions]
+
         return cls.accumulate_result_conclusions(conclusions, acc_method)
 
     @staticmethod
