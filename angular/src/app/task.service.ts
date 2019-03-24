@@ -15,6 +15,7 @@ import {
 import {map, tap} from "rxjs/operators";
 
 export type LastAutoTestsMap = { [sid: number]: { [cid: number]: AutoTest } };
+export type AutoTestConclusionsMap = { [cid: number]: any };
 
 export class CategoryInfo {
   name: string;
@@ -264,6 +265,10 @@ export class TaskService {
     return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/user-submissions/${user_id}/last-auto-tests`)
   }
 
+  getUserSubmissionAutoTestConclusions(task_id: number, user_id: number): Observable<AutoTestConclusionsMap> {
+    return this.http.get<AutoTestConclusionsMap>(`${this.api}/${task_id}/user-submissions/${user_id}/auto-test-conclusions`)
+  }
+
   getUser(task_id: number, user_id: number): Observable<User> {
     return this.http.get<User>(`${this.api}/${task_id}/users/${user_id}`)
   }
@@ -276,6 +281,10 @@ export class TaskService {
     return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/team-submissions/${team_id}/last-auto-tests`)
   }
 
+  getTeamSubmissionAutoTestConclusions(task_id: number, team_id: number): Observable<AutoTestConclusionsMap> {
+    return this.http.get<AutoTestConclusionsMap>(`${this.api}/${task_id}/team-submissions/${team_id}/auto-test-conclusions`)
+  }
+
   getMySubmissions(task_id: number): Observable<Submission[]> {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/my-submissions`)
   }
@@ -284,12 +293,20 @@ export class TaskService {
     return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/my-submissions/last-auto-tests`)
   }
 
+  getMySubmissionAutoTestConclusions(task_id: number): Observable<AutoTestConclusionsMap> {
+    return this.http.get<AutoTestConclusionsMap>(`${this.api}/${task_id}/my-submissions/auto-test-conclusions`)
+  }
+
   getMyTeamSubmissions(task_id: number): Observable<Submission[]> {
     return this.http.get<Submission[]>(`${this.api}/${task_id}/my-team-submissions`)
   }
 
   getMyTeamSubmissionLastAutoTests(task_id: number): Observable<LastAutoTestsMap> {
     return this.http.get<LastAutoTestsMap>(`${this.api}/${task_id}/my-team-submissions/last-auto-tests`)
+  }
+
+  getMyTeamSubmissionAutoTestConclusions(task_id: number): Observable<AutoTestConclusionsMap> {
+    return this.http.get<AutoTestConclusionsMap>(`${this.api}/${task_id}/my-team-submissions/auto-test-conclusions`)
   }
 
   getMyTeamAssociation(task_id: number): Observable<UserTeamAssociation> {
