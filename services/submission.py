@@ -279,6 +279,17 @@ class SubmissionService:
             ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
         return ret
 
+    @classmethod
+    def get_auto_test_conclusions_for_user_task(cls, task: Task, include_private_tests=False):
+        for summary in cls.get_user_summaries(task):
+            try:
+                conclusion = cls.get_auto_test_conclusions_for_task_and_user(task, summary.user,
+                                                                             include_private_tests=
+                                                                             include_private_tests)
+            except Exception as e:
+                conclusion = e
+            yield (summary.user, conclusion)
+
     @staticmethod
     def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
         if task is None:

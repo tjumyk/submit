@@ -211,6 +211,49 @@ def task_user_submissions_auto_test_conclusions(tid, uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/all-user-submissions-auto-test-conclusions')
+@requires_login
+def task_all_user_submissions_auto_test_conclusions(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        from collections import defaultdict
+        tables = defaultdict(list)
+        configs = task.auto_test_configs
+        for user, conclusions in SubmissionService.get_auto_test_conclusions_for_user_task(task,
+                                                                                           include_private_tests=True):
+            for config in configs:
+                if isinstance(conclusions, Exception):
+                    tables[config.id].append((user, str(conclusions)))
+                else:
+                    tables[config.id].append((user, conclusions.get(config.id)))
+        for config in configs:
+            tables[config.id].sort(key=lambda x: x[0].name)
+        from io import StringIO
+        with StringIO() as buffer:
+            for cid, table in tables.items():
+                print(cid, file=buffer)
+                for user, conclusion in table:
+                    print('%s %r' % (user.name, conclusion), file=buffer)
+            return buffer.getvalue(), {'Content-Type': 'text/plain'}
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:task_id>/users/<int:uid>')
 @requires_login
 def get_user(task_id, uid):
