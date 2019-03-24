@@ -225,6 +225,8 @@ class SubmissionService:
             -> Dict[int, object]:
         late_penalty = LatePenalty(task.late_penalty)
         configs = task.auto_test_configs
+        if not configs:
+            return {}
 
         last_submission_only = True
         first_submission_only = True
@@ -239,18 +241,18 @@ class SubmissionService:
                                                                only_for_first_submission=first_submission_only,
                                                                only_for_last_submission=last_submission_only)
 
-        # get due time (with special consideration if any)
-        due_time = task.due_time
-        special = TaskService.get_special_consideration_for_task_user(task, user)
-        if special and special.due_time_extension:
-            due_time += timedelta(hours=special.due_time_extension)
-
-        # compute penalties if any
         submission_late_penalties = {}
-        for submission in cls.get_for_task_and_user(task, user, include_cleared=False, submitted_after=due_time):
-            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
-            if penalty:
-                submission_late_penalties[submission.id] = penalty
+        due_time = task.due_time
+        if due_time is not None:
+            special = TaskService.get_special_consideration_for_task_user(task, user)
+            if special is not None and special.due_time_extension:
+                due_time += timedelta(hours=special.due_time_extension)
+
+            # compute penalties if any
+            for submission in cls.get_for_task_and_user(task, user, include_cleared=False, submitted_after=due_time):
+                penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+                if penalty:
+                    submission_late_penalties[submission.id] = penalty
 
         # re-structure dict
         test_results = defaultdict(list)
@@ -362,6 +364,8 @@ class SubmissionService:
         task = team.task
         late_penalty = LatePenalty(task.late_penalty)
         configs = task.auto_test_configs
+        if not configs:
+            return {}
 
         last_submission_only = True
         first_submission_only = True
@@ -376,18 +380,18 @@ class SubmissionService:
                                                       only_for_first_submission=first_submission_only,
                                                       only_for_last_submission=last_submission_only)
 
-        # get due time (with special consideration if any)
-        due_time = task.due_time
-        special = TaskService.get_special_consideration_for_team(team)
-        if special and special.due_time_extension:
-            due_time += timedelta(hours=special.due_time_extension)
-
-        # compute penalties if any
         submission_late_penalties = {}
-        for submission in cls.get_for_team(team, include_cleared=False, submitted_after=due_time):
-            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
-            if penalty:
-                submission_late_penalties[submission.id] = penalty
+        due_time = task.due_time
+        if due_time is not None:
+            special = TaskService.get_special_consideration_for_team(team)
+            if special and special.due_time_extension:
+                due_time += timedelta(hours=special.due_time_extension)
+
+            # compute penalties if any
+            for submission in cls.get_for_team(team, include_cleared=False, submitted_after=due_time):
+                penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+                if penalty:
+                    submission_late_penalties[submission.id] = penalty
 
         # re-structure dict
         test_results = defaultdict(list)
@@ -625,18 +629,21 @@ class SubmissionService:
         conclusions = [cls.extract_result_conclusion(t.result, config.result_conclusion_path) for t in candidate_tests]
         conclusions = cls.convert_result_conclusions_type(conclusions, conclusion_type)
 
-        if submission_penalties is not None and conclusion_type in {'int', 'float'}:
+        if submission_penalties and conclusion_type in {'int', 'float'}:
             # TODO add an option to use late_penalty or not for this AutoTestConfig
             penalties = [submission_penalties.get(t.submission_id) for t in candidate_tests]
             conclusions = [c if p is None or p == 0 else c * (1 - p) for c, p in zip(conclusions, penalties)]
-            if conclusion_type == 'int':  # round the numbers to integers
-                # TODO add options to use round/ceil/floor
-                conclusions = [round(c) for c in conclusions]
-            else:  # float
-                # TODO add options to set the precision
-                conclusions = [round(c * 100) / 100 for c in conclusions]
 
-        return cls.accumulate_result_conclusions(conclusions, acc_method)
+        final_conclusion = cls.accumulate_result_conclusions(conclusions, acc_method)
+
+        # normalize numerical final conclusion as we may have used penalty or average
+        if conclusion_type == 'int':
+            # TODO add options to use round/ceil/floor
+            final_conclusion = round(final_conclusion)
+        elif conclusion_type == 'float':
+            # TODO add options to set the precision
+            final_conclusion = round(final_conclusion * 100) / 100
+        return final_conclusion
 
     @staticmethod
     def convert_result_conclusions_type(conclusions, _type):
