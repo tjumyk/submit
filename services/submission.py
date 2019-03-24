@@ -700,5 +700,8 @@ class SubmissionService:
                 if type(ret) is not dict:
                     raise SubmissionServiceError('failed to evaluate path on result',
                                                  'tried to get value of key "%s" on non-dict object' % segment)
-                ret = ret[segment]
+                try:
+                    ret = ret[segment]
+                except KeyError as e:
+                    raise SubmissionServiceError('failed to evaluate path on result', str(e))
         return ret
