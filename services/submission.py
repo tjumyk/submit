@@ -261,19 +261,20 @@ class SubmissionService:
         ret = {}
         for config in configs:
             tests = test_results.get(config.id)
-            if not tests:
-                continue  # no tests for this config
+            if not tests:  # no tests for this config
+                ret[config.id] = None
+                continue
             if config.results_conclusion_accumulate_method == 'first' \
                     and not last_tests[min(last_tests.keys())].get(config.id) \
                     or config.results_conclusion_accumulate_method == 'last' \
                     and not last_tests[max(last_tests.keys())].get(config.id):
                 # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
-                # return None now.
+                # return None.
                 # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
                 # will get the result from the last submission *that has an AutoTest*.
                 ret[config.id] = None
-            else:
-                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+                continue
+            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
         return ret
 
     @staticmethod
@@ -397,19 +398,20 @@ class SubmissionService:
         ret = {}
         for config in configs:
             tests = test_results.get(config.id)
-            if not tests:
-                continue  # no tests for this config
+            if not tests:  # no tests for this config
+                ret[config.id] = None
+                continue
             if config.results_conclusion_accumulate_method == 'first' \
                     and not last_tests[min(last_tests.keys())].get(config.id) \
                     or config.results_conclusion_accumulate_method == 'last' \
                     and not last_tests[max(last_tests.keys())].get(config.id):
                 # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
-                # return None now.
+                # return None.
                 # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
                 # will get the result from the last submission *that has an AutoTest*.
                 ret[config.id] = None
-            else:
-                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+                continue
+            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
         return ret
 
     @staticmethod
