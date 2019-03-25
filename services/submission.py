@@ -239,6 +239,7 @@ class SubmissionService:
         if not configs:
             return {}
 
+        # NOTICE: The following logic will break if no config
         last_submission_only = True
         first_submission_only = True
         for config in configs:
@@ -401,6 +402,7 @@ class SubmissionService:
         if not configs:
             return {}
 
+        # NOTICE: The following logic will break if no config
         last_submission_only = True
         first_submission_only = True
         for config in configs:
