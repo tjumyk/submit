@@ -8,7 +8,7 @@
   <thead>
   <tr>
     <th>#</th><th>ID</th><th *ngIf="task.is_team_task">Submitter</th><th>Submitted At</th>
-    <th *ngFor="let config of task.auto_test_configs">{{config.name}}</th>
+    <th *ngFor="let config of task.auto_test_configs">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></th>
     <th>Operations</th>
   </tr>
   </thead>

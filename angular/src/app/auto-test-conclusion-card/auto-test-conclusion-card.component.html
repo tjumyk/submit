@@ -1,5 +1,5 @@
 <div class="ui segment" *ngIf="task && conclusions && task.auto_test_configs.length">
-  <h3 class="ui center aligned header">Results</h3>
+  <h3 class="ui center aligned header">Result</h3>
   <div class="ui grid stackable centered center aligned">
     <div class="four wide column" *ngFor="let config of task.auto_test_configs">
       <div class="ui statistic fluid">
@@ -15,7 +15,7 @@
         <ng-template #noResult>
           <div class="value text">No Result</div>
         </ng-template>
-        <div class="label">{{config.name}}</div>
+        <div class="label">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></div>
       </div>
     </div>
   </div>

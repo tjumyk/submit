@@ -64,7 +64,11 @@
   <div *ngIf="test.result != null">
     <div class="ui divider horizontal">Result</div>
     <p *ngIf="config">
-      <b>Conclusion:</b> {{printConclusion(test, config)}}
+      <b>Conclusion:</b>
+      <ng-container *ngIf="extractConclusion(test, config) != null; else noConclusion">
+        {{printConclusion(test, config)}}
+      </ng-container>
+      <ng-template #noConclusion>(No Conclusion)</ng-template>
     </p>
     <ng-container *ngIf="config && config.result_render_html && extractConclusion(test, config) != null; else noHTMLRender">
       <div class="ui menu secondary pointing">
