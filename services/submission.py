@@ -879,12 +879,15 @@ class SubmissionService:
             .group_by(Submission.id, AutoTest.config_id).subquery()
 
         if task.is_team_task:
-            results = db.session.query(Team.id, sub_query.c.submission_id, AutoTest) \
+            sub_sub_query = db.session.query(Team.id.label('team_id'),
+                                             sub_query.c.submission_id.label('submission_id'),
+                                             sub_query.c.last_test_id.label('last_test_id')) \
                 .filter(Submission.id == sub_query.c.submission_id,
                         Submission.submitter_id == UserTeamAssociation.user_id,
                         UserTeamAssociation.team_id == Team.id,
-                        Team.task_id == task.id) \
-                .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id)
+                        Team.task_id == task.id).subquery()
+            results = db.session.query(sub_sub_query.c.team_id, sub_sub_query.c.submission_id, AutoTest) \
+                .outerjoin(AutoTest, AutoTest.id == sub_sub_query.c.last_test_id)
         else:
             results = db.session.query(Submission.submitter_id, Submission.id, AutoTest) \
                 .join(sub_query, Submission.id == sub_query.c.submission_id) \
