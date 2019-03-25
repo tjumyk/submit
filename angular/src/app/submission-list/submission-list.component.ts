@@ -64,6 +64,9 @@ export class SubmissionListComponent implements OnInit {
                   submissions => {
                     this.submissions = submissions;
 
+                    if(submissions.length == 0 || task.auto_test_configs.length == 0)
+                      return;
+
                     this.loadingLastAutoTests = true;
                     this.taskService.getUserSubmissionLastAutoTests(this.taskId, this.userId).pipe(
                       finalize(()=>this.loadingLastAutoTests=false)
