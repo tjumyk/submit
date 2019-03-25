@@ -3,6 +3,8 @@ import {AutoTest, AutoTestConfig, ErrorMessage, Submission} from "../models";
 import {SubmissionService} from "../submission.service";
 import {finalize} from "rxjs/operators";
 import {AdminService} from "../admin.service";
+import * as moment from "moment";
+import {printDuration} from "../time-util";
 
 @Component({
   selector: 'app-auto-test-advanced-card',
@@ -35,6 +37,10 @@ export class AutoTestAdvancedCardComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  computeDuration(start_time, end_time) {
+    return printDuration(moment(end_time).diff(moment(start_time), 'seconds'))
   }
 
   deleteAutoTest(test: AutoTest, btn: HTMLElement) {

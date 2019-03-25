@@ -53,6 +53,11 @@
     <span *ngIf="test.stopped_at; else noStopTime">{{test.stopped_at | date: 'medium'}}</span>
     <ng-template #noStopTime>N/A</ng-template>
   </div>
+  <div class="item">
+    <div class="header">Duration</div>
+    <span *ngIf="test.started_at && test.stopped_at; else noDuration">{{computeDuration(test.started_at, test.stopped_at)}}</span>
+    <ng-template #noDuration>N/A</ng-template>
+  </div>
 </div>
 
 <ng-container *ngIf="(test.final_state || test.state) == 'FAILURE' || (test.final_state || test.state) == 'SUCCESS'">

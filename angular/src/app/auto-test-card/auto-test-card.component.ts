@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AutoTest, AutoTestConfig} from "../models";
 import {SubmissionService} from "../submission.service";
+import {printDuration} from "../time-util";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-auto-test-card',
@@ -26,6 +28,10 @@ export class AutoTestCardComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  computeDuration(start_time, end_time) {
+    return printDuration(moment(end_time).diff(moment(start_time), 'seconds'))
   }
 
 }
