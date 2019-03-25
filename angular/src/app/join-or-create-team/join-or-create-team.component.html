@@ -88,7 +88,7 @@
           <span *ngIf="t.creator.nickname; else nameOnly2">{{t.creator.nickname}} ({{t.creator.name}})</span>
           <ng-template #nameOnly2>{{t.creator.name}}</ng-template>
         </td>
-        <td>{{t.slogan}}</td>
+        <td class="break-all">{{t.slogan}}</td>
         <td>{{t.total_user_associations}}</td>
         <td class="collapsing">
           <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam [ngClass]="{'disabled': teamJoinClosed}"><i class="icon hand paper"></i> Join</a>
