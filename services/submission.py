@@ -886,8 +886,8 @@ class SubmissionService:
                         Team.task_id == task.id) \
                 .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id)
         else:
-            results = db.session.query(Submission.submitter_id, sub_query.c.submission_id, AutoTest) \
-                .filter(Submission.id == sub_query.c.submission_id) \
+            results = db.session.query(Submission.submitter_id, Submission.id, AutoTest) \
+                .join(sub_query, Submission.id == sub_query.c.submission_id) \
                 .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id)
 
         all_last_tests = {}
