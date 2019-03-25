@@ -293,7 +293,7 @@ class SubmissionService:
         return ret
 
     @classmethod
-    def get_late_penalties_for_task_and_user(cls, task: Task, user: UserAlias):
+    def get_late_penalties_for_task_and_user(cls, task: Task, user: UserAlias) -> Optional[Dict[int, float]]:
         if task is None:
             raise SubmissionServiceError('task is required')
         if user is None:
@@ -452,7 +452,7 @@ class SubmissionService:
         return ret
 
     @classmethod
-    def get_late_penalties_for_team(cls, team: Team):
+    def get_late_penalties_for_team(cls, team: Team) -> Optional[Dict[int, float]]:
         if team is None:
             raise SubmissionServiceError('team is required')
 
@@ -704,7 +704,7 @@ class SubmissionService:
         return final_conclusion
 
     @staticmethod
-    def convert_result_conclusions_type(conclusions, _type):
+    def convert_result_conclusions_type(conclusions: list, _type) -> list:
         try:
             if _type == 'int':
                 return [int(c) for c in conclusions]
@@ -722,7 +722,7 @@ class SubmissionService:
                                                     % _type, str(e))
 
     @staticmethod
-    def accumulate_result_conclusions(conclusions, accumulate_method):
+    def accumulate_result_conclusions(conclusions: list, accumulate_method: str):
         try:
             if accumulate_method == 'last':
                 return conclusions[-1]
