@@ -1,13 +1,19 @@
-export function printDuration(seconds) {
+export function printDuration(totalSeconds: number): string {
+  totalSeconds = Math.round(totalSeconds); // remove sub-second
   let output = '';
-  let units = ['h', 'm', 's'];
-  let unitSeconds = [3600, 60, 1];
+  let skipUnit = true;
+
+  let units = ['h', 'm'];
+  let unitSeconds = [3600, 60];
   for (let i = 0; i < units.length; ++i) {
     let tmp = unitSeconds[i];
-    let value = Math.floor(seconds / tmp);
-    if (value)
+    let value = Math.floor(totalSeconds / tmp);
+    if (value || !skipUnit) {
       output += value + units[i];
-    seconds = seconds % tmp;
+      skipUnit = false;
+    }
+    totalSeconds %= tmp;
   }
+  output += totalSeconds + 's';
   return output
 }
