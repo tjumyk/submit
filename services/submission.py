@@ -66,8 +66,8 @@ class LatePenalty:
         if repr_string:
             self._cuts = self._parse(repr_string)
 
-    @staticmethod
-    def _parse(repr_string: str):
+    @classmethod
+    def _parse(cls, repr_string: str):
         try:
             raw_cuts = [float(c) for c in repr_string.strip().split()]
         except ValueError as e:
@@ -84,7 +84,7 @@ class LatePenalty:
             if index == num_raw_cuts - 1 and cut < 1e-6:  # no further penalty
                 break
             if total + cut > 1.0:  # fix overflow
-                cut = round((1.0 - total) * 10000) / 10000  # remove long tails due to precision loss
+                cut = cls._round(1.0 - total)  # remove long tails due to precision loss
                 if cut > 0:
                     total += cut
                     cuts.append(cut)
@@ -96,17 +96,24 @@ class LatePenalty:
 
         return cuts
 
+    @staticmethod
+    def _round(num: float) -> float:
+        """
+        Round a float to remove long tails
+        """
+        return round(num * 100000) / 100000
+
     def __repr__(self):
         return '<LatePenalty %s>' % ' '.join(str(c) for c in self._cuts)
 
-    def compute_penalty(self, late: timedelta):
+    def compute_penalty(self, late: timedelta) -> float:
         if not self._cuts:  # no late penalty
-            return 0
+            return 0.0
         seconds = late.total_seconds()
         if seconds <= 0:
-            return 0
+            return 0.0
         days = math.ceil(seconds / (3600 * 24))
-        return sum(self._cuts[0:days])
+        return self._round(sum(self._cuts[0:days]))
 
 
 class SubmissionService:
