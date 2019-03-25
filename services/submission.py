@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Tuple
 
 from celery.result import AsyncResult
 from sqlalchemy import desc, func
+from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
@@ -588,6 +589,17 @@ class SubmissionService:
         result = bot.run_test.apply_async((submission.id, config.id), countdown=3)  # wait 3 seconds to allow db commit
         test = AutoTestService.add(submission, config, result.id)
         return test, result
+
+    @staticmethod
+    def get_auto_tests(submission: Submission, joined_load_output_files=False) -> List[AutoTest]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        query = db.session.query(AutoTest)
+        if joined_load_output_files:
+            query = query.options(joinedload(AutoTest.output_files))
+        return query.filter(AutoTest.submission_id == submission.id) \
+            .order_by(AutoTest.id).all()
 
     @staticmethod
     def get_last_auto_tests(submission: Submission) -> List[Tuple[AutoTestConfig, AutoTest]]:

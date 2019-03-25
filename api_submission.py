@@ -104,11 +104,8 @@ def test_and_results(sid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        tests = []
-        for test in submission.auto_tests:
-            tests.append(AutoTestService.test_to_dict(test, with_advanced_fields=True))
-
-        return jsonify(tests)
+        return jsonify([AutoTestService.test_to_dict(t, with_advanced_fields=True)
+                        for t in SubmissionService.get_auto_tests(submission, joined_load_output_files=True)])
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
