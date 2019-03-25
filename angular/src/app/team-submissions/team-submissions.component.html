@@ -28,7 +28,11 @@
   </div>
 
   <table class="ui table unstackable">
-    <thead><tr><th>#</th><th>Team ID</th><th>Team Name</th><th>Total Submissions</th><th>Last Submission Time</th><th>Operations</th></tr></thead>
+    <thead>
+    <tr>
+      <th>#</th><th>Team ID</th><th>Team Name</th><th>Total Submissions</th><th>Last Submission Time</th>
+      <th *ngFor="let config of task.auto_test_configs">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></th>
+      <th>Operations</th></tr></thead>
     <tbody>
     <tr *ngFor="let summary of teamSummaries; index as i">
       <td>{{i+1}}</td>
@@ -36,6 +40,12 @@
       <td><a routerLink="../teams/{{summary.team.id}}">{{summary.team.name}}</a></td>
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.last_submit_time | date:'medium'}}</td>
+      <td *ngFor="let config of task.auto_test_configs">
+        <ng-container *ngIf="autoTestConclusions && autoTestConclusions[summary.team.id] && autoTestConclusions[summary.team.id][config.id] != null">
+          <!-- TODO Avoid looking up dictionary again-->
+          {{autoTestConclusions[summary.team.id][config.id]|json}}
+        </ng-container>
+      </td>
       <td>
         <a routerLink="{{summary.team.id}}" class="ui button icon mini" title="Submissions"><i class="icon search"></i></a>
       </td>

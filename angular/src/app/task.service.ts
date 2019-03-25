@@ -16,6 +16,7 @@ import {map, tap} from "rxjs/operators";
 
 export type LastAutoTestsMap = { [sid: number]: { [cid: number]: AutoTest } };
 export type AutoTestConclusionsMap = { [cid: number]: any };
+export type AllAutoTestConclusionsMap = { [uid: number]: AutoTestConclusionsMap };
 
 export class CategoryInfo {
   name: string;
@@ -357,5 +358,9 @@ export class TaskService {
 
   getMyTeamSubmissionStatus(task_id: number): Observable<SubmissionStatus> {
     return this.http.get<SubmissionStatus>(`${this.api}/${task_id}/my-team-submission-status`)
+  }
+
+  getAutoTestConclusions(task_id: number): Observable<AllAutoTestConclusionsMap> {
+    return this.http.get<AllAutoTestConclusionsMap>(`${this.api}/${task_id}/auto-test-conclusions`)
   }
 }

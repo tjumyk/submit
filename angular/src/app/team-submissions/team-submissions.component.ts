@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Task, TeamSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
-import {TaskService} from "../task.service";
+import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {SubmissionService} from "../submission.service";
@@ -20,6 +20,8 @@ export class TeamSubmissionsComponent implements OnInit {
   teamSummaries: TeamSubmissionSummary[];
   totalSubmissions: number;
   loadingSummaries: boolean;
+  loadingAutoTestConclusions: boolean;
+  autoTestConclusions: AllAutoTestConclusionsMap;
 
   constructor(
     private accountService: AccountService,
@@ -48,6 +50,14 @@ export class TeamSubmissionsComponent implements OnInit {
             for (let item of summaries) {
               this.totalSubmissions += item.total_submissions;
             }
+
+            this.loadingAutoTestConclusions = true;
+            this.taskService.getAutoTestConclusions(this.taskId).pipe(
+              finalize(() => this.loadingAutoTestConclusions = false)
+            ).subscribe(
+              conclusions => this.autoTestConclusions = conclusions,
+              error => this.error = error.error
+            )
           },
           error => this.error = error.error
         )
