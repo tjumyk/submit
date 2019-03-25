@@ -648,6 +648,10 @@
               <div class="field">
                 <label>Result Render HTML</label>
                 <textarea name="result_render_html" rows="6" [(ngModel)]="updateAutoTestConfigForm.result_render_html" placeholder="HTML for rendering test results. If this is empty, the raw result will be displayed."></textarea>
+                <ng-container *ngIf="updateAutoTestConfigForm.result_render_html">
+                  <label>Result Render HTML Preview</label>
+                  <div [innerHTML]="updateAutoTestConfigForm.result_render_html"></div>
+                </ng-container>
               </div>
               <div class="field">
                 <label>Result Conclusion Type</label>
