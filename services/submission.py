@@ -743,3 +743,152 @@ class SubmissionService:
                 except KeyError as e:
                     raise AutoTestConclusionExtractionError('failed to evaluate path on result', str(e))
         return ret
+
+    @classmethod
+    def get_auto_test_conclusions_for_task(cls, task: Task, include_private_tests=False) \
+            -> Dict[int, Dict[int, object]]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        configs = task.auto_test_configs
+        if not configs:
+            return {}
+
+        all_last_tests = cls.get_last_auto_tests_for_task(task, include_cleared=False,
+                                                          include_private_tests=include_private_tests)
+
+        all_late_penalties = cls.get_late_penalties_for_task(task)
+
+        all_ret = {}
+        for unit_id, last_tests in all_last_tests.items():
+            # unit_id is submitter_id for user-task, or team_id for team-task
+            late_penalties = all_late_penalties.get(unit_id) if all_late_penalties else None
+            all_ret[unit_id] = cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
+        return all_ret
+
+    @staticmethod
+    def get_for_task(task: Task, include_cleared=False, submitted_after: datetime = None) \
+            -> Dict[int, List[Submission]]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        filters = [
+            Submission.task_id == task.id
+        ]
+        if not include_cleared:
+            filters.append(Submission.is_cleared == False)
+        if submitted_after is not None:
+            filters.append(Submission.created_at > submitted_after)
+
+        if task.is_team_task:
+            filters.extend([
+                Submission.submitter_id == UserTeamAssociation.user_id,
+                UserTeamAssociation.team_id == Team.id,
+                Team.task_id == task.id
+            ])
+            results = db.session.query(Team.id, Submission) \
+                .filter(*filters) \
+                .order_by(Submission.id)
+        else:
+            results = ((s.submitter_id, s) for s in db.session.query(Submission)
+                .filter(*filters)
+                .order_by(Submission.id))
+
+        ret = {}
+        for unit_id, submission in results:  # unit_id is submitter_id for user-task, or team_id for team-task
+            ret_unit = ret.get(unit_id)
+            if ret_unit is None:
+                ret[unit_id] = ret_unit = []
+            ret_unit.append(submission)
+        return ret
+
+    @classmethod
+    def get_late_penalties_for_task(cls, task: Task) -> Optional[Dict[int, Dict[int, float]]]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        if not task.late_penalty:
+            return None
+        late_penalty = LatePenalty(task.late_penalty)
+
+        due_time = task.due_time
+        if due_time is None:
+            return None
+
+        all_specials = TaskService.get_special_considerations_for_task(task)
+        if task.is_team_task:
+            due_time_extensions = {special.team_id: special.due_time_extension
+                                   for special in all_specials
+                                   if special.due_time_extension is not None}
+        else:
+            due_time_extensions = {special.user_id: special.due_time_extension
+                                   for special in all_specials
+                                   if special.due_time_extension is not None}
+
+        all_penalties = {}
+        for unit_id, submissions in cls.get_for_task(task, include_cleared=False, submitted_after=due_time).items():
+            unit_due_time = due_time
+            extension = due_time_extensions.get(unit_id)
+            if extension:
+                unit_due_time += timedelta(hours=extension)
+
+            penalties = {}
+            for submission in submissions:
+                penalty = late_penalty.compute_penalty(submission.created_at - unit_due_time)
+                if penalty:
+                    penalties[submission.id] = penalty
+            if penalties:
+                all_penalties[unit_id] = penalties
+
+        return all_penalties
+
+    @classmethod
+    def get_last_auto_tests_for_task(cls, task: Task, include_cleared=False, include_private_tests=False) \
+            -> Dict[int, Dict[int, AutoTest]]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        filters = [
+            Submission.task_id == task.id
+        ]
+        if not include_cleared:
+            filters.append(Submission.is_cleared == False)
+
+        public_config_ids = None
+        if not include_private_tests:  # have to run another query to get public config ids
+            id_results = db.session.query(AutoTestConfig.id) \
+                .filter(AutoTestConfig.is_private == False, AutoTestConfig.task_id == task.id)
+            public_config_ids = set(r[0] for r in id_results)
+
+        sub_query = db.session.query(Submission.id.label('submission_id'),
+                                     func.max(AutoTest.id).label('last_test_id')) \
+            .outerjoin(AutoTest, AutoTest.submission_id == Submission.id) \
+            .filter(*filters) \
+            .group_by(Submission.id, AutoTest.config_id).subquery()
+
+        if task.is_team_task:
+            results = db.session.query(Team.id, sub_query.c.submission_id, AutoTest) \
+                .filter(Submission.id == sub_query.c.submission_id,
+                        Submission.submitter_id == UserTeamAssociation.user_id,
+                        UserTeamAssociation.team_id == Team.id,
+                        Team.task_id == task.id) \
+                .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id)
+        else:
+            results = db.session.query(Submission.submitter_id, sub_query.c.submission_id, AutoTest) \
+                .filter(Submission.id == sub_query.c.submission_id) \
+                .outerjoin(AutoTest, AutoTest.id == sub_query.c.last_test_id)
+
+        all_last_tests = {}
+        for unit_id, submission_id, test in results:  # unit_id is submitter_id for user-task, or team_id for team-task
+            last_tests = all_last_tests.get(unit_id)
+            if last_tests is None:
+                all_last_tests[unit_id] = last_tests = {}
+            tests = last_tests.get(submission_id)
+            if tests is None:
+                last_tests[submission_id] = tests = {}  # make sure all submission_ids are in last_tests even if no test
+            if test is None:
+                continue  # no test for this submission (we are using outer-join)
+            if not include_private_tests and test.config_id not in public_config_ids:
+                continue  # skip private tests
+            tests[test.config_id] = test
+        return all_last_tests

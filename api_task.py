@@ -1041,3 +1041,28 @@ def download_materials_zip(task_id):
                                    attachment_filename=zip_attachment_name, cache_timeout=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/auto-test-conclusions')
+@requires_login
+def task_auto_test_conclusions(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        return jsonify(SubmissionService.get_auto_test_conclusions_for_task(task, include_private_tests=True))
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
