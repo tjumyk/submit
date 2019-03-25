@@ -260,37 +260,8 @@ class SubmissionService:
                                                                only_for_first_submission=first_submission_only,
                                                                only_for_last_submission=last_submission_only)
 
-        # get late penalties if any
         late_penalties = cls.get_late_penalties_for_task_and_user(task, user)
-
-        # re-structure dict
-        test_results = defaultdict(list)
-        for sid, tests in last_tests.items():
-            for cid, test in tests.items():
-                test_results[cid].append(test)
-
-        ret = {}
-        for config in configs:
-            tests = test_results.get(config.id)
-            if not tests:  # no tests for this config
-                ret[config.id] = None
-                continue
-            if config.results_conclusion_accumulate_method == 'first' \
-                    and not last_tests[min(last_tests.keys())].get(config.id) \
-                    or config.results_conclusion_accumulate_method == 'last' \
-                    and not last_tests[max(last_tests.keys())].get(config.id):
-                # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
-                # return None.
-                # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
-                # will get the result from the last submission *that has an AutoTest*.
-                ret[config.id] = None
-                continue
-            try:
-                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, late_penalties)
-            except AutoTestConclusionExtractionError as e:
-                ret[config.id] = None
-                logger.warning('%s: %s' % (e.msg, e.detail))
-        return ret
+        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
 
     @classmethod
     def get_late_penalties_for_task_and_user(cls, task: Task, user: UserAlias) -> Optional[Dict[int, float]]:
@@ -423,33 +394,8 @@ class SubmissionService:
                                                       only_for_first_submission=first_submission_only,
                                                       only_for_last_submission=last_submission_only)
 
-        # get late penalties if any
         late_penalties = cls.get_late_penalties_for_team(team)
-
-        # re-structure dict
-        test_results = defaultdict(list)
-        for sid, tests in last_tests.items():
-            for cid, test in tests.items():
-                test_results[cid].append(test)
-
-        ret = {}
-        for config in configs:
-            tests = test_results.get(config.id)
-            if not tests:  # no tests for this config
-                ret[config.id] = None
-                continue
-            if config.results_conclusion_accumulate_method == 'first' \
-                    and not last_tests[min(last_tests.keys())].get(config.id) \
-                    or config.results_conclusion_accumulate_method == 'last' \
-                    and not last_tests[max(last_tests.keys())].get(config.id):
-                # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
-                # return None.
-                # We must explicitly handle this case here, otherwise the `extract_conclusion_from_auto_tests` method
-                # will get the result from the last submission *that has an AutoTest*.
-                ret[config.id] = None
-                continue
-            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, late_penalties)
-        return ret
+        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
 
     @classmethod
     def get_late_penalties_for_team(cls, team: Team) -> Optional[Dict[int, float]]:
@@ -657,8 +603,40 @@ class SubmissionService:
             .order_by(AutoTest.config_id).all()
 
     @classmethod
-    def extract_conclusion_from_auto_tests(cls, config: AutoTestConfig, tests: List[AutoTest],
-                                           submission_penalties: Dict[int, float] = None):
+    def extract_conclusions_for_configs(cls, configs: List[AutoTestConfig], last_tests: Dict[int, Dict[int, AutoTest]],
+                                        late_penalties: Optional[Dict[int, float]]):
+        # re-structure dict
+        test_results = defaultdict(list)
+        for sid, tests in last_tests.items():
+            for cid, test in tests.items():
+                test_results[cid].append(test)
+
+        ret = {}
+        for config in configs:
+            tests = test_results.get(config.id)
+            if not tests:  # no tests for this config
+                ret[config.id] = None
+                continue
+            if config.results_conclusion_accumulate_method == 'first' \
+                    and not last_tests[min(last_tests.keys())].get(config.id) \
+                    or config.results_conclusion_accumulate_method == 'last' \
+                    and not last_tests[max(last_tests.keys())].get(config.id):
+                # If the REAL first/last submission has no AutoTest for this config but other submissions have, we must
+                # return None.
+                # We must explicitly handle this case here, otherwise the `extract_conclusion_for_config` method
+                # will get the result from the last submission *that has an AutoTest*.
+                ret[config.id] = None
+                continue
+            try:
+                ret[config.id] = cls.extract_conclusion_for_config(config, tests, late_penalties)
+            except AutoTestConclusionExtractionError as e:
+                ret[config.id] = None
+                logger.warning('%s: %s' % (e.msg, e.detail))
+        return ret
+
+    @classmethod
+    def extract_conclusion_for_config(cls, config: AutoTestConfig, tests: List[AutoTest],
+                                      submission_penalties: Dict[int, float] = None):
         if config is None:
             raise SubmissionServiceError('auto test config is required')
         if tests is None:
