@@ -1,4 +1,5 @@
 import json
+import logging
 import math
 import os
 from collections import defaultdict
@@ -14,8 +15,6 @@ from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTe
 from services.auto_test import AutoTestService
 from services.task import TaskService
 from testbot import bot
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -231,7 +230,11 @@ class SubmissionService:
     @classmethod
     def get_auto_test_conclusions_for_task_and_user(cls, task: Task, user: UserAlias, include_private_tests=False) \
             -> Dict[int, object]:
-        late_penalty = LatePenalty(task.late_penalty)
+        if task is None:
+            raise SubmissionServiceError('task is required')
+        if user is None:
+            raise SubmissionServiceError('user is required')
+
         configs = task.auto_test_configs
         if not configs:
             return {}
@@ -249,18 +252,8 @@ class SubmissionService:
                                                                only_for_first_submission=first_submission_only,
                                                                only_for_last_submission=last_submission_only)
 
-        submission_late_penalties = {}
-        due_time = task.due_time
-        if due_time is not None:
-            special = TaskService.get_special_consideration_for_task_user(task, user)
-            if special is not None and special.due_time_extension:
-                due_time += timedelta(hours=special.due_time_extension)
-
-            # compute penalties if any
-            for submission in cls.get_for_task_and_user(task, user, include_cleared=False, submitted_after=due_time):
-                penalty = late_penalty.compute_penalty(submission.created_at - due_time)
-                if penalty:
-                    submission_late_penalties[submission.id] = penalty
+        # get late penalties if any
+        late_penalties = cls.get_late_penalties_for_task_and_user(task, user)
 
         # re-structure dict
         test_results = defaultdict(list)
@@ -285,11 +278,38 @@ class SubmissionService:
                 ret[config.id] = None
                 continue
             try:
-                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+                ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, late_penalties)
             except AutoTestConclusionExtractionError as e:
                 ret[config.id] = None
                 logger.warning('%s: %s' % (e.msg, e.detail))
         return ret
+
+    @classmethod
+    def get_late_penalties_for_task_and_user(cls, task: Task, user: UserAlias):
+        if task is None:
+            raise SubmissionServiceError('task is required')
+        if user is None:
+            raise SubmissionServiceError('user is required')
+
+        if not task.late_penalty:
+            return None
+        late_penalty = LatePenalty(task.late_penalty)
+
+        due_time = task.due_time
+        if due_time is None:
+            return None
+
+        special = TaskService.get_special_consideration_for_task_user(task, user)
+        if special is not None and special.due_time_extension:
+            due_time += timedelta(hours=special.due_time_extension)
+
+        penalties = {}
+        for submission in cls.get_for_task_and_user(task, user, include_cleared=False,
+                                                    submitted_after=due_time):
+            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+            if penalty:
+                penalties[submission.id] = penalty
+        return penalties
 
     @staticmethod
     def count_for_task_and_user(task: Task, user: UserAlias, include_cleared=False) -> int:
@@ -373,8 +393,10 @@ class SubmissionService:
     @classmethod
     def get_auto_test_conclusions_for_team(cls, team: Team, include_private_tests=False) \
             -> Dict[int, object]:
+        if team is None:
+            raise SubmissionServiceError('team is required')
+
         task = team.task
-        late_penalty = LatePenalty(task.late_penalty)
         configs = task.auto_test_configs
         if not configs:
             return {}
@@ -392,18 +414,8 @@ class SubmissionService:
                                                       only_for_first_submission=first_submission_only,
                                                       only_for_last_submission=last_submission_only)
 
-        submission_late_penalties = {}
-        due_time = task.due_time
-        if due_time is not None:
-            special = TaskService.get_special_consideration_for_team(team)
-            if special and special.due_time_extension:
-                due_time += timedelta(hours=special.due_time_extension)
-
-            # compute penalties if any
-            for submission in cls.get_for_team(team, include_cleared=False, submitted_after=due_time):
-                penalty = late_penalty.compute_penalty(submission.created_at - due_time)
-                if penalty:
-                    submission_late_penalties[submission.id] = penalty
+        # get late penalties if any
+        late_penalties = cls.get_late_penalties_for_team(team)
 
         # re-structure dict
         test_results = defaultdict(list)
@@ -427,8 +439,33 @@ class SubmissionService:
                 # will get the result from the last submission *that has an AutoTest*.
                 ret[config.id] = None
                 continue
-            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, submission_late_penalties)
+            ret[config.id] = cls.extract_conclusion_from_auto_tests(config, tests, late_penalties)
         return ret
+
+    @classmethod
+    def get_late_penalties_for_team(cls, team: Team):
+        if team is None:
+            raise SubmissionServiceError('team is required')
+
+        task = team.task
+        if not task.late_penalty:
+            return None
+        late_penalty = LatePenalty(task.late_penalty)
+
+        due_time = task.due_time
+        if due_time is None:
+            return None
+
+        special = TaskService.get_special_consideration_for_team(team)
+        if special and special.due_time_extension:
+            due_time += timedelta(hours=special.due_time_extension)
+
+        penalties = {}
+        for submission in cls.get_for_team(team, include_cleared=False, submitted_after=due_time):
+            penalty = late_penalty.compute_penalty(submission.created_at - due_time)
+            if penalty:
+                penalties[submission.id] = penalty
+        return penalties
 
     @staticmethod
     def count_for_team(team: Team, include_cleared=False) -> int:
