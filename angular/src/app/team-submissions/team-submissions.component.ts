@@ -51,6 +51,9 @@ export class TeamSubmissionsComponent implements OnInit {
               this.totalSubmissions += item.total_submissions;
             }
 
+            if (this.totalSubmissions == 0)
+              return;
+
             this.loadingAutoTestConclusions = true;
             this.taskService.getAutoTestConclusions(this.taskId).pipe(
               finalize(() => this.loadingAutoTestConclusions = false)
@@ -76,7 +79,7 @@ export class TeamSubmissionsComponent implements OnInit {
     inputDiv.classList.add('disabled');
     this.submissionService.getSubmission(id).subscribe(
       submission => {
-        if(submission.task_id != this.taskId){
+        if (submission.task_id != this.taskId) {
           this.error = {msg: 'submission does not belong to this task'};
           btn.classList.remove('loading', 'disabled');
           inputDiv.classList.remove('disabled');

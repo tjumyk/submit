@@ -50,6 +50,9 @@ export class SubmissionsComponent implements OnInit {
               this.totalSubmissions += item.total_submissions;
             }
 
+            if (this.totalSubmissions == 0)
+              return;
+
             this.loadingAutoTestConclusions = true;
             this.taskService.getAutoTestConclusions(this.taskId).pipe(
               finalize(() => this.loadingAutoTestConclusions = false)
