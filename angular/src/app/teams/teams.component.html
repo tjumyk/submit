@@ -23,7 +23,7 @@
       </div>
       <div class="five wide column">
         <div class="ui action input fluid" #inputTeamUserIDWrapper>
-          <input type="text" placeholder="Find team by user ID/name" #inputTeamUserID (keyup)="bindEnter($event, btnGoToTeamUser)">
+          <input type="text" placeholder="Find member by ID/name" #inputTeamUserID (keyup)="bindEnter($event, btnGoToTeamUser)">
           <button class="ui button icon" (click)="goToTeamUser(inputTeamUserID.value, btnGoToTeamUser, inputTeamUserIDWrapper)" #btnGoToTeamUser><i class="icon crosshairs"></i></button>
         </div>
       </div>
@@ -57,7 +57,7 @@
       <th (click)="sortField('is_finalised', thStatus)" #thStatus>Status</th>
       <th (click)="sortField('creator.name', thCreator)" #thCreator>Creator</th>
       <th (click)="sortField('slogan', thSlogan)" #thSlogan>Slogan</th>
-      <th (click)="sortField('total_user_associations', thMembers)" #thMembers>Members (include pending)</th>
+      <th (click)="sortField('total_user_associations', thMembers)" #thMembers>Members</th>
       <th>Operations</th>
     </tr>
     </thead>
