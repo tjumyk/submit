@@ -44,6 +44,15 @@ class TeamService:
         return Team.query.filter_by(task_id=task.id, name=name).first()
 
     @staticmethod
+    def get_for_task(task, joined_load_user_associations=False) -> List[Team]:
+        if task is None:
+            raise TeamServiceError('task is required')
+        query = db.session.query(Team)
+        if joined_load_user_associations:
+            query = query.options(joinedload(Team.user_associations))
+        return query.filter(Team.task_id == task.id).order_by(Team.id).all()
+
+    @staticmethod
     def get_summaries_for_task(task) -> List[Tuple[Team, int]]:
         if task is None:
             raise TeamServiceError('task is required')

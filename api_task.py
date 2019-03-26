@@ -1113,3 +1113,38 @@ def task_export_results(tid):
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/export-teams')
+@requires_login
+def task_export_teams(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        if not task.is_team_task:
+            return jsonify(msg='task is not team task'), 400
+
+        teams = TeamService.get_for_task(task, joined_load_user_associations=True)
+        with StringIO() as buffer:
+            buffer.write('\t'.join(['TeamID', 'TeamName', 'UserID', 'UserName']))
+            buffer.write('\n')
+            for team in teams:
+                for ass in team.user_associations:
+                    buffer.write('\t'.join([str(team.id), team.name, str(ass.user.id), ass.user.name]))
+                    buffer.write('\n')
+            return buffer.getvalue(), {'Content-Type': 'text/plain'}
+    except (TaskServiceError, TermServiceError, AccountServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

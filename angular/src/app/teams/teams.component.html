@@ -30,7 +30,16 @@
     </div>
   </div>
 
-  <table class="ui table unstackable">
+  <div class="ui segment top attached clearing">
+    <div class="ui menu right floated secondary fitted">
+      <div class="item">
+        <div class="ui basic buttons small">
+          <a class="ui button" href="api/tasks/{{taskId}}/export-teams" target="_blank"><i class="icon share"></i> Export</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="ui table unstackable bottom attached">
     <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
     <tbody>
     <tr *ngFor="let team of teams; index as i">
