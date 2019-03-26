@@ -35,7 +35,7 @@ class TeamService:
         return Team.query.all()
 
     @staticmethod
-    def get_by_task_name(task: Task, name: str) -> Optional[Team]:
+    def get_by_task_and_name(task: Task, name: str) -> Optional[Team]:
         if task is None:
             raise TeamServiceError('task is required')
         if not name:
@@ -44,7 +44,7 @@ class TeamService:
         return Team.query.filter_by(task_id=task.id, name=name).first()
 
     @staticmethod
-    def get_for_task(task) -> List[Tuple[Team, int]]:
+    def get_summaries_for_task(task) -> List[Tuple[Team, int]]:
         if task is None:
             raise TeamServiceError('task is required')
         sub_query = db.session.query(Team.id.label('team_id'),

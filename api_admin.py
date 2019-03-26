@@ -562,7 +562,7 @@ def admin_task_special_considerations(task_id):
 
             team_name = params.get('team_name')
             if team_name:
-                team = TeamService.get_by_task_name(task, team_name)
+                team = TeamService.get_by_task_and_name(task, team_name)
                 if team is None:
                     return jsonify(msg='team not found'), 400
             else:
