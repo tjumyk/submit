@@ -147,7 +147,7 @@ export class Pagination<T> {
         else
           return val
       });
-      console.info(new Date().getTime() - startTime)
+      //console.info(new Date().getTime() - startTime)
     }
     this._items = items;
 
