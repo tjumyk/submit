@@ -1066,3 +1066,50 @@ def task_auto_test_conclusions(tid):
         return jsonify(SubmissionService.get_auto_test_conclusions_for_task(task, include_private_tests=True))
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/export-results')
+@requires_login
+def task_export_results(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        configs = task.auto_test_configs
+        conclusions = SubmissionService.get_auto_test_conclusions_for_task(task, include_private_tests=True)
+
+        if task.is_team_task:
+            summaries = SubmissionService.get_team_summaries(task)
+            with StringIO() as buffer:
+                buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
+                buffer.write('\n')
+                for summary in summaries:
+                    buffer.write('\t'.join([str(summary.team.id), summary.team.name] +
+                                           [str(conclusions.get(summary.team.id, {}).get(c.id)) for c in configs]))
+                    buffer.write('\n')
+                return buffer.getvalue(), {'Content-Type': 'text/plain'}
+        else:
+            summaries = SubmissionService.get_user_summaries(task)
+            with StringIO() as buffer:
+                buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
+                buffer.write('\n')
+                for summary in summaries:
+                    buffer.write('\t'.join([str(summary.user.id), summary.user.name] +
+                                           [str(conclusions.get(summary.user.id, {}).get(c.id)) for c in configs]))
+                    buffer.write('\n')
+                return buffer.getvalue(), {'Content-Type': 'text/plain'}
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
