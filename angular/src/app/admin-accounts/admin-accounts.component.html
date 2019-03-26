@@ -51,30 +51,7 @@
         </tr>
         </tbody>
       </table>
-      <div class="ui segment bottom attached clearing">
-        <div class="ui menu right floated secondary fitted">
-          <div class="item">
-            Showing {{userPages.startRow}}-{{userPages.endRow}} Rows, Total: {{userPages.items.length}}
-          </div>
-          <div class="item">
-            <form class="ui form">
-              <div class="inline field">
-                <label>Rows Per Page</label>
-                <select name="itemsPerPage" [(ngModel)]="userPages.itemsPerPage">
-                  <option [value]="num" *ngFor="let num of userPages.itemsPerPageOptions">{{num}}</option>
-                </select>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="ui pagination menu left floated">
-          <a class="item" *ngFor="let entry of userPages.pageEntries"
-             [ngClass]="{'active': entry.is_current, 'disabled': entry.is_ellipse}"
-             (click)="userPages.page=entry.page||userPages.page">
-            {{entry.page || '...'}}
-          </a>
-        </div>
-      </div>
+      <app-table-pagination-toolbar class="bottom attached" [pagination]="userPages"></app-table-pagination-toolbar>
     </div>
   </div>
 

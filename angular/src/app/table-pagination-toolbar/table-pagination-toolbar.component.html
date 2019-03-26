@@ -1,0 +1,22 @@
+<div class="ui menu right floated secondary fitted">
+  <div class="item">
+    Showing {{pagination.startRow}}-{{pagination.endRow}} Rows, Total: {{pagination.items.length}}
+  </div>
+  <div class="item">
+    <form class="ui form">
+      <div class="inline field">
+        <label>Rows Per Page</label>
+        <select name="itemsPerPage" [(ngModel)]="pagination.itemsPerPage">
+          <option [value]="num" *ngFor="let num of pagination.itemsPerPageOptions">{{num}}</option>
+        </select>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="ui pagination menu left floated">
+  <a class="item" *ngFor="let entry of pagination.pageEntries"
+     [ngClass]="{'active': entry.is_current, 'disabled': entry.is_ellipse}"
+     (click)="pagination.page=entry.page||pagination.page">
+    {{entry.page || '...'}}
+  </a>
+</div>
