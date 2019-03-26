@@ -2,10 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Team, Term, User} from "../models";
 import {TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {AdminService} from "../admin.service";
 import {TermService} from "../term.service";
 import {AccountService} from "../account.service";
+import {Subject} from "rxjs";
+import {makeSortField, Pagination} from "../table-util";
 
 @Component({
   selector: 'app-teams',
@@ -21,10 +23,14 @@ export class TeamsComponent implements OnInit {
   term: Term;
   taskId: number;
   teams: Team[];
+  teamPages: Pagination<Team>;
   teamFreeUsers: User[];
   totalUsersInTeams: number;
   loadingTeams: boolean;
   loadingTeamFreeUsers: boolean;
+
+  teamSearchKey = new Subject<string>();
+  sortField: (field: string, th: HTMLElement) => any;
 
   constructor(
     private accountService: AccountService,
@@ -39,6 +45,13 @@ export class TeamsComponent implements OnInit {
   ngOnInit() {
     this.termId = parseInt(this.route.parent.parent.snapshot.paramMap.get('term_id'));
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
+
+    this.teamSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      (key) => this.teamPages.search(key),
+      error => this.error = error.error
+    );
 
     this.accountService.getCurrentUser().subscribe(
       user => {
@@ -60,6 +73,25 @@ export class TeamsComponent implements OnInit {
                 for (let team of teams) {
                   this.totalUsersInTeams += team.total_user_associations
                 }
+                this.teamPages = new Pagination(teams, 500);
+                this.teamPages.setSearchMatcher((item, key)=>{
+                  const keyLower = key.toLowerCase();
+                  if (item.name.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  if (item.id.toString().indexOf(keyLower) >= 0)
+                    return true;
+                  if (item.slogan && item.slogan.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  let creator = item.creator;
+                  if (creator.name.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  if (creator.id.toString().indexOf(keyLower) >= 0)
+                    return true;
+                  if (creator.nickname && creator.nickname.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  return false;
+                });
+                this.sortField = makeSortField(this.teamPages);
 
                 this.loadingTeamFreeUsers = true;
                 this.taskService.getTeamFreeUsers(this.taskId).pipe(

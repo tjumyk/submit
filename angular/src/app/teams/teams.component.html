@@ -38,12 +38,32 @@
         </div>
       </div>
     </div>
+    <div class="ui left floated menu secondary fitted">
+      <div class="item">
+        <div class="ui input icon">
+          <input type="text" name="teamSearchKey" #inputTeamSearch (keyup)="teamSearchKey.next(inputTeamSearch.value)"
+                 placeholder="Search Team...">
+          <i class="icon search"></i>
+        </div>
+      </div>
+    </div>
   </div>
-  <table class="ui table unstackable bottom attached">
-    <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Creator</th><th>Slogan</th><th>Members (include pending)</th><th>Operations</th></tr></thead>
+  <table class="ui table unstackable attached sortable celled">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th (click)="sortField('id', thID)" #thID>ID</th>
+      <th (click)="sortField('name', thName)" #thName>Name</th>
+      <th (click)="sortField('is_finalised', thStatus)" #thStatus>Status</th>
+      <th (click)="sortField('creator.name', thCreator)" #thCreator>Creator</th>
+      <th (click)="sortField('slogan', thSlogan)" #thSlogan>Slogan</th>
+      <th (click)="sortField('total_user_associations', thMembers)" #thMembers>Members (include pending)</th>
+      <th>Operations</th>
+    </tr>
+    </thead>
     <tbody>
-    <tr *ngFor="let team of teams; index as i">
-      <td>{{i+1}}</td>
+    <tr *ngFor="let team of teamPages.pageItems; index as i">
+      <td>{{teamPages.startRow + i}}</td>
       <td>{{team.id}}</td>
       <td>{{team.name}}</td>
       <td>
@@ -68,6 +88,7 @@
     </tr>
     </tbody>
   </table>
+  <app-table-pagination-toolbar class="bottom attached" [pagination]="teamPages"></app-table-pagination-toolbar>
 
   <div class="ui loader active text inline centered" *ngIf="loadingTeamFreeUsers">Loading users not in teams...</div>
   <div *ngIf="teamFreeUsers && teamFreeUsers.length">
