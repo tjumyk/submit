@@ -27,7 +27,25 @@
     </div>
   </div>
 
-  <table class="ui table unstackable sortable celled top attached">
+  <div class="ui top attached clearing segment">
+    <div class="ui right floated menu secondary fitted">
+      <div class="item">
+        <div class="ui basic buttons small">
+          <a class="ui button" href="api/tasks/{{taskId}}/export-results" target="_blank"><i class="icon share"></i> Export</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui left floated menu secondary fitted">
+      <div class="item">
+        <div class="ui input icon">
+          <input type="text" name="teamSearchKey" #inputTeamSearch (keyup)="teamSearchKey.next(inputTeamSearch.value)"
+                 placeholder="Search Team...">
+          <i class="icon search"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="ui table unstackable sortable celled attached">
     <thead>
     <tr>
       <th>#</th>

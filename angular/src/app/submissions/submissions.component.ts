@@ -3,10 +3,11 @@ import {ErrorMessage, Task, UserSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
 import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {SubmissionService} from "../submission.service";
 import {makeSortField, Pagination} from "../table-util";
 import * as moment from "moment";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-submissions',
@@ -25,6 +26,7 @@ export class SubmissionsComponent implements OnInit {
   loadingAutoTestConclusions: boolean;
   autoTestConclusions: AllAutoTestConclusionsMap;
 
+  userSearchKey = new Subject<string>();
   sortField: (field: string, th: HTMLElement) => any;
 
   constructor(
@@ -38,6 +40,13 @@ export class SubmissionsComponent implements OnInit {
 
   ngOnInit() {
     this.taskId = parseInt(this.route.snapshot.parent.paramMap.get('task_id'));
+
+    this.userSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      (key) => this.userSummaryPages.search(key),
+      error => this.error = error.error
+    );
 
     this.taskService.getCachedTask(this.taskId).subscribe(
       task => {
@@ -56,6 +65,14 @@ export class SubmissionsComponent implements OnInit {
               item['_last_submit_time'] = moment(item.last_submit_time).unix()
             }
             this.userSummaryPages = new Pagination(summaries, 500);
+            this.userSummaryPages.setSearchMatcher((item, key)=>{
+              const keyLower = key.toLowerCase();
+              if (item.user.name.toLowerCase().indexOf(keyLower) >= 0)
+                return true;
+              if (item.user.id.toString().indexOf(keyLower) >= 0)
+                return true;
+              return false;
+            });
             this.sortField = makeSortField(this.userSummaryPages);
 
             if (this.totalSubmissions == 0)

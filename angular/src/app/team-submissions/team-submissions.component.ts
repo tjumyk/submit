@@ -3,10 +3,11 @@ import {ErrorMessage, Task, TeamSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
 import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {SubmissionService} from "../submission.service";
 import {makeSortField, Pagination} from "../table-util";
 import * as moment from "moment";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-team-submissions',
@@ -26,6 +27,7 @@ export class TeamSubmissionsComponent implements OnInit {
   loadingAutoTestConclusions: boolean;
   autoTestConclusions: AllAutoTestConclusionsMap;
 
+  teamSearchKey = new Subject<string>();
   sortField: (field: string, th: HTMLElement) => any;
 
   constructor(
@@ -39,6 +41,13 @@ export class TeamSubmissionsComponent implements OnInit {
 
   ngOnInit() {
     this.taskId = parseInt(this.route.snapshot.parent.paramMap.get('task_id'));
+
+    this.teamSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      (key) => this.teamSummaryPages.search(key),
+      error => this.error = error.error
+    );
 
     this.taskService.getCachedTask(this.taskId).subscribe(
       task => {
@@ -57,6 +66,14 @@ export class TeamSubmissionsComponent implements OnInit {
               item['_last_submit_time'] = moment(item.last_submit_time).unix()
             }
             this.teamSummaryPages = new Pagination(summaries, 500);
+            this.teamSummaryPages.setSearchMatcher((item, key)=>{
+              const keyLower = key.toLowerCase();
+              if (item.team.name.toLowerCase().indexOf(keyLower) >= 0)
+                return true;
+              if (item.team.id.toString().indexOf(keyLower) >= 0)
+                return true;
+              return false;
+            });
             this.sortField = makeSortField(this.teamSummaryPages);
 
             if (this.totalSubmissions == 0)
