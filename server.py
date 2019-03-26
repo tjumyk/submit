@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify
+import os
+
+from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account_api
 from api_admin import admin_api
@@ -64,6 +66,9 @@ def page_not_found(error):
             break
         if mime[0] == 'application/json':
             return jsonify(msg='wrong url', detail='You have accessed an unknown location'), 404
+    # in case we are building the front-end
+    if not os.path.exists(os.path.join(app.static_folder, 'index.html')):
+        return send_from_directory(app.root_path, 'building.html', cache_timeout=0), 503
     return app.send_static_file('index.html'), 404
 
 
