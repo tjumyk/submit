@@ -65,11 +65,13 @@ export class SubmissionsComponent implements OnInit {
               item['_last_submit_time'] = moment(item.last_submit_time).unix()
             }
             this.userSummaryPages = new Pagination(summaries, 500);
-            this.userSummaryPages.setSearchMatcher((item, key)=>{
+            this.userSummaryPages.setSearchMatcher((item, key) => {
               const keyLower = key.toLowerCase();
               if (item.user.name.toLowerCase().indexOf(keyLower) >= 0)
                 return true;
               if (item.user.id.toString().indexOf(keyLower) >= 0)
+                return true;
+              if (item.user.nickname && item.user.nickname.toLowerCase().indexOf(keyLower) >= 0)
                 return true;
               return false;
             });
