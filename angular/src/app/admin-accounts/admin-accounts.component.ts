@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ErrorMessage, Group, SuccessMessage, User} from "../models";
 import {AdminService} from "../admin.service";
 import {debounceTime, finalize} from "rxjs/operators";
-import {Pagination} from "../table-util";
+import {makeSortField, Pagination} from "../table-util";
 import {Subject} from "rxjs";
 import {TitleService} from "../title.service";
 
@@ -22,6 +22,8 @@ export class AdminAccountsComponent implements OnInit {
 
   syncingUsers: boolean;
   syncingGroups: boolean;
+
+  sortField: (field: string, th: HTMLElement)=>any;
 
   constructor(
     private adminService: AdminService,
@@ -60,6 +62,7 @@ export class AdminAccountsComponent implements OnInit {
     ).subscribe(
       users => {
         this.userPages = new Pagination<User>(users, 10);
+        this.sortField = makeSortField(this.userPages);
         this.userPages.setSearchMatcher((user: User, key: string) => {
           const keyLower = key.toLowerCase();
           if (user.name.toLowerCase().indexOf(keyLower) >= 0)
@@ -131,31 +134,6 @@ export class AdminAccountsComponent implements OnInit {
       () => this.groups.splice(index, 1),
       error => this.error = error.error
     )
-  }
-
-  sortField(field: string, th: HTMLElement) {
-    let sibling = th.parentNode.firstChild;
-    while (sibling) {
-      if (sibling.nodeType == 1 && sibling != th) {
-        (sibling as Element).classList.remove('sorted', 'descending', 'ascending');
-      }
-      sibling = sibling.nextSibling;
-    }
-
-    if (!th.classList.contains('sorted')) {
-      th.classList.add('sorted', 'ascending');
-      th.classList.remove('descending');
-      this.userPages.sort(field, false);
-    } else {
-      if (th.classList.contains('ascending')) {
-        th.classList.remove('ascending');
-        th.classList.add('descending');
-        this.userPages.sort(field, true);
-      } else {
-        th.classList.remove('sorted', 'descending', 'ascending');
-        this.userPages.sort(null);
-      }
-    }
   }
 
 }

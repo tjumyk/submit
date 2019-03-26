@@ -128,11 +128,12 @@ export class Pagination<T> {
       }
       // find compare function
       const compareFn = this._fieldComparators[this._sortField];
+      const sortFieldSegments = this._sortField.split('.');
 
       const startTime = new Date().getTime();
       items.sort((a, b) => {
-        const fa = a[this._sortField];
-        const fb = b[this._sortField];
+        const fa = Pagination.extractField(a, sortFieldSegments);
+        const fb = Pagination.extractField(b, sortFieldSegments);
 
         if (fa == undefined || fa == null) {
           return (fb == undefined || fb == null) ? 0 : 1;
@@ -160,6 +161,16 @@ export class Pagination<T> {
 
     // update current page
     this.updatePage();
+  }
+
+  private static extractField(obj: any, segments: string[]) {
+    let ret = obj;
+    for (let segment of segments) {
+      if (typeof ret != 'object')
+        return null;
+      ret = ret[segment]
+    }
+    return ret;
   }
 
   private updatePage() {
@@ -239,4 +250,31 @@ export class Pagination<T> {
     this._fieldComparators[field] = compareFn
   }
 
+}
+
+export function makeSortField<T>(pages: Pagination<T>): (field: string, th: HTMLElement) => any {
+  return function (field: string, th: HTMLElement) {
+    let sibling = th.parentNode.firstChild;
+    while (sibling) {
+      if (sibling.nodeType == 1 && sibling != th) {
+        (sibling as Element).classList.remove('sorted', 'descending', 'ascending');
+      }
+      sibling = sibling.nextSibling;
+    }
+
+    if (!th.classList.contains('sorted')) {
+      th.classList.add('sorted', 'ascending');
+      th.classList.remove('descending');
+      pages.sort(field, false);
+    } else {
+      if (th.classList.contains('ascending')) {
+        th.classList.remove('ascending');
+        th.classList.add('descending');
+        pages.sort(field, true);
+      } else {
+        th.classList.remove('sorted', 'descending', 'ascending');
+        pages.sort(null);
+      }
+    }
+  }
 }
