@@ -27,23 +27,29 @@
     </div>
   </div>
 
-  <table class="ui table unstackable">
+  <table class="ui table unstackable sortable celled top attached">
     <thead>
     <tr>
-      <th>#</th><th>Team ID</th><th>Team Name</th><th>Total Submissions</th><th>Last Submission Time</th>
-      <th *ngFor="let config of task.auto_test_configs">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></th>
+      <th>#</th>
+      <th (click)="sortField('team.id', thTeamID)" #thTeamID>Team ID</th>
+      <th (click)="sortField('team.name', thTeamName)" #thTeamName>Team Name</th>
+      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Total Submissions</th>
+      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Submission Time</th>
+      <th *ngFor="let config of task.auto_test_configs"
+          (click)="sortField('_auto_test_conclusion_'+config.id, thAutoTestConfig)" #thAutoTestConfig>
+        {{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i>
+      </th>
       <th>Operations</th></tr></thead>
     <tbody>
-    <tr *ngFor="let summary of teamSummaries; index as i">
-      <td>{{i+1}}</td>
+    <tr *ngFor="let summary of teamSummaryPages.pageItems; index as i">
+      <td>{{teamSummaryPages.startRow + i}}</td>
       <td>{{summary.team.id}}</td>
       <td><a routerLink="../teams/{{summary.team.id}}">{{summary.team.name}}</a></td>
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.last_submit_time | date:'medium'}}</td>
       <td *ngFor="let config of task.auto_test_configs">
-        <ng-container *ngIf="autoTestConclusions && autoTestConclusions[summary.team.id] && autoTestConclusions[summary.team.id][config.id] != null">
-          <!-- TODO Avoid looking up dictionary again-->
-          {{autoTestConclusions[summary.team.id][config.id]|json}}
+        <ng-container *ngIf="summary['_auto_test_conclusion_'+config.id] != null">
+          {{summary['_auto_test_conclusion_'+config.id]|json}}
         </ng-container>
       </td>
       <td>
@@ -52,4 +58,5 @@
     </tr>
     </tbody>
   </table>
+  <app-table-pagination-toolbar class="bottom attached" [pagination]="teamSummaryPages"></app-table-pagination-toolbar>
 </div>

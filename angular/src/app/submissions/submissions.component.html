@@ -29,16 +29,22 @@
     </div>
   </div>
 
-  <table class="ui table unstackable">
+  <table class="ui table unstackable sortable celled top attached">
     <thead>
     <tr>
-      <th>#</th><th>User</th><th>Total Submissions</th><th>Last Submission Time</th>
-      <th *ngFor="let config of task.auto_test_configs">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></th>
+      <th>#</th>
+      <th (click)="sortField('user.name', thUser)" #thUser>User</th>
+      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Total Submissions</th>
+      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Submission Time</th>
+      <th *ngFor="let config of task.auto_test_configs"
+          (click)="sortField('_auto_test_conclusion_'+config.id, thAutoTestConfig)" #thAutoTestConfig>
+        {{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i>
+      </th>
       <th>Operations</th></tr>
     </thead>
     <tbody>
-    <tr *ngFor="let summary of userSummaries; index as i">
-      <td>{{i+1}}</td>
+    <tr *ngFor="let summary of userSummaryPages.pageItems; index as i">
+      <td>{{userSummaryPages.startRow + i}}</td>
       <td>
         <a href="admin/users/{{summary.user.id}}" target="_blank">
           <img src="{{summary.user.avatar}}?size=64" *ngIf="summary.user.avatar; else defaultAvatar" class="ui image avatar">
@@ -49,9 +55,8 @@
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.last_submit_time | date:'medium'}}</td>
       <td *ngFor="let config of task.auto_test_configs">
-        <ng-container *ngIf="autoTestConclusions && autoTestConclusions[summary.user.id] && autoTestConclusions[summary.user.id][config.id] != null">
-          <!-- TODO Avoid looking up dictionary again-->
-          {{autoTestConclusions[summary.user.id][config.id]|json}}
+        <ng-container *ngIf="summary['_auto_test_conclusion_'+config.id] != null">
+          {{summary['_auto_test_conclusion_'+config.id]|json}}
         </ng-container>
       </td>
       <td>
@@ -60,4 +65,5 @@
     </tr>
     </tbody>
   </table>
+  <app-table-pagination-toolbar class="bottom attached" [pagination]="userSummaryPages"></app-table-pagination-toolbar>
 </div>

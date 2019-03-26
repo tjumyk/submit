@@ -5,6 +5,8 @@ import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {SubmissionService} from "../submission.service";
+import {makeSortField, Pagination} from "../table-util";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-submissions',
@@ -17,10 +19,13 @@ export class SubmissionsComponent implements OnInit {
   taskId: number;
   task: Task;
   userSummaries: UserSubmissionSummary[];
+  userSummaryPages: Pagination<UserSubmissionSummary>;
   totalSubmissions: number;
   loadingSummaries: boolean;
   loadingAutoTestConclusions: boolean;
   autoTestConclusions: AllAutoTestConclusionsMap;
+
+  sortField: (field: string, th: HTMLElement) => any;
 
   constructor(
     private accountService: AccountService,
@@ -48,7 +53,10 @@ export class SubmissionsComponent implements OnInit {
             this.totalSubmissions = 0;
             for (let item of summaries) {
               this.totalSubmissions += item.total_submissions;
+              item['_last_submit_time'] = moment(item.last_submit_time).unix()
             }
+            this.userSummaryPages = new Pagination(summaries, 500);
+            this.sortField = makeSortField(this.userSummaryPages);
 
             if (this.totalSubmissions == 0)
               return;
@@ -57,7 +65,19 @@ export class SubmissionsComponent implements OnInit {
             this.taskService.getAutoTestConclusions(this.taskId).pipe(
               finalize(() => this.loadingAutoTestConclusions = false)
             ).subscribe(
-              conclusions => this.autoTestConclusions = conclusions,
+              conclusions => {
+                this.autoTestConclusions = conclusions;
+
+                for (let item of this.userSummaries) {
+                  // TODO delete old conclusions when reload
+                  let unitConclusions = conclusions[item.user.id];
+                  if (unitConclusions) {
+                    for (let config of this.task.auto_test_configs) {
+                      item['_auto_test_conclusion_' + config.id] = unitConclusions[config.id]
+                    }
+                  }
+                }
+              },
               error => this.error = error.error
             )
           },
