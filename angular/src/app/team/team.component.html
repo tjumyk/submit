@@ -27,6 +27,10 @@
         {{team.created_at|date:'medium'}}
       </div>
       <div class="item">
+        <div class="header">Updated At</div>
+        {{team.modified_at|date:'medium'}}
+      </div>
+      <div class="item">
         <div class="header">Status</div>
         <span *ngIf="!team.is_finalised; else alreadyFinalisedText"><i class="icon lock open green"></i> Open</span>
         <ng-template #alreadyFinalisedText><i class="icon lock"></i> Finalised</ng-template>
