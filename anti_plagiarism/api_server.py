@@ -1,5 +1,6 @@
 import logging
 import os
+from io import StringIO
 from threading import Lock
 
 from flask import Flask, request, jsonify
@@ -22,26 +23,46 @@ class Store:
     Thread-safe in-memory index store for a requirement.
     """
 
-    def __init__(self, requirement_id: int, is_team_task: bool):
+    def __init__(self, requirement_id: int, is_team_task: bool, template_path: str = None):
         self.requirement_id = requirement_id
         self.is_team_task = is_team_task
+        self.template_path = template_path
 
+        self._template_uid = -1
+        self._template_fid = -1
         self._lock = Lock()
         self._indexed_file_ids = set()
         self._index = None
 
-    def add_and_evaluate_file(self, uid: int, file: SubmissionFile):
+    def add_file(self, sid: int, uid: int, file: SubmissionFile):
         with self._lock:
             if self._index is None:  # cold start
                 self._index = self._build_full_index()
+                if self.template_path:  # also index the template file
+                    try:
+                        self._index.process_file(self._template_uid, self._template_fid,
+                                                 os.path.join(data_folder, self.template_path))
+                    except SyntaxError:
+                        logger.warning('Syntax Error in template file')
+                    except IOError:
+                        logger.warning('IO Error in template file', exc_info=True)
             else:  # assume this submission is the only submission that has not been indexed
                 if file.id in self._indexed_file_ids:
                     return
-                self._index.process_file(uid, file.submission_id, os.path.join(data_folder, file.path), file.md5)
-                self._indexed_file_ids.add(file.id)
+                try:
+                    self._index.process_file(uid, file.submission_id, os.path.join(data_folder, file.path), file.md5)
+                except SyntaxError:
+                    logger.debug('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
+                except IOError:
+                    logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
+                self._indexed_file_ids.add(file.id)  # mark it as indexed even error occurred
 
+    def get_duplicates(self, uid: int, file_id: int, limit: int = 100):
         # TODO accept configurable options
-        return self._index.get_duplicates(filter_user_id=uid, filter_file_id=file.id)
+        options = {}
+        if self.template_path:
+            options['exclude_user_id'] = self._template_uid
+        return self._index.get_duplicates(include_user_id=uid, include_user_file_id=file_id, **options)[:limit]
 
     def _build_full_index(self) -> CodeSegmentIndex:
         index = CodeSegmentIndex(min_index_height=5)
@@ -130,7 +151,11 @@ def check():
                 if store is None:
                     _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
-            return jsonify([CodeSegmentIndex.result_to_dict(r) for r in store.add_and_evaluate_file(uid, file)])
+            store.add_file(submission_id, uid, file)
+            results = store.get_duplicates(uid, file.id)
+            with StringIO() as buffer:
+                CodeSegmentIndex.pretty_print_results(results, file=buffer)
+                return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TeamServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
