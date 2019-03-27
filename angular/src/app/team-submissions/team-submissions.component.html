@@ -61,7 +61,6 @@
     <tbody>
     <tr *ngFor="let summary of teamSummaryPages.pageItems; index as i">
       <td>{{teamSummaryPages.startRow + i}}</td>
-      <td>{{summary.team.id}}</td>
       <td><a routerLink="../teams/{{summary.team.id}}">{{summary.team.name}}</a></td>
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.first_submit_time | date:'medium'}}</td>
