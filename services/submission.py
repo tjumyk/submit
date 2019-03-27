@@ -586,7 +586,10 @@ class SubmissionService:
             raise SubmissionServiceError('auto test config is disabled')
 
         # TODO how to use priority support in Celery properly?
-        result = bot.run_test.apply_async((submission.id, config.id), countdown=3)  # wait 3 seconds to allow db commit
+        task_entry = bot.task_entries.get(config.type)
+        if task_entry is None:
+            raise SubmissionServiceError('task entry not found for config type: %s' % config.type)
+        result = task_entry.apply_async((submission.id, config.id), countdown=3)  # wait 3 seconds to allow db commit
         test = AutoTestService.add(submission, config, result.id)
         return test, result
 

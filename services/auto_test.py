@@ -53,7 +53,12 @@ class AutoTestService:
     def get_result(test: AutoTest) -> AsyncResult:
         if test is None:
             raise AutoTestServiceError('auto_test is required')
-        return bot.run_test.AsyncResult(test.work_id)
+
+        config_type = test.config.type
+        task_entry = bot.task_entries.get(config_type)
+        if task_entry is None:
+            raise AutoTestServiceError('task entry not found for config type: %s', config_type)
+        return task_entry.AsyncResult(test.work_id)
 
     @staticmethod
     def result_to_dict(result: AsyncResult, with_advanced_fields=False) -> dict:
@@ -81,7 +86,7 @@ class AutoTestService:
         return d
 
     @classmethod
-    def test_to_dict(cls, test: AutoTest, with_advanced_fields=False) ->dict:
+    def test_to_dict(cls, test: AutoTest, with_advanced_fields=False) -> dict:
         """
         Get a dumped dictionary with additional information from the temporary result
         """

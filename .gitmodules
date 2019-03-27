@@ -2,5 +2,5 @@
 	path = auth_connect
 	url = ../auth_connect.git
 [submodule "testbot"]
-	path = testbot
+	path = submit-testbot
 	url = ../submit-testbot.git
