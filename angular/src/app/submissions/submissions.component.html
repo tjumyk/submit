@@ -52,7 +52,7 @@
     <tr>
       <th>#</th>
       <th (click)="sortField('user.name', thUser)" #thUser>User</th>
-      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Total Submissions</th>
+      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Attempts</th>
       <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime>First Submission Time</th>
       <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Submission Time</th>
       <th *ngFor="let config of task.auto_test_configs"
