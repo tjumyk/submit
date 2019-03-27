@@ -2,7 +2,7 @@ import ast
 import logging
 import os
 import sys
-from typing import Optional
+from typing import Optional, Tuple, Dict, List
 
 import astunparse
 import magic
@@ -32,6 +32,9 @@ class CodeSegment:
     def __hash__(self):
         return self.dump.__hash__()
 
+    def to_dict(self) -> dict:
+        return dict(code=astunparse.unparse(self.node), height=self.height, total_nodes=self.total_nodes)
+
 
 class CodeOccurrence:
     def __init__(self, user_id, file_id, file_md5: str, lineno: Optional[int], col_offset: Optional[int]):
@@ -44,6 +47,10 @@ class CodeOccurrence:
     def __repr__(self):
         return '<CodeOccurrence user=%s, file=%s, md5=%s, line=%s, col=%s>' % \
                (self.user_id, self.file_id, self.file_md5, self.lineno, self.col_offset)
+
+    def to_dict(self) -> dict:
+        return dict(user_id=self.user_id, file_id=self.file_id, file_md5=self.file_md5, lineno=self.lineno,
+                    col_offset=self.col_offset)
 
 
 class CodeSegmentIndex:
@@ -125,7 +132,8 @@ class CodeSegmentIndex:
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
                        min_total_nodes: int = None, max_total_nodes: int = None,
                        min_height: int = None, max_height: int = None,
-                       sort_by: str = 'total_nodes'):
+                       sort_by: str = 'total_nodes',
+                       filter_user_id: int = None, filter_file_id: int = None):
         results = []
         for k, v in self._index.items():
             if min_height is not None and k.height < min_height:
@@ -141,9 +149,27 @@ class CodeSegmentIndex:
                 continue
             if max_occ_users is not None and occ_users > max_occ_users:
                 continue
+
+            if filter_user_id is not None:
+                user_occurrences = v.get(filter_user_id)
+                if user_occurrences is None:
+                    continue
+                if filter_file_id is None and not any(occ.file_id == filter_file_id for occ in user_occurrences):
+                    continue
+            else:
+                if filter_file_id is not None:
+                    logger.warning('parameter "filter_file_id" is ignored when "filter_user_id" is not provided')
+
             results.append((k, v))
         results.sort(key=lambda x: getattr(x[0], sort_by), reverse=True)
         return results
+
+    @staticmethod
+    def result_to_dict(result: Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]) -> Dict:
+        segment, occ_users = result
+        return dict(segment=segment.to_dict(),
+                    occurrences={uid: [occ.to_dict() for occ in user_occurrences] for uid, user_occurrences in
+                                 occ_users.items()})
 
     @staticmethod
     def pretty_print_result(result, file=sys.stdout):
