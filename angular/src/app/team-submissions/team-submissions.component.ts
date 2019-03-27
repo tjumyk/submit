@@ -63,10 +63,11 @@ export class TeamSubmissionsComponent implements OnInit {
             this.totalSubmissions = 0;
             for (let item of summaries) {
               this.totalSubmissions += item.total_submissions;
+              item['_first_submit_time'] = moment(item.first_submit_time).unix();
               item['_last_submit_time'] = moment(item.last_submit_time).unix()
             }
             this.teamSummaryPages = new Pagination(summaries, 500);
-            this.teamSummaryPages.setSearchMatcher((item, key)=>{
+            this.teamSummaryPages.setSearchMatcher((item, key) => {
               const keyLower = key.toLowerCase();
               if (item.team.name.toLowerCase().indexOf(keyLower) >= 0)
                 return true;

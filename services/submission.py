@@ -29,27 +29,32 @@ class AutoTestConclusionExtractionError(BasicError):
 
 
 class UserSubmissionSummary:
-    def __init__(self, user: UserAlias, total_submissions: int, last_submit_time: datetime):
+    def __init__(self, user: UserAlias, total_submissions: int, first_submit_time: datetime,
+                 last_submit_time: datetime):
         self.user = user
         self.total_submissions = total_submissions
+        self.first_submit_time = first_submit_time
         self.last_submit_time = last_submit_time
 
     def to_dict(self):
         d = dict(user=self.user.to_dict(),
                  total_submissions=self.total_submissions,
+                 first_submit_time=self.first_submit_time,
                  last_submit_time=self.last_submit_time)
         return d
 
 
 class TeamSubmissionSummary:
-    def __init__(self, team: Team, total_submissions: int, last_submit_time: datetime):
+    def __init__(self, team: Team, total_submissions: int, first_submit_time: datetime, last_submit_time: datetime):
         self.team = team
         self.total_submissions = total_submissions
+        self.first_submit_time = first_submit_time
         self.last_submit_time = last_submit_time
 
     def to_dict(self):
         d = dict(team=self.team.to_dict(),
                  total_submissions=self.total_submissions,
+                 first_submit_time=self.first_submit_time,
                  last_submit_time=self.last_submit_time)
         return d
 
@@ -133,16 +138,19 @@ class SubmissionService:
 
         sub_query = db.session.query(UserAlias.id.label('user_id'),
                                      func.count().label('total_submissions'),
+                                     func.min(Submission.created_at).label('first_submit_time'),
                                      func.max(Submission.created_at).label('last_submit_time')) \
             .filter(UserAlias.id == Submission.submitter_id,
                     Submission.task_id == task.id) \
             .group_by(UserAlias.id).subquery()
         query = db.session.query(UserAlias,
                                  sub_query.c.total_submissions,
+                                 sub_query.c.first_submit_time,
                                  sub_query.c.last_submit_time) \
             .filter(sub_query.c.user_id == UserAlias.id) \
             .order_by(sub_query.c.last_submit_time)
-        return [UserSubmissionSummary(user, total, last_time) for user, total, last_time in query.all()]
+        return [UserSubmissionSummary(user, total, first_time, last_time)
+                for user, total, first_time, last_time in query.all()]
 
     @staticmethod
     def get_team_summaries(task: Task) -> List[TeamSubmissionSummary]:
@@ -153,6 +161,7 @@ class SubmissionService:
 
         sub_query = db.session.query(Team.id.label('team_id'),
                                      func.count().label('total_submissions'),
+                                     func.min(Submission.created_at).label('first_submit_time'),
                                      func.max(Submission.created_at).label('last_submit_time')) \
             .filter(Team.id == UserTeamAssociation.team_id,
                     Team.task_id == task.id,
@@ -161,10 +170,12 @@ class SubmissionService:
             .group_by(Team.id).subquery()
         query = db.session.query(Team,
                                  sub_query.c.total_submissions,
+                                 sub_query.c.first_submit_time,
                                  sub_query.c.last_submit_time) \
             .filter(sub_query.c.team_id == Team.id) \
             .order_by(sub_query.c.last_submit_time)
-        return [TeamSubmissionSummary(team, total, last_submit) for team, total, last_submit in query.all()]
+        return [TeamSubmissionSummary(team, total, first_time, last_submit)
+                for team, total, first_time, last_submit in query.all()]
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False, submitted_after: datetime = None) \

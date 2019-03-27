@@ -181,12 +181,14 @@ export class UserTeamAssociation {
 export class UserSubmissionSummary {
   user: User;
   total_submissions: number;
+  first_submit_time: string;
   last_submit_time: string;
 }
 
 export class TeamSubmissionSummary {
   team: Team;
   total_submissions: number;
+  first_submit_time: string;
   last_submit_time: string;
 }
 
