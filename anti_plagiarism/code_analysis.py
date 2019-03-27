@@ -148,7 +148,7 @@ class CodeSegmentIndex:
     @staticmethod
     def pretty_print_result(result, file=sys.stdout):
         segment, occ_users = result
-        print('%-18s%-22s%-8s%s' % ('User ID', 'File/Submission ID', 'MD5', 'Location'), file=file)
+        print('%-18s%-22s%-8s%s' % ('User/Team ID', 'File/Submission ID', 'MD5', 'Location'), file=file)
         for uid, occ_user_items in occ_users.items():
             print(uid, file=file)
             for occ in occ_user_items:

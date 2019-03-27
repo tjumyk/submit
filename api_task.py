@@ -12,7 +12,7 @@ from typing import Optional
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
 from auth_connect.oauth import requires_login
-from code_analysis import CodeSegmentIndex
+from anti_plagiarism.code_analysis import CodeSegmentIndex
 from models import db, SpecialConsideration, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
@@ -277,7 +277,12 @@ def task_anti_plagiarism(task_id, requirement_id):
         syntax_error_count = 0
         io_error_count = 0
 
-        for sid, uid, file in SubmissionService.get_files(requirement_id):
+        if task.is_team_task:
+            # If task is a team task, treat a team as a single 'user'.
+            file_tuples = SubmissionService.get_team_files(requirement_id)
+        else:
+            file_tuples = SubmissionService.get_files(requirement_id)
+        for sid, uid, file in file_tuples:
             user_set.add(uid)
             try:
                 index.process_file(uid, sid, os.path.join(data_folder, file.path), file.md5)
@@ -290,7 +295,7 @@ def task_anti_plagiarism(task_id, requirement_id):
                 io_error_count += 1
                 continue
             valid_file_count += 1
-        logger.info('Processed users: %d, valid files: %d, syntax errors: %d, io errors: %d' %
+        logger.info('Processed users/teams: %d, valid files: %d, syntax errors: %d, io errors: %d' %
                     (len(user_set), valid_file_count, syntax_error_count, io_error_count))
 
         results = index.get_duplicates()[0:100]  # return top 100 results

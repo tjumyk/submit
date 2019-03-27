@@ -451,6 +451,16 @@ class SubmissionService:
             .all()
 
     @staticmethod
+    def get_team_files(requirement_id: int) -> List[Tuple[int, int, SubmissionFile]]:
+        return db.session.query(Submission.id, Team.id, SubmissionFile) \
+            .filter(SubmissionFile.requirement_id == requirement_id,
+                    Submission.id == SubmissionFile.submission_id,
+                    Submission.submitter_id == UserTeamAssociation.user_id,
+                    UserTeamAssociation.team_id == Team.id,
+                    Team.task_id == Submission.task_id) \
+            .all()
+
+    @staticmethod
     def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str]) \
             -> Tuple[Submission, List[Submission]]:
         # assume role has been checked (to minimize dependency)
