@@ -133,7 +133,9 @@ class CodeSegmentIndex:
                        min_total_nodes: int = None, max_total_nodes: int = None,
                        min_height: int = None, max_height: int = None,
                        sort_by: str = 'total_nodes',
-                       filter_user_id: int = None, filter_file_id: int = None):
+                       include_user_id: int = None, include_user_file_id: int = None,
+                       exclude_user_id: int = None, exclude_user_file_id: int = None,
+                       min_code_length: int = None, max_code_length: int = None):
         results = []
         for k, v in self._index.items():
             if min_height is not None and k.height < min_height:
@@ -150,15 +152,35 @@ class CodeSegmentIndex:
             if max_occ_users is not None and occ_users > max_occ_users:
                 continue
 
-            if filter_user_id is not None:
-                user_occurrences = v.get(filter_user_id)
+            if include_user_id is not None:
+                user_occurrences = v.get(include_user_id)
                 if user_occurrences is None:
                     continue
-                if filter_file_id is None and not any(occ.file_id == filter_file_id for occ in user_occurrences):
+                if include_user_file_id is not None and not any(occ.file_id == include_user_file_id
+                                                                for occ in user_occurrences):
                     continue
             else:
-                if filter_file_id is not None:
-                    logger.warning('parameter "filter_file_id" is ignored when "filter_user_id" is not provided')
+                if include_user_file_id is not None:
+                    logger.warning('parameter "include_user_file_id" is ignored when "include_user_id" is not provided')
+
+            if exclude_user_id is not None:
+                user_occurrences = v.get(exclude_user_id)
+                if user_occurrences is not None:
+                    if exclude_user_file_id is None:
+                        continue
+                    if any(occ.file_id == exclude_user_file_id for occ in user_occurrences):
+                        continue
+            else:
+                if exclude_user_file_id is not None:
+                    logger.warning('parameter "exclude_file_id" is ignored when "exclude_user_id" is not provided')
+
+            if min_code_length is not None or max_code_length is not None:
+                code = astunparse.unparse(k.node)
+                code_length = len(code)
+                if min_code_length is not None and code_length < min_code_length:
+                    continue
+                if max_code_length is not None and code_length > max_code_length:
+                    continue
 
             results.append((k, v))
         results.sort(key=lambda x: getattr(x[0], sort_by), reverse=True)
