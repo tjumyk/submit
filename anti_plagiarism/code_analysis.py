@@ -135,7 +135,8 @@ class CodeSegmentIndex:
                        sort_by: str = 'total_nodes',
                        include_user_id: int = None, include_user_file_id: int = None,
                        exclude_user_id: int = None, exclude_user_file_id: int = None,
-                       min_code_length: int = None, max_code_length: int = None):
+                       min_code_length: int = None, max_code_length: int = None,
+                       min_code_lines: int = 2, max_code_lines: int = None):
         results = []
         for k, v in self._index.items():
             if min_height is not None and k.height < min_height:
@@ -174,13 +175,26 @@ class CodeSegmentIndex:
                 if exclude_user_file_id is not None:
                     logger.warning('parameter "exclude_file_id" is ignored when "exclude_user_id" is not provided')
 
-            if min_code_length is not None or max_code_length is not None:
+            if min_code_length is not None or max_code_length is not None \
+                    or min_code_lines is not None or max_code_lines is not None:  # need to un-parse the AST
+                # The un-parsed code should have the same execution sequence as the original code but the textual format
+                # may be quite different.
                 code = astunparse.unparse(k.node)
+                # the un-parse function produce may produce an empty starting line and an empty ending line
+                code = code.strip()
                 code_length = len(code)
                 if min_code_length is not None and code_length < min_code_length:
                     continue
                 if max_code_length is not None and code_length > max_code_length:
                     continue
+                if min_code_lines is not None or max_code_lines is not None:  # need to count the number of lines
+                    # We are using the number of lines of the un-parsed code, which does not necessarily has the same
+                    # number of lines as the original code.
+                    num_lines = len(code.split('\n'))
+                    if min_code_lines is not None and num_lines < min_code_lines:
+                        continue
+                    if max_code_lines is not None and num_lines > max_code_lines:
+                        continue
 
             results.append((k, v))
         results.sort(key=lambda x: getattr(x[0], sort_by), reverse=True)
