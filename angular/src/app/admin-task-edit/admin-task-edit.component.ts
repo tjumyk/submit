@@ -209,6 +209,9 @@ export class AdminTaskEditComponent implements OnInit {
 
   validateTestEnvironment(material_id: number) {
     this.testEnvValidationResult = null;
+    if(material_id == null)
+      return;
+
     this.validatingTestEnvironment = true;
     this.adminService.validateTestEnvironment(material_id).pipe(
       finalize(() => this.validatingTestEnvironment = false)
