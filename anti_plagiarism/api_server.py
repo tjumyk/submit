@@ -1,13 +1,15 @@
 import json
 import logging
 import os
+import sys
 from io import StringIO
 from threading import Lock
+from typing import List, Tuple, Dict
 
 from flask import Flask, request, jsonify
 
-from anti_plagiarism.code_analysis import CodeSegmentIndex
-from models import SubmissionFile
+from anti_plagiarism.code_analysis import CodeSegmentIndex, CodeFileInfo, CodeSegment, CodeOccurrence
+from models import SubmissionFile, Task
 from server import app
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
@@ -17,6 +19,20 @@ ap_server = Flask(__name__)
 
 logger = logging.getLogger(__name__)
 data_folder = app.config['DATA_FOLDER']
+
+GRADE_NO_EVIDENCE = 0
+GRADE_WEAK_EVIDENCE = 1
+GRADE_MODERATE_EVIDENCE = 2
+GRADE_STRONG_EVIDENCE = 3
+GRADE_VERY_STRONG_EVIDENCE = 3
+GRADE_EXACTLY_SAME = 4
+
+GRADE_MESSAGES = {GRADE_NO_EVIDENCE: 'No Evidence',
+                  GRADE_WEAK_EVIDENCE: 'Weak Evidence',
+                  GRADE_MODERATE_EVIDENCE: 'Moderate Evidence',
+                  GRADE_STRONG_EVIDENCE: 'Strong Evidence',
+                  GRADE_VERY_STRONG_EVIDENCE: 'Very Strong Evidence',
+                  GRADE_EXACTLY_SAME: 'Exactly the Same'}
 
 
 class Store:
@@ -58,12 +74,20 @@ class Store:
                     logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
                 self._indexed_file_ids.add(file.id)  # mark it as indexed even error occurred
 
-    def get_duplicates(self, sid: int, uid: int, limit: int = 100):
+    def get_duplicates(self, sid: int, uid: int, limit: int = 100) \
+            -> List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
         # TODO accept configurable options
         options = {}
         if self.template_path:
             options['exclude_user_id'] = self._template_uid
-        return self._index.get_duplicates(include_user_id=uid, include_user_file_id=sid, **options)[:limit]
+        return self._index.get_duplicates(sort_by='total_nodes', include_user_id=uid, include_user_file_id=sid,
+                                          **options)[:limit]
+
+    def get_file_info(self, sid: int) -> CodeFileInfo:
+        return self._index.get_file_info(sid)
+
+    def pretty_print_results(self, results, file=sys.stdout):
+        return self._index.pretty_print_results(results, file)
 
     def _build_full_index(self) -> CodeSegmentIndex:
         index = CodeSegmentIndex(min_index_height=5)
@@ -156,14 +180,69 @@ def check():
 
             store.add_file(submission_id, uid, file)
             duplicates = store.get_duplicates(submission_id, uid)
-            summary = dict(total=len(duplicates))
+
+            summary = build_summary(store, task, uid, submission_id, duplicates)
             with StringIO() as buffer:
                 buffer.write(json.dumps(summary))  # dump a JSON summary in the first line
                 buffer.write('\n')
-                CodeSegmentIndex.pretty_print_results(duplicates, file=buffer)  # then the full report follows
+                store.pretty_print_results(duplicates, file=buffer)  # then the full report follows
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TeamServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+def build_summary(store: Store, task: Task, uid: int, submission_id: int,
+                  duplicates: List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]):
+    info = store.get_file_info(submission_id)
+    duplicate_id_set = set()
+    duplicate_entries = []
+    result_grade = GRADE_NO_EVIDENCE
+
+    max_dup_height = 0
+    max_dup_total_nodes = 0
+
+    for segment, dup in duplicates:
+        for _uid, user_occurrences in dup.items():
+            for occ in user_occurrences:
+                ids = (_uid, occ.file_id)
+                if ids == (uid, submission_id) or ids in duplicate_id_set:
+                    continue
+                duplicate_id_set.add(ids)
+
+                _info = store.get_file_info(occ.file_id)
+                entry = dict(submission_id=occ.file_id)
+                if task.is_team_task:
+                    entry['team_id'] = _uid
+                else:
+                    entry['user_id'] = _uid
+                if _info:
+                    entry['md5'] = _info.md5
+                duplicate_entries.append(entry)
+
+                if info and _info and info.md5 == _info.md5:
+                    result_grade = max(result_grade, GRADE_EXACTLY_SAME)
+                max_dup_height = max(max_dup_height, segment.height)
+                max_dup_total_nodes = max(max_dup_total_nodes, segment.total_nodes)
+
+    if info:
+        max_coverage = max(max_dup_height / info.ast_height, max_dup_total_nodes / info.ast_total_nodes)
+        if max_coverage == 1:
+            result_grade = max(result_grade, GRADE_EXACTLY_SAME)
+        elif max_coverage > 0.8:
+            result_grade = max(result_grade, GRADE_VERY_STRONG_EVIDENCE)
+        elif max_coverage > 0.6:
+            result_grade = max(result_grade, GRADE_STRONG_EVIDENCE)
+        elif max_coverage > 0.4:
+            result_grade = max(result_grade, GRADE_MODERATE_EVIDENCE)
+        elif max_coverage > 0.2:
+            result_grade = max(result_grade, GRADE_WEAK_EVIDENCE)
+    else:
+        logger.warning('coverage test skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
+
+    return dict(total_collide_files=len(duplicate_entries),
+                total_collisions=len(duplicates),
+                collide_files=duplicate_entries,
+                result=GRADE_MESSAGES[result_grade])
 
 
 if __name__ == '__main__':
