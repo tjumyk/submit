@@ -128,6 +128,8 @@ def check():
                 return jsonify(msg='requirement not found'), 404
             if not requirement.name.endswith('.py'):
                 return jsonify(msg='file type not supported'), 400
+            if requirement.task_id != submission.task_id:
+                return jsonify(msg='submission and requirement are not in the same task'), 400
 
             task = submission.task
             file = None
