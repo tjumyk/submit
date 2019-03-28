@@ -78,7 +78,6 @@ export class NewAutoTestConfigForm{
   type: string;
   environment_id?: number;
   description?: string;
-  is_enabled: boolean;
   is_private: boolean;
 }
 
