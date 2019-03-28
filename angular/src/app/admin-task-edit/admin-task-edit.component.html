@@ -475,6 +475,7 @@
                         <select name="type" [(ngModel)]="newAutoTestConfigForm.type" required #autoTestConfigTypeModel="ngModel">
                           <option value="docker">Docker</option>
                           <option value="run-script">Run Script</option>
+                          <option value="anti-plagiarism">Anti Plagiarism</option>
                         </select>
                         <div class="errors">
                           <label *ngIf="autoTestConfigTypeModel.errors?.required">Type is required</label>
@@ -537,6 +538,7 @@
                 <select name="type" [(ngModel)]="updateAutoTestConfigForm.type" required #updateAutoTestConfigTypeModel="ngModel">
                   <option value="docker">Docker</option>
                   <option value="run-script">Run Script</option>
+                  <option value="anti-plagiarism">Anti Plagiarism</option>
                 </select>
                 <div class="errors">
                   <label *ngIf="updateAutoTestConfigTypeModel.errors?.required">Type is required</label>
