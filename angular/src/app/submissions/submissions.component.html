@@ -53,13 +53,13 @@
       <th>#</th>
       <th (click)="sortField('user.name', thUser)" #thUser>User</th>
       <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Attempts</th>
-      <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime>First Submission Time</th>
-      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Submission Time</th>
+      <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime>First Attempt</th>
+      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Attempt</th>
       <th *ngFor="let config of task.auto_test_configs"
           (click)="sortField('_auto_test_conclusion_'+config.id, thAutoTestConfig)" #thAutoTestConfig>
         {{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i>
       </th>
-      <th>Operations</th></tr>
+      <th>Ops</th></tr>
     </thead>
     <tbody>
     <tr *ngFor="let summary of userSummaryPages.pageItems; index as i">
@@ -72,8 +72,8 @@
         </a>
       </td>
       <td>{{summary.total_submissions}}</td>
-      <td>{{summary.first_submit_time | date:'medium'}}</td>
-      <td>{{summary.last_submit_time | date:'medium'}}</td>
+      <td>{{summary.first_submit_time | date:'short'}}</td>
+      <td>{{summary.last_submit_time | date:'short'}}</td>
       <td *ngFor="let config of task.auto_test_configs">
         <ng-container *ngIf="summary['_auto_test_conclusion_'+config.id] != null">
           {{summary['_auto_test_conclusion_'+config.id]|json}}
