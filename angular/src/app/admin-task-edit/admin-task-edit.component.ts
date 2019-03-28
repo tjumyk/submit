@@ -76,7 +76,6 @@ export class AdminTaskEditComponent implements OnInit {
     this.newFileRequirementForm.is_optional = false;
     this.activeTab = 'basic';
     this.newMaterialForm.is_private = true;
-    this.newAutoTestConfigForm.is_enabled = true;
   }
 
   ngOnInit() {
