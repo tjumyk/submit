@@ -37,26 +37,32 @@ class CodeSegment:
 
 
 class CodeOccurrence:
-    def __init__(self, user_id, file_id, file_md5: str, lineno: Optional[int], col_offset: Optional[int]):
+    def __init__(self, user_id, file_id, lineno: Optional[int], col_offset: Optional[int]):
         self.user_id = user_id
         self.file_id = file_id
-        self.file_md5 = file_md5
         self.lineno = lineno
         self.col_offset = col_offset
 
     def __repr__(self):
-        return '<CodeOccurrence user=%s, file=%s, md5=%s, line=%s, col=%s>' % \
-               (self.user_id, self.file_id, self.file_md5, self.lineno, self.col_offset)
+        return '<CodeOccurrence user=%s, file=%s, line=%s, col=%s>' % \
+               (self.user_id, self.file_id, self.lineno, self.col_offset)
 
     def to_dict(self) -> dict:
-        return dict(user_id=self.user_id, file_id=self.file_id, file_md5=self.file_md5, lineno=self.lineno,
-                    col_offset=self.col_offset)
+        return dict(user_id=self.user_id, file_id=self.file_id, lineno=self.lineno, col_offset=self.col_offset)
+
+
+class CodeFileInfo:
+    def __init__(self, md5: str, ast_height: int, ast_total_nodes: int):
+        self.md5 = md5
+        self.ast_height = ast_height
+        self.ast_total_nodes = ast_total_nodes
 
 
 class CodeSegmentIndex:
     def __init__(self, min_index_height: int):
         self._min_index_height = min_index_height
         self._index = {}
+        self._file_info = {}
 
     def _put(self, segment: CodeSegment, occurrence: CodeOccurrence):
         occ_users = self._index.get(segment)
@@ -67,7 +73,7 @@ class CodeSegmentIndex:
             occ_users[occurrence.user_id] = occ_user_items = []
         occ_user_items.append(occurrence)
 
-    def process_code(self, user_id, file_id, code: str, file_md5: str):
+    def process_code(self, user_id, file_id, code: str):
         def _iterate_node(node):
             height = 1
             total_nodes = 1
@@ -91,7 +97,7 @@ class CodeSegmentIndex:
                             col_offset = node_dump
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, file_md5, lineno, col_offset))
+                              CodeOccurrence(user_id, file_id, lineno, col_offset))
             elif isinstance(node, list):
                 items = []
                 for x in node:
@@ -102,17 +108,17 @@ class CodeSegmentIndex:
                 dump = '[%s]' % ', '.join(items)
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, file_md5, None, None))
+                              CodeOccurrence(user_id, file_id, None, None))
             else:
                 dump = repr(node)
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, file_md5, None, None))
+                              CodeOccurrence(user_id, file_id, None, None))
 
             return dump, height, total_nodes
 
         root = ast.parse(code)
-        _iterate_node(root)
+        return _iterate_node(root)
 
     def process_file(self, user_id, file_id, file_path: str, file_md5: str = None):
         with open(file_path, 'rb') as f:
@@ -127,7 +133,11 @@ class CodeSegmentIndex:
                           % (encoding, user_id, file_id, file_path))
         if not file_md5:  # if no md5 given, compute it now
             file_md5 = md5sum(file_path)
-        self.process_code(user_id, file_id, code, file_md5)
+        _, ast_height, ast_total_nodes = self.process_code(user_id, file_id, code)
+        self._file_info[file_id] = CodeFileInfo(md5=file_md5, ast_height=ast_height, ast_total_nodes=ast_total_nodes)
+
+    def get_file_info(self, file_id) -> CodeFileInfo:
+        return self._file_info.get(file_id)
 
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
                        min_total_nodes: int = None, max_total_nodes: int = None,
@@ -136,7 +146,8 @@ class CodeSegmentIndex:
                        include_user_id: int = None, include_user_file_id: int = None,
                        exclude_user_id: int = None, exclude_user_file_id: int = None,
                        min_code_length: int = None, max_code_length: int = None,
-                       min_code_lines: int = 2, max_code_lines: int = None):
+                       min_code_lines: int = 2, max_code_lines: int = None) \
+            ->List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
         results = []
         for k, v in self._index.items():
             if min_height is not None and k.height < min_height:
@@ -207,25 +218,27 @@ class CodeSegmentIndex:
                     occurrences={uid: [occ.to_dict() for occ in user_occurrences] for uid, user_occurrences in
                                  occ_users.items()})
 
-    @staticmethod
-    def pretty_print_result(result, file=sys.stdout):
+    def pretty_print_result(self, result, file=sys.stdout):
         segment, occ_users = result
         print('%-18s%-22s%-8s%s' % ('User/Team ID', 'File/Submission ID', 'MD5', 'Location'), file=file)
         for uid, occ_user_items in occ_users.items():
             print(uid, file=file)
             for occ in occ_user_items:
-                md5_short = occ.file_md5[:6] if occ.file_md5 else occ.file_md5
+                md5 = None
+                file_info = self._file_info.get(occ.file_id)
+                if file_info:
+                    md5 = file_info.md5
+                md5_short = md5[:6] if md5 else None
                 print('%-18s%-22s%-8sLine %s, Col %s' % ('', occ.file_id, md5_short, occ.lineno, occ.col_offset),
                       file=file)
         print('AST Nodes: %d, Height: %d' % (segment.total_nodes, segment.height), file=file)
         print(astunparse.unparse(segment.node), file=file)
 
-    @classmethod
-    def pretty_print_results(cls, results, file=sys.stdout):
+    def pretty_print_results(self, results, file=sys.stdout):
         print('Total Results: %d' % len(results), file=file)
         for i, r in enumerate(results):
             print('--------------------------- #%-2s ---------------------------' % (i + 1), file=file)
-            cls.pretty_print_result(r, file=file)
+            self.pretty_print_result(r, file=file)
 
 
 def test_process_submissions(task_id: int, requirement_id: int, min_index_height: int):
