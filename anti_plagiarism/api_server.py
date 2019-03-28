@@ -154,7 +154,7 @@ def check():
                     _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
             store.add_file(submission_id, uid, file)
-            results = store.get_duplicates(uid, file.id)
+            results = store.get_duplicates(submission_id, uid)
             with StringIO() as buffer:
                 CodeSegmentIndex.pretty_print_results(results, file=buffer)
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
