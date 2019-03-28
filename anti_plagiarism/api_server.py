@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from io import StringIO
@@ -154,9 +155,12 @@ def check():
                     _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
             store.add_file(submission_id, uid, file)
-            results = store.get_duplicates(submission_id, uid)
+            duplicates = store.get_duplicates(submission_id, uid)
+            summary = dict(total=len(duplicates))
             with StringIO() as buffer:
-                CodeSegmentIndex.pretty_print_results(results, file=buffer)
+                buffer.write(json.dumps(summary))  # dump a JSON summary in the first line
+                buffer.write('\n')
+                CodeSegmentIndex.pretty_print_results(duplicates, file=buffer)  # then the full report follows
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TeamServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
