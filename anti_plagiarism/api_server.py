@@ -28,8 +28,8 @@ class Store:
         self.is_team_task = is_team_task
         self.template_path = template_path
 
+        self._template_sid = -1
         self._template_uid = -1
-        self._template_fid = -1
         self._lock = Lock()
         self._indexed_file_ids = set()
         self._index = None
@@ -40,7 +40,7 @@ class Store:
                 self._index = self._build_full_index()
                 if self.template_path:  # also index the template file
                     try:
-                        self._index.process_file(self._template_uid, self._template_fid,
+                        self._index.process_file(self._template_uid, self._template_sid,
                                                  os.path.join(data_folder, self.template_path))
                     except SyntaxError:
                         logger.warning('Syntax Error in template file')
@@ -50,19 +50,19 @@ class Store:
                 if file.id in self._indexed_file_ids:
                     return
                 try:
-                    self._index.process_file(uid, file.submission_id, os.path.join(data_folder, file.path), file.md5)
+                    self._index.process_file(uid, sid, os.path.join(data_folder, file.path), file.md5)
                 except SyntaxError:
                     logger.debug('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
                 except IOError:
                     logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
                 self._indexed_file_ids.add(file.id)  # mark it as indexed even error occurred
 
-    def get_duplicates(self, uid: int, file_id: int, limit: int = 100):
+    def get_duplicates(self, sid: int, uid: int, limit: int = 100):
         # TODO accept configurable options
         options = {}
         if self.template_path:
             options['exclude_user_id'] = self._template_uid
-        return self._index.get_duplicates(include_user_id=uid, include_user_file_id=file_id, **options)[:limit]
+        return self._index.get_duplicates(include_user_id=uid, include_user_file_id=sid, **options)[:limit]
 
     def _build_full_index(self) -> CodeSegmentIndex:
         index = CodeSegmentIndex(min_index_height=5)
