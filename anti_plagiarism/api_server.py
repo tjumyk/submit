@@ -267,13 +267,13 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
 def get_grade_from_coverage(coverage: float):
     if coverage == 1:
         return GRADE_FULL_COPY
-    elif coverage > 0.8:
+    elif coverage > 0.9:
         return GRADE_VERY_STRONG_EVIDENCE
     elif coverage > 0.6:
         return GRADE_STRONG_EVIDENCE
-    elif coverage > 0.4:
+    elif coverage > 0.3:
         return GRADE_MODERATE_EVIDENCE
-    elif coverage > 0.2:
+    elif coverage > 0:
         return GRADE_WEAK_EVIDENCE
     return GRADE_NO_EVIDENCE
 
