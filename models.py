@@ -220,7 +220,7 @@ class Task(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    materials = db.relationship('Material', backref=db.backref('task'), foreign_keys='[Material.task_id]')
+    materials = db.relationship('Material', backref=db.backref('task'))
     file_requirements = db.relationship('FileRequirement', backref=db.backref('task'))
     submissions = db.relationship('Submission', backref=db.backref('task'))
 
