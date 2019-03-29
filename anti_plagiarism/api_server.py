@@ -203,7 +203,8 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                   duplicates: List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]):
     info = store.get_file_info(submission_id)
     if not info:
-        logger.warning('coverage test will be skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
+        raise RuntimeError('file info required to generate a summary (uid=%s, sid=%s)' % (uid, submission_id))
+
     duplicate_user_set = set()
     duplicate_users = []  # to keep a order
     duplicate_id_set = set()
@@ -211,6 +212,9 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
     conclusion_grade = GRADE_NO_EVIDENCE
 
     for segment, dup in duplicates:
+        coverage = segment.total_nodes / info.ast_total_nodes
+        coverage_grade = get_grade_from_coverage(coverage)
+
         for _uid, user_occurrences in dup.items():
             if _uid == uid:
                 continue
@@ -225,7 +229,7 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                 duplicate_id_set.add(ids)
 
                 _info = store.get_file_info(occ.file_id)
-                entry = dict(submission_id=occ.file_id)
+                entry = dict(submission_id=occ.file_id, coverage=coverage)
                 if task.is_team_task:
                     entry['team_id'] = _uid
                 else:
@@ -233,15 +237,14 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                 if _info:
                     entry['md5'] = _info.md5
 
-                file_grade = GRADE_NO_EVIDENCE
-                if info:
-                    if _info:
-                        if info.md5 == _info.md5:
-                            file_grade = max(file_grade, GRADE_SAME_FILE)
-                        if info.ast_total_nodes == _info.ast_total_nodes == segment.total_nodes:
-                            file_grade = max(file_grade, GRADE_SAME_CODE)
-                    coverage_grade = get_grade_from_coverage(segment, info)
-                    file_grade = max(file_grade, coverage_grade)
+                file_grade = coverage_grade
+                if _info:
+                    if info.md5 == _info.md5:
+                        file_grade = max(file_grade, GRADE_SAME_FILE)
+                    if info.ast_total_nodes == _info.ast_total_nodes == segment.total_nodes:
+                        file_grade = max(file_grade, GRADE_SAME_CODE)
+                else:
+                    logger.warning('missing file info (uid=%s, sid=%s)' % (_uid, occ.file_id))
 
                 entry['grade'] = GRADE_MESSAGES[file_grade]
                 duplicate_entries.append(entry)
@@ -260,8 +263,7 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
     return summary
 
 
-def get_grade_from_coverage(segment: CodeSegment, file_info: CodeFileInfo):
-    coverage = segment.total_nodes / file_info.ast_total_nodes
+def get_grade_from_coverage(coverage: float):
     if coverage == 1:
         return GRADE_FULL_COPY
     elif coverage > 0.8:
