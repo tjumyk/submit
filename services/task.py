@@ -183,8 +183,12 @@ class TaskService:
             if environment.task_id != task.id:
                 raise TaskServiceError('environment material does not belong to this task')
             config.environment_id = environment.id
-        else:
-            config.environment_id = None
+
+        file_requirement = kwargs.pop('file_requirement', None)
+        if file_requirement:
+            if file_requirement.task_id != config.task_id:
+                raise TaskServiceError('target file requirement does not belong to this task')
+            config.file_requirement_id = file_requirement.id
 
         for k, v in kwargs.items():
             if k not in cls.auto_test_config_fields:
@@ -217,13 +221,23 @@ class TaskService:
         if config is None:
             raise TaskServiceError('auto test config is required')
 
-        environment = kwargs.pop('environment', None)
-        if environment:
-            if environment.task_id != config.task_id:
-                raise TaskServiceError('environment material does not belong to this task')
-            config.environment_id = environment.id
-        else:
-            config.environment_id = None
+        if 'environment' in kwargs:
+            environment = kwargs.pop('environment')
+            if environment:
+                if environment.task_id != config.task_id:
+                    raise TaskServiceError('environment material does not belong to this task')
+                config.environment_id = environment.id
+            else:
+                config.environment_id = None
+
+        if 'file_requirement' in kwargs:
+            file_requirement = kwargs.pop('file_requirement')
+            if file_requirement:
+                if file_requirement.task_id != config.task_id:
+                    raise TaskServiceError('target file requirement does not belong to this task')
+                config.file_requirement_id = file_requirement.id
+            else:
+                config.file_requirement_id = None
 
         for k, v in kwargs.items():
             if k not in cls.auto_test_config_fields:
@@ -261,6 +275,8 @@ class TaskService:
     def _check_auto_test_config(config: AutoTestConfig):
         if config.type in {'run-script', 'docker'} and not config.environment_id:
             raise TaskServiceError('no test environment specified')
+        if config.type in {'anti-plagiarism'} and not config.file_requirement_id:
+            raise TaskServiceError('no target file requirement specified')
 
         con_type = config.result_conclusion_type
         acc_method = config.results_conclusion_accumulate_method

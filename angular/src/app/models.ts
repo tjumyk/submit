@@ -230,6 +230,7 @@ export class AutoTestConfig {
 
   trigger?: string;
   environment_id?: number;
+  file_requirement_id?: number;
   docker_auto_remove: boolean;
   docker_cpus?: number;
   docker_memory?: number;

@@ -471,6 +471,13 @@ def admin_task_auto_test_configs(tid):
                     return jsonify(msg='environment material not found')
                 params['environment'] = env
 
+            file_req_id = params.pop('file_requirement_id', None)
+            if file_req_id:
+                file_req = TaskService.get_file_requirement(file_req_id)
+                if file_req is None:
+                    return jsonify(msg='target file requirement not found')
+                params['file_requirement'] = file_req
+
             config = TaskService.add_auto_test_config(task, **params)
 
             db.session.commit()
@@ -490,12 +497,25 @@ def admin_task_auto_test_config(cid):
         if request.method == 'PUT':
             params = request.json
 
-            env_id = params.pop('environment_id', None)
-            if env_id:
-                env = TaskService.get_material(env_id)
-                if env is None:
-                    return jsonify(msg='environment material not found')
-                params['environment'] = env
+            if 'environment_id' in params:
+                env_id = params.pop('environment_id')
+                if env_id:
+                    env = TaskService.get_material(env_id)
+                    if env is None:
+                        return jsonify(msg='environment material not found')
+                    params['environment'] = env
+                else:
+                    params['environment'] = None
+
+            if 'file_requirement_id' in params:
+                file_req_id = params.pop('file_requirement_id')
+                if file_req_id:
+                    file_req = TaskService.get_file_requirement(file_req_id)
+                    if file_req is None:
+                        return jsonify(msg='target file requirement not found')
+                    params['file_requirement'] = file_req
+                else:
+                    params['file_requirement'] = None
 
             config = TaskService.update_auto_test_config(config, **params)
 

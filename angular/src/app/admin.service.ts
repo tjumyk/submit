@@ -79,6 +79,7 @@ export class NewAutoTestConfigForm{
   environment_id?: number;
   description?: string;
   is_private: boolean;
+  file_requirement_id?: number;
 }
 
 export class UpdateAutoTestConfigForm{
@@ -91,6 +92,7 @@ export class UpdateAutoTestConfigForm{
   priority: number;
   trigger?: string;
   environment_id?: number;
+  file_requirement_id?: number;
   docker_auto_remove: boolean;
   docker_cpus?: number;
   docker_memory?: number;

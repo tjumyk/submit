@@ -504,6 +504,19 @@
                           <label *ngIf="autoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
                         </div>
                       </div>
+                      <div *ngIf="newAutoTestConfigForm.type=='anti-plagiarism'" class="field required" [ngClass]="{'error': (autoTestConfigFileRequirementId.touched || autoTestConfigFileRequirementId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigFileRequirementId.invalid}">
+                        <label>Target File Requirement</label>
+                        <select name="file_requirement_id" [(ngModel)]="newAutoTestConfigForm.file_requirement_id" required #autoTestConfigFileRequirementId="ngModel">
+                          <ng-container *ngFor="let req of task.file_requirements">
+                            <option *ngIf="req.name.endsWith('.py')" [ngValue]="req.id">
+                              {{ req.name }}
+                            </option>
+                          </ng-container>
+                        </select>
+                        <div class="errors">
+                          <label *ngIf="autoTestConfigFileRequirementId.errors?.required">Target File Requirement is required. Only supported types of files are listed here.</label>
+                        </div>
+                      </div>
                       <button class="ui fluid primary button" type="submit">Add Configuration</button>
                     </form>
                   </div>
@@ -614,7 +627,6 @@
                 </ng-template>
               </ng-container>
 
-
               <ng-container *ngIf="updateAutoTestConfigForm.type=='docker'">
                 <div class="field">
                   <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigDockerAutoRemove.click()">
@@ -635,6 +647,22 @@
                 <div class="field">
                   <label>Docker Memory (unit: MB)</label>
                   <input type="number" step="1" min="1" name="docker_memory" [(ngModel)]="updateAutoTestConfigForm.docker_memory" placeholder="Limit size of memory (must be an integer). Empty field means no limit on memory.">
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="updateAutoTestConfigForm.type=='anti-plagiarism'">
+                <div class="field required" [ngClass]="{'error': (updateAutoTestConfigFileRequirementId.touched || updateAutoTestConfigFileRequirementId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigFileRequirementId.invalid}">
+                  <label>Target File Requirement</label>
+                  <select name="file_requirement_id" [(ngModel)]="updateAutoTestConfigForm.file_requirement_id" required #updateAutoTestConfigFileRequirementId="ngModel">
+                    <ng-container *ngFor="let req of task.file_requirements">
+                      <option *ngIf="req.name.endsWith('.py')" [ngValue]="req.id">
+                        {{ req.name }}
+                      </option>
+                    </ng-container>
+                  </select>
+                  <div class="errors">
+                    <label *ngIf="updateAutoTestConfigFileRequirementId.errors?.required">Target File Requirement is required. Only supported types of files are listed here.</label>
+                  </div>
                 </div>
               </ng-container>
               <!-- End Execution Section -->

@@ -325,6 +325,7 @@ export class AdminTaskEditComponent implements OnInit {
     form.priority = config.priority;
     form.trigger = config.trigger;
     form.environment_id = config.environment_id;
+    form.file_requirement_id = config.file_requirement_id;
     form.docker_auto_remove = config.docker_auto_remove;
     form.docker_cpus = config.docker_cpus;
     form.docker_memory = config.docker_memory;
