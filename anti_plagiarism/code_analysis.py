@@ -120,6 +120,25 @@ class CodeSegmentIndex:
         root = ast.parse(code)
         return _iterate_node(root)
 
+    def remove_code(self, user_id, file_id):
+        segments_to_delete = []
+        for k, v in self._index.items():
+            user_occurrences = v.get(user_id)
+            if user_occurrences:
+                i = 0
+                while i < len(user_occurrences):
+                    occ = user_occurrences[i]
+                    if occ.file_id == file_id:
+                        user_occurrences.pop(i)
+                    else:
+                        i += 1
+                if len(user_occurrences) == 0:  # empty occ list
+                    del v[user_id]
+            if len(v) == 0:  # empty occ users
+                segments_to_delete.append(k)
+        for k in segments_to_delete:
+            del self._index[k]
+
     def process_file(self, user_id, file_id, file_path: str, file_md5: str = None):
         with open(file_path, 'rb') as f:
             buffer = f.read()
