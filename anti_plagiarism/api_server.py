@@ -24,15 +24,23 @@ GRADE_NO_EVIDENCE = 0
 GRADE_WEAK_EVIDENCE = 1
 GRADE_MODERATE_EVIDENCE = 2
 GRADE_STRONG_EVIDENCE = 3
-GRADE_VERY_STRONG_EVIDENCE = 3
-GRADE_EXACTLY_SAME = 4
+GRADE_VERY_STRONG_EVIDENCE = 4
+# FULL_COPY means the (normalised) code of the whole file is copied from another file but it is possible that only part
+# of that file is copied.
+GRADE_FULL_COPY = 5
+# SAME_CODE means the two collided files have identical (normalised) code.
+GRADE_SAME_CODE = 6
+# SAME_FILE means the two collided files have identical content (same MD5).
+GRADE_SAME_FILE = 7
 
 GRADE_MESSAGES = {GRADE_NO_EVIDENCE: 'No Evidence',
                   GRADE_WEAK_EVIDENCE: 'Weak Evidence',
                   GRADE_MODERATE_EVIDENCE: 'Moderate Evidence',
                   GRADE_STRONG_EVIDENCE: 'Strong Evidence',
                   GRADE_VERY_STRONG_EVIDENCE: 'Very Strong Evidence',
-                  GRADE_EXACTLY_SAME: 'Exactly the Same'}
+                  GRADE_FULL_COPY: 'Full Copy',
+                  GRADE_SAME_CODE: 'Same Code',
+                  GRADE_SAME_FILE: 'Same File'}
 
 
 class Store:
@@ -194,17 +202,16 @@ def check():
 def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                   duplicates: List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]):
     info = store.get_file_info(submission_id)
+    if not info:
+        logger.warning('coverage test will be skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
     duplicate_id_set = set()
     duplicate_entries = []
-    result_grade = GRADE_NO_EVIDENCE
-
-    max_dup_height = 0
-    max_dup_total_nodes = 0
+    conclusion_grade = GRADE_NO_EVIDENCE
 
     for segment, dup in duplicates:
         for _uid, user_occurrences in dup.items():
             for occ in user_occurrences:
-                ids = (_uid, occ.file_id)
+                ids = (_uid, occ.file_id)  # note occ.file_id is actually submission_id
                 if ids == (uid, submission_id) or ids in duplicate_id_set:
                     continue
                 duplicate_id_set.add(ids)
@@ -217,32 +224,42 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                     entry['user_id'] = _uid
                 if _info:
                     entry['md5'] = _info.md5
+
+                file_grade = GRADE_NO_EVIDENCE
+                if info:
+                    if _info:
+                        if info.md5 == _info.md5:
+                            file_grade = max(file_grade, GRADE_SAME_FILE)
+                        if info.ast_total_nodes == _info.ast_total_nodes == segment.total_nodes:
+                            file_grade = max(file_grade, GRADE_SAME_CODE)
+                    coverage_grade = get_grade_from_coverage(segment, info)
+                    file_grade = max(file_grade, coverage_grade)
+
+                entry['grade'] = GRADE_MESSAGES[file_grade]
                 duplicate_entries.append(entry)
+                conclusion_grade = max(conclusion_grade, file_grade)
 
-                if info and _info and info.md5 == _info.md5:
-                    result_grade = max(result_grade, GRADE_EXACTLY_SAME)
-                max_dup_height = max(max_dup_height, segment.height)
-                max_dup_total_nodes = max(max_dup_total_nodes, segment.total_nodes)
-
-    if info:
-        max_coverage = max(max_dup_height / info.ast_height, max_dup_total_nodes / info.ast_total_nodes)
-        if max_coverage == 1:
-            result_grade = max(result_grade, GRADE_EXACTLY_SAME)
-        elif max_coverage > 0.8:
-            result_grade = max(result_grade, GRADE_VERY_STRONG_EVIDENCE)
-        elif max_coverage > 0.6:
-            result_grade = max(result_grade, GRADE_STRONG_EVIDENCE)
-        elif max_coverage > 0.4:
-            result_grade = max(result_grade, GRADE_MODERATE_EVIDENCE)
-        elif max_coverage > 0.2:
-            result_grade = max(result_grade, GRADE_WEAK_EVIDENCE)
-    else:
-        logger.warning('coverage test skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
-
-    return dict(total_collide_files=len(duplicate_entries),
+    return dict(total_collided_files=len(duplicate_entries),
                 total_collisions=len(duplicates),
-                collide_files=duplicate_entries,
-                result=GRADE_MESSAGES[result_grade])
+                collided_files=duplicate_entries,
+                conclusion=GRADE_MESSAGES[conclusion_grade])
+
+
+def get_grade_from_coverage(segment: CodeSegment, file_info: CodeFileInfo):
+    ast_height_coverage = segment.height / file_info.ast_height,
+    ast_nodes_coverage = segment.total_nodes / file_info.ast_total_nodes
+    coverage = max(ast_height_coverage, ast_nodes_coverage)  # currently simply use the higher one as criterion
+    if coverage == 1:
+        return GRADE_FULL_COPY
+    elif coverage > 0.8:
+        return GRADE_VERY_STRONG_EVIDENCE
+    elif coverage > 0.6:
+        return GRADE_STRONG_EVIDENCE
+    elif coverage > 0.4:
+        return GRADE_MODERATE_EVIDENCE
+    elif coverage > 0.2:
+        return GRADE_WEAK_EVIDENCE
+    return GRADE_NO_EVIDENCE
 
 
 if __name__ == '__main__':
