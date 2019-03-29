@@ -151,6 +151,9 @@ def check():
         if requirement_id is None:
             return jsonify(msg='requirement id is required'), 400
         requirement_id = int(requirement_id)
+        template_file_id = request.args.get('tid')
+        if template_file_id is not None:
+            template_file_id = int(template_file_id)
 
         with app.test_request_context():
             submission = SubmissionService.get(submission_id)
@@ -159,6 +162,13 @@ def check():
             requirement = TaskService.get_file_requirement(requirement_id)
             if requirement is None:
                 return jsonify(msg='requirement not found'), 404
+            if template_file_id is not None:
+                template_file = TaskService.get_material(template_file_id)
+                if template_file is None:
+                    return jsonify(msg='template file not found'), 404
+                template_file_path = template_file.file_path
+            else:
+                template_file_path = None
             if not requirement.name.endswith('.py'):
                 return jsonify(msg='file type not supported'), 400
             if requirement.task_id != submission.task_id:
@@ -184,7 +194,7 @@ def check():
             with _global_lock:
                 store = _stores_map.get(requirement.id)
                 if store is None:
-                    _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
+                    _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task, template_file_path)
 
             store.add_file(submission_id, uid, file)
             duplicates = store.get_duplicates(submission_id, uid)
