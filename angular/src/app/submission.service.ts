@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {AutoTest, AutoTestConfig, Submission} from "./models";
+import * as _ from "lodash";
 
 @Injectable({
   providedIn: 'root'
@@ -125,7 +126,8 @@ export class SubmissionService {
 
     let html = config.result_render_html;
     html = html.replace(/{{([^}]*)}}/g, (match, path) => {
-      return this.evaluateObjectPath(test.result, path)
+      let result = this.evaluateObjectPath(test.result, path);
+      return _.escape(result.toString())
     });
     return html;
   }
