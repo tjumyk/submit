@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {AutoTest, AutoTestConfig, Submission} from "./models";
-import * as _ from "lodash";
 
 @Injectable({
   providedIn: 'root'
@@ -127,8 +126,18 @@ export class SubmissionService {
     let html = config.result_render_html;
     html = html.replace(/{{([^}]*)}}/g, (match, path) => {
       let result = this.evaluateObjectPath(test.result, path);
-      return _.escape(result.toString())
+      return SubmissionService.escapeHtml(result.toString())
     });
     return html;
+  }
+
+  static escapeHtml(unsafe) {
+    // https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 }
