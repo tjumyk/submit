@@ -124,8 +124,19 @@ export class SubmissionService {
       return '';
 
     let html = config.result_render_html;
-    html = html.replace(/{{([^}]*)}}/g, (match, path) => {
+    html = html.replace(/{{([^}]*)}}/g, (match, expr: string) => {
+      let parts = expr.trim().split('|', 2);
+      let path = parts[0].trim();
+      let pipe = null;
+      if (parts.length > 1)
+        pipe = parts[1].trim();
+
       let result = this.evaluateObjectPath(test.result, path);
+      switch (pipe) {
+        case 'json':
+          result = JSON.stringify(result, null, 2);
+          break;
+      }
       return SubmissionService.escapeHtml(result.toString())
     });
     return html;
