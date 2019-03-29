@@ -48,13 +48,15 @@ class Store:
     Thread-safe in-memory index store for a requirement.
     """
 
-    def __init__(self, requirement_id: int, is_team_task: bool, template_path: str = None):
+    def __init__(self, requirement_id: int, is_team_task: bool):
         self.requirement_id = requirement_id
         self.is_team_task = is_team_task
-        self.template_path = template_path
 
-        self._template_sid = -1
+        self._template_path = None
+        self._template_md5 = None
         self._template_uid = -1
+        self._template_sid = -1
+
         self._lock = Lock()
         self._indexed_file_ids = set()
         self._index = None
@@ -63,14 +65,6 @@ class Store:
         with self._lock:
             if self._index is None:  # cold start
                 self._index = self._build_full_index()
-                if self.template_path:  # also index the template file
-                    try:
-                        self._index.process_file(self._template_uid, self._template_sid,
-                                                 os.path.join(data_folder, self.template_path))
-                    except SyntaxError:
-                        logger.warning('Syntax Error in template file')
-                    except IOError:
-                        logger.warning('IO Error in template file', exc_info=True)
             else:  # assume this submission is the only submission that has not been indexed
                 if file.id in self._indexed_file_ids:
                     return
@@ -82,14 +76,32 @@ class Store:
                     logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
                 self._indexed_file_ids.add(file.id)  # mark it as indexed even error occurred
 
-    def get_duplicates(self, sid: int, uid: int, limit: int = 100) \
-            -> List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
-        # TODO accept configurable options
-        options = {}
-        if self.template_path:
-            options['exclude_user_id'] = self._template_uid
+    def get_duplicates(self, sid: int, uid: int, limit: int = 100, template_path: str = None,
+                       template_md5: str = None) -> List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
+        with self._lock:
+            if template_path:  # enable template
+                if not self._template_path or (self._template_path != template_path
+                                               or self._template_md5 != template_md5):  # need to index the template
+                    if self._template_path:  # need to remove old template from index
+                        self._index.remove_code(self._template_uid, self._template_sid)
+                    try:
+                        self._index.process_file(self._template_uid, self._template_sid,
+                                                 os.path.join(data_folder, template_path))
+                    except SyntaxError:
+                        logger.warning('Syntax Error in template file: %s' % template_path)
+                    except IOError:
+                        logger.warning('IO Error in template file: %s' % template_path, exc_info=True)
+                    self._template_path = template_path
+                    self._template_md5 = template_md5
+            else:  # disable template
+                if self._template_path is not None:  # need to remove old template from index
+                    self._index.remove_code(self._template_uid, self._template_sid)
+                    self._template_path = None
+                    self._template_md5 = None
+
+        exclude_user_id = self._template_uid if template_path else None
         return self._index.get_duplicates(sort_by='total_nodes', include_user_id=uid, include_user_file_id=sid,
-                                          **options)[:limit]
+                                          exclude_user_id=exclude_user_id)[:limit]
 
     def get_file_info(self, sid: int) -> CodeFileInfo:
         return self._index.get_file_info(sid)
@@ -166,9 +178,8 @@ def check():
                 template_file = TaskService.get_material(template_file_id)
                 if template_file is None:
                     return jsonify(msg='template file not found'), 404
-                template_file_path = template_file.file_path
             else:
-                template_file_path = None
+                template_file = None
             if not requirement.name.endswith('.py'):
                 return jsonify(msg='file type not supported'), 400
             if requirement.task_id != submission.task_id:
@@ -194,10 +205,14 @@ def check():
             with _global_lock:
                 store = _stores_map.get(requirement.id)
                 if store is None:
-                    _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task, template_file_path)
+                    _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
             store.add_file(submission_id, uid, file)
-            duplicates = store.get_duplicates(submission_id, uid)
+            if template_file:
+                duplicates = store.get_duplicates(submission_id, uid, template_path=template_file.file_path,
+                                                  template_md5=template_file.md5)
+            else:
+                duplicates = store.get_duplicates(submission_id, uid)
 
             summary = build_summary(store, task, uid, submission_id, duplicates)
             with StringIO() as buffer:
