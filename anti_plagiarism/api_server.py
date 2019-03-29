@@ -204,16 +204,20 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
     info = store.get_file_info(submission_id)
     if not info:
         logger.warning('coverage test will be skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
+    duplicate_user_set = set()
+    duplicate_users = []  # to keep a order
     duplicate_id_set = set()
-    duplicate_users = set()
-    duplicate_entries = []
+    duplicate_entries = []  # to keep a order
     conclusion_grade = GRADE_NO_EVIDENCE
 
     for segment, dup in duplicates:
         for _uid, user_occurrences in dup.items():
             if _uid == uid:
                 continue
-            duplicate_users.add(_uid)
+            if _uid not in duplicate_user_set:
+                duplicate_users.append(_uid)
+                duplicate_user_set.add(_uid)
+
             for occ in user_occurrences:
                 ids = (_uid, occ.file_id)  # note occ.file_id is actually submission_id
                 if ids in duplicate_id_set:
