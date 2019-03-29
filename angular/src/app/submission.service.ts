@@ -137,6 +137,8 @@ export class SubmissionService {
           result = JSON.stringify(result, null, 2);
           break;
       }
+      if(result === null || result === undefined)
+        return '';
       return SubmissionService.escapeHtml(result.toString())
     });
     return html;
