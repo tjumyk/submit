@@ -209,7 +209,11 @@ class CodeSegmentIndex:
                     or min_code_lines is not None or max_code_lines is not None:  # need to un-parse the AST
                 # The un-parsed code should have the same execution sequence as the original code but the textual format
                 # may be quite different.
-                code = astunparse.unparse(k.node)
+                try:
+                    code = astunparse.unparse(k.node)
+                except AttributeError as e:
+                    logger.warning('Un-parse AST failed: %s' % str(e))
+                    continue
                 # the un-parse function produce may produce an empty starting line and an empty ending line
                 code = code.strip()
                 code_length = len(code)
