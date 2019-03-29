@@ -234,11 +234,13 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
     duplicate_users = []  # to keep a order
     duplicate_id_set = set()
     duplicate_entries = []  # to keep a order
+    max_coverage = 0
     conclusion_grade = GRADE_NO_EVIDENCE
 
     for segment, dup in duplicates:
         coverage = segment.total_nodes / info.ast_total_nodes
         coverage_grade = get_grade_from_coverage(coverage)
+        max_coverage = max(max_coverage, coverage)
 
         for _uid, user_occurrences in dup.items():
             if _uid == uid:
@@ -276,9 +278,11 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                 duplicate_entries.append(entry)
                 conclusion_grade = max(conclusion_grade, file_grade)
 
+    max_coverage = round(max_coverage * 100) / 100
     summary = dict(total_collisions=len(duplicates),
                    total_collided_files=len(duplicate_entries),
                    collided_files=duplicate_entries,
+                   coverage=max_coverage,
                    conclusion=GRADE_MESSAGES[conclusion_grade])
     if task.is_team_task:
         summary['total_collided_teams'] = len(duplicate_users)
