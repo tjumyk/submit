@@ -67,7 +67,10 @@
       <td>{{summary.last_submit_time | date:'short'}}</td>
       <td *ngFor="let config of task.auto_test_configs">
         <ng-container *ngIf="summary['_auto_test_conclusion_'+config.id] != null">
-          {{summary['_auto_test_conclusion_'+config.id]|json}}
+          <ng-container *ngIf="config.result_conclusion_type != 'json'; else jsonConclusion">
+            {{summary['_auto_test_conclusion_'+config.id]}}
+          </ng-container>
+          <ng-template #jsonConclusion>{{summary['_auto_test_conclusion_'+config.id]|json}}</ng-template>
         </ng-container>
       </td>
       <td>
