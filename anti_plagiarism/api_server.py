@@ -205,6 +205,7 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
     if not info:
         logger.warning('coverage test will be skipped due to missing file info (uid=%s, sid=%s)' % (uid, submission_id))
     duplicate_id_set = set()
+    duplicate_users = set()
     duplicate_entries = []
     conclusion_grade = GRADE_NO_EVIDENCE
 
@@ -212,6 +213,7 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
         for _uid, user_occurrences in dup.items():
             if _uid == uid:
                 continue
+            duplicate_users.add(_uid)
             for occ in user_occurrences:
                 ids = (_uid, occ.file_id)  # note occ.file_id is actually submission_id
                 if ids in duplicate_id_set:
@@ -241,10 +243,17 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                 duplicate_entries.append(entry)
                 conclusion_grade = max(conclusion_grade, file_grade)
 
-    return dict(total_collided_files=len(duplicate_entries),
-                total_collisions=len(duplicates),
-                collided_files=duplicate_entries,
-                conclusion=GRADE_MESSAGES[conclusion_grade])
+    summary = dict(total_collisions=len(duplicates),
+                   total_collided_files=len(duplicate_entries),
+                   collided_files=duplicate_entries,
+                   conclusion=GRADE_MESSAGES[conclusion_grade])
+    if task.is_team_task:
+        summary['total_collided_teams'] = len(duplicate_users)
+        summary['collided_teams'] = duplicate_users
+    else:
+        summary['total_collided_users'] = len(duplicate_users)
+        summary['collided_users'] = duplicate_users
+    return summary
 
 
 def get_grade_from_coverage(segment: CodeSegment, file_info: CodeFileInfo):
