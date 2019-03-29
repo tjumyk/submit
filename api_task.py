@@ -646,7 +646,8 @@ def task_my_submissions(tid):
                     if not config.is_enabled or config.trigger != 'after_submit':
                         continue
                     configs_to_run.append(config)
-                configs_to_run.sort(key=lambda c: c.priority, reverse=True)
+                configs_to_run.sort(key=lambda c: c.id)  # sort by id first
+                configs_to_run.sort(key=lambda c: c.priority, reverse=True)  # then by priority (reversed)
                 # TODO how to use global priority control in Celery?
                 for config in configs_to_run:
                     SubmissionService.run_auto_test(new_submission, config)
