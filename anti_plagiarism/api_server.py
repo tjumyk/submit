@@ -261,9 +261,7 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
 
 
 def get_grade_from_coverage(segment: CodeSegment, file_info: CodeFileInfo):
-    ast_height_coverage = segment.height / file_info.ast_height
-    ast_nodes_coverage = segment.total_nodes / file_info.ast_total_nodes
-    coverage = max(ast_height_coverage, ast_nodes_coverage)  # currently simply use the higher one as criterion
+    coverage = segment.total_nodes / file_info.ast_total_nodes
     if coverage == 1:
         return GRADE_FULL_COPY
     elif coverage > 0.8:
