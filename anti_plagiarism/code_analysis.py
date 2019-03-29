@@ -241,7 +241,8 @@ class CodeSegmentIndex:
     def pretty_print_results(self, results, file=sys.stdout):
         print('Total Results: %d' % len(results), file=file)
         for i, r in enumerate(results):
-            print('--------------------------- #%-2s ---------------------------' % (i + 1), file=file)
+            print('--------------------------------------- #%-2s ---------------------------------------'
+                  % (i + 1), file=file)
             self.pretty_print_result(r, file=file)
 
 
