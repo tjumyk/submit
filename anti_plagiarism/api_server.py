@@ -229,7 +229,8 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
                 duplicate_id_set.add(ids)
 
                 _info = store.get_file_info(occ.file_id)
-                entry = dict(submission_id=occ.file_id, coverage=coverage)
+                entry = dict(submission_id=occ.file_id)
+                entry['coverage'] = round(coverage * 100) / 100
                 if task.is_team_task:
                     entry['team_id'] = _uid
                 else:
