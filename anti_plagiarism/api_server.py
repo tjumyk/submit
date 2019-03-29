@@ -210,9 +210,11 @@ def build_summary(store: Store, task: Task, uid: int, submission_id: int,
 
     for segment, dup in duplicates:
         for _uid, user_occurrences in dup.items():
+            if _uid == uid:
+                continue
             for occ in user_occurrences:
                 ids = (_uid, occ.file_id)  # note occ.file_id is actually submission_id
-                if ids == (uid, submission_id) or ids in duplicate_id_set:
+                if ids in duplicate_id_set:
                     continue
                 duplicate_id_set.add(ids)
 
