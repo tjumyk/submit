@@ -478,6 +478,13 @@ def admin_task_auto_test_configs(tid):
                     return jsonify(msg='target file requirement not found')
                 params['file_requirement'] = file_req
 
+            template_file_id = params.pop('template_file_id', None)
+            if template_file_id:
+                template_file = TaskService.get_material(template_file_id)
+                if template_file is None:
+                    return jsonify(msg='template file material not found')
+                params['template_file'] = template_file
+
             config = TaskService.add_auto_test_config(task, **params)
 
             db.session.commit()
@@ -516,6 +523,16 @@ def admin_task_auto_test_config(cid):
                     params['file_requirement'] = file_req
                 else:
                     params['file_requirement'] = None
+
+            if 'template_file_id' in params:
+                template_file_id = params.pop('template_file_id')
+                if template_file_id:
+                    template_file = TaskService.get_material(template_file_id)
+                    if template_file is None:
+                        return jsonify(msg='template file material not found')
+                    params['template_file'] = template_file
+                else:
+                    params['template_file'] = None
 
             config = TaskService.update_auto_test_config(config, **params)
 

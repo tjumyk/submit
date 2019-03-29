@@ -190,6 +190,12 @@ class TaskService:
                 raise TaskServiceError('target file requirement does not belong to this task')
             config.file_requirement_id = file_requirement.id
 
+        template_file = kwargs.pop('template_file', None)
+        if template_file:
+            if template_file.task_id != task.id:
+                raise TaskServiceError('template file material does not belong to this task')
+            config.template_file_id = template_file.id
+
         for k, v in kwargs.items():
             if k not in cls.auto_test_config_fields:
                 raise TaskServiceError('invalid field: %s' % k)
@@ -238,6 +244,15 @@ class TaskService:
                 config.file_requirement_id = file_requirement.id
             else:
                 config.file_requirement_id = None
+
+        if 'template_file' in kwargs:
+            template_file = kwargs.pop('template_file')
+            if template_file:
+                if template_file.task_id != config.task_id:
+                    raise TaskServiceError('template file material does not belong to this task')
+                config.template_file_id = template_file.id
+            else:
+                config.template_file_id = None
 
         for k, v in kwargs.items():
             if k not in cls.auto_test_config_fields:

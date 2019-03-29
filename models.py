@@ -419,6 +419,7 @@ class AutoTestConfig(db.Model):
     docker_cpus = db.Column(db.Float)
     docker_memory = db.Column(db.Integer)
     docker_network = db.Column(db.Boolean, nullable=False, default=False)
+    template_file_id = db.Column(db.Integer, db.ForeignKey('material.id'))
 
     # result handling
     result_render_html = db.Column(db.Text)
@@ -430,16 +431,21 @@ class AutoTestConfig(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     task = db.relationship('Task', backref=db.backref('auto_test_configs'))
-    environment = db.relationship('Material', backref=db.backref('auto_test_configs'))
+    environment = db.relationship('Material', backref=db.backref('as_environment_for_auto_test_configs'),
+                                  foreign_keys='[AutoTestConfig.environment_id]')
     file_requirement = db.relationship('FileRequirement', backref=db.backref('auto_test_configs'))
+    template_file = db.relationship('Material', backref=db.backref('as_template_file_for_auto_test_configs'),
+                                    foreign_keys='[AutoTestConfig.template_file_id]')
 
     def __repr__(self):
         return '<AutoTestConfig %r>' % self.id
 
-    def to_dict(self, with_environment=False, with_file_requirement=False, with_advanced_fields=False) -> dict:
+    def to_dict(self, with_environment=False, with_file_requirement=False, with_template_file=False,
+                with_advanced_fields=False) -> dict:
         d = dict(id=self.id, name=self.name, type=self.type, description=self.description,
                  task_id=self.task_id, is_enabled=self.is_enabled, is_private=self.is_private, priority=self.priority,
                  trigger=self.trigger, environment_id=self.environment_id, file_requirement_id=self.file_requirement_id,
+                 template_file_id=self.template_file_id,
                  result_render_html=self.result_render_html, result_conclusion_type=self.result_conclusion_type,
                  result_conclusion_path=self.result_conclusion_path,
                  results_conclusion_accumulate_method=self.results_conclusion_accumulate_method)
@@ -447,6 +453,8 @@ class AutoTestConfig(db.Model):
             d['environment'] = self.environment.to_dict() if self.environment_id is not None else None
         if with_file_requirement:
             d['file_requirement'] = self.file_requirement.to_dict() if self.file_requirement is not None else None
+        if with_template_file:
+            d['template_file'] = self.template_file.to_dict() if self.template_file is not None else None
         if with_advanced_fields:
             d['docker_auto_remove'] = self.docker_auto_remove
             d['docker_cpus'] = self.docker_cpus

@@ -235,6 +235,7 @@ export class AutoTestConfig {
   docker_cpus?: number;
   docker_memory?: number;
   docker_network: boolean;
+  template_file_id?: number;
 
   result_render_html?: string;
   result_conclusion_type: string;
@@ -246,6 +247,8 @@ export class AutoTestConfig {
 
   task?: Task;
   environment?: Material;
+  file_requirement?: FileRequirement;
+  template_file?: Material;
 }
 
 export class AutoTest {

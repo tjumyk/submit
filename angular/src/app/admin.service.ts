@@ -97,6 +97,7 @@ export class UpdateAutoTestConfigForm{
   docker_cpus?: number;
   docker_memory?: number;
   docker_network: boolean;
+  template_file_id?: number;
 
   result_render_html?: string;
   result_conclusion_type: string;

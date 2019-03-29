@@ -664,6 +664,17 @@
                     <label *ngIf="updateAutoTestConfigFileRequirementId.errors?.required">Target File Requirement is required. Only supported types of files are listed here.</label>
                   </div>
                 </div>
+                <div class="field">
+                  <label>Template File</label>
+                  <select name="template_file_id" [(ngModel)]="updateAutoTestConfigForm.template_file_id">
+                    <option [ngValue]="null">(None)</option>
+                    <ng-container *ngFor="let mat of task.materials">
+                      <option *ngIf="mat.type=='code'" [ngValue]="mat.id">
+                        {{ mat.name + (mat.is_private ? ' (private)' : ' (public)')}}
+                      </option>
+                    </ng-container>
+                  </select>
+                </div>
               </ng-container>
               <!-- End Execution Section -->
 

@@ -330,6 +330,7 @@ export class AdminTaskEditComponent implements OnInit {
     form.docker_cpus = config.docker_cpus;
     form.docker_memory = config.docker_memory;
     form.docker_network = config.docker_network;
+    form.template_file_id = config.template_file_id;
     form.result_render_html = config.result_render_html;
     form.result_conclusion_type = config.result_conclusion_type;
     form.result_conclusion_path = config.result_conclusion_path;
