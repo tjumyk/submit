@@ -243,8 +243,9 @@ class Task(db.Model):
             d['evaluation_method'] = self.evaluation_method
             d['materials'] = [m.to_dict() for m in self.materials if not m.is_private or with_advanced_fields]
             d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
-            d['auto_test_configs'] = [c.to_dict(with_advanced_fields=with_advanced_fields)
-                                      for c in self.auto_test_configs if not c.is_private or with_advanced_fields]
+            auto_test_configs = [c.to_dict(with_advanced_fields=with_advanced_fields)
+                                 for c in self.auto_test_configs if not c.is_private or with_advanced_fields]
+            d['auto_test_configs'] = auto_test_configs.sort(key=lambda c: c['id'])
         if with_advanced_fields:
             d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
             d['created_at'] = self.created_at
