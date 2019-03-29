@@ -147,7 +147,7 @@ class CodeSegmentIndex:
                        exclude_user_id: int = None, exclude_user_file_id: int = None,
                        min_code_length: int = None, max_code_length: int = None,
                        min_code_lines: int = 2, max_code_lines: int = None) \
-            ->List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
+            -> List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]:
         results = []
         for k, v in self._index.items():
             if min_height is not None and k.height < min_height:
@@ -220,16 +220,20 @@ class CodeSegmentIndex:
 
     def pretty_print_result(self, result, file=sys.stdout):
         segment, occ_users = result
-        print('%-18s%-22s%-8s%s' % ('User/Team ID', 'File/Submission ID', 'MD5', 'Location'), file=file)
+        print('%-18s%-22s%-16s%-8s%s' % ('User/Team ID', 'File/Submission ID', 'AST Coverage', 'MD5', 'Location'),
+              file=file)
         for uid, occ_user_items in occ_users.items():
             print(uid, file=file)
             for occ in occ_user_items:
                 md5 = None
+                coverage = None
                 file_info = self._file_info.get(occ.file_id)
                 if file_info:
                     md5 = file_info.md5
+                    coverage = '%.f%%' % (segment.total_nodes / file_info.ast_total_nodes * 100)
                 md5_short = md5[:6] if md5 else None
-                print('%-18s%-22s%-8sLine %s, Col %s' % ('', occ.file_id, md5_short, occ.lineno, occ.col_offset),
+                print('%-18s%-22s%-16s%-8sLine %s, Col %s' % ('', occ.file_id, coverage, md5_short, occ.lineno,
+                                                              occ.col_offset),
                       file=file)
         print('AST Nodes: %d, Height: %d' % (segment.total_nodes, segment.height), file=file)
         print(astunparse.unparse(segment.node), file=file)
