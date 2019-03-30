@@ -291,14 +291,15 @@ def test_process_submissions(task_id: int, requirement_id: int, min_index_height
         user_set = set()
         valid_file_count = 0
         syntax_error_count = 0
-        for sid, uid, path in db.session.query(Submission.id, Submission.submitter_id, SubmissionFile.path) \
+        for sid, uid, path, md5 in db.session.query(Submission.id, Submission.submitter_id, SubmissionFile.path,
+                                                    SubmissionFile.md5) \
                 .filter(SubmissionFile.requirement_id == requirement_id,
                         SubmissionFile.submission_id == Submission.id,
                         Submission.task_id == task_id) \
                 .all():
             user_set.add(uid)
             try:
-                index.process_file(uid, sid, os.path.join(data_folder, path))
+                index.process_file(uid, sid, os.path.join(data_folder, path), md5)
             except SyntaxError:
                 logger.warning('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
                 syntax_error_count += 1
