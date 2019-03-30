@@ -206,13 +206,17 @@ def check():
                     _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
             store.add_file(submission_id, uid, file)
+            file_info = store.get_file_info(submission_id)
+            if file_info is None:  # failed to process file, e.g. syntax/io error
+                return '', 204  # TODO is it a good idea to return nothing?
+
             if template_file:
                 duplicates = store.get_duplicates(submission_id, uid, template_path=template_file.file_path,
                                                   template_md5=template_file.md5)
             else:
                 duplicates = store.get_duplicates(submission_id, uid)
 
-            summary = build_summary(store, task, uid, submission_id, duplicates)
+            summary = build_summary(store, task, uid=uid, info=file_info, duplicates=duplicates)
             with StringIO() as buffer:
                 buffer.write(json.dumps(summary))  # dump a JSON summary in the first line
                 buffer.write('\n')
@@ -222,12 +226,8 @@ def check():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-def build_summary(store: Store, task: Task, uid: int, submission_id: int,
+def build_summary(store: Store, task: Task, uid: int, info: CodeFileInfo,
                   duplicates: List[Tuple[CodeSegment, Dict[int, List[CodeOccurrence]]]]):
-    info = store.get_file_info(submission_id)
-    if not info:
-        raise RuntimeError('file info required to generate a summary (uid=%s, sid=%s)' % (uid, submission_id))
-
     duplicate_user_set = set()
     duplicate_users = []  # to keep a order
     duplicate_id_set = set()
