@@ -148,6 +148,9 @@ export class TeamSubmissionDetailsComponent implements OnInit, OnDestroy {
   }
 
   runAutoTest() {
+    if(this.selectedAutoTestConfigId == null)
+      return;
+
     this.requestingRunAutoTest = true;
     this.adminService.runAutoTest(this.submissionId, this.selectedAutoTestConfigId).pipe(
       finalize(() => this.requestingRunAutoTest = false)
