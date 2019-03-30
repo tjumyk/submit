@@ -501,7 +501,7 @@
                           </ng-container>
                         </select>
                         <div class="errors">
-                          <label *ngIf="autoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
+                          <label *ngIf="autoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to upload your test environment as a Material first.</label>
                         </div>
                       </div>
                       <div *ngIf="newAutoTestConfigForm.type=='anti-plagiarism'" class="field required" [ngClass]="{'error': (autoTestConfigFileRequirementId.touched || autoTestConfigFileRequirementId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigFileRequirementId.invalid}">
@@ -596,7 +596,7 @@
                   </ng-container>
                 </select>
                 <div class="errors">
-                  <label *ngIf="updateAutoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to add your test environment as a Material first.</label>
+                  <label *ngIf="updateAutoTestConfigEnvironmentId.errors?.required">Test environment is required. You need to upload your test environment as a Material first.</label>
                 </div>
               </div>
 
@@ -674,6 +674,9 @@
                       </option>
                     </ng-container>
                   </select>
+                  <p *ngIf="updateAutoTestConfigForm.template_file_id==null">
+                    <i class="icon circle info"></i> If you want to use a template file, please upload it as a Material (with type 'Code') first.
+                  </p>
                 </div>
               </ng-container>
               <!-- End Execution Section -->
