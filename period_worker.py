@@ -40,15 +40,17 @@ class DelayedKeyboardInterrupt(object):
 def _exec_work():
     now = datetime.utcnow()
     expire = worker_config['expire']
+    notify_open = worker_config['notify_open']
     due_notify_hours = worker_config['due_notify_hours']
     team_join_close_notify_hours = worker_config['team_join_close_notify_hours']
     with app.test_request_context():
-        for task in db.session.query(Task) \
-                .filter(Task.open_time < now,
-                        Task.open_time > now - timedelta(seconds=expire),
-                        or_(Task.close_time.is_(None), Task.close_time > now)) \
-                .all():
-            _process_task_open(task)
+        if notify_open:
+            for task in db.session.query(Task) \
+                    .filter(Task.open_time < now,
+                            Task.open_time > now - timedelta(seconds=expire),
+                            or_(Task.close_time.is_(None), Task.close_time > now)) \
+                    .all():
+                _process_task_open(task)
         for close_hours in team_join_close_notify_hours:
             for task in db.session.query(Task) \
                     .filter(Task.is_team_task == True,
