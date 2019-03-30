@@ -190,7 +190,7 @@ def check():
                     file = f
                     break
             if file is None:
-                return '', 204  # TODO is it a good idea to return nothing?
+                return jsonify(conclusion='Skipped', reason='File not submitted')
 
             if task.is_team_task:
                 ass = TeamService.get_team_association(task, submission.submitter)
@@ -208,7 +208,7 @@ def check():
             store.add_file(submission_id, uid, file)
             file_info = store.get_file_info(submission_id)
             if file_info is None:  # failed to process file, e.g. syntax/io error
-                return '', 204  # TODO is it a good idea to return nothing?
+                return jsonify(conclusion='Skipped', reason='File syntax or IO error')
 
             if template_file:
                 duplicates = store.get_duplicates(submission_id, uid, template_path=template_file.file_path,
