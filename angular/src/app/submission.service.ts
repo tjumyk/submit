@@ -136,8 +136,12 @@ export class SubmissionService {
         case 'json':
           result = JSON.stringify(result, null, 2);
           break;
+        case 'percent':
+          if (typeof result == 'number')
+            result = Math.round(result * 100) + '%';
+          break
       }
-      if(result === null || result === undefined)
+      if (result === null || result === undefined)
         return '';
       return SubmissionService.escapeHtml(result.toString())
     });
