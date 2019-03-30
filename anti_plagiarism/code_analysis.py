@@ -62,7 +62,7 @@ class CodeSegmentIndex:
     def __init__(self, min_index_height: int):
         self._min_index_height = min_index_height
         self._index = {}
-        self._file_info = {}
+        self._file_info_map = {}
 
     def _put(self, segment: CodeSegment, occurrence: CodeOccurrence):
         occ_users = self._index.get(segment)
@@ -139,7 +139,18 @@ class CodeSegmentIndex:
         for k in segments_to_delete:
             del self._index[k]
 
-    def process_file(self, user_id, file_id, file_path: str, file_md5: str = None):
+    def process_file(self, user_id, file_id, file_path: str, file_md5: str = None) -> CodeFileInfo:
+        file_info = self._file_info_map.get(file_id)
+        if file_info is not None:
+            if file_info.md5 == file_md5:
+                logger.info('Skipped processing file as already processed: uid=%s, fid/sid=%s, md5=%s'
+                            % (user_id, file_id, file_md5))
+                return file_info
+            else:
+                logger.info('Removing index for old file: uid=%s, fid/sid=%s, old_md5=%s, new_md5=%s'
+                            % (user_id, file_id, file_info.md5, file_md5))
+                self.remove_code(user_id, file_id)
+
         with open(file_path, 'rb') as f:
             buffer = f.read()
         encoding = magic.Magic(mime_encoding=True).from_buffer(buffer)
@@ -153,10 +164,12 @@ class CodeSegmentIndex:
         if not file_md5:  # if no md5 given, compute it now
             file_md5 = md5sum(file_path)
         _, ast_height, ast_total_nodes = self.process_code(user_id, file_id, code)
-        self._file_info[file_id] = CodeFileInfo(md5=file_md5, ast_height=ast_height, ast_total_nodes=ast_total_nodes)
+        file_info = CodeFileInfo(md5=file_md5, ast_height=ast_height, ast_total_nodes=ast_total_nodes)
+        self._file_info_map[file_id] = file_info
+        return file_info
 
     def get_file_info(self, file_id) -> CodeFileInfo:
-        return self._file_info.get(file_id)
+        return self._file_info_map.get(file_id)
 
     def get_duplicates(self, min_occ_users: int = 2, max_occ_users: int = None,
                        min_total_nodes: int = None, max_total_nodes: int = None,
@@ -250,7 +263,7 @@ class CodeSegmentIndex:
             for occ in occ_user_items:
                 md5 = None
                 coverage = None
-                file_info = self._file_info.get(occ.file_id)
+                file_info = self._file_info_map.get(occ.file_id)
                 if file_info:
                     md5 = file_info.md5
                     coverage = '%.f%%' % (segment.total_nodes / file_info.ast_total_nodes * 100)
