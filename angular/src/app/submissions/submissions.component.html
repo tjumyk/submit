@@ -89,4 +89,6 @@
     </tbody>
   </table>
   <app-table-pagination-toolbar class="bottom attached" [pagination]="userSummaryPages"></app-table-pagination-toolbar>
+
+  <app-run-auto-test-card [task]="task" (error)="error=$event"></app-run-auto-test-card>
 </div>

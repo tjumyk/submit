@@ -15,5 +15,6 @@
 
   <app-auto-test-conclusion-card [task]="task" [conclusions]="autoTestConclusions"></app-auto-test-conclusion-card>
   <app-submissions-table [task]="task" [status]="status" [submissions]="submissions" [lastAutoTests]="lastAutoTests"></app-submissions-table>
+  <app-run-auto-test-card [task]="task" [user]="user" (error)="error=$event"></app-run-auto-test-card>
 </div>
 

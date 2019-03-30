@@ -1,0 +1,19 @@
+<div *ngIf="isAdmin" class="ui grid centered stackable">
+  <div class="ui six wide column">
+    <div class="ui segment">
+      <form class="ui form">
+        <h4 class="ui dividing header">Run New Test</h4>
+        <div class="ui field">
+          <label>Test Config</label>
+          <select name="auto_test_config" [(ngModel)]="activeConfig">
+            <option *ngFor="let config of task.auto_test_configs" [ngValue]="config">{{config.name}}</option>
+          </select>
+        </div>
+        <button class="ui button fluid" (click)="runAutoTest()" [ngClass]="{'disabled loading': requestingRunAutoTest}">
+          <i class="icon play"></i>
+          Run
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
