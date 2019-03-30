@@ -42,6 +42,9 @@ GRADE_MESSAGES = {GRADE_NO_EVIDENCE: 'No Evidence',
                   GRADE_SAME_CODE: 'Same Code',
                   GRADE_SAME_FILE: 'Same File'}
 
+_stores_map = {}
+_global_lock = Lock()
+
 
 class Store:
     """
@@ -140,11 +143,6 @@ class Store:
         return index
 
 
-_stores_map = {}
-
-_global_lock = Lock()
-
-
 @ap_server.route('/')
 def index_page():
     return '<h1>anti-plagiarism api server</h1>'
@@ -203,6 +201,8 @@ def check():
             with _global_lock:
                 store = _stores_map.get(requirement.id)
                 if store is None:
+                    # Currently, only allow one store in memory. TODO: use a queue to manage in-memory stores
+                    _stores_map.clear()
                     _stores_map[requirement.id] = store = Store(requirement.id, task.is_team_task)
 
             store.add_file(submission_id, uid, file)
