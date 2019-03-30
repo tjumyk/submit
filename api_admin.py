@@ -6,7 +6,7 @@ import tempfile
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
 from auth_connect.oauth import requires_admin
-from models import db
+from models import db, Submission, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.course import CourseService, CourseServiceError
@@ -631,7 +631,7 @@ def admin_special_consideration(spec_id):
 
 @admin_api.route('/submissions/<int:sid>/run-auto-test/<int:cid>')
 @requires_admin
-def admin_run_test(sid, cid):
+def admin_submission_run_auto_test(sid, cid):
     try:
         submission = SubmissionService.get(sid)
         if submission is None:
@@ -646,7 +646,7 @@ def admin_run_test(sid, cid):
         test_obj = test.to_dict(with_advanced_fields=True)
         test_obj.update(AutoTestService.result_to_dict(result, with_advanced_fields=True))  # merge temporary result
         return jsonify(test_obj), 201
-    except SubmissionServiceError as e:
+    except (SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -679,5 +679,60 @@ def admin_delete_test(sid, tid):
         db.session.delete(test)
         db.session.commit()
         return "", 204
+    except (SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/auto-test-configs/<int:cid>/run', methods=['GET'])
+@requires_admin
+def admin_run_auto_test(cid):
+    try:
+        config = TaskService.get_auto_test_config(cid)
+        if config is None:
+            return jsonify(msg='auto test config not found'), 404
+
+        task = config.task
+
+        filters = [
+            Submission.task_id == task.id,
+            Submission.is_cleared == False
+        ]
+
+        if task.is_team_task:
+            team_id = request.args.get('team_id')
+            if team_id is not None:
+                try:
+                    team_id = int(team_id)
+                except (ValueError, TypeError):
+                    return jsonify(msg='team id must be an integer'), 400
+                team = TeamService.get(team_id)
+                if team is None:
+                    return jsonify(msg='team not found'), 404
+                if team.task_id != task.id:
+                    return jsonify(msg='team does not belong to this task'), 400
+                filters.extend([UserTeamAssociation.team_id == team_id,
+                                UserTeamAssociation.user_id == Submission.submitter_id])
+        else:
+            user_id = request.args.get('user_id')
+            if user_id is not None:
+                try:
+                    user_id = int(user_id)
+                except (ValueError, TypeError):
+                    return jsonify(msg='user id must be an integer'), 400
+                filters.append(Submission.submitter_id == user_id)
+
+        submissions = db.session.query(Submission).filter(*filters).order_by(Submission.id)
+
+        result_tuples = []
+        for submission in submissions:
+            result_tuples.append(SubmissionService.run_auto_test(submission, config))
+        db.session.commit()
+
+        ret = []
+        for test, result in result_tuples:
+            test_obj = test.to_dict(with_advanced_fields=True)
+            test_obj.update(AutoTestService.result_to_dict(result, with_advanced_fields=True))  # merge temporary result
+            ret.append(test_obj)
+        return jsonify(ret), 201
     except (SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

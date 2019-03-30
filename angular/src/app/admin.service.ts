@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs/internal/Observable";
 import {
-  AutoTest, AutoTestConfig,
+  AutoTest,
+  AutoTestConfig,
   Course,
   ErrorMessage,
   FileRequirement,
@@ -15,7 +16,7 @@ import {
 } from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
-import * as moment from"moment";
+import * as moment from "moment";
 
 export class NewCourseForm {
   code: string;
@@ -350,5 +351,14 @@ export class AdminService {
 
   deleteAutoTest(id: number, tid: number): Observable<any> {
     return this.http.delete(`${this.api}/submissions/${id}/auto-tests/${tid}`)
+  }
+
+  runAutoTests(config_id: number, user_id: number = null, team_id: number = null): Observable<AutoTest[]> {
+    let params = new HttpParams();
+    if (user_id !== null)
+      params = params.append('user_id', user_id.toString());
+    if (team_id !== null)
+      params = params.append('team_id', team_id.toString());
+    return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/run`, {params: params})
   }
 }
