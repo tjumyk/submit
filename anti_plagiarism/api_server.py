@@ -64,7 +64,7 @@ class Store:
     def add_file(self, sid: int, uid: int, file: SubmissionFile):
         with self._lock:
             if self._index is None:  # cold start
-                self._index = self._build_full_index()
+                self._index = self._build_full_index()  # should include the current submission
             else:  # assume this submission is the only submission that has not been indexed
                 if file.id in self._indexed_file_ids:
                     return
@@ -86,7 +86,7 @@ class Store:
                         self._index.remove_code(self._template_uid, self._template_sid)
                     try:
                         self._index.process_file(self._template_uid, self._template_sid,
-                                                 os.path.join(data_folder, template_path))
+                                                 os.path.join(data_folder, template_path), template_md5)
                     except SyntaxError:
                         logger.warning('Syntax Error in template file: %s' % template_path)
                     except IOError:
@@ -124,18 +124,16 @@ class Store:
         io_error_count = 0
         for sid, uid, file in file_tuples:
             user_set.add(uid)
-            self._indexed_file_ids.add(file.id)
             try:
                 index.process_file(uid, sid, os.path.join(data_folder, file.path), file.md5)
+                valid_file_count += 1
             except SyntaxError:
                 logger.debug('Syntax Error in (uid: %s, sid: %s)' % (uid, sid))
                 syntax_error_count += 1
-                continue
             except IOError:
                 logger.warning('IO Error in (uid: %s, sid: %s)' % (uid, sid), exc_info=True)
                 io_error_count += 1
-                continue
-            valid_file_count += 1
+            self._indexed_file_ids.add(file.id)  # mark it as indexed even error occurred
         logger.info('Built full index for requirement %d. '
                     'users/teams: %d, valid files: %d, syntax errors: %d, io errors: %d' %
                     (self.requirement_id, len(user_set), valid_file_count, syntax_error_count, io_error_count))
