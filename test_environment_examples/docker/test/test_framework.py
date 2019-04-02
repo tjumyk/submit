@@ -194,6 +194,8 @@ class TestSuite:
                 # noinspection PyBroadException
                 try:
                     result = unit.run(modules)
+                    if result is None:
+                        result = 'No Answer'  # make it explicit
                     logger.info('Test unit %s finished: %s', unit.name, result)
                     # DO NOT provide ANY error messages here as we have provided the testing data to the target methods
                     # and the students can deliberately throw an Exception with confidential data.
