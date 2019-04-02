@@ -142,8 +142,8 @@ class TestSuite:
         adding the method alias names into the argument list. The order of the arguments can be arbitrary. The return
         value of this function will be treated as the result of this test. If the return value is None, it will be
         considered as 'No Answer', which means a required method is defined but has no result. Otherwise, the return
-        value should be an integer, a float number or a dict in which keys are item names and values are results for
-        each item (similarly, only integer or float numbers will be added).
+        value should be an integer, a float number, a list of integer or float numbers, or a dict in which keys are item
+        names and values are results for each item (similarly, only integer or float numbers will be added).
         """
 
         def decorator(f):
@@ -228,13 +228,19 @@ class TestSuite:
 
             if unit.result_path:
                 dict_set_path(results, unit.result_path, result)
+
             if unit.add_to_total:
+                numeric_types = {int, float}
                 result_type = type(result)
-                if result_type in {int, float}:
+                if result_type in numeric_types:
                     total += result
+                elif result_type is list:
+                    for item_result in result:
+                        if type(item_result) in numeric_types:
+                            total += item_result
                 elif result_type is dict:
                     for item_name, item_result in result.items():
-                        if type(item_result) in {int, float}:
+                        if type(item_result) in numeric_types:
                             total += item_result
         if self._total_path:
             dict_set_path(results, self._total_path, total)
