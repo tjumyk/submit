@@ -1,10 +1,11 @@
+import inspect
 import json
 import logging
 import os
 import re
 import sys
 from importlib import import_module
-from typing import List, Dict
+from typing import Dict
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -39,14 +40,15 @@ class TestConfigError(Exception):
 
 
 class TestUnit:
+    METHOD_ALIAS_FORMAT = re.compile(r'^\w+$')
     METHOD_PATH_FORMAT = re.compile(r'^(\w+\.)?\w+$')
     RESULT_PATH_FORMAT = re.compile(r'^(\w+\.)*\w+$')
 
-    def __init__(self, name: str, endpoint, require_methods: List[str] = None, result_path: str = None,
+    def __init__(self, name: str, endpoint, require_methods: Dict[str, str] = None, result_path: str = None,
                  add_to_total: bool = True):
         self.name = name
         self.endpoint = endpoint
-        self.require_methods = require_methods or []
+        self.require_methods = require_methods or {}
         self.result_path = result_path if result_path is not None else name  # replace it with name if it is None
         self.add_to_total = add_to_total
 
@@ -54,14 +56,26 @@ class TestUnit:
             raise TestConfigError('Test unit name must not be empty')
         if endpoint is None:
             raise TestConfigError('Test unit endpoint must not be empty')
-        for method_path in self.require_methods:
+        require_method_copy = dict(require_methods)
+        for arg in inspect.getfullargspec(endpoint).args:
+            if require_method_copy.pop(arg, None) is None:
+                raise TestConfigError('Required method alias not declared: %s' % arg)
+        if require_method_copy:
+            logger.warning('Required method not used: %s' % ', '.join(require_method_copy.keys()))
+
+        for method_alias, method_path in self.require_methods.items():
+            if not method_alias:
+                raise TestConfigError('Required method alias must not be empty')
+            if not self.METHOD_ALIAS_FORMAT.match(method_alias):
+                raise TestConfigError('Invalid format in required method alias')
             if not method_path:
                 raise TestConfigError('Required method path must not be empty')
             if not self.METHOD_PATH_FORMAT.match(method_path):
                 raise TestConfigError('Invalid format in required method path')
 
-    def run(self, modules: dict):
-        return self.endpoint(**modules)
+    def run(self, methods: dict):
+        params = {arg: methods.get(arg) for arg in inspect.getfullargspec(self.endpoint).args}
+        return self.endpoint(**params)
 
 
 class TestSuite:
@@ -107,20 +121,25 @@ class TestSuite:
                 raise TestConfigError('Duplicate result path: "%s"' % unit.result_path)
         self._units.append(unit)
 
-    def test(self, name: str, require_methods: List[str] = None, result_path: str = None, add_to_total: bool = True):
+    def test(self, name: str, require_methods: Dict[str, str] = None, result_path: str = None,
+             add_to_total: bool = True):
         """
         Create a TestUnit with the wrapped function as the endpoint and register it in this TestSuite.
         :param name: Name of the new test unit.
-        :param require_methods: A list of paths of required methods. If there are exactly one required module in this
-        test suite, each path can be just the method names. Otherwise, each path must start with the alias name of a
-        required module, followed by a dot character, then with the method name, e.g. 'submission.my_func'.
+        :param require_methods: A dict of required methods where the keys are alias names and values are corresponding
+        method paths. If there are exactly one required module in this test suite, each path can be just the method
+        names. Otherwise, each path must start with the alias name of a required module, followed by a dot character,
+        then with the method name, e.g. 'submission.my_func'.
         :param result_path: The path in which the result of this unit should be saved in the result object. A path can
         be a dot-separated string, e.g. 'ProblemA.Question3'. If it is None, which is also the default value, it will be
         replaced with the name of this test unit. If it is an empty string, then the result of this unit will not appear
         in the result object.
         :param add_to_total: If this is true, the result will be added to the total, no matter if this result appear in
         the result object or not, as long as this result is an integer or float number.
-        :return: A decorator function
+        :return: A decorator function.
+
+        The wrapped function, i.e. the endpoint function, can use any of the required methods of this test unit by
+        adding the method alias names into the argument list. The order of the arguments can be arbitrary.
         """
 
         def decorator(f):
@@ -160,29 +179,26 @@ class TestSuite:
         results = {}
         for unit in self._units:
             methods_not_found = []
-            modules = {}
-            for method_path in unit.require_methods:
+            methods = {}
+            for method_alias, method_path in unit.require_methods.items():
                 segments = method_path.split('.', 1)
                 if len(segments) > 1:
-                    alias, method_name = segments
+                    module_alias, method_name = segments
                 else:  # only method name provided
                     # this is valid only if only one module required by the test suite
                     method_name = segments[0]
                     if len(self._require_modules) != 1:
-                        msg = 'Missing module alias for required method: %s' % method_name
-                        print_error_message(msg)
-                        raise NameError(msg)
-                    alias = list(self._loaded_modules.keys())[0]
+                        raise TestConfigError('Missing module alias for required method: %s' % method_name)
+                    module_alias = list(self._loaded_modules.keys())[0]
 
-                module = self._loaded_modules.get(alias)
+                module = self._loaded_modules.get(module_alias)
                 if module is None:
-                    msg = 'Module not found for alias: %s' % alias
-                    print_error_message(msg)
-                    raise NameError(msg)
+                    raise TestConfigError('Module not found for alias: %s' % module_alias)
 
                 if not hasattr(module, method_name):
-                    methods_not_found.append(method_name)
-                modules[alias] = module
+                    methods_not_found.append(method_path)
+                else:
+                    methods[method_alias] = getattr(module, method_name)
 
             if methods_not_found:
                 # skip running this test unit if any of the required methods do not exist
@@ -193,13 +209,13 @@ class TestSuite:
                 logger.info('Running test unit %s', unit.name)
                 # noinspection PyBroadException
                 try:
-                    result = unit.run(modules)
+                    result = unit.run(methods)
                     if result is None:
                         result = 'No Answer'  # make it explicit
                     logger.info('Test unit %s finished: %s', unit.name, result)
+                except Exception:
                     # DO NOT provide ANY error messages here as we have provided the testing data to the target methods
                     # and the students can deliberately throw an Exception with confidential data.
-                except Exception:
                     result = 'Exception Occurred'
                     # The details of the exception are printed to the stderr but not reported (only appear in stderr.txt
                     # output file).
