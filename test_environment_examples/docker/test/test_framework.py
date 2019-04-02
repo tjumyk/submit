@@ -135,11 +135,15 @@ class TestSuite:
         replaced with the name of this test unit. If it is an empty string, then the result of this unit will not appear
         in the result object.
         :param add_to_total: If this is true, the result will be added to the total, no matter if this result appear in
-        the result object or not, as long as this result is an integer or float number.
+        the result object or not, as long as this result is valid (see the description about the return value below).
         :return: A decorator function.
 
         The wrapped function, i.e. the endpoint function, can use any of the required methods of this test unit by
-        adding the method alias names into the argument list. The order of the arguments can be arbitrary.
+        adding the method alias names into the argument list. The order of the arguments can be arbitrary. The return
+        value of this function will be treated as the result of this test. If the return value is None, it will be
+        considered as 'No Answer', which means a required method is defined but has no result. Otherwise, the return
+        value should be an integer, a float number or a dict in which keys are item names and values are results for
+        each item (similarly, only integer or float numbers will be added).
         """
 
         def decorator(f):
@@ -224,8 +228,14 @@ class TestSuite:
 
             if unit.result_path:
                 dict_set_path(results, unit.result_path, result)
-            if unit.add_to_total and type(result) in {int, float}:
-                total += result
+            if unit.add_to_total:
+                result_type = type(result)
+                if result_type in {int, float}:
+                    total += result
+                elif result_type is dict:
+                    for item_name, item_result in result.items():
+                        if type(item_result) in {int, float}:
+                            total += item_result
         if self._total_path:
             dict_set_path(results, self._total_path, total)
 
