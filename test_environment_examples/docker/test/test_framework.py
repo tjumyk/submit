@@ -163,8 +163,12 @@ class TestSuite:
         for alias, module_path in self._require_modules.items():
             try:
                 self._loaded_modules[alias] = import_module(module_path)
-                # it is safe to report some error messages of some known types here as we have not provided any data to
-                # the imported modules.
+                # It is relatively safe to report some error messages of some known types here as we have not provided
+                # any data to the imported modules.
+                # However, students can still add some dangerous code in the global scope of their submitted files,
+                # which will be executed when we try to import them. Besides, students can create a fake exception to
+                # expose some confidential data if they managed to steal it with the global code, e.g. read a data file.
+                # So, it is very important to protect the data from unexpected access.
                 # The details of the exception are printed to the stderr but not reported (only appear in stderr.txt
                 # output file).
                 # The test units should not run if exception occurred here.
