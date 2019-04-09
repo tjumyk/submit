@@ -108,26 +108,47 @@ export class TeamSubmissionsComponent implements OnInit {
 
   }
 
-  goToSubmission(subId: string, btn: HTMLElement, inputDiv: HTMLElement) {
+  goToSubmission(subId: string, find_by: string, btn: HTMLElement, inputDiv: HTMLElement) {
     let id = parseInt(subId);
     if (isNaN(id))
       return;
 
-    btn.classList.add('loading', 'disabled');
+    let query = null;
+    switch (find_by) {
+      case 'submission_id':
+        query = this.submissionService.getSubmission(id);
+        break;
+      case 'auto_test_id':
+        query = this.taskService.findSubmissionByAutoTestID(this.taskId, id);
+        break;
+    }
+    if (query == null)
+      return;
+
+    let buttons = inputDiv.querySelectorAll('.button');
+
+    function clear_loading_state() {
+      for (let i = 0; i < buttons.length; ++i)
+        buttons.item(i).classList.remove('disabled');
+      btn.classList.remove('loading');
+      inputDiv.classList.remove('disabled');
+    }
+
+    for (let i = 0; i < buttons.length; ++i)
+      buttons.item(i).classList.add('disabled');
+    btn.classList.add('loading');
     inputDiv.classList.add('disabled');
-    this.submissionService.getSubmission(id).subscribe(
+    query.subscribe(
       submission => {
         if (submission.task_id != this.taskId) {
           this.error = {msg: 'submission does not belong to this task'};
-          btn.classList.remove('loading', 'disabled');
-          inputDiv.classList.remove('disabled');
+          clear_loading_state();
           return
         }
 
         this.taskService.getTeamAssociation(this.taskId, submission.submitter_id).pipe(
           finalize(() => {
-            btn.classList.remove('loading', 'disabled');
-            inputDiv.classList.remove('disabled');
+            clear_loading_state();
           })
         ).subscribe(
           ass => {
@@ -142,16 +163,9 @@ export class TeamSubmissionsComponent implements OnInit {
       },
       error => {
         this.error = error.error;
-        btn.classList.remove('loading', 'disabled');
-        inputDiv.classList.remove('disabled');
+        clear_loading_state();
       }
     )
-  }
-
-  bindEnter(event: KeyboardEvent, btn: HTMLElement) {
-    if (event.keyCode == 13) {// Enter key
-      btn.click()
-    }
   }
 
 }

@@ -224,4 +224,8 @@ export class TaskService {
   getAutoTestConclusions(task_id: number): Observable<AllAutoTestConclusionsMap> {
     return this.http.get<AllAutoTestConclusionsMap>(`${this.api}/${task_id}/auto-test-conclusions`)
   }
+
+  findSubmissionByAutoTestID(task_id: number, test_id: number): Observable<Submission>{
+    return this.http.get<Submission>(`${this.api}/${task_id}/find-submission-by-auto-test-id/${test_id}`)
+  }
 }

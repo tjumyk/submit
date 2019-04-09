@@ -1154,3 +1154,34 @@ def task_export_teams(tid):
             return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TermServiceError, AccountServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/find-submission-by-auto-test-id/<int:test_id>')
+@requires_login
+def task_find_submission_by_auto_test_id(task_id, test_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 500
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        auto_test = AutoTestService.get(test_id)
+
+        if auto_test is None:
+            return jsonify(msg='auto test not found'), 404
+        submission = auto_test.submission
+        if submission.task_id != task.id:
+            return jsonify(msg='submission does not belong to this task'), 400
+
+        return jsonify(submission.to_dict())
+    except (AccountServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

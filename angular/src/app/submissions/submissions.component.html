@@ -19,10 +19,13 @@
         </div>
       </div>
       <div class="column five wide">
-        <div class="ui fluid action input" #inputSubmissionIDWrapper>
-          <input type="text" placeholder="Find submission by ID" #inputSubmissionID (keyup)="bindEnter($event, btnGoToSubmission)">
-          <button class="ui icon button" (click)="goToSubmission(inputSubmissionID.value, btnGoToSubmission, inputSubmissionIDWrapper)" #btnGoToSubmission>
-            <i class="icon crosshairs"></i>
+        <div class="ui fluid action input" #inputFindSubmissionWrapper>
+          <input type="text" placeholder="Find submission..." #inputFindID>
+          <button class="ui icon button" (click)="goToSubmission(inputFindID.value, 'submission_id', btnGoToSubmissionByID, inputFindSubmissionWrapper)" #btnGoToSubmissionByID title="by Submission ID">
+            <i class="icon paper plane"></i>
+          </button>
+          <button class="ui icon button" (click)="goToSubmission(inputFindID.value, 'auto_test_id', btnGoToSubmissionByAutoTestID, inputFindSubmissionWrapper)" #btnGoToSubmissionByAutoTestID title="by Auto Test ID">
+            <i class="icon terminal"></i>
           </button>
         </div>
       </div>

@@ -109,29 +109,45 @@ export class SubmissionsComponent implements OnInit {
 
   }
 
-  goToSubmission(subId: string, btn: HTMLElement, inputDiv: HTMLElement) {
-    let id = parseInt(subId);
+  goToSubmission(inputID: string, find_by: string, btn: HTMLElement, inputDiv: HTMLElement) {
+    let id = parseInt(inputID);
     if (isNaN(id))
       return;
 
-    btn.classList.add('loading', 'disabled');
+    let query = null;
+    switch (find_by) {
+      case 'submission_id':
+        query = this.submissionService.getSubmission(id);
+        break;
+      case 'auto_test_id':
+        query = this.taskService.findSubmissionByAutoTestID(this.taskId, id);
+        break;
+    }
+    if (query == null)
+      return;
+
+    let buttons = inputDiv.querySelectorAll('.button');
+    for (let i = 0; i < buttons.length; ++i)
+      buttons.item(i).classList.add('disabled');
+    btn.classList.add('loading');
     inputDiv.classList.add('disabled');
-    this.submissionService.getSubmission(id).pipe(
+    query.pipe(
       finalize(() => {
-        btn.classList.remove('loading', 'disabled');
+        for (let i = 0; i < buttons.length; ++i)
+          buttons.item(i).classList.remove('disabled');
+        btn.classList.remove('loading');
         inputDiv.classList.remove('disabled');
       })
     ).subscribe(
       submission => {
+        if (submission.task_id != this.taskId) {
+          this.error = {msg: 'submission does not belong to this task'};
+          return
+        }
+
         this.router.navigate([`${submission.submitter_id}/${submission.id}`], {relativeTo: this.route})
       },
       error => this.error = error.error
     )
-  }
-
-  bindEnter(event: KeyboardEvent, btn: HTMLElement) {
-    if (event.keyCode == 13) {// Enter key
-      btn.click()
-    }
   }
 }
