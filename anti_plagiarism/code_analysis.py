@@ -77,45 +77,75 @@ class CodeSegmentIndex:
         def _iterate_node(node):
             height = 1
             total_nodes = 1
+            lineno = None
+            col_offset = None
             if isinstance(node, ast.AST):
                 fields = []
-                for a, b in ast.iter_fields(node):
-                    node_dump, node_height, node_total_nodes = _iterate_node(b)
-                    fields.append((a, node_dump))
+                for field_name, field_value in ast.iter_fields(node):
+                    node_dump, node_height, node_total_nodes, node_lineno, node_col_offset = _iterate_node(field_value)
+                    fields.append((field_name, node_dump))
                     height = max(height, node_height + 1)
                     total_nodes += node_total_nodes
-                dump = '%s(%s)' % (node.__class__.__name__, ', '.join(b for a, b in fields))
+                dump = '%s(%s)' % (node.__class__.__name__, ', '.join(dump for _, dump in fields))
 
-                lineno = None
-                col_offset = None
-                if node._attributes:
-                    for a in node._attributes:
-                        node_dump, node_height, node_total_nodes = _iterate_node(getattr(node, a))
-                        if a == 'lineno':
-                            lineno = node_dump
-                        elif a == 'col_offset':
-                            col_offset = node_dump
+                lineno, col_offset = _extract_node_position(node)
+
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
                               CodeOccurrence(user_id, file_id, lineno, col_offset))
             elif isinstance(node, list):
-                items = []
+                item_dumps = []
+                item_heights = []
+                item_total_nodes = []
+                item_positions = []
                 for x in node:
-                    node_dump, node_height, node_total_nodes = _iterate_node(x)
-                    items.append(node_dump)
+                    node_dump, node_height, node_total_nodes, node_lineno, node_col_offset = _iterate_node(x)
+                    item_dumps.append(node_dump)
+                    item_positions.append((node_lineno, node_col_offset))
                     height = max(height, node_height + 1)
+                    item_heights.append(node_height)
+                    item_total_nodes.append(node_total_nodes)
                     total_nodes += node_total_nodes
-                dump = '[%s]' % ', '.join(items)
+                dump = '[%s]' % ', '.join(item_dumps)
+
+                if len(node):  # use the position info of the first item
+                    lineno, col_offset = item_positions[0]
+
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, None, None))
+                              CodeOccurrence(user_id, file_id, lineno, col_offset))
+
+                # also index partial lists
+                for start_idx in range(len(node)):
+                    for end_idx in range(start_idx + 2, len(node) + 1):  # at least two items
+                        partial_list_height = max(item_heights[start_idx:end_idx])
+                        if partial_list_height >= self._min_index_height:
+                            partial_list = node[start_idx:end_idx]
+                            partial_list_dump = ', '.join(item_dumps[start_idx: end_idx])
+                            partial_list_total_nodes = sum(item_total_nodes[start_idx:end_idx])
+                            partial_list_lineno, partial_list_col_offset = item_positions[start_idx]
+                            self._put(CodeSegment(partial_list_dump, partial_list, partial_list_height,
+                                                  partial_list_total_nodes),
+                                      CodeOccurrence(user_id, file_id, partial_list_lineno, partial_list_col_offset))
             else:
                 dump = repr(node)
+                # no position info available, use default None for lineno and col_offset
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
-                              CodeOccurrence(user_id, file_id, None, None))
+                              CodeOccurrence(user_id, file_id, lineno, col_offset))
 
-            return dump, height, total_nodes
+            return dump, height, total_nodes, lineno, col_offset
+
+        def _extract_node_position(node):
+            lineno = None
+            col_offset = None
+            if node._attributes:
+                for attr_name in node._attributes:
+                    if attr_name == 'lineno':
+                        lineno = getattr(node, attr_name)
+                    elif attr_name == 'col_offset':
+                        col_offset = getattr(node, attr_name)
+            return lineno, col_offset
 
         root = ast.parse(code)
         return _iterate_node(root)
@@ -163,7 +193,7 @@ class CodeSegmentIndex:
                           % (encoding, user_id, file_id, file_path))
         if not file_md5:  # if no md5 given, compute it now
             file_md5 = md5sum(file_path)
-        _, ast_height, ast_total_nodes = self.process_code(user_id, file_id, code)
+        _, ast_height, ast_total_nodes, _, _ = self.process_code(user_id, file_id, code)
         file_info = CodeFileInfo(md5=file_md5, ast_height=ast_height, ast_total_nodes=ast_total_nodes)
         self._file_info_map[file_id] = file_info
         return file_info
