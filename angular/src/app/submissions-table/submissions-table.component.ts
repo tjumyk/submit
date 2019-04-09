@@ -1,7 +1,8 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {AutoTest, Submission, SubmissionStatus, Task} from "../models";
-import {LastAutoTestsMap, LatePenalty} from "../task.service";
+import {LastAutoTestsMap} from "../task.service";
 import * as moment from "moment";
+import {LatePenalty} from "../late-penalty";
 
 @Component({
   selector: 'app-submissions-table',

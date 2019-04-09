@@ -2,10 +2,11 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ErrorMessage, FileRequirement, SubmissionStatus, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
-import {LatePenalty, TaskService} from "../task.service";
+import {TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
+import {LatePenalty} from '../late-penalty';
 
 export class AttemptEntry {
   attempted: boolean;

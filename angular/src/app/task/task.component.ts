@@ -1,12 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ErrorMessage, Material, SuccessMessage, Task, Term, User} from "../models";
-import {CategoryInfo, LatePenalty, TaskService} from "../task.service";
+import {CategoryInfo, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {TermService} from "../term.service";
 import {AccountService} from "../account.service";
 import * as moment from "moment";
 import {TitleService} from "../title.service";
+import {LatePenalty} from "../late-penalty";
 
 @Component({
   selector: 'app-task',
