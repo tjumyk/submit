@@ -270,7 +270,7 @@ def task_anti_plagiarism(task_id, requirement_id):
         if not requirement.name.endswith('.py'):
             return jsonify(msg='file type not supported'), 400
 
-        index = CodeSegmentIndex(min_index_height=5)
+        index = CodeSegmentIndex()
         data_folder = app.config['DATA_FOLDER']
         user_set = set()
         valid_file_count = 0

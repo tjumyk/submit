@@ -79,7 +79,7 @@ class Store:
         return self._index.pretty_print_results(results, file)
 
     def _build_full_index(self) -> CodeSegmentIndex:
-        index = CodeSegmentIndex(min_index_height=5)
+        index = CodeSegmentIndex()
 
         if self.is_team_task:
             # treat a team as a single 'user' in this module
