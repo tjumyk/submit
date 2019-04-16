@@ -59,8 +59,9 @@ class CodeFileInfo:
 
 
 class CodeSegmentIndex:
-    def __init__(self, min_index_height: int):
+    def __init__(self, min_index_height: int = 5, max_split_list_length: int = 100):
         self._min_index_height = min_index_height
+        self._max_split_list_length = max_split_list_length
         self._index = {}
         self._file_info_map = {}
 
@@ -108,25 +109,29 @@ class CodeSegmentIndex:
                     total_nodes += node_total_nodes
                 dump = '[%s]' % ', '.join(item_dumps)
 
-                if len(node):  # use the position info of the first item
+                num_items = len(node)
+                if num_items:  # use the position info of the first item
                     lineno, col_offset = item_positions[0]
 
                 if height >= self._min_index_height:
                     self._put(CodeSegment(dump, node, height, total_nodes),
                               CodeOccurrence(user_id, file_id, lineno, col_offset))
 
-                # also index partial lists
-                for start_idx in range(len(node)):
-                    for end_idx in range(start_idx + 2, len(node) + 1):  # at least two items
-                        partial_list_height = max(item_heights[start_idx:end_idx])
-                        if partial_list_height >= self._min_index_height:
-                            partial_list = node[start_idx:end_idx]
-                            partial_list_dump = ', '.join(item_dumps[start_idx: end_idx])
-                            partial_list_total_nodes = sum(item_total_nodes[start_idx:end_idx])
-                            partial_list_lineno, partial_list_col_offset = item_positions[start_idx]
-                            self._put(CodeSegment(partial_list_dump, partial_list, partial_list_height,
-                                                  partial_list_total_nodes),
-                                      CodeOccurrence(user_id, file_id, partial_list_lineno, partial_list_col_offset))
+                # also index partial lists if list length is not too big
+                if num_items <= self._max_split_list_length:
+                    for start_idx in range(num_items):
+                        for end_idx in range(start_idx + 2, num_items + 1):  # at least two items
+                            partial_list_height = max(item_heights[start_idx:end_idx])
+                            if partial_list_height >= self._min_index_height:
+                                partial_list = node[start_idx:end_idx]
+                                partial_list_dump = ', '.join(item_dumps[start_idx: end_idx])
+                                partial_list_total_nodes = sum(item_total_nodes[start_idx:end_idx])
+                                partial_list_lineno, partial_list_col_offset = item_positions[start_idx]
+                                segment = CodeSegment(partial_list_dump, partial_list, partial_list_height,
+                                                      partial_list_total_nodes)
+                                occurrence = CodeOccurrence(user_id, file_id, partial_list_lineno,
+                                                            partial_list_col_offset)
+                                self._put(segment, occurrence)
             else:
                 dump = repr(node)
                 # no position info available, use default None for lineno and col_offset
