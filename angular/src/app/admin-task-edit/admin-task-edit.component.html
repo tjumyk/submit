@@ -416,7 +416,7 @@
               <tr *ngFor="let config of task.auto_test_configs; index as i">
                 <td>{{ config.id }}</td>
                 <td>{{ config.name }}</td>
-                <td>{{ config.type}}</td>
+                <td>{{ autoTestConfigTypes[config.type] }}</td>
                 <td>
                   <i title="Enabled" class="icon green play circle" *ngIf="config.is_enabled; else auto_test_config_disabled"></i>
                   <i title="Private" class="icon red lock" *ngIf="config.is_private; else auto_test_config_private"></i>
@@ -473,9 +473,7 @@
                       <div class="field required" [ngClass]="{'error': (autoTestConfigTypeModel.touched || autoTestConfigTypeModel.dirty || fNewAutoTestConfig.submitted) && autoTestConfigTypeModel.invalid}">
                         <label>Type</label>
                         <select name="type" [(ngModel)]="newAutoTestConfigForm.type" required #autoTestConfigTypeModel="ngModel">
-                          <option value="docker">Docker</option>
-                          <option value="run-script">Run Script</option>
-                          <option value="anti-plagiarism">Anti Plagiarism</option>
+                          <option [ngValue]="type.key" *ngFor="let type of autoTestConfigTypes | keyvalue">{{type.value}}</option>
                         </select>
                         <div class="errors">
                           <label *ngIf="autoTestConfigTypeModel.errors?.required">Type is required</label>
@@ -517,6 +515,15 @@
                           <label *ngIf="autoTestConfigFileRequirementId.errors?.required">Target File Requirement is required. Only supported types of files are listed here.</label>
                         </div>
                       </div>
+                      <div *ngIf="newAutoTestConfigForm.type=='file-exists'" class="field required" [ngClass]="{'error': (autoTestConfigFileRequirementId.touched || autoTestConfigFileRequirementId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigFileRequirementId.invalid}">
+                        <label>Target File Requirement</label>
+                        <select name="file_requirement_id" [(ngModel)]="newAutoTestConfigForm.file_requirement_id" required #autoTestConfigFileRequirementId="ngModel">
+                          <option *ngFor="let req of task.file_requirements" [ngValue]="req.id"> {{ req.name }} </option>
+                        </select>
+                        <div class="errors">
+                          <label *ngIf="autoTestConfigFileRequirementId.errors?.required">Target File Requirement is required.</label>
+                        </div>
+                      </div>
                       <button class="ui fluid primary button" type="submit">Add Configuration</button>
                     </form>
                   </div>
@@ -543,9 +550,7 @@
               <div class="field required" [ngClass]="{'error': (updateAutoTestConfigTypeModel.touched || updateAutoTestConfigTypeModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigTypeModel.invalid}">
                 <label>Type</label>
                 <select name="type" [(ngModel)]="updateAutoTestConfigForm.type" required #updateAutoTestConfigTypeModel="ngModel">
-                  <option value="docker">Docker</option>
-                  <option value="run-script">Run Script</option>
-                  <option value="anti-plagiarism">Anti Plagiarism</option>
+                  <option [ngValue]="type.key" *ngFor="let type of autoTestConfigTypes | keyvalue">{{type.value}}</option>
                 </select>
                 <div class="errors">
                   <label *ngIf="updateAutoTestConfigTypeModel.errors?.required">Type is required</label>
@@ -677,6 +682,18 @@
                   <p *ngIf="updateAutoTestConfigForm.template_file_id==null">
                     <i class="icon circle info"></i> If you want to use a template file, please upload it as a Material (with type 'Code') first.
                   </p>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="updateAutoTestConfigForm.type=='file-exists'">
+                <div class="field required" [ngClass]="{'error': (updateAutoTestConfigFileRequirementId.touched || updateAutoTestConfigFileRequirementId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigFileRequirementId.invalid}">
+                  <label>Target File Requirement</label>
+                  <select name="file_requirement_id" [(ngModel)]="updateAutoTestConfigForm.file_requirement_id" required #updateAutoTestConfigFileRequirementId="ngModel">
+                    <option *ngFor="let req of task.file_requirements" [ngValue]="req.id"> {{ req.name }} </option>
+                  </select>
+                  <div class="errors">
+                    <label *ngIf="updateAutoTestConfigFileRequirementId.errors?.required">Target File Requirement is required.</label>
+                  </div>
                 </div>
               </ng-container>
               <!-- End Execution Section -->

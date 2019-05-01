@@ -68,6 +68,13 @@ export class AdminTaskEditComponent implements OnInit {
   editingLatePenalty: boolean;
   activeTab: string;
 
+  autoTestConfigTypes = {
+    'docker': 'Docker',
+    'run-script': 'Run Script',
+    'anti-plagiarism': 'Anti Plagiarism',
+    'file-exists': 'File Exists'
+  };
+
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute,
@@ -187,18 +194,18 @@ export class AdminTaskEditComponent implements OnInit {
     input.click()
   }
 
-  updateMaterialVisibility(material: Material, is_private: boolean, btn: HTMLElement){
+  updateMaterialVisibility(material: Material, is_private: boolean, btn: HTMLElement) {
     let form = new UpdateMaterialForm();
     form.is_private = is_private;
     form.description = material.description; // keep it untouched
 
     btn.classList.add('loading', 'disabled');
     this.adminService.updateMaterial(material.id, form).pipe(
-      finalize(() =>{
+      finalize(() => {
         btn.classList.remove('loading', 'disabled');
       })
     ).subscribe(
-      mat =>{
+      mat => {
         material.is_private = mat.is_private;
         material.modified_at = mat.modified_at;
       },
@@ -208,7 +215,7 @@ export class AdminTaskEditComponent implements OnInit {
 
   validateTestEnvironment(material_id: number) {
     this.testEnvValidationResult = null;
-    if(material_id == null)
+    if (material_id == null)
       return;
 
     this.validatingTestEnvironment = true;

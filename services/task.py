@@ -290,7 +290,7 @@ class TaskService:
     def _check_auto_test_config(config: AutoTestConfig):
         if config.type in {'run-script', 'docker'} and not config.environment_id:
             raise TaskServiceError('no test environment specified')
-        if config.type in {'anti-plagiarism'} and not config.file_requirement_id:
+        if config.type in {'anti-plagiarism', 'file-exists'} and not config.file_requirement_id:
             raise TaskServiceError('no target file requirement specified')
 
         con_type = config.result_conclusion_type
