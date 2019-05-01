@@ -125,6 +125,9 @@ export class TeamsComponent implements OnInit {
   }
 
   goToTeamUser(userKey: string, btn: HTMLElement, inputDiv: HTMLElement){
+    if(!userKey || !userKey.trim())
+      return;
+
     let uid = parseInt(userKey);
     let query = null;
     if(isNaN(uid))
