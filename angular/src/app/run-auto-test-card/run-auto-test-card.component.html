@@ -9,6 +9,12 @@
             <option *ngFor="let config of task.auto_test_configs" [ngValue]="config">{{config.name}}</option>
           </select>
         </div>
+        <div class="ui field">
+          <div class="ui input checkbox" (click)="checkboxLastSubmissionOnly.click()">
+            <input type="checkbox" tabindex="0" class="hidden" #checkboxLastSubmissionOnly name="last_submissions_only" [(ngModel)]="lastSubmissionsOnly">
+            <label>Last Submissions Only</label>
+          </div>
+        </div>
         <button class="ui button fluid" (click)="runAutoTest()" [ngClass]="{'disabled loading': requestingRunAutoTest}">
           <i class="icon play"></i>
           Run

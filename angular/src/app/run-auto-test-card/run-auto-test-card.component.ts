@@ -17,6 +17,7 @@ export class RunAutoTestCardComponent implements OnInit {
   isAdmin: boolean;
 
   activeConfig: AutoTestConfig;
+  lastSubmissionsOnly: boolean;
   requestingRunAutoTest: boolean;
 
   @Output() error: EventEmitter<ErrorMessage> = new EventEmitter();
@@ -41,18 +42,21 @@ export class RunAutoTestCardComponent implements OnInit {
       return;
 
     let needPrompt = true;
-    let target = `all the submissions for ${this.task.title}`;
-    let api = this.adminService.runAutoTests(config.id);
+    let target_header = "all the submissions";
+    if (this.lastSubmissionsOnly)
+      target_header = "all the last submissions";
+    let target = `${target_header} in ${this.task.title}`;
+    let api = this.adminService.runAutoTests(config.id, null, null, this.lastSubmissionsOnly);
 
     if (this.task.is_team_task) {
       if (this.team) {
-        target = `all the submissions from team "${this.team.name}" (ID=${this.team.id}) in ${this.task.title}`;
-        api = this.adminService.runAutoTests(config.id, null, this.team.id);
+        target = `${target_header} from team "${this.team.name}" (ID=${this.team.id}) in ${this.task.title}`;
+        api = this.adminService.runAutoTests(config.id, null, this.team.id, this.lastSubmissionsOnly);
       }
     } else {
       if (this.user) {
-        target = `all the submissions from user "${this.user.name}" (ID=${this.user.id}) in ${this.task.title}`;
-        api = this.adminService.runAutoTests(config.id, this.user.id, null);
+        target = `${target_header} from user "${this.user.name}" (ID=${this.user.id}) in ${this.task.title}`;
+        api = this.adminService.runAutoTests(config.id, this.user.id, null, this.lastSubmissionsOnly);
       }
     }
 

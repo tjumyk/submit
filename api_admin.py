@@ -4,9 +4,10 @@ import shutil
 import tempfile
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
+from sqlalchemy import func
 
 from auth_connect.oauth import requires_admin
-from models import db, Submission, UserTeamAssociation
+from models import db, Submission, UserTeamAssociation, Team
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.course import CourseService, CourseServiceError
@@ -698,6 +699,8 @@ def admin_run_auto_test(cid):
             Submission.is_cleared == False
         ]
 
+        last_submissions_only = request.args.get('last_submissions_only') == 'true'
+
         if task.is_team_task:
             team_id = request.args.get('team_id')
             if team_id is not None:
@@ -712,6 +715,21 @@ def admin_run_auto_test(cid):
                     return jsonify(msg='team does not belong to this task'), 400
                 filters.extend([UserTeamAssociation.team_id == team_id,
                                 UserTeamAssociation.user_id == Submission.submitter_id])
+
+            if last_submissions_only:
+                if team_id is not None:
+                    last_sid = db.session.query(func.max(Submission.id).label('sid')).filter(*filters).subquery()
+                    submissions = db.session.query(Submission).filter(Submission.id == last_sid.c.sid)
+                else:
+                    filters.extend([UserTeamAssociation.user_id == Submission.submitter_id,
+                                    UserTeamAssociation.team_id == Team.id,
+                                    Team.task_id == task.id])
+                    last_sids = db.session.query(UserTeamAssociation.team_id, func.max(Submission.id).label('sid'))\
+                        .filter(*filters)\
+                        .group_by(UserTeamAssociation.team_id).subquery()
+                    submissions = db.session.query(Submission).filter(Submission.id == last_sids.c.sid)
+            else:
+                submissions = db.session.query(Submission).filter(*filters).order_by(Submission.id)
         else:
             user_id = request.args.get('user_id')
             if user_id is not None:
@@ -721,7 +739,17 @@ def admin_run_auto_test(cid):
                     return jsonify(msg='user id must be an integer'), 400
                 filters.append(Submission.submitter_id == user_id)
 
-        submissions = db.session.query(Submission).filter(*filters).order_by(Submission.id)
+            if last_submissions_only:
+                if user_id is not None:
+                    last_sid = db.session.query(func.max(Submission.id).label('sid')).filter(*filters).subquery()
+                    submissions = db.session.query(Submission).filter(Submission.id == last_sid.c.sid)
+                else:
+                    last_sids = db.session.query(Submission.submitter_id, func.max(Submission.id).label('sid')) \
+                        .filter(*filters) \
+                        .group_by(Submission.submitter_id).subquery()
+                    submissions = db.session.query(Submission).filter(Submission.id == last_sids.c.sid)
+            else:
+                submissions = db.session.query(Submission).filter(*filters).order_by(Submission.id)
 
         result_tuples = []
         for submission in submissions:
