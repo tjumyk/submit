@@ -161,7 +161,7 @@ def worker_get_submission_and_config(sid, wid):
         submission_dict = submission.to_dict(with_files=True)
         config_dict = test.config.to_dict(with_environment=True, with_advanced_fields=True)
 
-        task = test.task
+        task = submission.task
         if task.is_team_task:  # plug in team info
             ass = TeamService.get_team_association(task, submission.submitter)
             if ass is None:
