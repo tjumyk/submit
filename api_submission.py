@@ -10,6 +10,7 @@ from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
+from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
 
 submission_api = Blueprint('submission_api', __name__)
@@ -155,10 +156,20 @@ def worker_get_submission_and_config(sid, wid):
         test = AutoTestService.get_by_submission_work_id(sid, wid)
         if test is None:
             return jsonify(msg='test not found'), 404
-        submission_dict = test.submission.to_dict(with_files=True)
+        submission = test.submission
+
+        submission_dict = submission.to_dict(with_files=True)
         config_dict = test.config.to_dict(with_environment=True, with_advanced_fields=True)
+
+        task = test.task
+        if task.is_team_task:  # plug in team info
+            ass = TeamService.get_team_association(task, submission.submitter)
+            if ass is None:
+                return jsonify(msg='team info not found'), 500
+            submission_dict['submitter_team_id'] = ass.team_id
+
         return jsonify(dict(submission=submission_dict, config=config_dict))
-    except AutoTestServiceError as e:
+    except (AutoTestServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
