@@ -103,6 +103,7 @@ export class UpdateAutoTestConfigForm{
   result_render_html?: string;
   result_conclusion_type: string;
   result_conclusion_path?: string;
+  result_conclusion_apply_late_penalty: boolean;
   results_conclusion_accumulate_method: string;
 }
 

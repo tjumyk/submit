@@ -425,6 +425,7 @@ class AutoTestConfig(db.Model):
     result_render_html = db.Column(db.Text)
     result_conclusion_type = db.Column(db.String(16), nullable=False, default='json')
     result_conclusion_path = db.Column(db.String(128))
+    result_conclusion_apply_late_penalty = db.Column(db.Boolean, nullable=False, default=True)
     results_conclusion_accumulate_method = db.Column(db.String(32), nullable=False, default='last')
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -448,6 +449,7 @@ class AutoTestConfig(db.Model):
                  template_file_id=self.template_file_id,
                  result_render_html=self.result_render_html, result_conclusion_type=self.result_conclusion_type,
                  result_conclusion_path=self.result_conclusion_path,
+                 result_conclusion_apply_late_penalty=self.result_conclusion_apply_late_penalty,
                  results_conclusion_accumulate_method=self.results_conclusion_accumulate_method)
         if with_environment:
             d['environment'] = self.environment.to_dict() if self.environment_id is not None else None

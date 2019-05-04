@@ -58,6 +58,7 @@ class TaskService:
         'result_render_html',
         'result_conclusion_type',
         'result_conclusion_path',
+        'result_conclusion_apply_late_penalty',
         'results_conclusion_accumulate_method',
     }
 

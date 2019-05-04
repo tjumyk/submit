@@ -701,8 +701,7 @@ class SubmissionService:
         conclusions = [cls.extract_result_conclusion(t.result, config.result_conclusion_path) for t in candidate_tests]
         conclusions = cls.convert_result_conclusions_type(conclusions, conclusion_type)
 
-        if submission_penalties and conclusion_type in {'int', 'float'}:
-            # TODO add an option to use late_penalty or not for this AutoTestConfig
+        if config.result_conclusion_apply_late_penalty and submission_penalties and conclusion_type in {'int', 'float'}:
             penalties = [submission_penalties.get(t.submission_id) for t in candidate_tests]
             conclusions = [c if p is None or p == 0 else c * (1 - p) for c, p in zip(conclusions, penalties)]
 

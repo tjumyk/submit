@@ -341,6 +341,7 @@ export class AdminTaskEditComponent implements OnInit {
     form.result_render_html = config.result_render_html;
     form.result_conclusion_type = config.result_conclusion_type;
     form.result_conclusion_path = config.result_conclusion_path;
+    form.result_conclusion_apply_late_penalty = config.result_conclusion_apply_late_penalty;
     form.results_conclusion_accumulate_method = config.results_conclusion_accumulate_method;
 
     this.validateTestEnvironment(config.environment_id)
