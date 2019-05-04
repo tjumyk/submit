@@ -420,6 +420,7 @@
                 <td>
                   <i title="Enabled" class="icon green play circle" *ngIf="config.is_enabled; else auto_test_config_disabled"></i>
                   <i title="Private" class="icon red lock" *ngIf="config.is_private; else auto_test_config_private"></i>
+                  <i title="Late Penalty Applied" class="icon red clock" *ngIf="config.result_conclusion_apply_late_penalty"></i>
                   <ng-template #auto_test_config_disabled>
                     <i title="Disabled" class="icon red times circle"></i>
                   </ng-template>
