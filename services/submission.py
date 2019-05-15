@@ -273,7 +273,7 @@ class SubmissionService:
                                                                only_for_last_submission=last_submission_only)
 
         late_penalties = cls.get_late_penalties_for_task_and_user(task, user)
-        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
+        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties, include_private_tests)
 
     @classmethod
     def get_late_penalties_for_task_and_user(cls, task: Task, user: UserAlias) -> Optional[Dict[int, float]]:
@@ -407,7 +407,7 @@ class SubmissionService:
                                                       only_for_last_submission=last_submission_only)
 
         late_penalties = cls.get_late_penalties_for_team(team)
-        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
+        return cls.extract_conclusions_for_configs(configs, last_tests, late_penalties, include_private_tests)
 
     @classmethod
     def get_late_penalties_for_team(cls, team: Team) -> Optional[Dict[int, float]]:
@@ -640,7 +640,8 @@ class SubmissionService:
 
     @classmethod
     def extract_conclusions_for_configs(cls, configs: List[AutoTestConfig], last_tests: Dict[int, Dict[int, AutoTest]],
-                                        late_penalties: Optional[Dict[int, float]]):
+                                        late_penalties: Optional[Dict[int, float]],
+                                        include_private_tests: bool = False):
         # re-structure dict
         test_results = defaultdict(list)
         for sid, tests in last_tests.items():
@@ -649,6 +650,8 @@ class SubmissionService:
 
         ret = {}
         for config in configs:
+            if not include_private_tests and config.is_private:
+                continue
             tests = test_results.get(config.id)
             if not tests:  # no tests for this config
                 ret[config.id] = None
@@ -798,7 +801,8 @@ class SubmissionService:
         for unit_id, last_tests in all_last_tests.items():
             # unit_id is submitter_id for user-task, or team_id for team-task
             late_penalties = all_late_penalties.get(unit_id) if all_late_penalties else None
-            all_ret[unit_id] = cls.extract_conclusions_for_configs(configs, last_tests, late_penalties)
+            all_ret[unit_id] = cls.extract_conclusions_for_configs(configs, last_tests, late_penalties,
+                                                                   include_private_tests)
         return all_ret
 
     @staticmethod
