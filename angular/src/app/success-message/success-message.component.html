@@ -1,4 +1,4 @@
-<div *ngFor="let success of history" class="ui success message">
+<div *ngFor="let success of history, index as i" class="ui success message">
   <i class="close icon" (click)="deleteMessage(i)"></i>
   <div class="header"><i class="check circle icon"></i> {{success.msg||'Success'}}</div>
   <p *ngIf="success.msg">{{success.detail}}</p>
