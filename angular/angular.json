@@ -48,7 +48,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/lib/semantic/semantic.min.css",
+              "node_modules/semantic-ui/dist/semantic.min.css",
               "src/styles.less"
             ],
             "scripts": [],
