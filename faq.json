@@ -1,0 +1,42 @@
+[
+  {
+    "question": "Why do I have access to this system?",
+    "answer": "Because you have enrolled in some relevant courses, which use this system to manage some course activities, e.g. labs, projects, or assignments."
+  },
+  {
+    "question": "What is the difference between the \"Due Time\" and \"Close Time\"?",
+    "answer": "\"Due time\" is the deadline for the normal submissions, while \"Close Time\" is the deadline for both the normal submissions and late submissions. After the \"Due Time\" and before the \"Close Time\", you may still submit your work but late penalties may apply."
+  },
+  {
+    "question": "Why can't I join a team?",
+    "answer": "Before the \"team join close time\", you are allowed to request joining a team as long as this team is in \"open\" state. After such time, you can never join any team, which means you can only create a new team with yourself as the only member."
+  },
+  {
+    "question": "Why should I finalize my team before we submit our work?",
+    "answer": "Finalizing a team means locking the member list of the team. After you finalize your team, no one can request joining your team, leave your team or dismiss the team. Only finalized teams are permitted to submit their work. The purpose of this mechanism is to avoid any team change after some members already have some submissions."
+  },
+  {
+    "question": "Can I submit my work if I am not the creator of my team?",
+    "answer": "Yes. All the members of a team have the right to submit their work."
+  },
+  {
+    "question": "If a task has an \"Attempt Limit\", e.g. 10, will every member of my team have 10 chances?",
+    "answer": "No. The whole team share the 10 chances."
+  },
+  {
+    "question": "Will the results of the auto testings be the final marks of the corresponding tasks?",
+    "answer": "Not necessarily. Auto testings are only designed to be a quick feedback to help you spot any serious or common bugs. Depends on the complexity of the task, we may need to run separate offline tests with larger datasets or in a larger scale to fully evaluate your work. However, your final marks shouldn't be too bad if you achieved a good result in the auto tests. Besides, we may also need careful manual inspections to deal with any special cases. The tutors may let you know the final marks with other means."
+  },
+  {
+    "question": "How to disable certain Email notifications?",
+    "answer": "You may click the little bell button at the left bottom side to access the \"Email Subscriptions\" page."
+  },
+  {
+    "question": "What should I do if my teammates do not contribute or co-operate?",
+    "answer": "Report it to the tutors ASAP."
+  },
+  {
+    "question": "What should I do if I witnessed plagiarism?",
+    "answer": "Report it to the tutors ASAP."
+  }
+]
