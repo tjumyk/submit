@@ -1,5 +1,4 @@
 import os
-import re
 import smtplib
 import time
 from email.headerregistry import Address
@@ -9,10 +8,7 @@ from typing import List, Tuple
 
 from flask import current_app as app
 
-_templates = {}
-
-# noinspection RegExpRedundantEscape
-_regex_html_param = re.compile(r"(\{\{[^}]+\}\})")
+from utils.message import MultiFormatMessageContent
 
 
 def _make_recipient_header(recipients):
@@ -66,8 +62,8 @@ class PreparedEmail:
         p.communicate(self.msg.as_bytes())
 
 
-def prepare_email(template: str, to_list: List[Tuple[str, str]], cc_list: List[Tuple[str, str]] = None,
-                  bcc_list: List[Tuple[str, str]] = None, mail_args: dict = None):
+def prepare_email(content: MultiFormatMessageContent, to_list: List[Tuple[str, str]],
+                  cc_list: List[Tuple[str, str]] = None, bcc_list: List[Tuple[str, str]] = None):
     mail_config = app.config['MAIL']
 
     msg = EmailMessage()
@@ -87,40 +83,15 @@ def prepare_email(template: str, to_list: List[Tuple[str, str]], cc_list: List[T
     if bcc_list:
         msg['Bcc'] = _make_recipient_header(bcc_list)
 
-    temp = _templates.get(template)
-    if temp is None:
-        temp = {}
-        txt_path = os.path.join('mail_templates', template + '.txt')
-        html_path = os.path.join('mail_templates', template + '.html')
-        with open(txt_path) as f_txt:
-            txt = f_txt.read()
-            temp['subject'], temp['text'] = txt.split('\n', 1)
-        if os.path.isfile(html_path):
-            with open(html_path) as f_html:
-                temp['html'] = f_html.read()
-        _templates[template] = temp
-
-    temp_subject = temp['subject']
-    temp_text = temp['text']
-    temp_html = temp.get('html')
-
-    if mail_args:
-        temp_subject = temp_subject.format(**mail_args)
-        temp_text = temp_text.format(**mail_args)
-        if temp_html:
-            # In html templates, double curly-braces are used for string interpolation to avoid conflict with css and js
-            # functions
-            temp_html = _regex_html_param.sub(lambda m: m.group(1)[1:-1].format(**mail_args), temp_html)
-
-    msg['Subject'] = temp_subject
-    msg.set_content(temp_text)
-    if temp_html:
-        msg.add_alternative(temp_html, subtype='html')
+    msg['Subject'] = content.subject
+    msg.set_content(content.text)
+    if content.email_html:
+        msg.add_alternative(content.email_html, subtype='html')
 
     return PreparedEmail(msg=msg, to_list=to_list, cc_list=cc_list, bcc_list=bcc_list)
 
 
-def send_email(template: str, to_list: List[Tuple[str, str]], cc_list: List[Tuple[str, str]] = None,
-               bcc_list: List[Tuple[str, str]] = None, mail_args: dict = None):
-    mail = prepare_email(template, to_list, cc_list, bcc_list, mail_args)
+def send_email(content: MultiFormatMessageContent, to_list: List[Tuple[str, str]],
+               cc_list: List[Tuple[str, str]] = None, bcc_list: List[Tuple[str, str]] = None):
+    mail = prepare_email(content, to_list, cc_list, bcc_list)
     mail.send()

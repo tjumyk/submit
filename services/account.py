@@ -98,6 +98,10 @@ class AccountService:
             user_alias = UserAlias(id=user.id, name=user.name, email=user.email, nickname=user.nickname,
                                    avatar=user.avatar)
             db.session.add(user_alias)
+
+            # additional initializations for new user alias
+            from .messsage import MessageService
+            MessageService.init_new_user_subscriptions(user_alias)
         else:
             if user_alias.name != user.name:
                 raise AccountServiceError('failed to sync user', 'Inconsistent user name')

@@ -549,3 +549,77 @@ class AutoTestOutputFile(db.Model):
         if with_advanced_fields:
             d['save_path'] = self.save_path
         return d
+
+
+class MessageChannel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), nullable=False)
+    description = db.Column(db.String(128))
+
+    def to_dict(self):
+        return dict(id=self.id, name=self.name, description=self.description)
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    channel_id = db.Column(db.Integer, db.ForeignKey('message_channel.id'), nullable=False)
+    term_id = db.Column(db.Integer, db.ForeignKey('term.id'), nullable=False)
+
+    sender_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+    receiver_group_id = db.Column(db.Integer, db.ForeignKey('group_alias.id'))
+
+    subject = db.Column(db.String(128), nullable=False)
+    body = db.Column(db.Text)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    sender = db.relationship('UserAlias', backref=db.backref('messages_sent'),
+                             foreign_keys='[Message.sender_id]')
+    receiver = db.relationship('UserAlias', backref=db.backref('messages_received'),
+                               foreign_keys='[Message.receiver_id]')
+    receiver_group = db.relationship('GroupAlias', backref=db.backref('messages_received'))
+    channel = db.relationship('MessageChannel', backref=db.backref('messages'))
+    term = db.relationship('Term', backref=db.backref('messages'))
+
+    def to_dict(self, with_sender: bool = True, with_receiver: bool = True, with_channel: bool = True,
+                with_term: bool = False, with_body=True):
+        d = dict(id=self.id, channel_id=self.channel_id, term_id=self.term_id, sender_id=self.sender_id,
+                 receiver_id=self.receiver_id, receiver_group_id=self.receiver_group_id, subject=self.subject,
+                 created_at=self.created_at)
+        if with_sender:
+            d['sender'] = self.sender.to_dict() if self.sender_id is not None else None
+        if with_receiver:
+            d['receiver'] = self.receiver.to_dict() if self.receiver_id is not None else None
+            d['receiver_group'] = self.receiver_group.to_dict() if self.receiver_group_id is not None else None
+        if with_channel:
+            d['channel'] = self.channel.to_dict()
+        if with_term:
+            d['term'] = self.term.to_dict()
+        if with_body:
+            d['body'] = self.body
+        return d
+
+
+class MessageIsRead(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey('message.id'), primary_key=True)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship('UserAlias', lazy=False, backref=db.backref('messages_read',
+                                                                       cascade="all, delete-orphan"))
+    message = db.relationship('Message', lazy=False, backref=db.backref('users_read',
+                                                                        cascade="all, delete-orphan"))
+
+
+class EmailSubscription(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
+    channel_id = db.Column(db.Integer, db.ForeignKey('message_channel.id'), primary_key=True)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship('UserAlias', lazy=False, backref=db.backref('email_subscriptions',
+                                                                       cascade="all, delete-orphan"))
+    channel = db.relationship('MessageChannel', lazy=False, backref=db.backref('email_subscriptions',
+                                                                               cascade="all, delete-orphan"))

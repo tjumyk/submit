@@ -1,5 +1,4 @@
 import logging
-import math
 import os
 import signal
 import time
@@ -9,9 +8,11 @@ from sqlalchemy import or_
 
 from models import Task, db
 from server import app
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.task import TaskService
-from services.team import TeamService
-from utils.mail import send_email
+from services.team import TeamService, TeamServiceError
+from utils.message import build_message_with_template
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -72,18 +73,6 @@ def _exec_work():
                 _process_task_due(task, due_hours)
 
 
-def _send_email_bcc_batched(template, bcc_list, mail_args):
-    total_bcc = len(bcc_list)
-    max_recipients_per_mail = worker_config['max_recipients_per_mail']
-    batches = math.ceil(total_bcc / max_recipients_per_mail)
-    logger.info('Sending "%s" emails to %d users in %d batches (batch size: %d)...'
-                % (template, total_bcc, batches, max_recipients_per_mail))
-    for i in range(batches):
-        logger.info('Sending for batch %d...' % i)
-        batch_bcc_list = bcc_list[i * max_recipients_per_mail: (i + 1) * max_recipients_per_mail]
-        send_email(template, [], bcc_list=batch_bcc_list, mail_args=mail_args)
-
-
 def _process_task_open(task):
     process_name = 'Task Open: %r at %s' % (task, task.open_time)
     mark_name = 'task_open_%d_%s.mark' % (task.id, str(task.open_time).replace(' ', '_'))
@@ -94,11 +83,18 @@ def _process_task_open(task):
             logger.info('[Process Started] %s' % process_name)
             term = task.term
             mail_args = dict(site=app.config['SITE'], term=term, task=task)
-            bcc_list = [(u.name, u.email) for u in term.student_group.users]
-            _send_email_bcc_batched('task_open', bcc_list, mail_args)
+            msg_content = build_message_with_template('task_open', mail_args)
+            msg_channel = MessageService.get_channel_by_name('task')
+            msg, mails = MessageSenderService.send_to_group(msg_channel, term, msg_content, None, term.student_group)
+
+            db.session.commit()
+            for mail in mails:
+                mail.send()
             logger.info('[Process Finished] %s' % process_name)
     except FileExistsError:
         logger.info('[Process Skipped] %s. Mark File: %s' % (process_name, mark_name))
+    except (MessageServiceError, MessageSenderServiceError) as e:
+        logger.exception(e.msg)
 
 
 def _process_task_team_join_close(task, close_hours):
@@ -110,11 +106,19 @@ def _process_task_team_join_close(task, close_hours):
         with open(mark_path, 'x'):
             logger.info('[Process Started] %s' % process_name)
             mail_args = dict(site=app.config['SITE'], term=task.term, task=task, close_hours=close_hours)
-            bcc_list = [(u.name, u.email) for u in TeamService.get_free_users_for_task(task)]
-            _send_email_bcc_batched('task_team_join_close', bcc_list, mail_args)
+            msg_content = build_message_with_template('task_team_join_close', mail_args)
+            msg_channel = MessageService.get_channel_by_name('task')
+            msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                             TeamService.get_free_users_for_task(task))
+
+            db.session.commit()
+            for mail in mails:
+                mail.send()
             logger.info('[Process Finished] %s' % process_name)
     except FileExistsError:
         logger.info('[Process Skipped] %s. Mark File: %s' % (process_name, mark_name))
+    except (TeamServiceError, MessageServiceError, MessageSenderServiceError) as e:
+        logger.exception(e.msg)
 
 
 def _process_task_due(task, due_hours):
@@ -127,23 +131,35 @@ def _process_task_due(task, due_hours):
             logger.info('[Process Started] %s' % process_name)
 
             mail_args = dict(site=app.config['SITE'], term=task.term, task=task, due_hours=due_hours)
+            msg_channel = MessageService.get_channel_by_name('task')
+            all_mails = []
             if task.is_team_task:
                 # lazy teams
                 lazy_teams = TaskService.get_teams_no_submission(task)
-                user_list = (ass.user for team in lazy_teams for ass in team.user_associations)
-                bcc_list = [(u.name, u.email) for u in user_list]
-                _send_email_bcc_batched('task_due_for_team', bcc_list, mail_args)
+                user_list = [ass.user for team in lazy_teams for ass in team.user_associations]
+                msg_content = build_message_with_template('task_due_for_team', mail_args)
+                msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None, user_list)
+                all_mails.extend(mails)
 
                 # lazier users who even have no teams
-                bcc_list = [(u.name, u.email) for u in TeamService.get_free_users_for_task(task)]
-                _send_email_bcc_batched('task_due_for_no_team', bcc_list, mail_args)
+                msg_content = build_message_with_template('task_due_for_no_team', mail_args)
+                msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                                 TeamService.get_free_users_for_task(task))
+                all_mails.extend(mails)
             else:
                 lazy_users = TaskService.get_users_no_submission(task)
-                bcc_list = [(u.name, u.email) for u in lazy_users]
-                _send_email_bcc_batched('task_due', bcc_list, mail_args)
+                msg_content = build_message_with_template('task_due', mail_args)
+                msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None, lazy_users)
+                all_mails.extend(mails)
+
+            db.session.commit()
+            for mail in all_mails:
+                mail.send()
             logger.info('[Process Finished] %s' % process_name)
     except FileExistsError:
         logger.info('[Process Skipped] %s. Mark File: %s' % (process_name, mark_name))
+    except (TeamServiceError, MessageServiceError, MessageSenderServiceError) as e:
+        logger.exception(e.msg)
 
 
 def main():
@@ -155,14 +171,12 @@ def main():
     expire = worker_config['expire']
     due_notify_hours = worker_config['due_notify_hours']
     team_join_close_notify_hours = worker_config['team_join_close_notify_hours']
-    max_recipients_per_mail = worker_config['max_recipients_per_mail']
     if not os.path.exists(work_folder):
         os.makedirs(work_folder, mode=0o700)
     assert period > 0
     assert expire > period
     assert type(due_notify_hours) == list
     assert type(team_join_close_notify_hours) == list
-    assert type(max_recipients_per_mail) == int and max_recipients_per_mail > 0
 
     # align to whole minutes
     now_second = datetime.now().second

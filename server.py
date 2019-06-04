@@ -12,9 +12,11 @@ from api_submission import submission_api
 from api_task import task_api
 from api_team import team_api
 from api_term import term_api
+from api_message import message_api
 from auth_connect import oauth
 from models import db
 from services.account import AccountService, AccountServiceError
+from services.messsage import MessageService
 from utils import upload
 
 app = Flask(__name__)
@@ -48,6 +50,7 @@ app.register_blueprint(material_api, url_prefix='/api/materials')
 app.register_blueprint(submission_api, url_prefix='/api/submissions')
 app.register_blueprint(my_submission_api, url_prefix='/api/my-submissions')
 app.register_blueprint(my_team_submission_api, url_prefix='/api/my-team-submissions')
+app.register_blueprint(message_api, url_prefix='/api/messages')
 app.register_blueprint(admin_api, url_prefix='/api/admin')
 
 
@@ -75,6 +78,19 @@ def page_not_found(error):
 @app.cli.command()
 def create_db():
     db.create_all()
+
+
+@app.cli.command()
+def init_db():
+    MessageService.init_default_channels()
+    db.session.commit()
+
+
+@app.cli.command()
+def init_email_subscriptions():
+    for user in AccountService.get_all_users():
+        MessageService.init_new_user_subscriptions(user)
+    db.session.commit()
 
 
 @app.cli.command()

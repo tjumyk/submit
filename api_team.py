@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify, current_app as app
 
-from models import db
 from auth_connect.oauth import requires_login
+from models import db
 from services.account import AccountService
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.team import TeamService, TeamServiceError
-from utils.mail import prepare_email
+from utils.message import build_message_with_template
 from utils.upload import handle_upload, handle_post_upload, UploadError
 
 team_api = Blueprint('team_api', __name__)
@@ -47,20 +49,25 @@ def do_team(team_id):
                 return jsonify(msg='team creator required'), 403
 
             task = team.task
-            mail_args = dict(site=app.config['SITE'],
-                             operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                             team=team,
-                             task=task,
-                             term=task.term)
-            to_users = (a.user for a in team.user_associations)
-            mail = prepare_email('team_dismissed', to_list=[(u.name, u.email) for u in to_users], mail_args=mail_args)
+            msg_args = dict(site=app.config['SITE'],
+                            operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                            team=team,
+                            task=task,
+                            term=task.term)
+            msg_content = build_message_with_template('team_dismissed', msg_args)
+            msg_channel = MessageService.get_channel_by_name('team')
+            msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                             [ass.user for ass in team.user_associations])
 
             TeamService.dismiss(team)
             db.session.commit()
-            mail.send()
+            for mail in mails:
+                mail.send()
             return "", 204
     except (TeamServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @team_api.route('/<int:team_id>/users', methods=['GET'])
@@ -142,29 +149,33 @@ def team_apply(team_id):
 
         task = team.task
         creator = team.creator
-        mail_args = dict(site=app.config['SITE'],
-                         requester_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                         recipient_name=creator.nickname if creator.nickname else creator.name,
-                         team=team,
-                         task=task,
-                         term=task.term)
+        msg_args = dict(site=app.config['SITE'],
+                        requester_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                        recipient_name=creator.nickname if creator.nickname else creator.name,
+                        team=team,
+                        task=task,
+                        term=task.term)
+        msg_channel = MessageService.get_channel_by_name('team')
 
         if request.method == 'PUT':
-            mail = prepare_email('team_join_requested', to_list=[(creator.name, creator.email)], mail_args=mail_args)
+            msg_content = build_message_with_template('team_join_requested', msg_args)
+            msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, creator)
 
             TeamService.apply_join(team, user)
-            db.session.commit()
-            mail.send()
         else:  # DELETE
-            mail = prepare_email('team_join_request_cancelled', to_list=[(creator.name, creator.email)],
-                                 mail_args=mail_args)
+            msg_content = build_message_with_template('team_join_request_cancelled', msg_args)
+            msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, creator)
 
             TeamService.handle_join_application(team, user, False)
-            db.session.commit()
+
+        db.session.commit()
+        if mail:
             mail.send()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @team_api.route('/<int:team_id>/handle-join/<int:applicant_id>', methods=['PUT', 'DELETE'])
@@ -184,27 +195,31 @@ def team_apply_accept(team_id, applicant_id):
             return jsonify(msg='applicant not found'), 404
 
         task = team.task
-        mail_args = dict(site=app.config['SITE'],
-                         operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                         recipient_name=applicant.nickname if applicant.nickname else applicant.name,
-                         team=team,
-                         task=task,
-                         term=task.term)
+        msg_args = dict(site=app.config['SITE'],
+                        operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                        recipient_name=applicant.nickname if applicant.nickname else applicant.name,
+                        team=team,
+                        task=task,
+                        term=task.term)
+        msg_channel = MessageService.get_channel_by_name('team')
 
         is_accepted = request.method == 'PUT'
         if is_accepted:
-            mail = prepare_email('team_join_request_accepted', to_list=[(applicant.name, applicant.email)],
-                                 mail_args=mail_args)
+            msg_content = build_message_with_template('team_join_request_accepted', msg_args)
+            msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, applicant)
         else:
-            mail = prepare_email('team_join_request_rejected', to_list=[(applicant.name, applicant.email)],
-                                 mail_args=mail_args)
+            msg_content = build_message_with_template('team_join_request_rejected', msg_args)
+            msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, applicant)
 
         TeamService.handle_join_application(team, applicant, is_accepted)
         db.session.commit()
-        mail.send()
+        if mail:
+            mail.send()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @team_api.route('/<int:team_id>/leave', methods=['PUT'])
@@ -220,20 +235,25 @@ def team_leave(team_id):
 
         task = team.task
         creator = team.creator
-        mail_args = dict(site=app.config['SITE'],
-                         member_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                         recipient_name=creator.nickname if creator.nickname else creator.name,
-                         team=team,
-                         task=task,
-                         term=task.term)
-        mail = prepare_email('team_member_leave', to_list=[(creator.name, creator.email)], mail_args=mail_args)
+        msg_args = dict(site=app.config['SITE'],
+                        member_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                        recipient_name=creator.nickname if creator.nickname else creator.name,
+                        team=team,
+                        task=task,
+                        term=task.term)
+        msg_content = build_message_with_template('team_member_leave', msg_args)
+        msg_channel = MessageService.get_channel_by_name('team')
+        msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, creator)
 
         TeamService.leave(team, user)
         db.session.commit()
-        mail.send()
+        if mail:
+            mail.send()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @team_api.route('/<int:team_id>/kick-out/<int:uid>', methods=['PUT'])
@@ -253,21 +273,25 @@ def team_kick_out(team_id, uid):
             return jsonify(msg='target user not found'), 404
 
         task = team.task
-        mail_args = dict(site=app.config['SITE'],
-                         operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                         recipient_name=target_user.nickname if target_user.nickname else target_user.name,
-                         team=team,
-                         task=task,
-                         term=task.term)
-        mail = prepare_email('team_kicked_out', to_list=[(target_user.name, target_user.email)],
-                             mail_args=mail_args)
+        msg_args = dict(site=app.config['SITE'],
+                        operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                        recipient_name=target_user.nickname if target_user.nickname else target_user.name,
+                        team=team,
+                        task=task,
+                        term=task.term)
+        msg_channel = MessageService.get_channel_by_name('team')
+        msg_content = build_message_with_template('team_kicked_out', msg_args)
+        msg, mail = MessageSenderService.send_to_user(msg_channel, task.term, msg_content, None, target_user)
 
         TeamService.leave(team, target_user)
         db.session.commit()
-        mail.send()
+        if mail:
+            mail.send()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @team_api.route('/<int:team_id>/finalise', methods=['PUT'])
@@ -284,17 +308,23 @@ def team_finalise(team_id):
             return jsonify(msg='team creator required'), 403
 
         task = team.task
-        mail_args = dict(site=app.config['SITE'],
-                         operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                         team=team,
-                         task=task,
-                         term=task.term)
-        to_users = (a.user for a in team.user_associations)
-        mail = prepare_email('team_finalised', to_list=[(u.name, u.email) for u in to_users], mail_args=mail_args)
+        msg_args = dict(site=app.config['SITE'],
+                        operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                        team=team,
+                        task=task,
+                        term=task.term)
+        msg_channel = MessageService.get_channel_by_name('team')
+        msg_content = build_message_with_template('team_finalised', msg_args)
+
+        msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                         [ass.user for ass in team.user_associations])
 
         TeamService.finalise(team)
         db.session.commit()
-        mail.send()
+        for mail in mails:
+            mail.send()
         return "", 204
     except TeamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageSenderServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
