@@ -1,6 +1,9 @@
 <mj-section>
   <mj-column>
     <mj-text align="center">
+      <a class='link' href='https://kg.cse.unsw.edu.au/submit/email-subscriptions'>Manage Email Subscriptions</a>
+    </mj-text>
+    <mj-text align="center">
     	<a class='link' href='https://kg.cse.unsw.edu.au/'>Home</a> |
       <a class='link' href='https://kg.cse.unsw.edu.au/id/'>Identity System</a> |
       <a class='link' href='https://kg.cse.unsw.edu.au/submit/'>Submission System</a>
