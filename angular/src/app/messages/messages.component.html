@@ -1,0 +1,89 @@
+<div class="top fixed message container">
+  <div class="content">
+    <app-error-message [error]="error"></app-error-message>
+  </div>
+</div>
+
+<div class="ui text loader active" *ngIf="loadingMessages">Loading messages...</div>
+
+<div *ngIf="messages" class="sub wrapper">
+  <div class="header container">
+    <h1 class="ui header">
+      <i class="icon envelope"></i> Messages
+    </h1>
+  </div>
+  <div class="ui title divider"></div>
+
+
+  <div class="main container">
+
+    <div class="content">
+      <div class="ui grid stackable">
+        <div class="column">
+          <ng-container *ngIf="messages.length; else noMessages">
+            <table class="ui table unstackable compact">
+              <thead>
+              <tr><th>ID</th><th>Status</th><th>Sender</th><th>Subject</th><th>Time</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let msg of messages" [ngClass]="{'active': msg.is_read}">
+                <td>{{msg.id}}</td>
+                <td>
+                  <i class="icon envelope outline" [ngClass]="{'open': msg.is_read}"></i>
+                </td>
+                <td>
+                  <ng-container *ngIf="msg.sender; else fromSystem">
+                    <img class="ui avatar image" src="{{msg.sender.avatar}}?size=64" *ngIf="msg.sender.avatar; else userIcon">
+                    <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+                    {{ msg.sender.nickname || msg.sender.name }}
+                  </ng-container>
+                  <ng-template #fromSystem>System</ng-template>
+                </td>
+                <td>{{msg.subject}}</td>
+                <td>{{msg._created_from_now}}</td>
+                <td>
+                  <div class="ui mini buttons">
+                    <a class="ui button" [routerLink]="msg.id.toString()" [ngClass]="{'basic grey': msg.is_read}">Open</a>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </ng-container>
+
+          <ng-template #noMessages>
+            <div class="ui segment placeholder">
+              <div class="ui icon header">
+                <i class="icon envelope open"></i>
+                Your message box is empty.
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-bar">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui form">
+            <div class="grouped fields">
+              <div class="field">
+                <div class="ui toggle checkbox">
+                  <input class="hidden" type="checkbox" name="enableMessageRefresh" #checkboxEnableMessageRefresh [(ngModel)]="termService.enableMessageRefresh">
+                  <label (click)="checkboxEnableMessageRefresh.click()">Enable Auto Refresh</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a class="ui button fluid" routerLink="/email-subscriptions"><i class="icon bell"></i> Manage Email Notifications</a>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+

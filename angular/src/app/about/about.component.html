@@ -1,0 +1,28 @@
+<div class="ui container full-height">
+  <div class="ui middle aligned centered padded stackable grid">
+    <div class="six wide column">
+
+      <app-error-message [error]="error"></app-error-message>
+
+      <div class="ui raised segment">
+        <h3 class="ui center aligned icon header">
+          <img src="static/assets/logo-256.png">
+          <div class="content">
+            UNSWKG Submit
+            <div class="sub header" *ngIf="version">Version: {{version.commit}}</div>
+            <div class="sub header">Author: <a href="https://github.com/tjumyk" target="_blank">Yukai (Kelvin) Miao</a></div>
+            <div class="sub header">Copyright &copy; <a href="https://kg.cse.unsw.edu.au" target="_blank">UNSW Knowledge Graph Group</a></div>
+          </div>
+        </h3>
+
+      </div>
+
+      <div class="ui grid center aligned">
+        <div class="column">
+          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> Back</a>
+          <a class="ui basic button" routerLink="/"><i class="icon home"></i> Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

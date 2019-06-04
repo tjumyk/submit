@@ -1,0 +1,62 @@
+<div class="header container">
+  <a routerLink=".."><i class="icon left arrow"></i> Messages</a>
+  <h1 class="ui header">
+    <i class="icon envelope outline" [ngClass]="{'open': message && message.is_read}"></i>
+    <ng-container *ngIf="message">{{message.subject}}</ng-container>
+  </h1>
+</div>
+<div class="ui divider"></div>
+
+<div class="main container">
+  <div class="ui grid stackable">
+    <div class="column">
+
+      <app-error-message [error]="error"></app-error-message>
+      <div class="ui text loader active" *ngIf="loadingMessage">Loading message...</div>
+
+      <ng-container *ngIf="message">
+        <div class="ui segment secondary">
+          <div class="ui horizontal list">
+            <div class="item">
+              <div class="header">ID</div>
+              {{message.id}}
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Sender</div>
+                <ng-container *ngIf="message.sender; else fromSystem">
+                  <img class="ui avatar image" src="{{message.sender.avatar}}?size=64" *ngIf="message.sender.avatar; else userIcon">
+                  <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+                  {{ message.sender.nickname || message.sender.name }}
+                </ng-container>
+                <ng-template #fromSystem>System</ng-template>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Receiver</div>
+                <ng-container *ngIf="message.receiver; else noReceiver">
+                  <img class="ui avatar image" src="{{message.receiver.avatar}}?size=64" *ngIf="message.receiver.avatar; else userIcon">
+                  <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+                  {{ message.receiver.nickname || message.receiver.name }}
+                </ng-container>
+                <ng-template #noReceiver>
+                  <ng-container *ngIf="message.receiver_group">
+                    <i class="icon users"></i>
+                    {{ message.receiver_group.description || message.receiver_group.name }}
+                  </ng-container>
+                </ng-template>
+              </div>
+            </div>
+            <div class="item">
+              <div class="header">Time</div>
+              {{message.created_at|date:'medium'}}
+              ({{message._created_from_now}})
+            </div>
+          </div>
+        </div>
+        <div class="ui segment" [innerHTML]="message.body"></div>
+      </ng-container>
+    </div>
+  </div>
+</div>

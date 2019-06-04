@@ -135,9 +135,10 @@ export class HomeComponent implements OnInit {
       }
     }
 
-    if (!this.isAdmin && totalTermEntries == 1) {
-      this.router.navigate([`terms/${lastTermEntry.id}`], {relativeTo: this.route})
-    }
+    // // automatic redirect
+    // if (!this.isAdmin && totalTermEntries == 1) {
+    //   this.router.navigate([`terms/${lastTermEntry.id}`], {relativeTo: this.route})
+    // }
   }
 
   goDefault(courseId: number) {

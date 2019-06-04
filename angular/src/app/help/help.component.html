@@ -1,0 +1,37 @@
+<div class="ui container full-height">
+  <div class="ui middle aligned centered padded stackable grid">
+    <div class="ten wide column">
+      <app-error-message [error]="error"></app-error-message>
+
+      <div class="ui raised segment">
+        <div class="ui text loader inline centered active" *ngIf="loadingFAQ">Loading FAQ...</div>
+
+        <ng-container *ngIf="faq">
+          <h3 class="ui center aligned fluid header">
+            <i class="icon question circle"></i>
+            FAQ
+          </h3>
+
+          <div class="ui list">
+            <div class="item" *ngFor="let qa of faq">
+              <i class="icon right triangle"></i>
+              <div class="content">
+                <div class="header">{{qa.question}}</div>
+                <div class="description">{{qa.answer}}</div>
+              </div>
+            </div>
+          </div>
+
+          <p>If you have any further questions, please don't hesitate to contact the tutors or system administrators.</p>
+        </ng-container>
+      </div>
+
+      <div class="ui grid center aligned">
+        <div class="column">
+          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> Back</a>
+          <a class="ui basic button" routerLink="/"><i class="icon home"></i> Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

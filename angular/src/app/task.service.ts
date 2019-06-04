@@ -44,7 +44,7 @@ export class TaskService {
   static categories: { [key: string]: CategoryInfo } = {
     lab: {
       name: 'Labs',
-      icon: 'flask'
+      icon: 'lightbulb outline'
     },
     assignment: {
       name: 'Assignments',
@@ -52,7 +52,7 @@ export class TaskService {
     },
     project: {
       name: 'Projects',
-      icon: 'wrench'
+      icon: 'rocket'
     }
   };
 

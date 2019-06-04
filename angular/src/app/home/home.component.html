@@ -1,52 +1,48 @@
 <div class="ui container">
   <div class="ui middle aligned centered padded stackable grid">
-    <div class="ten wide column">
-      <div class="ui padded raised segment">
-        <h2 class="ui center aligned fluid header">
-          <img src="static/assets/logo-256.png">
-          UNSWKG Submit
-        </h2>
-        <app-error-message [error]="error"></app-error-message>
-        <div class="ui active inline centered text loader" *ngIf="loadingUser || loadingCourses">
-          <span *ngIf="loadingUser; else loadingCoursesHint">Loading user info...</span>
-          <ng-template #loadingCoursesHint>Loading courses...</ng-template>
-        </div>
-        <div *ngIf="entries" class="ui center aligned four column doubling grid">
-          <div class="column" *ngFor="let item of entries | keyvalue">
-            <div class="ui fluid card">
-              <div class="image" *ngIf="courseMap[item.key].icon">
-                <img [src]="courseMap[item.key].icon">
-              </div>
-              <div class="content">
-                <div class="header">{{ courseMap[item.key].code }}</div>
-                <div class="meta">
-                  {{ courseMap[item.key].name }}
-                </div>
-              </div>
-              <div class="ui menu vertical bottom attached">
-                <a class="item" *ngFor="let term of item.value" routerLink="terms/{{ term.id }}">
-                  <span>{{ term.year }} </span>
-                  <span>Semester {{ term.semester }}</span>
-                </a>
+    <div class="six wide column">
+      <h2 class="ui center aligned fluid header">
+        <img src="static/assets/logo-256.png">
+        UNSWKG Submit
+      </h2>
+      <app-error-message [error]="error"></app-error-message>
+      <div class="ui active inline centered text loader" *ngIf="loadingUser || loadingCourses">
+        <span *ngIf="loadingUser; else loadingCoursesHint">Loading user info...</span>
+        <ng-template #loadingCoursesHint>Loading courses...</ng-template>
+      </div>
+      <ng-container *ngIf="entries">
+        <div class="ui raised segment" *ngFor="let item of entries | keyvalue">
+          <h2 class="ui header">
+            <img class="ui image" *ngIf="courseMap[item.key].icon" [src]="courseMap[item.key].icon">
+            <div class="content">
+              {{ courseMap[item.key].code }}
+              <div class="sub header">
+                {{ courseMap[item.key].name }}
               </div>
             </div>
+          </h2>
+          <div class="ui menu vertical fluid">
+            <a class="item" *ngFor="let term of item.value" routerLink="terms/{{ term.id }}">
+              <i class="icon angle right"></i>
+              <span>{{ term.year }} </span>
+              <span>Semester {{ term.semester }}</span>
+            </a>
           </div>
         </div>
-        <div *ngIf="entries" class="ui center aligned grid">
-          <div class="column">
-            <p>
-              <a class="ui violet button basic" routerLink="admin" *ngIf="isAdmin"><i class="icon cogs"></i> Management</a>
-            </p>
-            <p>
-              <a class="ui button basic" *ngIf="user" href="account/profile" target="_blank">
-                <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
-                <ng-template #userIcon><i class="icon user circle"></i></ng-template>
-                {{ user.nickname || user.name }}
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
+
+        <p>
+          <a class="ui violet fluid button basic" routerLink="admin" *ngIf="isAdmin"><i class="icon cogs"></i> Management</a>
+        </p>
+
+        <p>
+          <a class="ui basic button fluid" *ngIf="user" href="account/profile" target="_blank">
+            <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
+            <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+            {{ user.nickname || user.name }}
+          </a>
+        </p>
+
+      </ng-container>
     </div>
   </div>
 </div>

@@ -32,6 +32,11 @@ import {TeamSubmissionDetailsComponent} from "./team-submission-details/team-sub
 import {JoinOrCreateTeamComponent} from "./join-or-create-team/join-or-create-team.component";
 import {TaskPreviewComponent} from "./task-preview/task-preview.component";
 import {TaskDetailsPreviewComponent} from "./task-details-preview/task-details-preview.component";
+import {MessagesComponent} from "./messages/messages.component";
+import {HelpComponent} from "./help/help.component";
+import {AboutComponent} from "./about/about.component";
+import {MessageDetailComponent} from "./message-detail/message-detail.component";
+import {EmailSubscriptionsComponent} from "./email-subscriptions/email-subscriptions.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -73,7 +78,9 @@ const routes: Routes = [
           {path: 'teams', component: TeamsComponent},
           {path: 'teams/:team_id', component: TeamComponent}
         ]
-      }
+      },
+      {path: 'messages', component: MessagesComponent},
+      {path: 'messages/:msg_id', component: MessageDetailComponent}
     ]
   },
   {
@@ -90,6 +97,9 @@ const routes: Routes = [
       {path: 'tasks/:task_id', component: AdminTaskEditComponent},
     ]
   },
+  {path: 'email-subscriptions', component: EmailSubscriptionsComponent},
+  {path: 'help', component: HelpComponent},
+  {path: 'about', component: AboutComponent},
   {path: 'forbidden', component: ForbiddenComponent},
   {path: '**', component: NotFoundComponent}
 ];

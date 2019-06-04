@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, SuccessMessage, Term, User} from "../models";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ErrorMessage, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
@@ -11,7 +11,7 @@ import {TitleService} from "../title.service";
   templateUrl: './term.component.html',
   styleUrls: ['./term.component.less']
 })
-export class TermComponent implements OnInit {
+export class TermComponent implements OnInit, OnDestroy {
   error: ErrorMessage;
 
   termId: number;
@@ -20,6 +20,13 @@ export class TermComponent implements OnInit {
 
   user: User;
   isAdmin: boolean;
+  accessRoles: Set<string>;
+
+  checking_messages: boolean;
+  message_check_handler: number;
+  messages_unread_count: number;
+
+  showMobileMenu: boolean;
 
   constructor(
     private accountService: AccountService,
@@ -43,6 +50,10 @@ export class TermComponent implements OnInit {
           term => {
             this.term = term;
             this.titleService.setTitle(`${term.year}S${term.semester}`, term.course.code);
+
+            this.accessRoles = TermService.getAccessRoles(this.term, this.user);
+
+            this.setupMessageCheck();
           },
           error => this.error = error.error
         )
@@ -50,6 +61,35 @@ export class TermComponent implements OnInit {
       error=>this.error=error.error
     );
 
+  }
+
+  ngOnDestroy(){
+    clearInterval(this.message_check_handler)
+  }
+
+  resetMobileMenu() {
+    this.showMobileMenu = false
+  }
+
+  setupMessageCheck(){
+    const messageChecker = ()=>{
+      if(!this.termService.enableMessageRefresh)
+        return;
+
+      this.checking_messages = true;
+      this.termService.getUnreadMessagesCount(this.termId).pipe(
+        finalize(() => this.checking_messages = false)
+      ).subscribe(
+        count => this.messages_unread_count = count,
+        error => {
+          this.error = error.error;
+          clearInterval(this.message_check_handler)
+        }
+      )
+    };
+
+    messageChecker();
+    this.message_check_handler = setInterval(messageChecker, 30000);
   }
 
 }

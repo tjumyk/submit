@@ -1,38 +1,73 @@
-<div class="ui container">
-  <div class="ui loader text active" *ngIf="loadingTerm">Loading term info...</div>
+<div class="top fixed message container">
+  <div class="content">
+    <app-error-message [error]="error"></app-error-message>
+  </div>
+</div>
 
-  <div class="ui grid stackable">
-    <div class="column">
-      <app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingTerm">Loading term info...</div>
 
-      <div *ngIf="term">
-        <h2 class="ui header">
-          <img [src]="term.course.icon" *ngIf="term.course.icon; else defaultIcon">
-          <ng-template #defaultIcon><i class="icon book"></i></ng-template>
-          <div class="content">
-            {{ term.course.code }} <span class="term-name">{{ term.course.name }}</span>
-            <div class="sub header">
-              {{ term.year }} Semester {{ term.semester }}
+<ng-container *ngIf="term">
+  <div class="ui top fixed inverted icon mobile menu" [ngClass]="{'pushed': showMobileMenu}">
+    <a class="item" (click)="showMobileMenu=!showMobileMenu"><i class="icon bars"></i></a>
+    <div class="item">{{term.course.code}} - {{term.year}}S{{term.semester}} </div>
+  </div>
+
+  <div class="main wrapper" [ngClass]="{'pushed': showMobileMenu}">
+    <div class="toc">
+      <div class="ui vertical inverted fluid main menu">
+        <a class="item" routerLink="/" (click)="resetMobileMenu()">
+          <i class="icon home"></i> Home
+        </a>
+        <a class="item" routerLink="/terms/{{term.id}}" (click)="resetMobileMenu()">
+          <h3 class="ui inverted term header">
+            <img [src]="term.course.icon" *ngIf="term.course.icon; else defaultIcon">
+            <ng-template #defaultIcon><i class="icon book"></i></ng-template>
+            <div class="content">
+              <span title="{{ term.course.name }}">{{ term.course.code }}</span>
+              <div class="sub header">
+                {{ term.year }} Semester {{ term.semester }}
+              </div>
             </div>
-          </div>
-        </h2>
-
-        <div class="ui menu stackable">
-          <a class="item" routerLink="/"><i class="icon home"></i> Home</a>
-          <a routerLink="tasks" class="item" routerLinkActive="active"><i class="icon tasks"></i> Tasks</a>
-          <div class="right menu">
-            <a routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" class="item"><i class="icon cogs"></i>Management</a>
-            <a class="item" *ngIf="user" href="account/profile" target="_blank">
-              <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
-              <ng-template #userIcon><i class="icon user circle"></i></ng-template>
-              {{ user.nickname || user.name }}
+          </h3>
+        </a>
+        <a class="item" routerLink="/terms/{{term.id}}/tasks" routerLinkActive="active" (click)="resetMobileMenu()">
+          <i class="icon map outline"></i> Tasks
+        </a>
+        <a class="item" routerLink="/terms/{{term.id}}/messages" routerLinkActive="active" (click)="resetMobileMenu()">
+          <i class="icon envelope"></i> Messages
+          <div class="ui green label" *ngIf="messages_unread_count">{{messages_unread_count}}</div>
+        </a>
+      </div>
+      <div class="ui inverted vertical fluid bottom menu">
+        <a class="item" routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" routerLinkActive="active" (click)="resetMobileMenu()">
+          <i class="icon cogs"></i>Management
+        </a>
+        <a class="item" *ngIf="user" href="account/profile" target="_blank" (click)="resetMobileMenu()">
+          <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
+          <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+          {{ user.nickname || user.name }}
+        </a>
+        <div class="item">
+          <div class="bottom-buttons">
+            <a class="ui circular icon inverted small button" routerLink="/email-subscriptions" title="Email Subscriptions" (click)="resetMobileMenu()">
+              <i class="icon bell"></i>
+            </a>
+            <a class="ui circular icon inverted small button" routerLink="/help" title="Help" (click)="resetMobileMenu()">
+              <i class="icon question"></i>
+            </a>
+            <a class="ui circular icon inverted small button" routerLink="/about" title="About" (click)="resetMobileMenu()">
+              <i class="icon info"></i>
             </a>
           </div>
         </div>
+      </div>
+    </div>
 
+    <div class="content">
+      <div class="scroll wrapper">
+        <div class="ui inverted dimmer" (click)="resetMobileMenu()" [ngClass]="{'active': showMobileMenu}"></div>
         <router-outlet></router-outlet>
       </div>
-
     </div>
   </div>
-</div>
+</ng-container>

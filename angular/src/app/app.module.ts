@@ -48,6 +48,11 @@ import { SubmissionsTableComponent } from './submissions-table/submissions-table
 import { AutoTestConclusionCardComponent } from './auto-test-conclusion-card/auto-test-conclusion-card.component';
 import { TablePaginationToolbarComponent } from './table-pagination-toolbar/table-pagination-toolbar.component';
 import { RunAutoTestCardComponent } from './run-auto-test-card/run-auto-test-card.component';
+import { MessagesComponent } from './messages/messages.component';
+import { HelpComponent } from './help/help.component';
+import { AboutComponent } from './about/about.component';
+import { MessageDetailComponent } from './message-detail/message-detail.component';
+import { EmailSubscriptionsComponent } from './email-subscriptions/email-subscriptions.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +99,11 @@ import { RunAutoTestCardComponent } from './run-auto-test-card/run-auto-test-car
     AutoTestConclusionCardComponent,
     TablePaginationToolbarComponent,
     RunAutoTestCardComponent,
+    MessagesComponent,
+    HelpComponent,
+    AboutComponent,
+    MessageDetailComponent,
+    EmailSubscriptionsComponent,
   ],
   imports: [
     BrowserModule,

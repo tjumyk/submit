@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
-import {Term, Task, User} from "./models";
+import {Message, Task, Term, User} from "./models";
 import {tap} from "rxjs/operators";
 
 @Injectable({
@@ -10,6 +10,9 @@ import {tap} from "rxjs/operators";
 export class TermService {
   private api = 'api/terms';
   private termCaches: {[key: number]: Term} = {};
+  private tasksCaches: { [key: number]: Task[] } = {};
+
+  enableMessageRefresh: boolean = true;
 
   constructor(
     private http: HttpClient
@@ -44,6 +47,28 @@ export class TermService {
   }
 
   getTasks(term_id: number): Observable<Task[]>{
-    return this.http.get<Task[]>(`${this.api}/${term_id}/tasks`)
+    return this.http.get<Task[]>(`${this.api}/${term_id}/tasks`).pipe(
+      tap(tasks => this.tasksCaches[term_id] = tasks)
+    )
+  }
+
+  getCachedTasks(term_id: number): Observable<Task[]> {
+    const tasks = this.tasksCaches[term_id];
+    if (tasks)
+      return of(tasks);
+    return this.getTasks(term_id);
+  }
+
+  getMessages(term_id: number): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.api}/${term_id}/messages`)
+  }
+
+  getMessagesAfterId(term_id: number, message_id: number): Observable<Message[]> {
+    let params = new HttpParams().append('after_id', message_id.toString());
+    return this.http.get<Message[]>(`${this.api}/${term_id}/messages`, {params: params})
+  }
+
+  getUnreadMessagesCount(term_id: number): Observable<number> {
+    return this.http.get<number>(`${this.api}/${term_id}/unread-messages-count`)
   }
 }

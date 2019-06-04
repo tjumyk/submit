@@ -23,6 +23,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   taskCategories: {[key: string]: Task[]} = {};
 
   user: User;
+  isAdmin: boolean;
   term: Term;
   accessRoles: Set<string>;
   categories = TaskService.categories;
@@ -45,6 +46,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.accountService.getCurrentUser().subscribe(
       user=>{
         this.user = user;
+        this.isAdmin = AccountService.isAdmin(user);
 
         this.termId = parseInt(this.route.snapshot.parent.paramMap.get('term_id'));
         this.termService.getCachedTerm(this.termId).subscribe(

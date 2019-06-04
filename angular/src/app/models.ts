@@ -1,12 +1,12 @@
-export class Message {
+export class BasicMessage {
   msg: string;
   detail?: string;
 }
 
-export class SuccessMessage extends Message {
+export class SuccessMessage extends BasicMessage {
 }
 
-export class ErrorMessage extends Message {
+export class ErrorMessage extends BasicMessage {
 }
 
 export class User {
@@ -290,4 +290,54 @@ export class AutoTestOutputFile {
   modified_at: string;
 
   auto_test?: AutoTest;
+}
+
+
+export class MessageChannel{
+  id: number;
+  name: string;
+  description: string;
+
+  // additional info
+  is_subscribed: boolean;
+}
+
+export class Message{
+  id: number;
+  channel_id: number;
+  sender_id: number;
+  receiver_id: number;
+  receiver_group_id: number;
+
+  subject: string;
+  body: string;
+
+  created_at: string;
+
+  channel?: MessageChannel;
+  sender?: User;
+  receiver?: User;
+  receiver_group?: Group;
+
+  // additional info
+  is_read: boolean;
+}
+
+export class EmailSubscription{
+  user_id: number;
+  channel_id: number;
+
+  created_at: string;
+
+  user?: User;
+  channel?: MessageChannel;
+}
+
+export class VersionInfo{
+  commit: string;
+}
+
+export class QAndA{
+  question: string;
+  answer: string;
 }

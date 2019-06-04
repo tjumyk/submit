@@ -1,38 +1,57 @@
-<app-success-message [success]="success"></app-success-message>
-<app-error-message [error]="error"></app-error-message>
-<div class="ui text loader active inline centered" *ngIf="loadingTask">Loading task info...</div>
-
-<div *ngIf="task">
-  <div class="ui breadcrumb">
-    <a routerLink="../.." class="section">Tasks</a>
-    <i class="icon divider right angle"></i>
-    <div class="section">{{category.name}}</div>
-    <i class="icon divider right angle"></i>
-    <div class="section active">{{task.title}}</div>
+<div class="top fixed message container">
+  <div class="content">
+    <app-success-message [success]="success"></app-success-message>
+    <app-error-message [error]="error"></app-error-message>
   </div>
+</div>
 
-  <div class="ui message warning" *ngIf="beforeOpen">
-    <i class="icon exclamation triangle"></i> The students have no access to this page until the opening time. However, they can see limited information via
-    <a routerLink="../../tasks-preview/{{taskId}}">this preview page</a>.
-  </div>
+<div class="ui text loader active" *ngIf="loadingTask">Loading task info...</div>
 
-  <div class="ui header">
-    <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
-    <div class="content">
-      {{ task.title }}
-      <div class="sub header">
-        {{ task.type | titlecase }}
+<div *ngIf="task" class="sub wrapper">
+  <div class="header container">
+    <a routerLink="/terms/{{term.id}}/tasks"><i class="icon left arrow"></i> Tasks</a>
+    <h1 class="ui header">
+      <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
+      <div class="content">
+        {{ task.title }}
       </div>
-    </div>
+    </h1>
   </div>
+  <div class="ui title divider"></div>
 
   <ng-template #timeTbd>TBD</ng-template>
   <ng-template #no>No</ng-template>
   <ng-template #noLimit>No limit</ng-template>
 
-  <div class="ui grid stackable">
-    <!--Left Panel-->
-    <div class="four wide column">
+  <div class="main container">
+
+    <div class="content">
+      <div class="ui grid stackable">
+        <div class="column">
+          <div class="ui message warning" *ngIf="beforeOpen">
+            <i class="icon exclamation triangle"></i> The students have no access to this page until the opening time. However, they can see limited information via
+            <a routerLink="../../tasks-preview/{{taskId}}">this preview page</a>.
+          </div>
+
+          <div class="ui pointing menu stackable">
+            <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
+            <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
+            <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</a>
+            <a routerLink="my-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> My Submissions</a>
+            <a routerLink="my-team-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> Team Submissions</a>
+            <div class="menu right" *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')">
+              <a routerLink="teams" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon users"></i> Teams</a>
+              <a routerLink="user-submissions" routerLinkActive="active" class="item" *ngIf="!task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
+              <a routerLink="team-submissions" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
+            </div>
+          </div>
+
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-bar">
       <div class="ui segments">
         <!--Start of Time info-->
         <div class="ui segment">
@@ -71,11 +90,11 @@
                       <div class="item" *ngFor="let segment of latePenalty.segments">
                         <div class="content">
                           <ng-container *ngIf="segment.toDay!=null; else endlessSegment">
-                              <ng-container *ngIf="segment.fromDay!=segment.toDay; else oneDaySegment">
-                                <div class="header">{{segment.fromDay|ordinal}}-{{segment.toDay|ordinal}} day</div>
-                                <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
-                              </ng-container>
+                            <ng-container *ngIf="segment.fromDay!=segment.toDay; else oneDaySegment">
+                              <div class="header">{{segment.fromDay|ordinal}}-{{segment.toDay|ordinal}} day</div>
+                              <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}} per day</div>
                             </ng-container>
+                          </ng-container>
                           <ng-template #oneDaySegment>
                             <div class="header">{{segment.fromDay|ordinal}} day</div>
                             <div class="description">-{{segment.penaltyPerDay | percent: '1.0-3'}}</div>
@@ -185,34 +204,16 @@
           </div>
         </div>
         <!--End of Submission Info-->
-      </div>
 
-
-      <div class="ui menu vertical fluid" *ngIf="accessRoles.has('admin')">
-        <a class="item" routerLink="/admin/tasks/{{task.id}}">
-          <i class="icon cog"></i> Configurations
-        </a>
-      </div>
-    </div>
-    <!--End of Left Panel-->
-
-    <!--Right Panel-->
-    <div class="twelve wide column">
-      <div class="ui pointing menu stackable">
-        <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
-        <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
-        <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</a>
-        <a routerLink="my-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> My Submissions</a>
-        <a routerLink="my-team-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> Team Submissions</a>
-        <div class="menu right" *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')">
-          <a routerLink="teams" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon users"></i> Teams</a>
-          <a routerLink="user-submissions" routerLinkActive="active" class="item" *ngIf="!task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
-          <a routerLink="team-submissions" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
+        <div class="ui segment" *ngIf="accessRoles.has('admin')">
+          <a class="ui button fluid" routerLink="/admin/tasks/{{task.id}}">
+            <i class="icon cog"></i> Configurations
+          </a>
         </div>
       </div>
-      <router-outlet></router-outlet>
+
     </div>
-    <!--End of Right Panel-->
+
 
   </div>
 

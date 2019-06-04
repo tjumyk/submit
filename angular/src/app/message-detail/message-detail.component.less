@@ -3,9 +3,8 @@
   flex-direction: column;
   height: 100%;
 }
-
 .header.container{
-  padding: 3em 3em 0;
+  padding: 1em 3em 0;
 }
 .main.container{
   margin: 0 3em;
@@ -14,27 +13,11 @@
     height: 100%;
   }
 }
-.task.column{
-  max-width: 400px;
-}
-.task-category{
-  margin-bottom: 3em;
-  &:last-child{
-    margin-bottom: 0;
-  }
-}
-.task-description{
-  white-space: pre-line;
-}
-
 @media (max-width: 767px){
   .header.container{
     padding: 3em 1em 0;
   }
   .main.container{
     margin: 0;
-  }
-  .task.column{
-    max-width: none;
   }
 }
