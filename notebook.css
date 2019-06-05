@@ -5,7 +5,6 @@ body{
 #notebook-container{
     padding: 0;
     box-shadow: none;
-    -webkit-box-shadow: none;
 }
 div#notebook{
     padding-top: 0;
@@ -21,13 +20,12 @@ body ::-webkit-scrollbar {
 }
 body ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 0px;
+    border-radius: 0;
 }
 body ::-webkit-scrollbar-thumb {
     cursor: pointer;
     border-radius: 5px;
     background: rgba(0, 0, 0, 0.25);
-    -webkit-transition: color 0.2s ease;
     transition: color 0.2s ease;
 }
 body ::-webkit-scrollbar-thumb:window-inactive {
@@ -38,6 +36,10 @@ body ::-webkit-scrollbar-thumb:hover {
 }
 
 /* selection */
+::-moz-selection {
+    background-color: #cce2ff;
+    color: rgba(0,0,0,.87);
+}
 ::selection {
     background-color: #cce2ff;
     color: rgba(0,0,0,.87);
