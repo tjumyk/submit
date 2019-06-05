@@ -1,3 +1,5 @@
+import {SafeResourceUrl} from "@angular/platform-browser";
+
 export class BasicMessage {
   msg: string;
   detail?: string;
@@ -340,4 +342,14 @@ export class VersionInfo{
 export class QAndA{
   question: string;
   answer: string;
+}
+
+export class NotebookPreview{
+  material_id: number;
+  md5: string;
+  name: string;
+
+  // additional
+  material?: Material;
+  url?: SafeResourceUrl;
 }

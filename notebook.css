@@ -1,0 +1,44 @@
+/* reset */
+body{
+    padding: 0;
+}
+#notebook-container{
+    padding: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+div#notebook{
+    padding-top: 0;
+    height: 100%;
+    overflow: auto;
+}
+
+/* scroll bar */
+body ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+}
+body ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 0px;
+}
+body ::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.25);
+    -webkit-transition: color 0.2s ease;
+    transition: color 0.2s ease;
+}
+body ::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(0, 0, 0, 0.15);
+}
+body ::-webkit-scrollbar-thumb:hover {
+    background: rgba(128, 135, 139, 0.8);
+}
+
+/* selection */
+::selection {
+    background-color: #cce2ff;
+    color: rgba(0,0,0,.87);
+}

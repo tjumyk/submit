@@ -1,9 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Material, SuccessMessage, Task, Term, User} from "../models";
+import {ErrorMessage, Material, NotebookPreview, Task, Term, User} from "../models";
 import {TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
+import {MaterialService} from "../material.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 export class MaterialCategory {
   type: string;
@@ -61,11 +63,15 @@ export class TaskDetailsComponent implements OnInit {
     },
   ];
 
+  notebookPreviews: { [mid: number]: NotebookPreview[] } = {};
+
   constructor(
     private accountService: AccountService,
     private termService: TermService,
     private taskService: TaskService,
-    private route: ActivatedRoute
+    private materialService: MaterialService,
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {
   }
 
@@ -117,6 +123,23 @@ export class TaskDetailsComponent implements OnInit {
           items: items
         })
     }
+
+    this.setupNotebooksPreview();
   }
 
+  private setupNotebooksPreview() {
+    for (let mat of this.task.materials) {
+      if (mat.type == 'specification') {
+        this.materialService.getNotebooks(mat.id).subscribe(
+          notebooks => {
+            for (let nb of notebooks) {
+              nb.material = mat;
+              nb.url = this.sanitizer.bypassSecurityTrustResourceUrl(`api/materials/${nb.material_id}/notebooks/${nb.name}/`)
+            }
+            this.notebookPreviews[mat.id] = notebooks
+          }
+        );
+      }
+    }
+  }
 }

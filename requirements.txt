@@ -9,4 +9,5 @@ celery[redis]
 docker
 astunparse
 python-magic
-
+nbconvert
+IPython

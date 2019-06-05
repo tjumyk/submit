@@ -5,6 +5,15 @@
     {{ task.description }}
   </div>
 
+  <ng-container *ngFor="let item of notebookPreviews | keyvalue">
+    <div class="ui segment" *ngFor="let notebook of item.value">
+      <h4 class="ui header dividing">{{notebook.material.name}} >> {{notebook.name}}</h4>
+      <div class="ui embed">
+        <iframe [src]="notebook.url"></iframe>
+      </div>
+    </div>
+  </ng-container>
+
   <div class="ui segments" *ngIf="materialCategories.length">
     <div class="ui segment" *ngFor="let category of materialCategories">
       <h4 class="ui header">
