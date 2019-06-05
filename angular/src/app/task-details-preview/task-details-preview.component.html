@@ -4,4 +4,15 @@
   <div class="ui segment task-description" *ngIf="task.description">
     {{ task.description }}
   </div>
+
+  <div class="ui placeholder segment">
+    <div class="ui icon header">
+      <i class="icon clock outline"></i>
+      More details will be released
+      <ng-container *ngIf="task.open_time; else unknownOpenTime">
+        {{task._open_time_from_now}}.
+      </ng-container>
+      <ng-template #unknownOpenTime>when the task is open.</ng-template>
+    </div>
+  </div>
 </div>
