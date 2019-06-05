@@ -20,67 +20,41 @@
     </div>
   </ng-container>
 
-  <div class="ui segments" *ngIf="materialCategories.length">
-    <div class="ui segment" *ngFor="let category of materialCategories">
-      <h4 class="ui header">
-        <i class="icon" [ngClass]="category.icon"></i>
-        <div class="content">
-          {{ category.type | titlecase }}
-        </div>
-      </h4>
-      <ul class="ui list enhanced">
-        <li class="item" *ngFor="let mat of category.items">
+  <ng-container *ngIf="task.materials.length">
+    <div class="ui segment">
+      <div class="ui top attached blue label">Materials</div>
+      <div class="ui cards">
+        <a href="api/materials/{{mat.id}}/download" class="ui card" *ngFor="let mat of task.materials">
           <div class="content">
-            <div class="header"><a href="api/materials/{{mat.id}}/download">{{mat.name}}</a></div>
-            <i class="ui red lock icon" *ngIf="mat.is_private" title="Private"></i>
-            <i class="ui green play icon" *ngIf="mat.id == task.auto_test_environment_id" title="Active Auto Test Environment"></i>
-            <div class="metadata">
-              <span>Size: {{mat.size|size}}</span>
-              <span>MD5:
-                <span [attr.data-tooltip]="mat.md5" data-position="bottom center">
-                  {{mat.md5|slice:0:6}}
-                </span>
-              </span>
-              <span>Last Updated: {{mat.modified_at | date: 'short'}}</span>
+            <i class="ui right floated red lock icon" *ngIf="mat.is_private" title="Private"></i>
+            <div class="header"><i class="icon" [ngClass]="materialIcons[mat.type]" title="{{ mat.type | titlecase }}"></i> {{mat.name}}</div>
+            <div class="meta">
+              <span class="date">{{mat.modified_at | date: 'medium'}}</span>
             </div>
             <div class="description">{{mat.description}}</div>
           </div>
-        </li>
-      </ul>
-    </div>
-    <div class="ui segment center aligned" *ngIf="task.materials.length>1">
-      <a href="api/tasks/{{taskId}}/download-materials-zip" class="ui button primary basic">
-        <i class="icon file archive outline"></i>
-        Download All <span *ngIf="hasPrivateMaterial">Public</span> as Zip
-      </a>
-      <a href="api/tasks/{{taskId}}/download-materials-zip?include_private=true" class="ui button red basic" *ngIf="hasPrivateMaterial">
-        <i class="icon file archive outline"></i>
-        Download All as Zip
-      </a>
-    </div>
-  </div>
-
-  <div class="ui segment" *ngIf="task.file_requirements.length">
-    <h4 class="ui header">
-      <i class="icon paper plane outline"></i>
-      <div class="content">Submission Requirements</div>
-    </h4>
-    <ul class="ui list enhanced">
-      <li class="item" *ngFor="let req of task.file_requirements">
-        <div class="content">
-          <div class="header">{{req.name}}</div>
-          <a href="api/tasks/{{task.id}}/anti-plagiarism/{{req.id}}" target="_blank"
-             *ngIf="req.name.endsWith('.py') && (accessRoles.has('admin') || accessRoles.has('tutor'))" title="Anti-Plagiarism">
-            <i class="ui red shield alternate icon"></i>
-          </a>
-          <div class="metadata">
-            <span *ngIf="req.is_optional">(Optional)</span>
-            <span *ngIf="req.size_limit!=null; else noSizeLimit">Up to {{req.size_limit | size}}</span>
-            <ng-template #noSizeLimit>Unlimited size</ng-template>
+          <div class="extra content">
+            <span class="right floated">
+              {{mat.size|size}}
+            </span>
+            <span [title]="'MD5: ' + mat.md5">
+              <i class="icon hashtag"></i> {{mat.md5|slice:0:6}}
+            </span>
           </div>
-          <div class="description">{{req.description}}</div>
-        </div>
-      </li>
-    </ul>
-  </div>
+        </a>
+      </div>
+
+      <div class="material-actions" *ngIf="task.materials.length>1">
+        <div class="ui divider"></div>
+        <a href="api/tasks/{{taskId}}/download-materials-zip" class="ui button primary basic">
+          <i class="icon file archive outline"></i>
+          Download All <span *ngIf="hasPrivateMaterial">Public</span> as Zip
+        </a>
+        <a href="api/tasks/{{taskId}}/download-materials-zip?include_private=true" class="ui button red basic" *ngIf="hasPrivateMaterial">
+          <i class="icon file archive outline"></i>
+          Download All as Zip
+        </a>
+      </div>
+    </div>
+  </ng-container>
 </div>

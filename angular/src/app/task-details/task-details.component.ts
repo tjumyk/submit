@@ -29,39 +29,15 @@ export class TaskDetailsComponent implements OnInit {
   accessRoles: Set<string>;
 
   hasPrivateMaterial: boolean = false;
-  materialCategories: MaterialCategory[];
-  materialCategoriesTemplate: MaterialCategory[] = [
-    {
-      type: 'specification',
-      icon: 'clipboard outline',
-      items: []
-    },
-    {
-      type: 'data',
-      icon: 'database',
-      items: []
-    },
-    {
-      type: 'code',
-      icon: 'code',
-      items: []
-    },
-    {
-      type: 'other',
-      icon: 'copy outline',
-      items: []
-    },
-    {
-      type: 'test environment',
-      icon: 'terminal',
-      items: []
-    },
-    {
-      type: 'solution',
-      icon: 'star outline',
-      items: []
-    },
-  ];
+
+  materialIcons: { [type: string]: string } = {
+    'specification': 'clipboard outline',
+    'data': 'database',
+    'code': 'code',
+    'other': 'copy outline',
+    'test environment': 'terminal',
+    'solution': 'star outline'
+  };
 
   notebookPreviews: { [mid: number]: NotebookPreview[] } = {};
 
@@ -102,26 +78,10 @@ export class TaskDetailsComponent implements OnInit {
   private setupTask(task: Task) {
     this.task = task;
 
-    const categories: { [key: string]: Material[] } = {};
     this.hasPrivateMaterial = false;
     for (let mat of task.materials) {
       if(mat.is_private)
         this.hasPrivateMaterial = true;
-      let list = categories[mat.type];
-      if (list == null) {
-        categories[mat.type] = list = [];
-      }
-      list.push(mat)
-    }
-    this.materialCategories = [];
-    for (let cat of this.materialCategoriesTemplate) {
-      const items = categories[cat.type];
-      if (items != null)
-        this.materialCategories.push({
-          type: cat.type,
-          icon: cat.icon,
-          items: items
-        })
     }
 
     this.setupNotebooksPreview();
