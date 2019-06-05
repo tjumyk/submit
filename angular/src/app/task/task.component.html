@@ -30,7 +30,7 @@
             <a routerLink="../../tasks-preview/{{taskId}}">this preview page</a>.
           </div>
 
-          <div class="ui pointing menu stackable">
+          <div class="ui labeled icon task-actions menu stackable">
             <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
             <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
             <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</a>
