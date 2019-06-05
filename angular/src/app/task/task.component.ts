@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, Material, SuccessMessage, Task, Term, User} from "../models";
+import {ErrorMessage, Task, Term, User} from "../models";
 import {CategoryInfo, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -15,7 +15,6 @@ import {LatePenalty} from "../late-penalty";
   styleUrls: ['./task.component.less']
 })
 export class TaskComponent implements OnInit, OnDestroy {
-  success: SuccessMessage;
   error: ErrorMessage;
 
   taskId: number;

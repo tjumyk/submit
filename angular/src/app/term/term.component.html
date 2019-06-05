@@ -1,7 +1,5 @@
-<div class="top fixed message container">
-  <div class="content">
-    <app-error-message [error]="error"></app-error-message>
-  </div>
+<div class="ui container">
+  <app-error-message [error]="initError"></app-error-message>
 </div>
 
 <div class="ui loader text active" *ngIf="loadingTerm">Loading term info...</div>
@@ -36,6 +34,7 @@
         <a class="item" routerLink="/terms/{{term.id}}/messages" routerLinkActive="active" (click)="resetMobileMenu()">
           <i class="icon envelope"></i> Messages
           <div class="ui green label" *ngIf="messages_unread_count">{{messages_unread_count}}</div>
+          <i class="icon exclamation triangle yellow" *ngIf="messageCheckError" title="{{messageCheckError.msg}}"></i>
         </a>
       </div>
       <div class="ui inverted vertical fluid bottom menu">

@@ -12,7 +12,8 @@ import {TitleService} from "../title.service";
   styleUrls: ['./term.component.less']
 })
 export class TermComponent implements OnInit, OnDestroy {
-  error: ErrorMessage;
+  initError: ErrorMessage;
+  messageCheckError: ErrorMessage;
 
   termId: number;
   term: Term;
@@ -55,10 +56,10 @@ export class TermComponent implements OnInit, OnDestroy {
 
             this.setupMessageCheck();
           },
-          error => this.error = error.error
+          error => this.initError = error.error
         )
       },
-      error=>this.error=error.error
+      error=>this.initError=error.error
     );
 
   }
@@ -82,7 +83,7 @@ export class TermComponent implements OnInit, OnDestroy {
       ).subscribe(
         count => this.messages_unread_count = count,
         error => {
-          this.error = error.error;
+          this.messageCheckError = error.error;
           clearInterval(this.message_check_handler)
         }
       )

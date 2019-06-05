@@ -1,7 +1,5 @@
-<div class="top fixed message container">
-  <div class="content">
-    <app-error-message [error]="error"></app-error-message>
-  </div>
+<div class="top error wrapper">
+  <app-error-message [error]="error"></app-error-message>
 </div>
 
 <div class="ui text loader active" *ngIf="loadingMessages">Loading messages...</div>

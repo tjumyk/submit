@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, SuccessMessage, Task, Term, User} from "../models";
+import {ErrorMessage, Task, Term, User} from "../models";
 import {CategoryInfo, TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
@@ -14,8 +14,6 @@ import {TitleService} from "../title.service";
   styleUrls: ['./task-preview.component.less']
 })
 export class TaskPreviewComponent implements OnInit, OnDestroy {
-
-  success: SuccessMessage;
   error: ErrorMessage;
 
   taskId: number;
@@ -85,7 +83,7 @@ export class TaskPreviewComponent implements OnInit, OnDestroy {
 
     const timeTracker = () => {
       if(moment(task.open_time).isSameOrBefore(moment.now())){
-        this.router.navigate([`../../tasks/${this.taskId}`], {relativeTo: this.route, replaceUrl: true})
+        this.router.navigate([`../../tasks/${this.taskId}`], {relativeTo: this.route, replaceUrl: true});
         return;
       }
       this.task['_open_time_from_now'] = task.open_time ? moment(task.open_time).fromNow() : null;
