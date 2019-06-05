@@ -119,6 +119,9 @@
     </div>
 
     <div class="ui segment" *ngIf="task.file_requirements.length; else noFileRequirements">
+      <div class="ui top attached progress" *ngIf="submitting">
+        <div class="bar" [ngStyle]="{'width.%': submitProgress}"></div>
+      </div>
       <form class="ui form" [ngClass]="{'loading': submitting}" (submit)="submit()">
         <div class="field" *ngFor="let req of task.file_requirements" [ngClass]="{'required': !req.is_optional, 'error': req._form_errors, 'disabled': !isReadyToSubmit}">
           <label>{{req.name}} <span *ngIf="req.is_optional">(Optional)</span></label>

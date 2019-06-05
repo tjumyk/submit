@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, FileRequirement, SubmissionStatus, Task, Term, User} from "../models";
+import {ErrorMessage, FileRequirement, Submission, SubmissionStatus, Task, Term, User} from "../models";
 import {AccountService} from "../account.service";
 import {TermService} from "../term.service";
 import {TaskService} from "../task.service";
@@ -7,6 +7,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
 import {LatePenalty} from '../late-penalty';
+import {HttpEventType} from "@angular/common/http";
 
 export class AttemptEntry {
   attempted: boolean;
@@ -45,6 +46,7 @@ export class SubmitComponent implements OnInit, OnDestroy {
   timeTrackerHandler: number;
 
   submitting: boolean;
+  submitProgress: number;
   files: { [key: number]: File } = {};
 
   constructor(
@@ -262,16 +264,24 @@ export class SubmitComponent implements OnInit, OnDestroy {
       return;
 
     this.submitting = true;
+    this.submitProgress = 0;
     this.taskService.addSubmission(this.taskId, this.files).pipe(
       finalize(() => this.submitting = false)
     ).subscribe(
-      submission => {
-        let redirect;
-        if (this.task.is_team_task)
-          redirect = `../my-team-submissions/${submission.id}`;
-        else
-          redirect = `../my-submissions/${submission.id}`;
-        this.router.navigate([redirect], {relativeTo: this.route})
+      event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            this.submitProgress = Math.round(100 * event.loaded / event.total);
+            break;
+          case HttpEventType.Response:
+            const submission = event.body as Submission;
+            let redirect;
+            if (this.task.is_team_task)
+              redirect = `../my-team-submissions/${submission.id}`;
+            else
+              redirect = `../my-submissions/${submission.id}`;
+            this.router.navigate([redirect], {relativeTo: this.route})
+        }
       },
       error => this.error = error.error
     )

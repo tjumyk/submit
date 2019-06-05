@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
   AutoTest,
@@ -101,14 +101,15 @@ export class TaskService {
     return this.getTaskPreview(id);
   }
 
-  addSubmission(task_id: number, files: { [key: number]: File }): Observable<Submission> {
+  addSubmission(task_id: number, files: { [key: number]: File }): Observable<HttpEvent<any>> {
     const form = new FormData();
     for (let req_id in files) {
       const file = files[req_id];
       if (file)
         form.append(req_id.toString(), file);
     }
-    return this.http.post<Submission>(`${this.api}/${task_id}/my-submissions`, form)
+    const req = new HttpRequest('POST', `${this.api}/${task_id}/my-submissions`, form, {reportProgress: true});
+    return this.http.request(req);
   }
 
   getUserSubmissionSummaries(task_id: number): Observable<UserSubmissionSummary[]> {
