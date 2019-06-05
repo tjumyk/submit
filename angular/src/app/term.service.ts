@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {Message, Task, Term, User} from "./models";
 import {tap} from "rxjs/operators";
+import Cookie from "js-cookie";
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +13,24 @@ export class TermService {
   private termCaches: {[key: number]: Term} = {};
   private tasksCaches: { [key: number]: Task[] } = {};
 
-  enableMessageRefresh: boolean = true;
+  private _enableMessageRefresh: boolean;
+  private disableMessageRefreshCookieName = 'submit_disable_message_refresh';
+  get enableMessageRefresh(){
+    return this._enableMessageRefresh;
+  }
+  set enableMessageRefresh(enabled: boolean){
+    this._enableMessageRefresh = enabled;
+    if(enabled)
+      Cookie.remove(this.disableMessageRefreshCookieName);
+    else
+      Cookie.set(this.disableMessageRefreshCookieName, 1)
+  }
 
   constructor(
     private http: HttpClient
-  ) { }
+  ) {
+    this._enableMessageRefresh = !Cookie.get(this.disableMessageRefreshCookieName)
+  }
 
   static getAccessRoles(term:Term, user:User):Set<string>{
     if(!term || !user)
