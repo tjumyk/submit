@@ -29,3 +29,21 @@
 .task-description{
   white-space: pre-line;
 }
+
+.notebook.label{
+  &>a{
+    &.title{
+      color: rgba(0, 0, 0, .85);
+      opacity: .75;
+      &:hover{
+        opacity: 1;
+      }
+    }
+    &.action{
+      float: right;
+    }
+  }
+  &>.sub.title{
+    opacity: .75;
+  }
+}
