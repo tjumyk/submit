@@ -7,7 +7,7 @@ import {QAndA, VersionInfo} from "./models";
   providedIn: 'root'
 })
 export class MetaService {
-  private api = '/api/meta';
+  private api = 'api/meta';
 
   constructor(
     private http: HttpClient

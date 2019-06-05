@@ -7,7 +7,7 @@ import {NotebookPreview} from "./models";
   providedIn: 'root'
 })
 export class MaterialService {
-  private api = '/api/materials';
+  private api = 'api/materials';
 
   constructor(
     private http: HttpClient
