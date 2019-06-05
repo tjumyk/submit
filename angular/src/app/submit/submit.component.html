@@ -128,6 +128,7 @@
             <label *ngIf="req._form_errors?.extension"><i class="icon times"></i> Invalid file extension</label>
             <label *ngIf="req._form_errors?.size"><i class="icon times"></i> File is too big (at most {{req.size_limit | size}})</label>
           </div>
+          <span *ngIf="req.description"><i class="icon info circle"></i> {{req.description}}</span>
         </div>
         <ng-container *ngIf="lateDays==null; else lateSubmitBtn">
           <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
