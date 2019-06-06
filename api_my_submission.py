@@ -1,9 +1,10 @@
-from flask import Blueprint, jsonify, send_from_directory, current_app as app, request
+from flask import Blueprint, jsonify, send_from_directory, current_app as app, request, render_template
 
 from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
+from services.submission_file_viewer import SubmissionFileViewerService
 
 my_submission_api = Blueprint('my_submission_api', __name__)
 
@@ -28,6 +29,7 @@ def do_submission(sid):
 
 
 @my_submission_api.route('/<int:sid>/files/<int:fid>/raw')
+@my_submission_api.route('/<int:sid>/files/<int:fid>/view')
 @my_submission_api.route('/<int:sid>/files/<int:fid>/download')
 @requires_login
 def submission_file_download(sid, fid):
@@ -46,8 +48,15 @@ def submission_file_download(sid, fid):
             return jsonify(msg='not your submission'), 403
 
         data_folder = app.config['DATA_FOLDER']
-        as_attachment = request.path.endswith('/download')
-        return send_from_directory(data_folder, file.path, as_attachment=as_attachment)
+        if request.path.endswith('/view'):
+            result = SubmissionFileViewerService.select_viewer(file, data_folder)
+            if result is not None:  # rendering is supported
+                template_name, context = result
+                return render_template(template_name, **context)
+            # otherwise, fallback to 'raw' content
+        if request.path.endswith('/download'):
+            return send_from_directory(data_folder, file.path, as_attachment=True)
+        return send_from_directory(data_folder, file.path)
     except SubmissionServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
