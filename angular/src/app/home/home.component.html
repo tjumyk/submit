@@ -1,6 +1,6 @@
 <div class="ui container">
-  <div class="ui middle aligned centered padded stackable grid">
-    <div class="six wide column">
+  <div class="ui middle aligned centered padded stackable main grid">
+    <div class="ten wide column">
       <h2 class="ui center aligned fluid header">
         <img src="static/assets/logo-256.png">
         UNSWKG Submit
@@ -12,7 +12,7 @@
       </div>
       <ng-container *ngIf="entries">
         <div class="ui raised segment" *ngFor="let item of entries | keyvalue">
-          <h2 class="ui header">
+          <h2 class="ui course header">
             <img class="ui image" *ngIf="courseMap[item.key].icon" [src]="courseMap[item.key].icon">
             <div class="content">
               {{ courseMap[item.key].code }}
