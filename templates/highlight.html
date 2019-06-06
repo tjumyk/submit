@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ name }} (#{{ md5 }})</title>
+    <style>
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+        html {
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body{
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: #FFFFFF;
+        }
+        pre{
+            margin: 0;
+        }
+
+        ::-moz-selection {
+            background-color: #cce2ff;
+            color: rgba(0,0,0,.87);
+        }
+        ::selection {
+            background-color: #cce2ff;
+            color: rgba(0,0,0,.87);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/androidstudio.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.7.0/highlightjs-line-numbers.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        hljs.initLineNumbersOnLoad();
+    </script>
+    <style>
+        .hljs-ln-numbers {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+            text-align: center;
+            color: rgb(128, 128, 128);
+            border-right: 1px solid rgb(128, 128, 128);
+            vertical-align: top;
+        }
+        .hljs-ln td{
+            padding-right: 5px;
+        }
+        .hljs-ln td.hljs-ln-code {
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<pre><code>{{ content }}</code></pre>
+</body>
+</html>

@@ -3,10 +3,10 @@ import os
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, jsonify, current_app as app, send_from_directory, request
+from flask import Blueprint, jsonify, current_app as app, send_from_directory, request, render_template
 
-from models import db
 from auth_connect.oauth import requires_login
+from models import db
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
@@ -14,6 +14,18 @@ from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
 
 submission_api = Blueprint('submission_api', __name__)
+
+_highlight_file_extensions = {
+    'py',
+    'pl', 'ruby', 'php',
+    'c', 'h', 'cpp', 'cxx', 'hpp',
+    'java', 'cs',
+    'js', 'css', 'html', 'coffee',
+    'sh',
+    'json', 'xml',
+    'sql',
+    'md', 'markdown'
+}
 
 
 def requires_worker(f):
@@ -83,6 +95,45 @@ def submission_file_download(sid, fid):
         data_folder = app.config['DATA_FOLDER']
         as_attachment = request.path.endswith('/download')
         return send_from_directory(data_folder, file.path, as_attachment=as_attachment)
+    except (SubmissionServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@submission_api.route('/<int:sid>/files/<int:fid>/view')
+@requires_login
+def submission_file_view(sid, fid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        file = SubmissionService.get_file(fid)
+        if file is None:
+            return jsonify(msg='file not found'), 404
+        if file.submission_id != sid:
+            return jsonify(msg='file does not belong to submission %s' % str(sid))
+
+        submission = file.submission
+        roles = TermService.get_access_roles(submission.task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        data_folder = app.config['DATA_FOLDER']
+        file_name = file.requirement.name
+
+        _, ext = os.path.splitext(file_name)
+        ext = ext.lower().lstrip('.')
+        if ext in _highlight_file_extensions:  # code highlight
+            with open(os.path.join(data_folder, file.path)) as f_file:
+                file_content = f_file.read()
+            return render_template('highlight.html', sid=sid, fid=fid,
+                                   name=file_name, content=file_content, md5=file.md5[0:6])
+
+        # if rendering is not supported, send raw content like '/raw' endpoint
+        return send_from_directory(data_folder, file.path)
     except (SubmissionServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
