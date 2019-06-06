@@ -30,12 +30,10 @@
         }
 
         ::-moz-selection {
-            background-color: #cce2ff;
-            color: rgba(0,0,0,.87);
+            background-color: #214283d9;
         }
         ::selection {
-            background-color: #cce2ff;
-            color: rgba(0,0,0,.87);
+            background-color: #214283d9;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/androidstudio.min.css">
@@ -46,6 +44,10 @@
         hljs.initLineNumbersOnLoad();
     </script>
     <style>
+        .hljs{
+            padding: 0;
+            background: #2b2b2b;
+        }
         .hljs-ln-numbers {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -53,16 +55,31 @@
             -ms-user-select: none;
             user-select: none;
 
-            text-align: center;
             color: rgb(128, 128, 128);
-            border-right: 1px solid rgb(128, 128, 128);
-            vertical-align: top;
+            border-right: 1px solid rgba(128, 128, 128, .6);
+            text-align: right;
+            vertical-align: center;
+            background: #313335;
+            font-size: 0.85em;
         }
-        .hljs-ln td{
-            padding-right: 5px;
+        .hljs-ln td.hljs-ln-numbers{
+            padding-left: 1em;
+            padding-right: 1em;
         }
         .hljs-ln td.hljs-ln-code {
-            padding-left: 10px;
+            padding-left: .5em;
+        }
+        .hljs-ln tr:first-child td.hljs-ln-numbers{
+            padding-top: .5em;
+        }
+        .hljs-ln tr:first-child td.hljs-ln-code {
+            padding-top: .5em;
+        }
+        .hljs-ln tr:last-child td.hljs-ln-numbers{
+            padding-bottom: .5em;
+        }
+        .hljs-ln tr:last-child td.hljs-ln-code {
+            padding-bottom: .5em;
         }
     </style>
 </head>
