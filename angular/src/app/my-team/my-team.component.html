@@ -101,10 +101,7 @@
     <tr *ngFor="let ass of team.user_associations; index as i" [ngClass]="{'active': user.id==ass.user_id}">
       <td>{{i+1}}</td>
       <td>
-        <img src="{{ass.user.avatar}}?size=64" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
-        <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
-        <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
-        <ng-template #nameOnly>{{ass.user.name}}</ng-template>
+        <app-user-mini-card [user]="ass.user" [enablePopup]="true"></app-user-mini-card>
         &nbsp;<i class="icon star yellow" *ngIf="ass.user_id==team.creator_id" title="Creator"></i>
       </td>
       <td>{{ass.created_at|date:'short'}}</td>

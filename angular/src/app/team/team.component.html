@@ -45,12 +45,8 @@
     <tr *ngFor="let ass of team.user_associations; index as i">
       <td>{{i+1}}</td>
       <td>
-        <a href="admin/users/{{ass.user_id}}" target="_blank">
-          <img src="{{ass.user.avatar}}?size=64" *ngIf="ass.user.avatar; else defaultAvatar" class="ui image avatar">
-          <span *ngIf="ass.user.nickname; else nameOnly">{{ass.user.nickname}} ({{ass.user.name}})</span>
-          <ng-template #nameOnly>{{ass.user.name}}</ng-template>
-          &nbsp;<i class="icon star yellow" *ngIf="ass.user_id==team.creator_id" title="Creator"></i>
-        </a>
+        <app-user-mini-card [user]="ass.user" [enablePopup]="true" [enableAdmin]="true"></app-user-mini-card>
+        &nbsp;<i class="icon star yellow" *ngIf="ass.user_id==team.creator_id" title="Creator"></i>
       </td>
       <td>{{ass.created_at|date:'medium'}}</td>
       <td>{{ass.modified_at|date:'medium'}}</td>

@@ -17,9 +17,7 @@
     <td>{{ i + 1 + rowOffset }}</td>
     <td>{{sub.id}}</td>
     <td *ngIf="task.is_team_task">
-      <img src="{{sub.submitter.avatar}}?size=64" *ngIf="sub.submitter.avatar; else defaultAvatar" class="ui image avatar">
-      <span *ngIf="sub.submitter.nickname; else nameOnly">{{sub.submitter.nickname}} ({{sub.submitter.name}})</span>
-      <ng-template #nameOnly>{{sub.submitter.name}}</ng-template>
+      <app-user-mini-card [user]="sub.submitter" [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
     </td>
     <td>
       {{sub.created_at | date: 'medium'}}

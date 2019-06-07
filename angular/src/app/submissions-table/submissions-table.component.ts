@@ -1,8 +1,9 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {AutoTest, Submission, SubmissionStatus, Task} from "../models";
+import {Submission, SubmissionStatus, Task} from "../models";
 import {LastAutoTestsMap} from "../task.service";
 import * as moment from "moment";
 import {LatePenalty} from "../late-penalty";
+import {AccountService} from "../account.service";
 
 @Component({
   selector: 'app-submissions-table',
@@ -15,12 +16,21 @@ export class SubmissionsTableComponent implements OnInit, OnChanges {
   @Input() submissions: Submission[];
   @Input() lastAutoTests: LastAutoTestsMap;
 
+  isAdmin: boolean = false;
+
   rowOffset: number;
 
-  constructor() {
+  constructor(
+    private accountService: AccountService
+  ) {
   }
 
   ngOnInit() {
+    this.accountService.getCurrentUser().subscribe(
+      user=>{
+        this.isAdmin = AccountService.isAdmin(user)
+      }
+    )
   }
 
   ngOnChanges(changes: SimpleChanges): void {

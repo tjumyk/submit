@@ -773,10 +773,7 @@
           <tr *ngFor="let spec of task.special_considerations; index as i">
             <td>{{spec.id}}</td>
             <td>
-              <a *ngIf="spec.user" href="admin/users/{{spec.user_id}}" target="_blank">
-                <span *ngIf="spec.user.nickname; else nameOnly">{{spec.user.nickname}} ({{spec.user.name}})</span>
-                <ng-template #nameOnly>{{spec.user.name}}</ng-template>
-              </a>
+              <app-user-mini-card *ngIf="spec.user" [user]="spec.user" [enablePopup]="true" [enableAdmin]="true"></app-user-mini-card>
               <a *ngIf="spec.team" routerLink="/terms/{{task.term_id}}/tasks/{{taskId}}/teams/{{spec.team_id}}">
                 {{spec.team.name}}
               </a>

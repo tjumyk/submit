@@ -53,6 +53,7 @@ import { HelpComponent } from './help/help.component';
 import { AboutComponent } from './about/about.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
 import { EmailSubscriptionsComponent } from './email-subscriptions/email-subscriptions.component';
+import { UserMiniCardComponent } from './user-mini-card/user-mini-card.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +105,7 @@ import { EmailSubscriptionsComponent } from './email-subscriptions/email-subscri
     AboutComponent,
     MessageDetailComponent,
     EmailSubscriptionsComponent,
+    UserMiniCardComponent,
   ],
   imports: [
     BrowserModule,

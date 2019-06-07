@@ -36,9 +36,7 @@
 
         <p>
           <a class="ui basic button fluid" *ngIf="user" href="account/profile" target="_blank">
-            <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
-            <ng-template #userIcon><i class="icon user circle"></i></ng-template>
-            {{ user.nickname || user.name }}
+            <app-user-mini-card [user]="user"></app-user-mini-card>
           </a>
         </p>
 

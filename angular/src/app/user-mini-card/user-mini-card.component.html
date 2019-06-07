@@ -1,0 +1,51 @@
+<div class="label" #popRef (mouseenter)="onStart()" (mouseleave)="onEnd()">
+  <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">
+  <ng-template #userIcon><i class="icon user circle"></i></ng-template>
+  {{ user.nickname || user.name }}
+</div>
+
+<div class="ui popup" #popCard (mouseenter)="onStart()" (mouseleave)="onEnd()" *ngIf="enablePopup && createPopup">
+  <div class="arrow" x-arrow></div>
+  <div class="profile">
+    <img class="ui tiny image rounded" *ngIf="user.avatar" src="{{user.avatar}}">
+    <div class="content">
+      <h3 class="ui header">
+        <div class="content">
+          <ng-container *ngIf="user.nickname; else noNickname">
+            <a href="admin/users/{{user.id}}" target="_blank" *ngIf="enableAdmin; else userNicknameNoAdmin">{{user.nickname}}</a>
+            <ng-template #userNicknameNoAdmin>{{user.nickname}}</ng-template>
+            <div class="sub header">
+              {{user.name}}
+            </div>
+          </ng-container>
+          <ng-template #noNickname>
+            <a href="admin/users/{{user.id}}" target="_blank" *ngIf="enableAdmin; else userNameNoAdmin">{{user.name}}</a>
+            <ng-template #userNameNoAdmin>{{user.name}}</ng-template>
+          </ng-template>
+        </div>
+      </h3>
+
+      <div class="ui list">
+        <div class="item">
+          <i class="icon envelope"></i>
+          <div class="content">
+            &nbsp;<a href="mailto:{{user.email}}" target="_blank">{{user.email}}</a>
+          </div>
+        </div>
+        <div class="item">
+          <i class="icon users"></i>
+          <div class="content">
+            <div class="ui tiny labels">
+              <ng-container *ngIf="enableAdmin; else groupsNoAdmin">
+                <a class="ui label" *ngFor="let group of user.groups" title="{{group.description}}" href="admin/groups/{{group.id}}" target="_blank">{{group.name}}</a>
+              </ng-container>
+              <ng-template #groupsNoAdmin>
+                <div class="ui label" *ngFor="let group of user.groups" title="{{group.description}}">{{group.name}}</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

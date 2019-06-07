@@ -68,11 +68,7 @@
     <tr *ngFor="let summary of userSummaryPages.pageItems; index as i">
       <td>{{userSummaryPages.startRow + i}}</td>
       <td>
-        <a href="admin/users/{{summary.user.id}}" target="_blank">
-          <img src="{{summary.user.avatar}}?size=64" *ngIf="summary.user.avatar; else defaultAvatar" class="ui image avatar">
-          <span *ngIf="summary.user.nickname; else nameOnly">{{summary.user.nickname}} ({{summary.user.name}})</span>
-          <ng-template #nameOnly>{{summary.user.name}}</ng-template>
-        </a>
+        <app-user-mini-card [user]="summary.user" [enablePopup]="true" [enableAdmin]="true"></app-user-mini-card>
       </td>
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.first_submit_time | date:'short'}}</td>

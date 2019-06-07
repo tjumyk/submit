@@ -71,11 +71,7 @@
         <ng-template #alreadyFinalised><i class="icon lock" title="Finalised"></i></ng-template>
       </td>
       <td>
-        <a href="admin/users/{{team.creator_id}}" target="_blank">
-          <img src="{{team.creator.avatar}}?size=64" *ngIf="team.creator.avatar; else defaultAvatar" class="ui image avatar">
-          <span *ngIf="team.creator.nickname; else nameOnly">{{team.creator.nickname}} ({{team.creator.name}})</span>
-        </a>
-        <ng-template #nameOnly>{{team.creator.name}}</ng-template>
+        <app-user-mini-card [user]="team.creator" [enablePopup]="true" [enableAdmin]="true"></app-user-mini-card>
       </td>
       <td class="break-word">{{team.slogan}}</td>
       <td>{{team.total_user_associations}}</td>
