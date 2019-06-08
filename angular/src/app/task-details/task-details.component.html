@@ -22,7 +22,13 @@
 
   <ng-container *ngIf="task.materials.length">
     <div class="ui segment">
-      <div class="ui top attached blue label">Materials</div>
+      <div class="ui top attached blue materials label">
+        Materials
+        <ng-container *ngIf="task.materials.length>1">
+          <a class="action" href="api/tasks/{{taskId}}/download-materials-zip?include_private=true" *ngIf="hasPrivateMaterial" title="Download All as Zip (include private)"><i class="icon file archive"></i></a>
+          <a class="action" href="api/tasks/{{taskId}}/download-materials-zip" [title]="'Download All as Zip' + (hasPrivateMaterial ? ' (public only)': '')"><i class="icon file archive outline"></i></a>
+        </ng-container>
+      </div>
       <div class="ui cards">
         <a href="api/materials/{{mat.id}}/download" class="ui card" *ngFor="let mat of task.materials">
           <div class="content">
@@ -41,18 +47,6 @@
               <i class="icon hashtag"></i> {{mat.md5|slice:0:6}}
             </span>
           </div>
-        </a>
-      </div>
-
-      <div class="material-actions" *ngIf="task.materials.length>1">
-        <div class="ui divider"></div>
-        <a href="api/tasks/{{taskId}}/download-materials-zip" class="ui button primary basic">
-          <i class="icon file archive outline"></i>
-          Download All <span *ngIf="hasPrivateMaterial">Public</span> as Zip
-        </a>
-        <a href="api/tasks/{{taskId}}/download-materials-zip?include_private=true" class="ui button red basic" *ngIf="hasPrivateMaterial">
-          <i class="icon file archive outline"></i>
-          Download All as Zip
         </a>
       </div>
     </div>
