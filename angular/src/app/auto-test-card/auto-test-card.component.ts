@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {AutoTest, AutoTestConfig, ErrorMessage} from "../models";
 import {SubmissionService} from "../submission.service";
 import {printDuration} from "../time-util";
@@ -12,7 +12,7 @@ import {AdminService} from "../admin.service";
   styleUrls: ['./auto-test-card.component.less'],
   host: {'class': 'ui segments'}
 })
-export class AutoTestCardComponent implements OnInit {
+export class AutoTestCardComponent implements OnInit, OnDestroy {
   @Input() test: AutoTest;
   @Input() config: AutoTestConfig;
 
@@ -31,6 +31,8 @@ export class AutoTestCardComponent implements OnInit {
 
   showDetails: boolean;
 
+  runTimerHandler: number;
+
   constructor(
     private adminService: AdminService,
     private submissionService: SubmissionService
@@ -44,6 +46,30 @@ export class AutoTestCardComponent implements OnInit {
   }
 
   ngOnInit() {
+    const runTimer = ()=>{
+      const state = this.test.final_state || this.test.state;
+      switch (state) {
+        case 'STARTED':
+          let elapsed = moment().diff(moment(this.test.started_at), 's');
+          this.test['_elapse_hours'] =  Math.floor(elapsed / 3600);
+          elapsed %= 3600;
+          this.test['_elapse_minutes'] = Math.floor(elapsed / 60);
+          elapsed %= 60;
+          this.test['_elapse_seconds'] = elapsed;
+          break;
+        case 'SUCCESS':
+        case 'FAILURE':
+        case 'REVOKED':
+          clearInterval(this.runTimerHandler); // stop timer
+      }
+    };
+
+    runTimer();
+    setInterval(runTimer, 1000)
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.runTimerHandler);
   }
 
   computeDuration(start_time, end_time) {

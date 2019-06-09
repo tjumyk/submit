@@ -78,8 +78,20 @@
     </ng-container>
 
     <ng-container *ngIf="(test.final_state || test.state) == 'STARTED'">
-      <div class="ui text loader active">Running test...</div>
-      <!-- TODO show a timer here -->
+      <div class="ui small timer statistics" *ngIf="test._elapse_seconds!==undefined">
+        <div class="statistic">
+          <div class="value">{{test._elapse_hours|number:'2.0-0'}}</div>
+          <div class="label">Hours</div>
+        </div>
+        <div class="statistic">
+          <div class="value">{{test._elapse_minutes|number:'2.0-0'}}</div>
+          <div class="label">Minutes</div>
+        </div>
+        <div class="statistic">
+          <div class="value">{{test._elapse_seconds|number:'2.0-0'}}</div>
+          <div class="label">Seconds</div>
+        </div>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="(test.final_state || test.state) == 'RETRY'">
