@@ -1,0 +1,25 @@
+<ng-container *ngIf="firstLoadComplete">
+  <div class="ui segment" *ngFor="let config of task.auto_test_configs">
+    <div class="ui config label top attached">
+      <i class="icon" [ngClass]="autoTestConfigTypes[config.type].icon" [title]="autoTestConfigTypes[config.type].name"></i>
+      {{config.name}}
+      <i class="icon red lock" *ngIf="config.is_private"></i>
+      <a class="action" title="Run New Test" (click)="runNewTest(config, btnRunNewTest)" #btnRunNewTest *ngIf="isAdmin"><i class="icon plus"></i></a>
+    </div>
+
+    <ng-container class="ui segments" *ngIf="autoTestGroups[config.id].length > 0; else noTestForConfig">
+      <ng-container *ngFor="let test of autoTestGroups[config.id]">
+        <app-auto-test-card [test]="test" [config]="config" [isAdmin]="isAdmin"
+                            (deleted)="onAutoTestDeleted(test)" (error)="error.emit($event)"></app-auto-test-card>
+      </ng-container>
+    </ng-container>
+    <ng-template #noTestForConfig>
+      <div class="ui segment placeholder">
+        <div class="ui header icon">
+          <i class="icon flag outline"></i>
+          No test found for this config right now.
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</ng-container>

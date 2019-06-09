@@ -26,6 +26,7 @@ import * as moment from "moment";
 import {HttpEventType} from "@angular/common/http";
 import {TaskService} from "../task.service";
 import {TitleService} from "../title.service";
+import {SubmissionService} from "../submission.service";
 
 @Component({
   selector: 'app-admin-task-edit',
@@ -68,15 +69,9 @@ export class AdminTaskEditComponent implements OnInit {
   editingLatePenalty: boolean;
   activeTab: string;
 
-  autoTestConfigTypes = {
-    'docker': 'Docker',
-    'run-script': 'Run Script',
-    'anti-plagiarism': 'Anti Plagiarism',
-    'file-exists': 'File Exists'
-  };
-
   constructor(
     private adminService: AdminService,
+    private submissionService: SubmissionService,
     private route: ActivatedRoute,
     private titleService: TitleService
   ) {

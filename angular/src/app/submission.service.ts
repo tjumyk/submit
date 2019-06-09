@@ -3,47 +3,76 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {AutoTest, AutoTestConfig, Submission} from "./models";
 
+export class AutoTestConfigTypeInfo {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class SubmissionService {
-  private api = 'api/submissions';
-  private myApi = 'api/my-submissions';
-  private myTeamApi = 'api/my-team-submissions';
+  readonly api = 'api/submissions';
+  readonly myApi = 'api/my-submissions';
+  readonly myTeamApi = 'api/my-team-submissions';
+
+  autoTestConfigTypes: {[id: string]: AutoTestConfigTypeInfo} = {
+    'docker': {
+      id: 'docker',
+      name: 'Docker',
+      icon: 'docker'
+    },
+    'run-script': {
+      id: 'run-script',
+      name: 'Run Script',
+      icon: 'terminal'
+    },
+    'anti-plagiarism': {
+      id: 'anti-plagiarism',
+      name: 'Anti Plagiarism',
+      icon: 'copyright'
+    },
+    'file-exists': {
+      id: 'file-exists',
+      name: 'File Exists',
+      icon: 'file outline'
+    }
+  };
 
   constructor(
     private http: HttpClient
   ) {
   }
 
-  getSubmission(id: number): Observable<Submission> {
-    return this.http.get<Submission>(`${this.api}/${id}`)
+  getSubmission(id: number, apiBase: string = this.api): Observable<Submission> {
+    return this.http.get<Submission>(`${apiBase}/${id}`)
   }
 
   getMySubmission(id: number): Observable<Submission> {
-    return this.http.get<Submission>(`${this.myApi}/${id}`)
+    return this.getSubmission(id, this.myApi)
   }
 
   getMyTeamSubmission(id: number): Observable<Submission> {
-    return this.http.get<Submission>(`${this.myTeamApi}/${id}`)
+    return this.getSubmission(id, this.myTeamApi)
   }
 
-  getAutoTestAndResults(id: number): Observable<AutoTest[]> {
-    return this.http.get<AutoTest[]>(`${this.api}/${id}/auto-tests`)
+  getAutoTestAndResults(id: number, apiBase: string=this.api): Observable<AutoTest[]> {
+    return this.http.get<AutoTest[]>(`${apiBase}/${id}/auto-tests`)
   }
 
   getMyAutoTestAndResults(id: number): Observable<AutoTest[]> {
-    return this.http.get<AutoTest[]>(`${this.myApi}/${id}/auto-tests`)
+    return this.getAutoTestAndResults(id, this.myApi)
   }
 
   getMyTeamAutoTestAndResults(id: number): Observable<AutoTest[]> {
-    return this.http.get<AutoTest[]>(`${this.myTeamApi}/${id}/auto-tests`)
+    return this.getAutoTestAndResults(id, this.myTeamApi)
   }
 
   getAutoTestStatusColor(status: string): string {
     switch (status) {
       case 'STARTED':
-        return '#21ba45';
+        return '#2185d0';
       case 'SUCCESS':
         return '#21ba45';
       case 'RETRY':
@@ -52,6 +81,8 @@ export class SubmissionService {
         return '#db2828';
       case 'REVOKED':
         return '#db2828';
+      case 'PENDING':
+        return '#767676';
       default:
         return '#1b1c1d';
     }
@@ -60,7 +91,7 @@ export class SubmissionService {
   getAutoTestStatusClass(status: string): string {
     switch (status) {
       case 'STARTED':
-        return 'green';
+        return 'blue';
       case 'SUCCESS':
         return 'green';
       case 'RETRY':
@@ -69,6 +100,8 @@ export class SubmissionService {
         return 'red';
       case 'REVOKED':
         return 'red';
+      case 'PENDING':
+        return 'grey';
       default:
         return 'black';
     }
@@ -89,22 +122,18 @@ export class SubmissionService {
     return ret;
   };
 
-  extractConclusion(test: AutoTest, config?: AutoTestConfig) {
+  extractConclusion(test: AutoTest, config: AutoTestConfig) {
     if (!test)
       return null;
-    if (!config)
-      config = test.config;
     if (!config)
       return null;
 
     return this.evaluateObjectPath(test.result, config.result_conclusion_path);
   };
 
-  printConclusion(test: AutoTest, config?: AutoTestConfig) {
+  printConclusion(test: AutoTest, config: AutoTestConfig) {
     if (!test)
       return null;
-    if (!config)
-      config = test.config;
     if (!config)
       return null;
 
@@ -115,11 +144,9 @@ export class SubmissionService {
     return conclusion;
   };
 
-  renderResultHTML(test: AutoTest, config?: AutoTestConfig): string {
+  renderResultHTML(test: AutoTest, config: AutoTestConfig): string {
     if (!test)
       return '';
-    if (!config)
-      config = test.config;
     if (!config)
       return '';
 

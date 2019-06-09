@@ -1,0 +1,14 @@
+:host{
+  display: block;
+}
+.config.label>.action{
+  float: right;
+  &.loading{
+    &>.icon{
+      animation: icon-loading 2s linear infinite;
+    }
+  }
+  &.disabled{
+    pointer-events: none;
+  }
+}

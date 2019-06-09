@@ -1,61 +1,173 @@
-<div class="ui list horizontal">
-  <div class="item">
-    <div class="header">ID</div>
-    {{test.id}}
-  </div>
-  <div class="item">
-    <div class="header">Config</div>
-    <span *ngIf="config; else noConfigData">{{config.name}}</span>
-    <ng-template #noConfigData>(ID: {{test.config_id}})</ng-template>
-  </div>
-  <div class="item">
-    <div class="header">Worker</div>
-    <span *ngIf="test.hostname; else noWorker">{{test.hostname}}</span>
-    <ng-template #noWorker>(None)</ng-template>
-  </div>
-  <div class="item">
-    <div class="header">State</div>
-    <span [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
-      {{test.final_state || test.state}}
-    </span>
-  </div>
-</div>
-
-<div class="ui list horizontal">
-  <div class="item">
-    <div class="header">Created At</div>
-    {{test.created_at | date: 'medium'}}
-  </div>
-  <div class="item">
-    <div class="header">Started At</div>
-    <span *ngIf="test.started_at; else noStartTime">{{test.started_at | date: 'medium'}}</span>
-    <ng-template #noStartTime>N/A</ng-template>
-  </div>
-  <div class="item">
-    <div class="header">Stopped At</div>
-    <span *ngIf="test.stopped_at; else noStopTime">{{test.stopped_at | date: 'medium'}}</span>
-    <ng-template #noStopTime>N/A</ng-template>
-  </div>
-  <div class="item">
-    <div class="header">Duration</div>
-    <span *ngIf="test.started_at && test.stopped_at; else noDuration">{{computeDuration(test.started_at, test.stopped_at)}}</span>
-    <ng-template #noDuration>N/A</ng-template>
-  </div>
-</div>
-
-<ng-container *ngIf="(test.final_state || test.state) == 'FAILURE' || (test.final_state || test.state) == 'SUCCESS'">
-  <div *ngIf="test.exception_class">
-    <div class="ui divider horizontal">Exception</div>
-    <p><b>{{test.exception_class}}</b> {{test.exception_message}}</p>
-  </div>
-  <div *ngIf="test.result != null">
-    <div class="ui divider horizontal">Result</div>
-    <ng-container
-      *ngIf="config && config.result_render_html && extractConclusion(test, config) != null; else noHTMLRender">
-      <div [innerHTML]="renderResultHTML(test, config)"></div>
+<div class="ui summary segment" [class.admin]="isAdmin" [ngClass]="getStatusClass(test.final_state || test.state)">
+  <a class="ui bottom attached toggle label" (click)="toggleDetails()" [ngClass]="{'activated': showDetails}">
+    <ng-container *ngIf="showDetails; else detailsHidden">
+      <i class="icon chevron up" ></i> Hide Details <i class="icon chevron up" ></i>
     </ng-container>
-    <ng-template #noHTMLRender>
-      <pre class="code">{{test.result|json}}</pre>
+    <ng-template #detailsHidden>
+      <i class="icon chevron down" ></i> Show Details <i class="icon chevron down" ></i>
     </ng-template>
+  </a>
+  <a class="ui right corner red label" (click)="deleteAutoTest(test, btnDeleteAutoTest)" #btnDeleteAutoTest *ngIf="isAdmin">
+    <i class="icon trash"></i>
+  </a>
+
+  <div class="conclusion">
+    <div class="ui segment inverted compact center aligned" [ngClass]="getStatusClass(test.final_state || test.state)">
+      <div class="ui label bottom attached">ID: {{test.id}}</div>
+      <div class="ui statistic inverted">
+        <ng-container *ngIf="(test.final_state || test.state) == 'SUCCESS'">
+          <div class="value" *ngIf="test.result != null && extractConclusion(test, config) != null; else noConclusion" [ngClass]="config.result_conclusion_type">
+            {{printConclusion(test, config)}}
+          </div>
+          <ng-template #noConclusion>
+            <div class="value">
+              <i class="icon question circle"></i>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'FAILURE'">
+          <div class="value">
+            <i class="icon times circle"></i>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'PENDING'">
+          <div class="value">
+            <i class="icon hourglass"></i>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'STARTED'">
+          <div class="value">
+            <i class="icon notch circle loading"></i>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'RETRY'">
+          <div class="value">
+            <i class="icon triangle exclamation"></i>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="(test.final_state || test.state) == 'REVOKED'">
+          <div class="value">
+            <i class="icon trash"></i>
+          </div>
+        </ng-container>
+      </div>
+    </div>
   </div>
-</ng-container>
+  <div class="content">
+    <ng-container *ngIf="(test.final_state || test.state) == 'SUCCESS'">
+      <ng-container *ngIf="test.result != null && config.result_render_html && extractConclusion(test, config) != null; else noHTMLRender">
+        <div [innerHTML]="renderResultHTML(test, config)"></div>
+      </ng-container>
+      <ng-template #noHTMLRender>
+        <pre class="code"><code>{{test.result|json}}</code></pre>
+      </ng-template>
+    </ng-container>
+
+    <ng-container *ngIf="(test.final_state || test.state) == 'FAILURE'">
+      <div class="ui header">{{test.exception_class}}</div>
+      <div class="description">{{test.exception_message}}</div>
+    </ng-container>
+
+    <ng-container *ngIf="(test.final_state || test.state) == 'PENDING'">
+      <div class="ui text loader active">Waiting for worker bot...</div>
+    </ng-container>
+
+    <ng-container *ngIf="(test.final_state || test.state) == 'STARTED'">
+      <div class="ui text loader active">Running test...</div>
+      <!-- TODO show a timer here -->
+    </ng-container>
+
+    <ng-container *ngIf="(test.final_state || test.state) == 'RETRY'">
+      <div class="ui text loader active">Retrying...</div>
+    </ng-container>
+
+    <ng-container *ngIf="(test.final_state || test.state) == 'REVOKED'">
+      <div class="ui header">Test has been revoked.</div>
+    </ng-container>
+  </div>
+</div>
+
+<div class="ui segment details" *ngIf="showDetails" #detailsPanel>
+  <div class="ui list horizontal">
+    <div class="item">
+      <div class="header">State</div>
+      <span [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
+        {{test.final_state || test.state}}
+      </span>
+    </div>
+    <div class="item" *ngIf="test.work_id">
+      <div class="header">Work ID</div>
+      {{test.work_id}}
+    </div>
+    <div class="item" *ngIf="test.hostname">
+      <div class="header">Worker</div>
+      {{test.hostname}}
+    </div>
+    <div class="item" *ngIf="test.pid">
+      <div class="header">PID</div>
+      {{test.pid}}
+    </div>
+  </div>
+
+  <div class="ui list horizontal">
+    <div class="item">
+      <div class="header">Created At</div>
+      {{test.created_at | date: 'medium'}}
+    </div>
+    <div class="item">
+      <div class="header">Started At</div>
+      <span *ngIf="test.started_at; else noStartTime">{{test.started_at | date: 'medium'}}</span>
+      <ng-template #noStartTime>N/A</ng-template>
+    </div>
+    <div class="item">
+      <div class="header">Stopped At</div>
+      <span *ngIf="test.stopped_at; else noStopTime">{{test.stopped_at | date: 'medium'}}</span>
+      <ng-template #noStopTime>N/A</ng-template>
+    </div>
+    <div class="item">
+      <div class="header">Duration</div>
+      <span *ngIf="test.started_at && test.stopped_at; else noDuration">{{computeDuration(test.started_at, test.stopped_at)}}</span>
+      <ng-template #noDuration>N/A</ng-template>
+    </div>
+  </div>
+
+  <ng-container *ngIf="(test.final_state || test.state) == 'FAILURE' || (test.final_state || test.state) == 'SUCCESS'">
+    <div *ngIf="test.exception_traceback">
+      <div class="ui divider horizontal">Exception Traceback</div>
+      <pre class="code"><code>{{test.exception_traceback}}</code></pre>
+    </div>
+    <div *ngIf="test.result != null && config.result_render_html && extractConclusion(test, config) != null">
+      <div class="ui divider horizontal">Raw Result</div>
+      <pre class="code"><code>{{test.result|json}}</code></pre>
+    </div>
+    <div *ngIf="test.output_files && test.output_files.length">
+      <div class="ui divider horizontal">Output Files</div>
+      <table class="ui table unstackable">
+        <thead><tr><th>#</th><th>ID</th><th>Path</th><th>Created At</th><th>Operations</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let file of test.output_files; index as j">
+          <td>{{j+1}}</td>
+          <td>{{file.id}}</td>
+          <td>{{file.path}}</td>
+          <td>{{file.created_at | date: 'medium'}}</td>
+          <td>
+            <div class="ui small buttons">
+              <a class="ui button icon" title="View" target="_blank" href="api/submissions/{{test.submission_id}}/auto-tests/{{test.id}}/output-files/{{file.id}}/raw">
+                <i class="icon eye"></i>
+              </a>
+              <a class="ui button icon" title="Download" href="api/submissions/{{test.submission_id}}/auto-tests/{{test.id}}/output-files/{{file.id}}/download">
+                <i class="icon download"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

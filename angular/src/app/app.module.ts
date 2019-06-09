@@ -43,7 +43,6 @@ import {TaskDetailsPreviewComponent} from './task-details-preview/task-details-p
 import { OrdinalPipe } from './ordinal.pipe';
 import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component';
 import { AutoTestMiniCardComponent } from './auto-test-mini-card/auto-test-mini-card.component';
-import { AutoTestAdvancedCardComponent } from './auto-test-advanced-card/auto-test-advanced-card.component';
 import { SubmissionsTableComponent } from './submissions-table/submissions-table.component';
 import { AutoTestConclusionCardComponent } from './auto-test-conclusion-card/auto-test-conclusion-card.component';
 import { TablePaginationToolbarComponent } from './table-pagination-toolbar/table-pagination-toolbar.component';
@@ -54,6 +53,8 @@ import { AboutComponent } from './about/about.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
 import { EmailSubscriptionsComponent } from './email-subscriptions/email-subscriptions.component';
 import { UserMiniCardComponent } from './user-mini-card/user-mini-card.component';
+import { SubmissionCardComponent } from './submission-card/submission-card.component';
+import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/submission-auto-tests-view.component';
 
 @NgModule({
   declarations: [
@@ -95,7 +96,6 @@ import { UserMiniCardComponent } from './user-mini-card/user-mini-card.component
     OrdinalPipe,
     AutoTestCardComponent,
     AutoTestMiniCardComponent,
-    AutoTestAdvancedCardComponent,
     SubmissionsTableComponent,
     AutoTestConclusionCardComponent,
     TablePaginationToolbarComponent,
@@ -106,6 +106,8 @@ import { UserMiniCardComponent } from './user-mini-card/user-mini-card.component
     MessageDetailComponent,
     EmailSubscriptionsComponent,
     UserMiniCardComponent,
+    SubmissionCardComponent,
+    SubmissionAutoTestsViewComponent,
   ],
   imports: [
     BrowserModule,

@@ -13,76 +13,10 @@
     <div class="active section">Submission {{submission.id}}</div>
   </div>
 
-  <div class="ui segment">
-    <div class="ui list horizontal">
-      <div class="item">
-        <div class="header">Submitted At</div>
-        {{ submission.created_at | date: 'medium' }} ({{createdFromNow}})
-      </div>
-    </div>
-  </div>
-
-  <h4 class="ui header">
-    <i class="icon copy outline"></i>
-    Files
-  </h4>
-  <table class="ui table unstackable">
-    <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Size</th><th>MD5 Hash</th><th>Operations</th></tr></thead>
-    <tbody>
-    <tr *ngFor="let file of submission.files; index as i">
-      <td>{{i+1}}</td>
-      <td>{{file.id}}</td>
-      <td>{{file.requirement.name}}</td>
-      <td>{{file.size | size}}</td>
-      <td><span [attr.data-tooltip]="file.md5" data-position="bottom center">{{file.md5|slice:0:6}}</span></td>
-      <td>
-        <div class="ui mini buttons">
-          <a class="ui icon button" href="api/submissions/{{submissionId}}/files/{{file.id}}/view" target="_blank"
-             title="View">
-            <i class="icon eye"></i>
-          </a>
-          <a class="ui icon button" href="api/submissions/{{submissionId}}/files/{{file.id}}/download"
-             title="Download">
-            <i class="icon download"></i>
-          </a>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <app-submission-card [submission]="submission"></app-submission-card>
 
   <ng-container *ngIf="task.evaluation_method=='auto_test'">
-    <h4 class="ui header">
-      <i class="icon terminal"></i>
-      Auto Tests
-    </h4>
-
-    <ng-container *ngIf="autoTests">
-      <app-auto-test-advanced-card
-        *ngFor="let test of autoTests"
-        [test]="test" [config]="test.config" [submission]="submission" [isAdmin]="isAdmin"
-        (deleted)="onAutoTestDeleted(test)" (error)="error=$event"></app-auto-test-advanced-card>
-    </ng-container>
-
-    <div *ngIf="isAdmin" class="ui run-new-test grid centered stackable">
-      <div class="ui six wide column">
-        <div class="ui segment">
-          <form class="ui form">
-            <h4 class="ui dividing header">Run New Test</h4>
-            <div class="ui field">
-              <label>Test Config</label>
-              <select name="auto_test_config" [(ngModel)]="selectedAutoTestConfigId">
-                <option *ngFor="let config of task.auto_test_configs" [ngValue]="config.id">{{config.name}}</option>
-              </select>
-            </div>
-            <button class="ui button fluid" (click)="runAutoTest()" [ngClass]="{'disabled loading': requestingRunAutoTest}">
-              <i class="icon play"></i>
-              Run
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+    <app-submission-auto-tests-view [submission]="submission" [task]="task" (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
 
 </div>

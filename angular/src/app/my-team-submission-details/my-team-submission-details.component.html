@@ -9,58 +9,11 @@
     <div class="active section">Submission {{submission.id}}</div>
   </div>
 
-  <div class="ui segment">
-    <div class="ui list horizontal">
-      <div class="item">
-        <div class="header">Submitter</div>
-        <span *ngIf="submission.submitter.nickname; else nameOnly">{{submission.submitter.nickname}} ({{submission.submitter.name}})</span>
-        <ng-template #nameOnly>{{submission.submitter.name}}</ng-template>
-      </div>
-      <div class="item">
-        <div class="header">Submitted At</div>
-        {{ submission.created_at | date: 'medium' }} ({{createdFromNow}})
-      </div>
-    </div>
-  </div>
-
-  <h4 class="ui header">
-    <i class="icon copy outline"></i>
-    Files
-  </h4>
-  <table class="ui table unstackable">
-    <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Size</th><th>MD5 Hash</th><th>Operations</th></tr></thead>
-    <tbody>
-    <tr *ngFor="let file of submission.files; index as i">
-      <td>{{i+1}}</td>
-      <td>{{file.id}}</td>
-      <td>{{file.requirement.name}}</td>
-      <td>{{file.size | size}}</td>
-      <td><span [attr.data-tooltip]="file.md5" data-position="bottom center">{{file.md5|slice:0:6}}</span></td>
-      <td>
-        <div class="ui mini buttons">
-          <a class="ui icon button" href="api/my-team-submissions/{{submissionId}}/files/{{file.id}}/view" target="_blank"
-             title="View">
-            <i class="icon eye"></i>
-          </a>
-          <a class="ui icon button" href="api/my-team-submissions/{{submissionId}}/files/{{file.id}}/download"
-             title="Download">
-            <i class="icon download"></i>
-          </a>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <app-submission-card [submission]="submission" [apiBase]="submissionService.myTeamApi"></app-submission-card>
 
   <ng-container *ngIf="task.evaluation_method=='auto_test'">
-    <h4 class="ui header">
-      <i class="icon terminal"></i>
-      Auto Tests
-    </h4>
-
-    <ng-container *ngIf="autoTests">
-      <app-auto-test-card *ngFor="let test of autoTests" [test]="test" [config]="test.config"></app-auto-test-card>
-    </ng-container>
+    <app-submission-auto-tests-view [submission]="submission" [task]="task" [apiBase]="submissionService.myTeamApi"
+                                    (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
 
 </div>

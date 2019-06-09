@@ -416,7 +416,7 @@
               <tr *ngFor="let config of task.auto_test_configs; index as i">
                 <td>{{ config.id }}</td>
                 <td>{{ config.name }}</td>
-                <td>{{ autoTestConfigTypes[config.type] }}</td>
+                <td>{{ submissionService.autoTestConfigTypes[config.type].name }}</td>
                 <td>
                   <i title="Enabled" class="icon green play circle" *ngIf="config.is_enabled; else auto_test_config_disabled"></i>
                   <i title="Private" class="icon red lock" *ngIf="config.is_private; else auto_test_config_private"></i>
@@ -474,7 +474,7 @@
                       <div class="field required" [ngClass]="{'error': (autoTestConfigTypeModel.touched || autoTestConfigTypeModel.dirty || fNewAutoTestConfig.submitted) && autoTestConfigTypeModel.invalid}">
                         <label>Type</label>
                         <select name="type" [(ngModel)]="newAutoTestConfigForm.type" required #autoTestConfigTypeModel="ngModel">
-                          <option [ngValue]="type.key" *ngFor="let type of autoTestConfigTypes | keyvalue">{{type.value}}</option>
+                          <option [ngValue]="type.key" *ngFor="let type of submissionService.autoTestConfigTypes | keyvalue">{{type.value.name}}</option>
                         </select>
                         <div class="errors">
                           <label *ngIf="autoTestConfigTypeModel.errors?.required">Type is required</label>
@@ -551,7 +551,7 @@
               <div class="field required" [ngClass]="{'error': (updateAutoTestConfigTypeModel.touched || updateAutoTestConfigTypeModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigTypeModel.invalid}">
                 <label>Type</label>
                 <select name="type" [(ngModel)]="updateAutoTestConfigForm.type" required #updateAutoTestConfigTypeModel="ngModel">
-                  <option [ngValue]="type.key" *ngFor="let type of autoTestConfigTypes | keyvalue">{{type.value}}</option>
+                  <option [ngValue]="type.key" *ngFor="let type of submissionService.autoTestConfigTypes | keyvalue">{{type.value.name}}</option>
                 </select>
                 <div class="errors">
                   <label *ngIf="updateAutoTestConfigTypeModel.errors?.required">Type is required</label>

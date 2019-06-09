@@ -1,0 +1,41 @@
+<div class="ui list horizontal">
+  <div class="item">
+    <div class="header">ID</div>
+    {{submission.id}}
+  </div>
+  <div class="item" *ngIf="submission.submitter">
+    <div class="header">Submitter</div>
+    <app-user-mini-card [user]="submission.submitter"></app-user-mini-card>
+  </div>
+  <div class="item">
+    <div class="header">Submitted At</div>
+    {{ submission.created_at | date: 'medium' }} ({{createdFromNow}})
+  </div>
+</div>
+
+<ng-container *ngIf="submission.files.length">
+  <div class="ui divider"></div>
+  <div class="ui cards">
+    <div class="ui card" *ngFor="let file of submission.files">
+      <div class="content">
+        <div class="ui right floated meta">
+    <span title="MD5: {{file.md5}}">
+      <i class="ui icon hashtag"></i> {{file.md5|slice:0:6}}
+    </span>
+        </div>
+        <div class="header">
+          {{file.requirement.name}}
+        </div>
+        <div class="meta">
+          <span>{{file.size | size}}</span>
+        </div>
+      </div>
+      <div class="extra content">
+        <div class="ui two buttons">
+          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/view" target="_blank"><i class="icon eye"></i> View</a>
+          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/download"><i class="icon download"></i> Download</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
