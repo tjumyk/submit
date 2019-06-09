@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, LOCALE_ID, OnInit} from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -7,7 +7,13 @@ import * as moment from 'moment';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit{
+
+  constructor(
+    @Inject(LOCALE_ID) private localeId: string
+  ) {
+  }
+
   ngOnInit(){
-    moment.locale('en-au')
+    moment.locale(this.localeId);
   }
 }

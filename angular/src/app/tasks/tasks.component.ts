@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, Task, Team, Term, User} from "../models";
+import {ErrorMessage, Task, Term, User} from "../models";
 import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -41,8 +41,6 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    moment.locale('en-AU');
-
     this.accountService.getCurrentUser().subscribe(
       user=>{
         this.user = user;

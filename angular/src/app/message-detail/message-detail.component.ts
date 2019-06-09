@@ -27,8 +27,6 @@ export class MessageDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    moment.locale('en-AU');
-
     this.mid = parseInt(this.route.snapshot.paramMap.get('msg_id'));
 
     this.loadingMessage = true;

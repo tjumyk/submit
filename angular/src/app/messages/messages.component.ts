@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MessageService} from "../message.service";
 import {finalize} from "rxjs/operators";
-import {ErrorMessage, Message, MessageChannel, SuccessMessage, Term} from "../models";
+import {ErrorMessage, Message, Term} from "../models";
 import * as moment from "moment";
 import {Observable} from "rxjs";
 import {TermService} from "../term.service";
@@ -31,8 +31,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    moment.locale('en-AU');
-
     this.termId = parseInt(this.route.parent.snapshot.paramMap.get('term_id'));
     this.termService.getCachedTerm(this.termId).subscribe(
       term => {

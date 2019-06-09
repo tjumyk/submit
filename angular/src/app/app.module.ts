@@ -115,9 +115,6 @@ import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/s
     HttpClientModule,
     FormsModule
   ],
-  providers: [
-    { provide: LOCALE_ID, useValue: 'en-AU' }
-  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
