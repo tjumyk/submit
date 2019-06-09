@@ -1,9 +1,9 @@
 <ng-container *ngIf="firstLoadComplete">
   <div class="ui segment" *ngFor="let config of task.auto_test_configs">
-    <div class="ui config label top attached">
+    <div class="ui config label top attached teal">
       <i class="icon" [ngClass]="autoTestConfigTypes[config.type].icon" [title]="autoTestConfigTypes[config.type].name"></i>
       {{config.name}}
-      <i class="icon red lock" *ngIf="config.is_private"></i>
+      <i class="icon red lock" *ngIf="config.is_private" title="Private Config"></i>
       <a class="action" title="Run New Test" (click)="runNewTest(config, btnRunNewTest)" #btnRunNewTest *ngIf="isAdmin"><i class="icon plus"></i></a>
     </div>
 
