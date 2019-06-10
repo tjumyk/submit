@@ -8,7 +8,7 @@ from nbconvert.nbconvertapp import NbConvertApp
 
 class NotebookToolkit:
     NOTEBOOK_FILE_EXTENSION = '.ipynb'
-    WORK_ROOT_DIR = '/tmp/submit_nbtoolkit'
+    WORK_FOLDER_NAME = 'submit_nbtoolkit'
 
     @classmethod
     def _scan_notebooks_in_dir(cls, path: str) -> List[str]:
@@ -26,9 +26,10 @@ class NotebookToolkit:
 
     @classmethod
     def _make_work_dir(cls):
-        if not os.path.exists(cls.WORK_ROOT_DIR):
-            os.makedirs(cls.WORK_ROOT_DIR)
-        return tempfile.mkdtemp(dir=cls.WORK_ROOT_DIR)
+        work_root = os.path.join(tempfile.gettempdir(), cls.WORK_FOLDER_NAME)
+        if not os.path.exists(work_root):
+            os.makedirs(work_root, mode=0o700)
+        return tempfile.mkdtemp(dir=work_root)
 
     @classmethod
     def extract_notebooks(cls, path: str) -> List[str]:
