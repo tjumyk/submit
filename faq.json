@@ -5,7 +5,7 @@
   },
   {
     "question": "What is the difference between the \"Due Time\" and \"Close Time\"?",
-    "answer": "\"Due time\" is the deadline for the normal submissions, while \"Close Time\" is the deadline for both the normal submissions and late submissions. After the \"Due Time\" and before the \"Close Time\", you may still submit your work but late penalties may apply."
+    "answer": "\"Due time\" is the deadline for the normal submissions, while \"Close Time\" is the deadline for the late submissions. After the \"Due Time\" and before the \"Close Time\", you may still submit your work but late penalties may apply."
   },
   {
     "question": "Why can't I join a team?",
