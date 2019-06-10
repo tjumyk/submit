@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ErrorMessage, Message} from "../models";
 import {MessageService} from "../message.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
 
@@ -22,7 +22,8 @@ export class MessageDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private messageService: MessageService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
   }
 
@@ -64,6 +65,15 @@ export class MessageDetailComponent implements OnInit, OnDestroy {
         },
         error=>this.error = error.error
       )
+    }
+  }
+
+  handleRouterLinks(event: MouseEvent){
+    const target = event.target as Element;
+    if(target.tagName == 'A' && target.classList.contains('router') && target.classList.contains('link')){ // is a router link
+      this.router.navigateByUrl(target.getAttribute('href'));
+      // event.stopPropagation(); TODO is this required?
+      return false;
     }
   }
 

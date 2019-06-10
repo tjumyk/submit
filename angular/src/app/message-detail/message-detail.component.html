@@ -51,7 +51,7 @@
             </div>
           </div>
         </div>
-        <div class="ui segment" [innerHTML]="message.body"></div>
+        <div class="ui segment" [innerHTML]="message.body" (click)="handleRouterLinks($event)"></div>
       </ng-container>
     </div>
   </div>
