@@ -25,9 +25,7 @@
               <div class="content">
                 <div class="header">Sender</div>
                 <ng-container *ngIf="message.sender; else fromSystem">
-                  <img class="ui avatar image" src="{{message.sender.avatar}}?size=64" *ngIf="message.sender.avatar; else userIcon">
-                  <ng-template #userIcon><i class="icon user circle"></i></ng-template>
-                  {{ message.sender.nickname || message.sender.name }}
+                  <app-user-mini-card [user]="message.sender"></app-user-mini-card>
                 </ng-container>
                 <ng-template #fromSystem>System</ng-template>
               </div>
@@ -36,9 +34,7 @@
               <div class="content">
                 <div class="header">Receiver</div>
                 <ng-container *ngIf="message.receiver; else noReceiver">
-                  <img class="ui avatar image" src="{{message.receiver.avatar}}?size=64" *ngIf="message.receiver.avatar; else userIcon">
-                  <ng-template #userIcon><i class="icon user circle"></i></ng-template>
-                  {{ message.receiver.nickname || message.receiver.name }}
+                  <app-user-mini-card [user]="message.receiver"></app-user-mini-card>
                 </ng-container>
                 <ng-template #noReceiver>
                   <ng-container *ngIf="message.receiver_group">
