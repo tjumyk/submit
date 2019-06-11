@@ -1,0 +1,12 @@
+Auto Test Completed (ID: {test.id})
+Hi {user_name},
+
+An auto test (ID: {test.id}) for your submission (ID: {submission.id}) in {task.title} just completed.
+
+We send you such kind of message only when a test took relatively long time to complete.
+
+You may click the following button or find the submission page to see the details.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/{submission_api_path}/{submission.id}
+
+{site[name]}

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Blueprint, jsonify, current_app as app, send_from_directory, request, render_template
@@ -9,12 +9,17 @@ from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.submission_file_viewer import SubmissionFileViewerService
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
+from utils.message import build_message_with_template
 
 submission_api = Blueprint('submission_api', __name__)
+
+_task_duration_notification_threshold = timedelta(minutes=1)
 
 
 def requires_worker(f):
@@ -243,9 +248,36 @@ def worker_result(sid, wid):
 
         test.stopped_at = datetime.utcnow()
         db.session.commit()
+
+        duration = test.stopped_at - test.created_at
+        if duration > _task_duration_notification_threshold:
+            # access role check omitted for simplicity, send notifications only for public test configs
+            if not test.config.is_private:
+                submission = test.submission
+                submitter = submission.submitter
+                task = submission.task
+                term = task.term
+                api_path = 'my-team-submissions' if task.is_team_task else 'my-submissions'
+                msg_args = dict(site=app.config['SITE'],
+                                user_name=submitter.nickname or submitter.name,
+                                test=test,
+                                submission=submission,
+                                submission_api_path=api_path,
+                                task=task,
+                                term=term)
+                msg_content = build_message_with_template('auto_test_complete', msg_args)
+                msg_channel = MessageService.get_channel_by_name('auto_test')
+                msgs, mail = MessageSenderService.send_to_user(msg_channel, term, msg_content, None, submitter)
+
+                db.session.commit()
+                if mail:
+                    mail.send()
+
         return "", 204
     except AutoTestServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageServiceError, MessageSenderServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @submission_api.route('/<int:sid>/worker-output-files/<string:wid>', methods=['POST'])

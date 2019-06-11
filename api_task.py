@@ -16,10 +16,13 @@ from anti_plagiarism.code_analysis import CodeSegmentIndex
 from models import db, SpecialConsideration, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
+from utils.message import build_message_with_template
 from utils.upload import md5sum
 
 task_api = Blueprint('task_api', __name__)
@@ -572,7 +575,7 @@ def task_my_submissions(tid):
                 save_paths[req_id] = os.path.join(folder, req.name)
 
             # create new submission
-            new_submission, submissions_to_clear = SubmissionService.add(task, user, files, save_paths)
+            new_submission, submissions_to_clear, submitted_for_team = SubmissionService.add(task, user, files, save_paths)
 
             # clear outdated submissions according to history limit
             file_paths_to_remove = []
@@ -653,10 +656,30 @@ def task_my_submissions(tid):
                     SubmissionService.run_auto_test(new_submission, config)
                 db.session.commit()  # have to commit again
 
+            # if this is a team task, notify other teammates about this submission
+            if task.is_team_task:
+                team_other_members = [ass.user for ass in submitted_for_team.user_associations
+                                      if ass.user.id != user.id]
+                msg_args = dict(site=app.config['SITE'],
+                                submitter_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                                submission=new_submission,
+                                team=submitted_for_team,
+                                task=task,
+                                term=task.term)
+                msg_content = build_message_with_template('team_new_teammate_submission', msg_args)
+                msg_channel = MessageService.get_channel_by_name('team')
+                msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                                 team_other_members)
+                db.session.commit()
+                for mail in mails:
+                    mail.send()
+
             return jsonify(new_submission.to_dict()), 201
 
     except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except (MessageServiceError, MessageSenderServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @task_api.route('/<int:tid>/my-submissions/last-auto-tests')

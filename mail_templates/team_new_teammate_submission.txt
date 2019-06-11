@@ -1,0 +1,10 @@
+New Submission from Teammate (ID: {submission.id})
+Hi,
+
+Your teammate {submitter_name} just made a new submission (ID: {submission.id}) for {task.title}.
+
+You may click the following button or open 'Team Submissions' tab in the task page to see the details.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/my-team-submissions/{submission.id}
+
+{site[name]}

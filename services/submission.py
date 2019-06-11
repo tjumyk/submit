@@ -473,7 +473,7 @@ class SubmissionService:
 
     @staticmethod
     def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str]) \
-            -> Tuple[Submission, List[Submission]]:
+            -> Tuple[Submission, List[Submission], Optional[Team]]:
         # assume role has been checked (to minimize dependency)
 
         if task is None:
@@ -525,6 +525,8 @@ class SubmissionService:
                     .order_by(desc(Submission.id)) \
                     .offset(task.submission_history_limit - 1).all()
         else:
+            team = None
+
             # get special considerations
             special = TaskService.get_special_consideration_for_task_user(task, submitter)
 
@@ -579,7 +581,7 @@ class SubmissionService:
                 raise SubmissionServiceError('unmet requirement', req.name)
 
         db.session.add(submission)
-        return submission, submissions_to_clear
+        return submission, submissions_to_clear, team
 
     @staticmethod
     def clear_submission(submission: Submission) -> List[str]:

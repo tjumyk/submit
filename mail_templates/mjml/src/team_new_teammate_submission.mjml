@@ -1,0 +1,22 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./include/head.mjml"/>
+  </mj-head>
+  
+  <mj-body>
+    <mj-include path="./include/header.mjml" />
+    
+    <mj-section background-color='#fff' padding='20px'>
+      <mj-column>
+        <mj-text>
+          <h2>Hi,</h2>
+          <p>Your teammate <b>{{submitter_name}}</b> just made a new submission (ID: <b>{{submission.id}}</b>) for <b>{{task.title}}</b>.</p>
+          <p>You may click the following button or open 'Team Submissions' tab in the task page to see the details.</p>
+        </mj-text>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/my-team-submissions/{{submission.id}}'>Submission Details</mj-button>
+      </mj-column>
+    </mj-section>
+    
+    <mj-include path="./include/footer.mjml" />
+  </mj-body>
+</mjml>

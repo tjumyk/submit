@@ -190,10 +190,12 @@ class MessageService:
 
     @staticmethod
     def init_default_channels():
-        MessageService.add_channel('task', 'Task-related messages')
-        MessageService.add_channel('team', 'Team-related messages')
+        MessageService.add_channel('task', 'Messages about Tasks')
+        MessageService.add_channel('team', 'Messages about Teams')
+        MessageService.add_channel('auto_test', 'Messages about Auto Tests')
 
     @classmethod
     def init_new_user_subscriptions(cls, user: UserAlias):
         cls.set_email_subscription(user, cls.get_channel_by_name('task'), True)
         cls.set_email_subscription(user, cls.get_channel_by_name('team'), True)
+        cls.set_email_subscription(user, cls.get_channel_by_name('auto_test'), True)
