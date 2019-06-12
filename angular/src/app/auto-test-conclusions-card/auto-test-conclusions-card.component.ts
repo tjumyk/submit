@@ -3,11 +3,11 @@ import {AutoTestConclusionsMap} from "../task.service";
 import {Task} from "../models";
 
 @Component({
-  selector: 'app-auto-test-conclusion-card',
-  templateUrl: './auto-test-conclusion-card.component.html',
-  styleUrls: ['./auto-test-conclusion-card.component.less']
+  selector: 'app-auto-test-conclusions-card',
+  templateUrl: './auto-test-conclusions-card.component.html',
+  styleUrls: ['./auto-test-conclusions-card.component.less']
 })
-export class AutoTestConclusionCardComponent implements OnInit {
+export class AutoTestConclusionsCardComponent implements OnInit {
   @Input() task: Task;
   @Input() conclusions: AutoTestConclusionsMap;
 

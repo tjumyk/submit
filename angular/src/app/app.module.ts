@@ -44,7 +44,7 @@ import { OrdinalPipe } from './ordinal.pipe';
 import { AutoTestCardComponent } from './auto-test-card/auto-test-card.component';
 import { AutoTestMiniCardComponent } from './auto-test-mini-card/auto-test-mini-card.component';
 import { SubmissionsTableComponent } from './submissions-table/submissions-table.component';
-import { AutoTestConclusionCardComponent } from './auto-test-conclusion-card/auto-test-conclusion-card.component';
+import { AutoTestConclusionsCardComponent } from './auto-test-conclusions-card/auto-test-conclusions-card.component';
 import { TablePaginationToolbarComponent } from './table-pagination-toolbar/table-pagination-toolbar.component';
 import { RunAutoTestCardComponent } from './run-auto-test-card/run-auto-test-card.component';
 import { MessagesComponent } from './messages/messages.component';
@@ -97,7 +97,7 @@ import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/s
     AutoTestCardComponent,
     AutoTestMiniCardComponent,
     SubmissionsTableComponent,
-    AutoTestConclusionCardComponent,
+    AutoTestConclusionsCardComponent,
     TablePaginationToolbarComponent,
     RunAutoTestCardComponent,
     MessagesComponent,
