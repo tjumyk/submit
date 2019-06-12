@@ -54,6 +54,23 @@ pre.code{
   }
 }
 
+.marks-indicator{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding-bottom: calc(2rem + 2px);
+  &>.inner{
+    border-radius: 4px 4px 0 0;
+    max-height: 100%;
+    background: rgba(27, 28, 29, 0.5)
+  }
+  ~.value{
+    z-index: 1;
+  }
+}
+
 .ui.details.segment{
   height: 0;
   opacity: 0;

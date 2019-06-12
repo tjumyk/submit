@@ -16,9 +16,14 @@
       <div class="ui label bottom attached">ID: {{test.id}}</div>
       <div class="ui statistic inverted">
         <ng-container *ngIf="(test.final_state || test.state) == 'SUCCESS'">
-          <div class="value" *ngIf="test.result != null && extractConclusion(test, config) != null; else noConclusion" [ngClass]="config.result_conclusion_type">
-            {{printConclusion(test, config)}}
-          </div>
+          <ng-container *ngIf="test.result != null && extractConclusion(test, config) != null; else noConclusion">
+            <div class="marks-indicator" *ngIf="(config.result_conclusion_type == 'int' || config.result_conclusion_type == 'float') && config.result_conclusion_full_marks">
+              <div class="inner" [ngStyle]="{'height.%': 100*(1-extractConclusion(test, config)/config.result_conclusion_full_marks)}"></div>
+            </div>
+            <div class="value" [ngClass]="config.result_conclusion_type">
+              {{printConclusion(test, config)}}
+            </div>
+          </ng-container>
           <ng-template #noConclusion>
             <div class="value">
               <i class="icon question circle"></i>
