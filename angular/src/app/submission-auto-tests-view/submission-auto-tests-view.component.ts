@@ -109,9 +109,24 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
 
             let oldTest = this.autoTests[test.id];
             if (oldTest) { // test already exists, we need to update the old test
-              for (let key in test) {
-                oldTest[key] = test[key];
-              }
+              oldTest.work_id = test.work_id;
+
+              oldTest.hostname = test.hostname;
+              oldTest.pid = test.pid;
+
+              oldTest.state = test.state;
+              oldTest.final_state = test.final_state;
+              oldTest.result = test.result;
+              oldTest.exception_class = test.exception_class;
+              oldTest.exception_message = test.exception_message;
+              oldTest.exception_traceback = test.exception_traceback;
+
+              oldTest.created_at= test.created_at;
+              oldTest.modified_at = test.modified_at;
+              oldTest.started_at = test.started_at;
+              oldTest.stopped_at = test.stopped_at;
+
+              oldTest.output_files = test.output_files;
             } else { // new test
               this.autoTestGroups[test.config_id].push(test);  // note the group must have been created
               this.autoTests[test.id] = test;
