@@ -319,6 +319,8 @@ export class AdminTaskEditComponent implements OnInit {
     this.editingAutoTestConfig = config;
 
     let form = this.updateAutoTestConfigForm;
+    // have to manually assign each property because iterating through keys of either 'form' will miss keys with empty
+    // values and iterating through keys of 'config' results in more keys than needed.
     form.name = config.name;
     form.type = config.type;
     form.description = config.description;
@@ -338,6 +340,7 @@ export class AdminTaskEditComponent implements OnInit {
     form.result_conclusion_path = config.result_conclusion_path;
     form.result_conclusion_apply_late_penalty = config.result_conclusion_apply_late_penalty;
     form.results_conclusion_accumulate_method = config.results_conclusion_accumulate_method;
+    form.result_conclusion_full_marks = config.result_conclusion_full_marks;
 
     this.validateTestEnvironment(config.environment_id)
   }

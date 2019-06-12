@@ -729,6 +729,10 @@
                 <label>Result Conclusion Path</label>
                 <input type="text" name="result_conclusion_path" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_path" placeholder="Path of the conclusion in the result object. Empty path means the whole result is the conclusion.">
               </div>
+              <div class="field" *ngIf="updateAutoTestConfigForm.result_conclusion_type == 'int' || updateAutoTestConfigForm.result_conclusion_type == 'float'">
+                <label>Result Conclusion Full Marks</label>
+                <input type="number" name="result_conclusion_full_marks" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_full_marks" placeholder="Full marks of the conclusion">
+              </div>
               <div class="field">
                 <div class="ui input checkbox" (click)="checkboxResultConclusionApplyLatePenalty.click()">
                   <input type="checkbox" tabindex="0" class="hidden" #checkboxResultConclusionApplyLatePenalty name="result_conclusion_apply_late_penalty" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_apply_late_penalty">
