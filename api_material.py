@@ -104,8 +104,8 @@ def material_get_notebook_content(mid, path: str):
 
         path = path.lstrip('/')
         if path.find('/') < 0:
-            # force a trailing slash after notebook name to avoid errors when loading resources from relative paths
-            return redirect(request.url + '/', code=301)
+            # require a trailing slash after notebook name to avoid errors when loading resources from relative paths
+            return jsonify(msg='notebook name must end with a slash'), 400
 
         notebook_name, sub_path = path.split('/', 1)
         notebook = MaterialPreviewService.get_notebook(material, notebook_name, app.config['DATA_FOLDER'])
