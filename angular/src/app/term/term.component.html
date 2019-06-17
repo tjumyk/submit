@@ -63,8 +63,8 @@
     </div>
 
     <div class="content">
+      <div class="ui inverted dimmer" (click)="resetMobileMenu()" [ngClass]="{'active': showMobileMenu}"></div>
       <div class="scroll wrapper">
-        <div class="ui inverted dimmer" (click)="resetMobileMenu()" [ngClass]="{'active': showMobileMenu}"></div>
         <router-outlet></router-outlet>
       </div>
     </div>
