@@ -67,7 +67,7 @@ class MessageService:
 
         msgs = db.session.query(Message) \
             .filter(*filters) \
-            .order_by(Message.created_at.desc()) \
+            .order_by(Message.id.desc()) \
             .all()
         return msgs
 
