@@ -86,24 +86,31 @@ class MessageService:
         return unread_count
 
     @staticmethod
-    def set_is_read(msg: Message, user: UserAlias, is_read: bool):
-        if msg is None:
-            raise MessageServiceError(msg='message is required')
+    def set_is_read(user: UserAlias, is_read: bool, *messages: Message):
         if user is None:
             raise MessageServiceError(msg='user is required')
+        if not messages:
+            return
 
-        mark = MessageIsRead.query.filter_by(user_id=user.id, message_id=msg.id).first()
+        marks = db.session.query(MessageIsRead) \
+            .filter(MessageIsRead.user_id == user.id,
+                    MessageIsRead.message_id.in_([msg.id for msg in messages])).all()
+
         if is_read:
-            if mark is None:
-                db.session.add(MessageIsRead(user_id=user.id, message_id=msg.id))
+            target_set = set(msg.id for msg in messages)
+            read_set = set(mark.message_id for mark in marks)
+            for mid in set.difference(target_set, read_set):
+                db.session.add(MessageIsRead(user_id=user.id, message_id=mid))
         else:
-            if mark is not None:
+            for mark in marks:
                 db.session.delete(mark)
 
     @staticmethod
     def get_is_read(user: UserAlias, *messages: Message) -> Set[int]:
         if user is None:
             raise MessageServiceError(msg='user is required')
+        if not messages:
+            return set()
 
         read_set = set()
         for result in db.session.query(MessageIsRead.message_id.label('mid')) \

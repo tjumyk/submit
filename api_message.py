@@ -46,7 +46,7 @@ def mark_read(mid):
         if not MessageService.is_receiver(msg, user):
             return jsonify(msg='access forbidden'), 403
 
-        MessageService.set_is_read(msg, user, is_read=True)
+        MessageService.set_is_read(user, True, msg)
         db.session.commit()
         return "", 204
     except (AccountServiceError, MessageServiceError) as e:

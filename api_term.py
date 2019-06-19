@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from auth_connect.oauth import requires_login
+from models import db
 from services.account import AccountService, AccountServiceError
 from services.messsage import MessageService, MessageServiceError
 from services.term import TermService, TermServiceError
@@ -87,5 +88,26 @@ def term_unread_messages_count(term_id):
             return jsonify(msg='term not found'), 404
 
         return jsonify(MessageService.get_unread_count_for_term_user(term, user))
+    except (AccountServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@term_api.route('/<int:term_id>/mark-all-messages-read')
+@requires_login
+def term_messages_mark_all_read(term_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        term = TermService.get(term_id)
+        if term is None:
+            return jsonify(msg='term not found'), 404
+
+        msgs = MessageService.get_for_term_user(term, user)
+        MessageService.set_is_read(user, True, *msgs)
+
+        db.session.commit()
+        return "", 204
     except (AccountServiceError, MessageServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

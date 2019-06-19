@@ -95,4 +95,18 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.messageRefreshHandler = setInterval(messageRefresher, 30000);
   }
 
+  markAllRead(btn: HTMLElement){
+    btn.classList.add('disabled', 'loading');
+    this.termService.markAllMessagesRead(this.termId).pipe(
+      finalize(()=>btn.classList.remove('disabled', 'loading'))
+    ).subscribe(
+      ()=>{
+        for(let msg of this.messages){
+          msg.is_read = true
+        }
+      },
+      error=>this.error = error.error
+    )
+  }
+
 }

@@ -75,7 +75,10 @@
             </div>
           </div>
 
-          <a class="ui button fluid" routerLink="/email-subscriptions"><i class="icon bell"></i> Manage Email Notifications</a>
+          <div class="ui basic buttons vertical labeled icon">
+            <button class="ui button" (click)="markAllRead(btnMarkAllAsRead)" #btnMarkAllAsRead><i class="icon check"></i> Mark All as Read</button>
+            <a class="ui button" routerLink="/email-subscriptions"><i class="icon bell"></i> Manage Email Notifications</a>
+          </div>
         </div>
       </div>
     </div>

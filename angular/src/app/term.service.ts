@@ -85,4 +85,8 @@ export class TermService {
   getUnreadMessagesCount(term_id: number): Observable<number> {
     return this.http.get<number>(`${this.api}/${term_id}/unread-messages-count`)
   }
+
+  markAllMessagesRead(term_id: number): Observable<any>{
+    return this.http.get(`${this.api}/${term_id}/mark-all-messages-read`)
+  }
 }
