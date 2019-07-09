@@ -5,6 +5,10 @@
     {{ task.description }}
   </div>
 
+  <div class="ui segment" *ngIf="numGetNotebookJobs">
+    <div class="ui loader inline centered active text">Scanning Jupyter Notebooks...</div>
+  </div>
+
   <ng-container *ngFor="let item of notebookPreviews | keyvalue">
     <div class="ui segment" *ngFor="let notebook of item.value">
       <div class="ui top attached label notebook">

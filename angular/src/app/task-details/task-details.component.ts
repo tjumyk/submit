@@ -6,6 +6,7 @@ import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
 import {MaterialService} from "../material.service";
 import {DomSanitizer} from "@angular/platform-browser";
+import {finalize} from "rxjs/operators";
 
 export class MaterialCategory {
   type: string;
@@ -29,6 +30,7 @@ export class TaskDetailsComponent implements OnInit {
   accessRoles: Set<string>;
 
   hasPrivateMaterial: boolean = false;
+  numGetNotebookJobs: number;
 
   materialIcons: { [type: string]: string } = {
     'specification': 'clipboard outline',
@@ -88,16 +90,21 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   private setupNotebooksPreview() {
+    this.numGetNotebookJobs = 0;
     for (let mat of this.task.materials) {
       if (mat.type == 'specification') {
-        this.materialService.getNotebooks(mat.id).subscribe(
+        ++this.numGetNotebookJobs;
+        this.materialService.getNotebooks(mat.id).pipe(
+          finalize(() => --this.numGetNotebookJobs)
+        ).subscribe(
           notebooks => {
             for (let nb of notebooks) {
               nb.material = mat;
               nb.url = this.sanitizer.bypassSecurityTrustResourceUrl(`api/materials/${nb.material_id}/notebooks/${nb.name}/`)
             }
             this.notebookPreviews[mat.id] = notebooks
-          }
+          },
+          error => this.error = error.error
         );
       }
     }
