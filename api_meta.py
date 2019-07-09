@@ -11,7 +11,7 @@ meta_api = Blueprint('meta_api', __name__)
 @meta_api.route('/version')
 @requires_login
 def get_version():
-    git_commit = subprocess.check_output(["git", "describe", "--always"]).decode().strip()
+    git_commit = subprocess.check_output(["git", "describe", "--tags"]).decode().strip()
 
     return jsonify(commit=git_commit)
 
