@@ -25,9 +25,6 @@ export class UserMiniCardComponent implements OnInit, OnDestroy {
   @ViewChild('popCard')
   popCard: ElementRef;
 
-  @ViewChild('avatar')
-  avatar: ElementRef;
-
   private popper: Popper;
 
   private showDelay: number = 100;
