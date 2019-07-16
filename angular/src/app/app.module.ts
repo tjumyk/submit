@@ -55,6 +55,9 @@ import { EmailSubscriptionsComponent } from './email-subscriptions/email-subscri
 import { UserMiniCardComponent } from './user-mini-card/user-mini-card.component';
 import { SubmissionCardComponent } from './submission-card/submission-card.component';
 import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/submission-auto-tests-view.component';
+import { PopupComponent } from './popup/popup.component';
+import { PopupRefComponent } from './popup-ref/popup-ref.component';
+import { PopupContentComponent } from './popup-content/popup-content.component';
 
 @NgModule({
   declarations: [
@@ -108,6 +111,9 @@ import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/s
     UserMiniCardComponent,
     SubmissionCardComponent,
     SubmissionAutoTestsViewComponent,
+    PopupComponent,
+    PopupRefComponent,
+    PopupContentComponent,
   ],
   imports: [
     BrowserModule,
