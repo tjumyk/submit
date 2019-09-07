@@ -92,7 +92,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
       )
     };
 
-    this.messageRefreshHandler = setInterval(messageRefresher, 30000);
+    this.messageRefreshHandler = setInterval(messageRefresher, this.termService.messageRefreshPeriod);
   }
 
   markAllRead(btn: HTMLElement){

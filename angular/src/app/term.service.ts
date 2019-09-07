@@ -13,6 +13,10 @@ export class TermService {
   private termCaches: {[key: number]: Term} = {};
   private tasksCaches: { [key: number]: Task[] } = {};
 
+  private _messageRefreshPeriod = 2 * 60 * 1000;
+  get messageRefreshPeriod(){
+    return this._messageRefreshPeriod;
+  }
   private _enableMessageRefresh: boolean;
   private disableMessageRefreshCookieName = 'submit_disable_message_refresh';
   get enableMessageRefresh(){

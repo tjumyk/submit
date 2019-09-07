@@ -90,7 +90,7 @@ export class TermComponent implements OnInit, OnDestroy {
     };
 
     messageChecker();
-    this.message_check_handler = setInterval(messageChecker, 30000);
+    this.message_check_handler = setInterval(messageChecker, this.termService.messageRefreshPeriod);
   }
 
 }
