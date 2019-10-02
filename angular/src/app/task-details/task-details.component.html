@@ -5,25 +5,6 @@
     {{ task.description }}
   </div>
 
-  <div class="ui segment" *ngIf="numGetNotebookJobs">
-    <div class="ui loader inline centered active text">Scanning Jupyter Notebooks...</div>
-  </div>
-
-  <ng-container *ngFor="let item of notebookPreviews | keyvalue">
-    <div class="ui segment" *ngFor="let notebook of item.value">
-      <div class="ui top attached label notebook">
-        <a class="title" href="api/materials/{{notebook.material_id}}/download" title="Download">
-          {{notebook.material.name}}
-        </a>
-        <span class="sub title" *ngIf="notebook.name != notebook.material.name"><i class="icon angle double right"></i> {{notebook.name}}</span>
-        <a class="action" [href]="notebook.url" target="_blank" title="Open in a new tab"><i class="icon external alternate"></i></a>
-      </div>
-      <div class="ui embed">
-        <iframe [src]="notebook.url"></iframe>
-      </div>
-    </div>
-  </ng-container>
-
   <ng-container *ngIf="task.materials.length">
     <div class="ui segment">
       <div class="ui top attached blue materials label">
@@ -55,4 +36,24 @@
       </div>
     </div>
   </ng-container>
+
+  <div class="ui segment" *ngIf="numGetNotebookJobs">
+    <div class="ui loader inline centered active text">Scanning Jupyter Notebooks...</div>
+  </div>
+
+  <ng-container *ngFor="let item of notebookPreviews | keyvalue">
+    <div class="ui segment" *ngFor="let notebook of item.value">
+      <div class="ui top attached label notebook">
+        <a class="title" href="api/materials/{{notebook.material_id}}/download" title="Download">
+          {{notebook.material.name}}
+        </a>
+        <span class="sub title" *ngIf="notebook.name != notebook.material.name"><i class="icon angle double right"></i> {{notebook.name}}</span>
+        <a class="action" [href]="notebook.url" target="_blank" title="Open in a new tab"><i class="icon external alternate"></i></a>
+      </div>
+      <div class="ui embed">
+        <iframe [src]="notebook.url"></iframe>
+      </div>
+    </div>
+  </ng-container>
+
 </div>
