@@ -30,6 +30,9 @@ export class TermService {
       Cookie.set(this.disableMessageRefreshCookieName, 1)
   }
 
+  // A global trigger to enforce an instant update to the unread count of the messages
+  unreadMessagesCountTrigger = () => undefined;
+
   constructor(
     private http: HttpClient
   ) {

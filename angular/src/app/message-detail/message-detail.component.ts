@@ -4,6 +4,7 @@ import {MessageService} from "../message.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
+import {TermService} from "../term.service";
 
 @Component({
   selector: 'app-message-detail',
@@ -21,6 +22,7 @@ export class MessageDetailComponent implements OnInit, OnDestroy {
   timeTrackerHandler: number;
 
   constructor(
+    private termService: TermService,
     private messageService: MessageService,
     private route: ActivatedRoute,
     private router: Router
@@ -36,6 +38,7 @@ export class MessageDetailComponent implements OnInit, OnDestroy {
     ).subscribe(
       msg => {
         this.setupMessage(msg);
+        this.termService.unreadMessagesCountTrigger()
       },
       error => this.error = error.error
     )

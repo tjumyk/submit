@@ -65,7 +65,8 @@ export class TermComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(){
-    clearInterval(this.message_check_handler)
+    clearInterval(this.message_check_handler);
+    this.termService.unreadMessagesCountTrigger = () => undefined;
   }
 
   resetMobileMenu() {
@@ -73,10 +74,7 @@ export class TermComponent implements OnInit, OnDestroy {
   }
 
   setupMessageCheck(){
-    const messageChecker = ()=>{
-      if(!this.termService.enableMessageRefresh)
-        return;
-
+    const doMessageCheck = ()=>{
       this.checking_messages = true;
       this.termService.getUnreadMessagesCount(this.termId).pipe(
         finalize(() => this.checking_messages = false)
@@ -89,8 +87,15 @@ export class TermComponent implements OnInit, OnDestroy {
       )
     };
 
-    messageChecker();
+    const messageChecker = ()=>{
+      if(!this.termService.enableMessageRefresh)
+        return;
+      doMessageCheck()
+    };
+
+    this.termService.unreadMessagesCountTrigger = () => doMessageCheck();
     this.message_check_handler = setInterval(messageChecker, this.termService.messageRefreshPeriod);
+    doMessageCheck();
   }
 
 }

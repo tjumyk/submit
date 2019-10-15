@@ -42,6 +42,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
         ).subscribe(
           msgs => {
             this.setupMessages(msgs);
+            this.termService.unreadMessagesCountTrigger();
           },
           error => this.error = error.error
         )
@@ -104,6 +105,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
         for(let msg of this.messages){
           msg.is_read = true
         }
+        this.termService.unreadMessagesCountTrigger();
       },
       error=>this.error = error.error
     )
