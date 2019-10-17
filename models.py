@@ -241,13 +241,16 @@ class Task(db.Model):
             d['submission_attempt_limit'] = self.submission_attempt_limit
             d['submission_history_limit'] = self.submission_history_limit
             d['evaluation_method'] = self.evaluation_method
-            d['materials'] = [m.to_dict() for m in self.materials if not m.is_private or with_advanced_fields]
-            d['file_requirements'] = [f.to_dict() for f in self.file_requirements]
+            d['materials'] = sorted((m.to_dict()
+                                     for m in self.materials
+                                     if not m.is_private or with_advanced_fields), key=lambda m: m['id'])
+            d['file_requirements'] = sorted((f.to_dict() for f in self.file_requirements), key=lambda f: f['id'])
             d['auto_test_configs'] = sorted((c.to_dict(with_advanced_fields=with_advanced_fields)
                                              for c in self.auto_test_configs
                                              if not c.is_private or with_advanced_fields), key=lambda c: c['id'])
         if with_advanced_fields:
-            d['special_considerations'] = [s.to_dict(with_user_or_team=True) for s in self.special_considerations]
+            d['special_considerations'] = sorted((s.to_dict(with_user_or_team=True)
+                                                  for s in self.special_considerations), key=lambda s: s['id'])
             d['created_at'] = self.created_at
             d['modified_at'] = self.modified_at
         return d
