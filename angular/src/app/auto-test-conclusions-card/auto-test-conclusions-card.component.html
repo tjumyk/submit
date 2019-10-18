@@ -1,5 +1,5 @@
 <div class="ui segment" *ngIf="task && conclusions && task.auto_test_configs.length">
-  <h3 class="ui center aligned header">Result</h3>
+  <div class="ui top attached label">Result</div>
   <div class="ui grid stackable centered center aligned">
     <div class="four wide column" *ngFor="let config of task.auto_test_configs">
       <div class="ui statistic fluid">
