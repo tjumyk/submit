@@ -11,3 +11,4 @@ astunparse
 python-magic
 nbconvert
 IPython
+tzlocal

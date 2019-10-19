@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Tuple
 
+import tzlocal
 from celery.result import AsyncResult
 from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload
@@ -176,6 +177,29 @@ class SubmissionService:
             .order_by(sub_query.c.last_submit_time)
         return [TeamSubmissionSummary(team, total, first_time, last_submit)
                 for team, total, first_time, last_submit in query.all()]
+
+    @staticmethod
+    def get_daily_summaries(task: Task):
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        # Get the geographical local timezone, e.g. 'Australia/Sydney', to avoid the Daylight Saving Time issue.
+        timezone = tzlocal.get_localzone().zone
+
+        # cast the 'created_at' field to the precision of days in the specified timezone
+        # https://www.postgresql.org/docs/current/functions-datetime.html
+        created_at_day = func.date(func.timezone(timezone, func.timezone('utc', Submission.created_at)))
+
+        sub_query = db.session.query(Submission.id.label('sid'),
+                                     created_at_day.label('date')) \
+            .filter(Submission.task_id == task.id)\
+            .subquery()
+        query = db.session.query(sub_query.c.date,
+                                 func.count())\
+            .group_by(sub_query.c.date) \
+            .order_by(sub_query.c.date)
+
+        return [(date.strftime('%Y-%m-%d'), count) for date, count in query.all()]
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False, submitted_after: datetime = None) \

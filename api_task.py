@@ -122,6 +122,31 @@ def task_team_submission_summaries(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/daily-submission-summaries')
+@requires_login
+def task_daily_submission_summaries(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        return jsonify(SubmissionService.get_daily_summaries(task))
+    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:tid>/user-submissions/<int:uid>')
 @requires_login
 def task_user_submissions(tid, uid):
