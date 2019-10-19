@@ -183,12 +183,18 @@ class SubmissionService:
         if task is None:
             raise SubmissionServiceError('task is required')
 
-        # Get the geographical local timezone, e.g. 'Australia/Sydney', to avoid the Daylight Saving Time issue.
-        timezone = tzlocal.get_localzone().zone
-
-        # cast the 'created_at' field to the precision of days in the specified timezone
-        # https://www.postgresql.org/docs/current/functions-datetime.html
-        created_at_day = func.date(func.timezone(timezone, func.timezone('utc', Submission.created_at)))
+        # cast the 'Submission.created_at' field to the precision of days in the local timezone
+        db_type = db.session.bind.dialect.name
+        if db_type == 'sqlite':
+            # https://www.sqlite.org/lang_datefunc.html
+            created_at_day = func.date(Submission.created_at, 'localtime')
+        elif db_type == 'postgresql':
+            # Get the geographical local timezone, e.g. 'Australia/Sydney', to avoid the Daylight Saving Time issue.
+            timezone = tzlocal.get_localzone().zone
+            # https://www.postgresql.org/docs/current/functions-datetime.html
+            created_at_day = func.date(func.timezone(timezone, func.timezone('utc', Submission.created_at)))
+        else:  # TODO support other DB types
+            raise NotImplementedError('DB type not supported for local date computation: %s' % db_type)
 
         sub_query = db.session.query(Submission.id.label('sid'),
                                      created_at_day.label('date')) \
@@ -199,7 +205,11 @@ class SubmissionService:
             .group_by(sub_query.c.date) \
             .order_by(sub_query.c.date)
 
-        return [(date.strftime('%Y-%m-%d'), count) for date, count in query.all()]
+        if db_type == 'sqlite':
+            return query.all()
+        elif db_type == 'postgresql':
+            return [(date.strftime('%Y-%m-%d'), count) for date, count in query.all()]
+        return  # logic should never reach here
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False, submitted_after: datetime = None) \
