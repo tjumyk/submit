@@ -60,6 +60,15 @@ class TeamSubmissionSummary:
         return d
 
 
+class DailySubmissionSummary:
+    def __init__(self, date: str, total: int):
+        self.date = date
+        self.total = total
+
+    def to_dict(self):
+        return dict(date=self.date, total=self.total)
+
+
 class LatePenalty:
     """
     In this implementation, I just store the cut numbers as-is because I'm lazy now. A better implementation is to store
@@ -179,7 +188,7 @@ class SubmissionService:
                 for team, total, first_time, last_submit in query.all()]
 
     @staticmethod
-    def get_daily_summaries(task: Task):
+    def get_daily_summaries(task: Task) -> List[DailySubmissionSummary]:
         if task is None:
             raise SubmissionServiceError('task is required')
 
@@ -206,10 +215,10 @@ class SubmissionService:
             .order_by(sub_query.c.date)
 
         if db_type == 'sqlite':
-            return query.all()
+            return [DailySubmissionSummary(date, count) for date, count in query.all()]
         elif db_type == 'postgresql':
-            return [(date.strftime('%Y-%m-%d'), count) for date, count in query.all()]
-        return  # logic should never reach here
+            return [DailySubmissionSummary(date.strftime('%Y-%m-%d'), count) for date, count in query.all()]
+        return []  # logic should never reach here
 
     @staticmethod
     def get_for_task_and_user(task: Task, user: UserAlias, include_cleared=False, submitted_after: datetime = None) \

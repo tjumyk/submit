@@ -142,7 +142,7 @@ def task_daily_submission_summaries(tid):
 
         # allow access even before the opening time
 
-        return jsonify(SubmissionService.get_daily_summaries(task))
+        return jsonify([s.to_dict() for s in SubmissionService.get_daily_summaries(task)])
     except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
