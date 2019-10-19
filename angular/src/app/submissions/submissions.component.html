@@ -32,6 +32,10 @@
     </div>
   </div>
 
+  <div class="ui segment" *ngIf="dailySummaries">
+    <app-daily-submission-chart [task]="task" [summaries]="dailySummaries"></app-daily-submission-chart>
+  </div>
+
   <div class="ui top attached clearing segment">
     <div class="ui right floated menu secondary fitted">
       <div class="item">

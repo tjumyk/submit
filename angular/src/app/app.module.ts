@@ -58,6 +58,7 @@ import { SubmissionAutoTestsViewComponent } from './submission-auto-tests-view/s
 import { PopupComponent } from './popup/popup.component';
 import { PopupRefComponent } from './popup-ref/popup-ref.component';
 import { PopupContentComponent } from './popup-content/popup-content.component';
+import { DailySubmissionChartComponent } from './daily-submission-chart/daily-submission-chart.component';
 
 @NgModule({
   declarations: [
@@ -114,6 +115,7 @@ import { PopupContentComponent } from './popup-content/popup-content.component';
     PopupComponent,
     PopupRefComponent,
     PopupContentComponent,
+    DailySubmissionChartComponent,
   ],
   imports: [
     BrowserModule,

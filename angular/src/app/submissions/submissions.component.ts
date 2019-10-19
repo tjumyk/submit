@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, Task, UserSubmissionSummary} from "../models";
+import {DailySubmissionSummary, ErrorMessage, Task, UserSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
 import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -25,6 +25,9 @@ export class SubmissionsComponent implements OnInit {
   loadingSummaries: boolean;
   loadingAutoTestConclusions: boolean;
   autoTestConclusions: AllAutoTestConclusionsMap;
+
+  loadingDailySummaries: boolean;
+  dailySummaries: DailySubmissionSummary[];
 
   userSearchKey = new Subject<string>();
   sortField: (field: string, th: HTMLElement) => any;
@@ -98,6 +101,14 @@ export class SubmissionsComponent implements OnInit {
                   }
                 }
               },
+              error => this.error = error.error
+            );
+
+            this.loadingDailySummaries = true;
+            this.taskService.getDailySubmissionSummaries(this.taskId).pipe(
+              finalize(() => this.loadingDailySummaries = false)
+            ).subscribe(
+              _summaries => this.dailySummaries = _summaries,
               error => this.error = error.error
             )
           },

@@ -194,6 +194,11 @@ export class TeamSubmissionSummary {
   last_submit_time: string;
 }
 
+export class DailySubmissionSummary {
+  date: string;
+  total: number;
+}
+
 
 export class SpecialConsideration {
   id: number;
