@@ -84,7 +84,7 @@ export class DailySubmissionChartComponent implements OnInit, AfterViewInit {
                 unit: 'day',
                 min: firstDay,
                 max: lastDay,
-                tooltipFormat: 'YYYY-MM-DD'
+                tooltipFormat: 'll'
               }
             }
           ],
