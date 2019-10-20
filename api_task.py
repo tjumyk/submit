@@ -1151,8 +1151,9 @@ def task_export_results(tid):
                 buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
                 buffer.write('\n')
                 for summary in summaries:
+                    team_conclusions = conclusions.get(summary.team.id, {})
                     buffer.write('\t'.join([str(summary.team.id), summary.team.name] +
-                                           [str(conclusions.get(summary.team.id, {}).get(c.id)) for c in configs]))
+                                           [str(team_conclusions.get(c.id)) for c in configs]))
                     buffer.write('\n')
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
         else:
@@ -1161,8 +1162,9 @@ def task_export_results(tid):
                 buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
                 buffer.write('\n')
                 for summary in summaries:
+                    user_conclusions = conclusions.get(summary.user.id, {})
                     buffer.write('\t'.join([str(summary.user.id), summary.user.name] +
-                                           [str(conclusions.get(summary.user.id, {}).get(c.id)) for c in configs]))
+                                           [str(user_conclusions.get(c.id)) for c in configs]))
                     buffer.write('\n')
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
