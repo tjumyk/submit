@@ -106,6 +106,8 @@ export class AutoTestConclusionSummaryChartsComponent implements OnInit {
     // decide grid columns
     switch (this.data.length) {
       case 0:
+        this.gridClass = 'empty';
+        break;
       case 1:
         this.gridClass = 'one column';
         break;
