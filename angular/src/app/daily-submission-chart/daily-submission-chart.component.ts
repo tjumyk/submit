@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {DailySubmissionSummary, Task} from "../models";
-import Chart from 'chart.js';
+
 import * as moment from "moment";
 
 @Component({
@@ -8,26 +8,19 @@ import * as moment from "moment";
   templateUrl: './daily-submission-chart.component.html',
   styleUrls: ['./daily-submission-chart.component.less']
 })
-export class DailySubmissionChartComponent implements OnInit, AfterViewInit {
+export class DailySubmissionChartComponent implements OnInit {
   @Input()
   task: Task;
   @Input()
   summaries: DailySubmissionSummary[];
 
-  @ViewChild('canvas')
-  canvas: ElementRef;
-
-  chart: Chart;
+  chartData: any;
 
   constructor() {
   }
 
   ngOnInit() {
-
-  }
-
-  ngAfterViewInit(): void {
-    if (!this.canvas.nativeElement || !this.task || !this.summaries)
+    if (!this.task || !this.summaries)
       return;
 
     let firstDay = undefined;
@@ -64,10 +57,10 @@ export class DailySubmissionChartComponent implements OnInit, AfterViewInit {
       data.push({x: summary['_moment'], y: summary.total});
     }
 
-    this.chart = new Chart(this.canvas.nativeElement, {
+    this.chartData = {
       type: 'bar',
       data: {
-        datasets:[
+        datasets: [
           {
             label: 'Daily Submissions',
             data: data
@@ -98,7 +91,7 @@ export class DailySubmissionChartComponent implements OnInit, AfterViewInit {
           ]
         }
       }
-    })
+    }
   }
 
 }

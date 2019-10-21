@@ -59,6 +59,7 @@ import { PopupComponent } from './popup/popup.component';
 import { PopupRefComponent } from './popup-ref/popup-ref.component';
 import { PopupContentComponent } from './popup-content/popup-content.component';
 import { DailySubmissionChartComponent } from './daily-submission-chart/daily-submission-chart.component';
+import { ChartComponent } from './chart/chart.component';
 
 @NgModule({
   declarations: [
@@ -116,6 +117,7 @@ import { DailySubmissionChartComponent } from './daily-submission-chart/daily-su
     PopupRefComponent,
     PopupContentComponent,
     DailySubmissionChartComponent,
+    ChartComponent,
   ],
   imports: [
     BrowserModule,
