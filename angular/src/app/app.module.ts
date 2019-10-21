@@ -59,6 +59,7 @@ import { PopupComponent } from './popup/popup.component';
 import { PopupRefComponent } from './popup-ref/popup-ref.component';
 import { PopupContentComponent } from './popup-content/popup-content.component';
 import { DailySubmissionChartComponent } from './daily-submission-chart/daily-submission-chart.component';
+import { AutoTestConclusionSummaryChartsComponent } from './auto-test-conclusion-summary-charts/auto-test-conclusion-summary-charts.component';
 import { ChartComponent } from './chart/chart.component';
 
 @NgModule({
@@ -117,6 +118,7 @@ import { ChartComponent } from './chart/chart.component';
     PopupRefComponent,
     PopupContentComponent,
     DailySubmissionChartComponent,
+    AutoTestConclusionSummaryChartsComponent,
     ChartComponent,
   ],
   imports: [

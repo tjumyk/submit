@@ -36,6 +36,9 @@
     <app-daily-submission-chart [task]="task" [summaries]="dailySummaries"></app-daily-submission-chart>
   </div>
 
+  <app-auto-test-conclusion-summary-charts *ngIf="autoTestConclusions" [task]="task"
+                                           [conclusions]="autoTestConclusions"></app-auto-test-conclusion-summary-charts>
+
   <div class="ui top attached clearing segment">
     <div class="ui right floated menu secondary fitted">
       <div class="item">

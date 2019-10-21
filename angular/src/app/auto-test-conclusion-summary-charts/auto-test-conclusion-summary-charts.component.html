@@ -1,0 +1,12 @@
+<div class="ui grid stackable" [ngClass]="gridClass">
+  <div class="column" *ngFor="let d of data">
+    <div class="ui segment">
+      <div class="ui top attached label">
+        <i class="icon" [ngClass]="autoTestConfigTypes[d.config.type].icon" [title]="autoTestConfigTypes[d.config.type].name"></i>
+        {{d.config.name}}
+        <i class="icon red lock" *ngIf="d.config.is_private" title="Private Config"></i>
+      </div>
+      <app-chart [data]="d.chartData"></app-chart>
+    </div>
+  </div>
+</div>
