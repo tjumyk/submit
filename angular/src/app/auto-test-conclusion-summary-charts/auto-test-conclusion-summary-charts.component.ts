@@ -41,8 +41,8 @@ const colorScheme = [
 const antiPlagiarismLevels = [
   {name: 'No Evidence', color: colors.green},
   {name: 'Weak Evidence', color: colors.olive},
-  {name: 'Moderate Evidence', color: colors.orange},
-  {name: 'Strong Evidence', color: colors.yellow},
+  {name: 'Moderate Evidence', color: colors.yellow},
+  {name: 'Strong Evidence', color: colors.orange},
   {name: 'Very Strong Evidence', color: colors.red},
   {name: 'Full Copy', color: colors.purple},
   {name: 'Same Code', color: colors.violet},
