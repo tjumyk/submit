@@ -307,17 +307,20 @@ def team_finalise(team_id):
         if not TeamService.is_creator(team, user):
             return jsonify(msg='team creator required'), 403
 
-        task = team.task
-        msg_args = dict(site=app.config['SITE'],
-                        operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                        team=team,
-                        task=task,
-                        term=task.term)
-        msg_channel = MessageService.get_channel_by_name('team')
-        msg_content = build_message_with_template('team_finalised', msg_args)
-
-        msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
-                                                         [ass.user for ass in team.user_associations])
+        team_other_members = [ass.user for ass in team.user_associations if ass.user.id != user.id]
+        if team_other_members:
+            task = team.task
+            msg_args = dict(site=app.config['SITE'],
+                            operator_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
+                            team=team,
+                            task=task,
+                            term=task.term)
+            msg_channel = MessageService.get_channel_by_name('team')
+            msg_content = build_message_with_template('team_finalised', msg_args)
+            msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                             team_other_members)
+        else:
+            mails = []
 
         TeamService.finalise(team)
         db.session.commit()
