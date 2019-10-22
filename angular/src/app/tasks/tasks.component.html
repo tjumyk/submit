@@ -13,64 +13,73 @@
       <div class="ui text loader active" *ngIf="loadingTasks">Loading tasks...</div>
 
       <ng-container *ngIf="tasks">
-
-        <div class="task-category" *ngFor="let item of taskCategories | keyvalue">
-          <div class="ui header">
-            <i class="icon" [ngClass]="categories[item.key].icon"></i>
-            {{ categories[item.key].name }}
-          </div>
-          <div class="ui two column grid stackable">
-            <div class="task column" *ngFor="let task of item.value">
-              <div class="ui fluid card raised">
-                <div class="content">
-                  <div class="header">{{ task.title }}</div>
-                  <div class="description">
-                    <p class="task-description" *ngIf="task.description">
-                      {{ task.description.split('\n', 1)[0] }}
-                    </p>
-                    <div class="ui list">
-                      <div class="item">
-                        <i class="icon clock outline"></i>
-                        <div class="content">
-                          Open: <span *ngIf="task.open_time; else timeTbd">{{ task.open_time|date:'short' }} ({{task._open_time_from_now}})</span>
+        <ng-container *ngIf="tasks.length > 0; else noTasks">
+          <div class="task-category" *ngFor="let item of taskCategories | keyvalue">
+            <div class="ui header">
+              <i class="icon" [ngClass]="categories[item.key].icon"></i>
+              {{ categories[item.key].name }}
+            </div>
+            <div class="ui two column grid stackable">
+              <div class="task column" *ngFor="let task of item.value">
+                <div class="ui fluid card raised">
+                  <div class="content">
+                    <div class="header">{{ task.title }}</div>
+                    <div class="description">
+                      <p class="task-description" *ngIf="task.description">
+                        {{ task.description.split('\n', 1)[0] }}
+                      </p>
+                      <div class="ui list">
+                        <div class="item">
+                          <i class="icon clock outline"></i>
+                          <div class="content">
+                            Open: <span *ngIf="task.open_time; else timeTbd">{{ task.open_time|date:'short' }} ({{task._open_time_from_now}})</span>
+                          </div>
+                        </div>
+                        <div class="item">
+                          <i class="icon clock"></i>
+                          <div class="content">
+                            Due: <span *ngIf="task.due_time; else timeTbd">{{ task.due_time|date:'short' }} ({{task._due_time_from_now}})</span>
+                          </div>
+                        </div>
+                        <div class="item" *ngIf="task.is_team_task">
+                          <i class="icon users"></i>
+                          <div class="content">
+                            Team task (team size: {{printTaskTeamSize(task)}})
+                          </div>
+                        </div>
+                        <div class="item" *ngIf="task.is_team_task">
+                          <i class="icon hand paper outline"></i>
+                          <div class="content">
+                            Join team before: <span *ngIf="task.team_join_close_time; else timeTbd">{{ task.team_join_close_time|date:'short' }} ({{task._team_join_close_time_from_now}})</span>
+                          </div>
                         </div>
                       </div>
-                      <div class="item">
-                        <i class="icon clock"></i>
-                        <div class="content">
-                          Due: <span *ngIf="task.due_time; else timeTbd">{{ task.due_time|date:'short' }} ({{task._due_time_from_now}})</span>
-                        </div>
-                      </div>
-                      <div class="item" *ngIf="task.is_team_task">
-                        <i class="icon users"></i>
-                        <div class="content">
-                          Team task (team size: {{printTaskTeamSize(task)}})
-                        </div>
-                      </div>
-                      <div class="item" *ngIf="task.is_team_task">
-                        <i class="icon hand paper outline"></i>
-                        <div class="content">
-                          Join team before: <span *ngIf="task.team_join_close_time; else timeTbd">{{ task.team_join_close_time|date:'short' }} ({{task._team_join_close_time_from_now}})</span>
-                        </div>
-                      </div>
+                      <ng-template #timeTbd>TBD</ng-template>
                     </div>
-                    <ng-template #timeTbd>TBD</ng-template>
                   </div>
-                </div>
-                <div class="extra content">
-                  <div class="ui buttons fluid" *ngIf="task._accessible; else previewBtn">
-                    <a routerLink="{{ task.id }}" class="ui primary button"><i class="icon list"></i> Details</a>
-                    <a routerLink="{{ task.id }}/submit" class="ui button" *ngIf="accessRoles.has('student')"><i class="icon paper plane outline"></i> Submit</a>
-                    <a routerLink="/admin/tasks/{{ task.id }}" class="ui button" *ngIf="accessRoles.has('admin')"><i class="icon cog"></i> Configs</a>
+                  <div class="extra content">
+                    <div class="ui buttons fluid" *ngIf="task._accessible; else previewBtn">
+                      <a routerLink="{{ task.id }}" class="ui primary button"><i class="icon list"></i> Details</a>
+                      <a routerLink="{{ task.id }}/submit" class="ui button" *ngIf="accessRoles.has('student')"><i class="icon paper plane outline"></i> Submit</a>
+                      <a routerLink="/admin/tasks/{{ task.id }}" class="ui button" *ngIf="accessRoles.has('admin')"><i class="icon cog"></i> Configs</a>
+                    </div>
+                    <ng-template #previewBtn>
+                      <a routerLink="../tasks-preview/{{ task.id }}" class="ui button fluid"><i class="icon eye"></i> Preview</a>
+                    </ng-template>
                   </div>
-                  <ng-template #previewBtn>
-                    <a routerLink="../tasks-preview/{{ task.id }}" class="ui button fluid"><i class="icon eye"></i> Preview</a>
-                  </ng-template>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+        <ng-template #noTasks>
+          <div class="ui segment placeholder">
+            <div class="ui icon header">
+              <i class="icon coffee"></i>
+              There is no task created yet.
+            </div>
+          </div>
+        </ng-template>
       </ng-container>
     </div>
   </div>
