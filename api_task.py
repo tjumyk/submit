@@ -685,19 +685,21 @@ def task_my_submissions(tid):
             if task.is_team_task:
                 team_other_members = [ass.user for ass in submitted_for_team.user_associations
                                       if ass.user.id != user.id]
-                msg_args = dict(site=app.config['SITE'],
-                                submitter_name='%s (%s)' % (user.nickname, user.name) if user.nickname else user.name,
-                                submission=new_submission,
-                                team=submitted_for_team,
-                                task=task,
-                                term=task.term)
-                msg_content = build_message_with_template('team_new_teammate_submission', msg_args)
-                msg_channel = MessageService.get_channel_by_name('team')
-                msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
-                                                                 team_other_members)
-                db.session.commit()
-                for mail in mails:
-                    mail.send()
+                if team_other_members:
+                    submitter_name = '%s (%s)' % (user.nickname, user.name) if user.nickname else user.name
+                    msg_args = dict(site=app.config['SITE'],
+                                    submitter_name=submitter_name,
+                                    submission=new_submission,
+                                    team=submitted_for_team,
+                                    task=task,
+                                    term=task.term)
+                    msg_content = build_message_with_template('team_new_teammate_submission', msg_args)
+                    msg_channel = MessageService.get_channel_by_name('team')
+                    msgs, mails = MessageSenderService.send_to_users(msg_channel, task.term, msg_content, None,
+                                                                     team_other_members)
+                    db.session.commit()
+                    for mail in mails:
+                        mail.send()
 
             return jsonify(new_submission.to_dict()), 201
 
