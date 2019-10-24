@@ -382,6 +382,7 @@ def admin_material_validate_test_environment(mid):
                 info['type'] = 'docker'
 
                 conda_installer = re.compile(r'((Ana|Mini)conda[\d\w\-._]+)\.sh')
+                conda_create = re.compile(r'conda\s+create\s+(.*\s+)?python=(.*)')
                 with open(dockerfile) as f_dockerfile:
                     for line in f_dockerfile:
                         line = line.strip()
@@ -395,6 +396,10 @@ def admin_material_validate_test_environment(mid):
                             match = conda_installer.search(line)
                             if match:
                                 info['conda_version'] = match.group(1)
+                            else:
+                                match = conda_create.search(line)
+                                if match:
+                                    info['conda_python_version'] = match.group(2)
 
                 requirements_txt = os.path.join(tmp_dir, 'test', 'requirements.txt')
                 if os.path.exists(requirements_txt):

@@ -118,6 +118,7 @@ export class NewSpecialConsiderationForm{
 export class TestEnvironmentValidationResult{
   type?: string;
   conda_version?: string;
+  conda_python_version?: string;
   docker_entry_point?: string;
   docker_cmd?: string;
   docker_run_config?: {};
@@ -312,7 +313,7 @@ export class AdminService {
   }
 
   validateTestEnvironment(material_id: number): Observable<TestEnvironmentValidationResult>{
-    return this.http.get(`${this.api}/materials/${material_id}/validate-test-environment`);
+    return this.http.get<TestEnvironmentValidationResult>(`${this.api}/materials/${material_id}/validate-test-environment`);
   }
 
   addAutoTestConfig(task_id: number, form: NewAutoTestConfigForm): Observable<AutoTestConfig>{

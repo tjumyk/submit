@@ -614,6 +614,7 @@
                   <ul class="list">
                     <li><b>Type:</b> {{testEnvValidationResult.type}}</li>
                     <li *ngIf="testEnvValidationResult.conda_version"><b>Conda Version:</b> {{testEnvValidationResult.conda_version}}</li>
+                    <li *ngIf="testEnvValidationResult.conda_python_version"><b>Conda Python Version:</b> {{testEnvValidationResult.conda_python_version}}</li>
                     <li *ngIf="testEnvValidationResult.docker_entry_point"><b>Docker ENTRYPOINT:</b> {{testEnvValidationResult.docker_entry_point}}</li>
                     <li *ngIf="testEnvValidationResult.docker_cmd"><b>Docker CMD:</b> {{testEnvValidationResult.docker_cmd}}</li>
                     <li *ngIf="testEnvValidationResult.pip_requirements"><b>Pip Requirements:</b> <span class="ui label" *ngFor="let req of testEnvValidationResult.pip_requirements">{{req}}</span></li>
