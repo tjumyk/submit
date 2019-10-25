@@ -216,8 +216,16 @@ export class AutoTestConclusionSummaryChartsComponent implements OnInit {
     let labels: string[];
     let bgColors;
     if (boolMode) {
-      labels = ['true', 'false'];
-      bgColors = [colors.green, colors.red];
+      labels = [];
+      bgColors = [];
+      if(resultCounts['true'] !== undefined){
+        labels.push('true');
+        bgColors.push(colors.green)
+      }
+      if(resultCounts['false'] !== undefined){
+        labels.push('false');
+        bgColors.push(colors.red)
+      }
     } else {
       if (config.type == 'anti-plagiarism') {
         labels = [];
