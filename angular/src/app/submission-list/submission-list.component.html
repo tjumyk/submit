@@ -4,12 +4,19 @@
 <div class="ui loader text active" *ngIf="loadingSubmissions">Loading user submissions...</div>
 
 <div *ngIf="submissions">
-  <div class="ui breadcrumb">
-    <a routerLink=".." class="section">Submissions</a>
-    <i class="icon right angle divider"></i>
-    <div class="section active">
-      <span *ngIf="user.nickname; else nameOnly">{{user.nickname}} ({{user.name}})</span>
-      <ng-template #nameOnly>{{user.name}}</ng-template>
+  <div class="ui grid stackable two column">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a routerLink=".." class="section">Submissions</a>
+        <i class="icon right angle divider"></i>
+        <div class="section active">
+          <span *ngIf="user.nickname; else nameOnly">{{user.nickname}} ({{user.name}})</span>
+          <ng-template #nameOnly>{{user.name}}</ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="column right aligned">
+      <a class="ui button mini" href="admin/users/{{user.id}}" target="_blank"><i class="icon user pro"></i> User Info</a>
     </div>
   </div>
 

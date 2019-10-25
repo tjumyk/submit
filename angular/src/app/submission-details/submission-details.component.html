@@ -2,15 +2,22 @@
 <div class="ui text loader" *ngIf="loadingSubmission">Loading submission info...</div>
 
 <div *ngIf="submission">
-  <div class="ui breadcrumb">
-    <a class="section" routerLink="../..">Submissions</a>
-    <i class="icon right angle divider"></i>
-    <a class="section" routerLink="..">
-      <span *ngIf="submission.submitter.nickname; else nameOnly">{{submission.submitter.nickname}} ({{submission.submitter.name}})</span>
-      <ng-template #nameOnly>{{submission.submitter.name}}</ng-template>
-    </a>
-    <i class="icon right angle divider"></i>
-    <div class="active section">Submission {{submission.id}}</div>
+  <div class="ui grid stackable two column">
+    <div class="column">
+      <div class="ui breadcrumb">
+        <a class="section" routerLink="../..">Submissions</a>
+        <i class="icon right angle divider"></i>
+        <a class="section" routerLink="..">
+          <span *ngIf="submission.submitter.nickname; else nameOnly">{{submission.submitter.nickname}} ({{submission.submitter.name}})</span>
+          <ng-template #nameOnly>{{submission.submitter.name}}</ng-template>
+        </a>
+        <i class="icon right angle divider"></i>
+        <div class="active section">Submission {{submission.id}}</div>
+      </div>
+    </div>
+    <div class="column right aligned">
+      <a class="ui button mini" href="admin/users/{{submission.submitter.id}}" target="_blank"><i class="icon user pro"></i> User Info</a>
+    </div>
   </div>
 
   <app-submission-card [submission]="submission"></app-submission-card>
