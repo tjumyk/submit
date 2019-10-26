@@ -359,3 +359,9 @@ export class NotebookPreview{
   material?: Material;
   url?: SafeResourceUrl;
 }
+
+export class SubmissionFileDiff{
+  from_file: SubmissionFile;
+  to_file: SubmissionFile;
+  diff: string;
+}

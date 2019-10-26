@@ -4,6 +4,7 @@ from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
+from services.submission_file_diff import SubmissionFileDiffService, SubmissionFileDiffServiceError
 from services.submission_file_viewer import SubmissionFileViewerService
 
 my_submission_api = Blueprint('my_submission_api', __name__)
@@ -58,6 +59,38 @@ def submission_file_download(sid, fid):
             return send_from_directory(data_folder, file.path, as_attachment=True)
         return send_from_directory(data_folder, file.path)
     except SubmissionServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@my_submission_api.route('/<int:sid>/diff')
+@requires_login
+def submission_diff(sid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+
+        if submission.submitter_id != user.id:
+            return jsonify(msg='not your submission'), 403
+
+        data_folder = app.config['DATA_FOLDER']
+        results = []
+        for file in submission.files:
+            if not SubmissionFileDiffService.is_file_supported(file.requirement):
+                continue
+            prev_file = SubmissionService.get_previous_file_for_submitter(file)
+            if not prev_file:  # no previous version
+                continue
+            if file.md5 == prev_file.md5:
+                continue
+            diff = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder)
+            if diff is not None:
+                results.append(diff)
+        return jsonify([diff.to_dict() for diff in results])
+    except (SubmissionServiceError, SubmissionFileDiffServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

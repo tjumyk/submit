@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {AutoTest, AutoTestConfig, Submission} from "./models";
+import {AutoTest, AutoTestConfig, Submission, SubmissionFileDiff} from "./models";
 
 export class AutoTestConfigTypeInfo {
   id: string;
@@ -67,6 +67,10 @@ export class SubmissionService {
 
   getMyTeamAutoTestAndResults(id: number): Observable<AutoTest[]> {
     return this.getAutoTestAndResults(id, this.myTeamApi)
+  }
+
+  getDiffs(id:number, apiBase: string=this.api):Observable<SubmissionFileDiff[]>{
+    return this.http.get<SubmissionFileDiff[]>(`${apiBase}/${id}/diff`)
   }
 
   getAutoTestStatusColor(status: string): string {

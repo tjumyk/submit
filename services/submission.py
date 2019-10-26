@@ -979,3 +979,43 @@ class SubmissionService:
                 continue  # skip private tests
             tests[test.config_id] = test
         return all_last_tests
+
+    @staticmethod
+    def get_previous_file_for_submitter(file: SubmissionFile) -> Optional[SubmissionFile]:
+        if file is None:
+            raise SubmissionServiceError('file is required')
+
+        submission = file.submission
+        # Find the previous file submitted by the same user. Be careful, a file may be optional.
+        return db.session.query(SubmissionFile) \
+            .filter(SubmissionFile.requirement_id == file.requirement_id,
+                    SubmissionFile.submission_id == Submission.id,
+                    Submission.task_id == submission.task_id,
+                    Submission.submitter_id == submission.submitter_id,
+                    Submission.id < submission.id) \
+            .order_by(Submission.id.desc()) \
+            .first()
+
+    @staticmethod
+    def get_previous_file_for_team(file: SubmissionFile) -> Optional[SubmissionFile]:
+        if file is None:
+            raise SubmissionServiceError('file is required')
+
+        submission = file.submission
+        task = submission.task
+
+        from .team import TeamService
+        ass = TeamService.get_team_association(task, submission.submitter)
+        if ass is None:
+            raise SubmissionServiceError('submitter not in a team')
+
+        # Find the previous file submitted by the same team. Be careful, a file may be optional.
+        return db.session.query(SubmissionFile) \
+            .filter(SubmissionFile.requirement_id == file.requirement_id,
+                    SubmissionFile.submission_id == Submission.id,
+                    Submission.task_id == submission.task_id,
+                    Submission.submitter_id == UserTeamAssociation.user_id,
+                    UserTeamAssociation.team_id == ass.team_id,
+                    Submission.id < submission.id) \
+            .order_by(Submission.id.desc()) \
+            .first()

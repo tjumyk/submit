@@ -49,6 +49,7 @@
             ],
             "styles": [
               "node_modules/semantic-ui/dist/semantic.min.css",
+              "node_modules/highlight.js/styles/androidstudio.css",
               "src/styles.less"
             ],
             "scripts": [],

@@ -4,6 +4,7 @@ from auth_connect.oauth import requires_login
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
+from services.submission_file_diff import SubmissionFileDiffService, SubmissionFileDiffServiceError
 from services.submission_file_viewer import SubmissionFileViewerService
 from services.team import TeamService, TeamServiceError
 
@@ -90,6 +91,53 @@ def submission_file_download(sid, fid):
             return send_from_directory(data_folder, file.path, as_attachment=True)
         return send_from_directory(data_folder, file.path)
     except (SubmissionServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@my_team_submission_api.route('/<int:sid>/diff')
+@requires_login
+def submission_diff(sid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+
+        # team check
+        task = submission.task
+        ass = TeamService.get_team_association(task, user)
+        if not ass:
+            return jsonify(msg='user not in a team'), 403
+        team = ass.team
+        if not team.is_finalised:
+            return jsonify(msg='team is not finalised'), 403
+
+        # same team check
+        is_same_team = False
+        for _ass in team.user_associations:
+            if _ass.user_id == submission.submitter_id:
+                is_same_team = True
+                break
+        if not is_same_team:
+            return jsonify(msg="not your team's submission"), 403
+
+        data_folder = app.config['DATA_FOLDER']
+        results = []
+        for file in submission.files:
+            if not SubmissionFileDiffService.is_file_supported(file.requirement):
+                continue
+            prev_file = SubmissionService.get_previous_file_for_team(file)
+            if not prev_file:  # no previous version
+                continue
+            if file.md5 == prev_file.md5:
+                continue
+            diff = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder)
+            if diff is not None:
+                results.append(diff)
+        return jsonify([diff.to_dict() for diff in results])
+    except (SubmissionServiceError, SubmissionFileDiffServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

@@ -1,0 +1,6 @@
+<div class="ui label top purple attached">
+  <i class="icon file"></i> {{diff.from_file.requirement.name}} (Submission {{diff.from_file.submission_id}})
+  <i class="icon arrow right"></i>
+  <i class="icon file"></i> {{diff.to_file.requirement.name}} (Submission {{diff.to_file.submission_id}})
+</div>
+<app-code-highlight class="viewer" [code]="diff.diff" language="diff"></app-code-highlight>

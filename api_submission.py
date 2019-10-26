@@ -12,6 +12,7 @@ from services.auto_test import AutoTestService, AutoTestServiceError
 from services.message_sender import MessageSenderService, MessageSenderServiceError
 from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
+from services.submission_file_diff import SubmissionFileDiffService, SubmissionFileDiffServiceError
 from services.submission_file_viewer import SubmissionFileViewerService
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
@@ -98,6 +99,46 @@ def submission_file_download(sid, fid):
             return send_from_directory(data_folder, file.path, as_attachment=True)
         return send_from_directory(data_folder, file.path)
     except (SubmissionServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@submission_api.route('/<int:sid>/diff')
+@requires_login
+def submission_diff(sid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+
+        roles = TermService.get_access_roles(submission.task.term, user)
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        task = submission.task
+        data_folder = app.config['DATA_FOLDER']
+        results = []
+        for file in submission.files:
+            if not SubmissionFileDiffService.is_file_supported(file.requirement):
+                continue
+            if task.is_team_task:
+                prev_file = SubmissionService.get_previous_file_for_team(file)
+            else:
+                prev_file = SubmissionService.get_previous_file_for_submitter(file)
+            if not prev_file:  # no previous version
+                continue
+            if file.md5 == prev_file.md5:
+                continue
+            diff = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder)
+            if diff is not None:
+                results.append(diff)
+        return jsonify([diff.to_dict() for diff in results])
+    except (SubmissionServiceError, SubmissionFileDiffServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
