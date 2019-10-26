@@ -1,5 +1,6 @@
 import difflib
 import os
+from functools import lru_cache
 from io import StringIO
 from typing import Optional
 
@@ -20,6 +21,12 @@ class SubmissionFileDiff:
     def to_dict(self) -> dict:
         d = dict(from_file=self.from_file.to_dict(), to_file=self.to_file.to_dict(), diff=self.diff)
         return d
+
+
+@lru_cache(maxsize=256)
+def cached_read_file(_id: int, md5: str, path: str):
+    with open(path) as f:
+        return f.readlines()
 
 
 class SubmissionFileDiffService:
@@ -65,11 +72,8 @@ class SubmissionFileDiffService:
             raise SubmissionFileDiffServiceError('to file is too big')
 
         # TODO md5 check (necessary?)
-
-        with open(os.path.join(data_root, from_file.path)) as f_from:
-            from_content = f_from.readlines()
-        with open(os.path.join(data_root, to_file.path)) as f_to:
-            to_content = f_to.readlines()
+        from_content = cached_read_file(from_file.id, from_file.md5, os.path.join(data_root, from_file.path))
+        to_content = cached_read_file(to_file.id, to_file.md5, os.path.join(data_root, to_file.path))
 
         diff = difflib.unified_diff(from_content, to_content, fromfile=from_req.name, tofile=to_req.name,
                                     fromfiledate='(Submission %d)' % from_file.submission_id,
