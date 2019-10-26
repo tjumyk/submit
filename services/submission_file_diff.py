@@ -23,6 +23,7 @@ class SubmissionFileDiff:
 
 
 class SubmissionFileDiffService:
+    _max_file_size = 10 * 1024 * 1024  # 10 MB
     _text_file_extensions = {
         'txt',
         'py',
@@ -58,6 +59,10 @@ class SubmissionFileDiffService:
         to_req = to_file.requirement
         if not cls.is_file_supported(to_req):
             raise SubmissionFileDiffServiceError('to file is not supported')
+        if from_file.size > cls._max_file_size:
+            raise SubmissionFileDiffServiceError('from file is too big')
+        if to_file.size > cls._max_file_size:
+            raise SubmissionFileDiffServiceError('to file is too big')
 
         # TODO md5 check (necessary?)
 
