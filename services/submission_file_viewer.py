@@ -24,6 +24,6 @@ class SubmissionFileViewerService:
             with open(os.path.join(data_root, file.path)) as f_file:
                 file_content = f_file.read()
             return 'highlight.html', dict(submission_id=file.submission_id, id=file.id, name=file_name,
-                                          content=file_content, md5=file.md5[0:6])
+                                          content=file_content, md5=file.md5[0:6], language_class=ext)
 
         return None
