@@ -11,6 +11,8 @@ export class FileDiffViewerComponent implements OnInit {
   @Input()
   diff: SubmissionFileDiff;
 
+  expanded: boolean = false;
+
   constructor() {
   }
 

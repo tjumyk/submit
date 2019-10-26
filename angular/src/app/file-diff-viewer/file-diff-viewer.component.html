@@ -3,4 +3,14 @@
   <i class="icon arrow right"></i>
   <i class="icon file"></i> {{diff.to_file.requirement.name}} (Submission {{diff.to_file.submission_id}})
 </div>
-<app-code-highlight class="viewer" [code]="diff.diff" language="diff"></app-code-highlight>
+<div class="container" [ngClass]="{'expanded': expanded}">
+  <app-code-highlight [code]="diff.diff" language="diff"></app-code-highlight>
+</div>
+<a class="ui label bottom attached" (click)="expanded=!expanded">
+  <ng-container *ngIf="expanded; else collapsed">
+    <i class="icon chevron up"></i> Collapse Diff Viewer <i class="icon chevron up"></i>
+  </ng-container>
+  <ng-template #collapsed>
+    <i class="icon chevron down"></i> Expand Diff Viewer <i class="icon chevron down"></i>
+  </ng-template>
+</a>
