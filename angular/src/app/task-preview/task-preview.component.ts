@@ -82,7 +82,7 @@ export class TaskPreviewComponent implements OnInit, OnDestroy {
     this.category = TaskService.categories[task.type];
 
     const timeTracker = () => {
-      if(moment(task.open_time).isSameOrBefore(moment.now())){
+      if(task.open_time && moment(task.open_time).isSameOrBefore(moment.now())){
         this.router.navigate([`../../tasks/${this.taskId}`], {relativeTo: this.route, replaceUrl: true});
         return;
       }
