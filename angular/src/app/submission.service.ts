@@ -69,8 +69,8 @@ export class SubmissionService {
     return this.getAutoTestAndResults(id, this.myTeamApi)
   }
 
-  getDiffs(id:number, apiBase: string=this.api):Observable<SubmissionFileDiff[]>{
-    return this.http.get<SubmissionFileDiff[]>(`${apiBase}/${id}/diff`)
+  getDiffs(id:number, apiBase: string=this.api):Observable<{[fid:number]: SubmissionFileDiff}>{
+    return this.http.get<{[fid:number]: SubmissionFileDiff}>(`${apiBase}/${id}/diff`)
   }
 
   getAutoTestStatusColor(status: string): string {

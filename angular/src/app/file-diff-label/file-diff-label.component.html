@@ -1,0 +1,12 @@
+<ng-container *ngIf="diff">
+  <ng-container *ngIf="!diff.same; else sameFile">
+    <ng-container *ngIf="!diff.binary; else binaryDiff">
+      <a href="{{apiBase}}/{{diff.to_submission_id}}/files/{{diff.to_file_id}}/diff" target="_blank">
+        <span class="addition">+{{diff.additions}}</span>
+        <span class="deletion">-{{diff.deletions}}</span>
+      </a>
+    </ng-container>
+  </ng-container>
+  <ng-template #sameFile>Same File</ng-template>
+  <ng-template #binaryDiff>Binary Diff</ng-template>
+</ng-container>

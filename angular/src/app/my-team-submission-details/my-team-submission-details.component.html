@@ -9,13 +9,11 @@
     <div class="active section">Submission {{submission.id}}</div>
   </div>
 
-  <app-submission-card [submission]="submission" [apiBase]="submissionService.myTeamApi"></app-submission-card>
+  <app-submission-card [submission]="submission" [apiBase]="submissionService.myTeamApi"
+                       (error)="error=$event"></app-submission-card>
 
   <ng-container *ngIf="task.evaluation_method=='auto_test'">
     <app-submission-auto-tests-view [submission]="submission" [task]="task" [apiBase]="submissionService.myTeamApi"
                                     (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
-
-  <app-submission-diff-view [submission]="submission" [apiBase]="submissionService.myTeamApi"
-                            (error)="error=$event"></app-submission-diff-view>
 </div>

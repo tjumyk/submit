@@ -32,6 +32,7 @@ def do_submission(sid):
 @my_submission_api.route('/<int:sid>/files/<int:fid>/raw')
 @my_submission_api.route('/<int:sid>/files/<int:fid>/view')
 @my_submission_api.route('/<int:sid>/files/<int:fid>/download')
+@my_submission_api.route('/<int:sid>/files/<int:fid>/diff')
 @requires_login
 def submission_file_download(sid, fid):
     try:
@@ -49,15 +50,25 @@ def submission_file_download(sid, fid):
             return jsonify(msg='not your submission'), 403
 
         data_folder = app.config['DATA_FOLDER']
+        if request.path.endswith('/raw'):
+            return send_from_directory(data_folder, file.path)
         if request.path.endswith('/view'):
             result = SubmissionFileViewerService.select_viewer(file, data_folder)
             if result is not None:  # rendering is supported
                 template_name, context = result
                 return render_template(template_name, **context)
             # otherwise, fallback to 'raw' content
+            return send_from_directory(data_folder, file.path)
         if request.path.endswith('/download'):
             return send_from_directory(data_folder, file.path, as_attachment=True)
-        return send_from_directory(data_folder, file.path)
+        if request.path.endswith('/diff'):
+            prev_file = SubmissionService.get_previous_file_for_submitter(file)
+            if not prev_file:  # no previous version
+                return jsonify(msg='no previous version'), 400
+            diff = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder, with_diff_content=True)
+            template_name, context = SubmissionFileViewerService.get_diff_viewer(diff)
+            return render_template(template_name, **context)
+        return jsonify(msg='invalid path'), 400
     except SubmissionServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -77,19 +88,13 @@ def submission_diff(sid):
             return jsonify(msg='not your submission'), 403
 
         data_folder = app.config['DATA_FOLDER']
-        results = []
+        results = {}
         for file in submission.files:
-            if not SubmissionFileDiffService.is_file_supported(file.requirement):
-                continue
             prev_file = SubmissionService.get_previous_file_for_submitter(file)
             if not prev_file:  # no previous version
                 continue
-            if file.md5 == prev_file.md5:
-                continue
-            diff = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder)
-            if diff is not None:
-                results.append(diff)
-        return jsonify([diff.to_dict() for diff in results])
+            results[file.id] = SubmissionFileDiffService.generate_diff(prev_file, file, data_folder)
+        return jsonify({fid: diff.to_dict() for fid, diff in results.items()})
     except (SubmissionServiceError, SubmissionFileDiffServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

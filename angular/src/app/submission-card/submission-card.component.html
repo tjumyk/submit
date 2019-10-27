@@ -19,15 +19,20 @@
     <div class="ui card" *ngFor="let file of submission.files">
       <div class="content">
         <div class="ui right floated meta">
-    <span title="MD5: {{file.md5}}">
-      <i class="ui icon hashtag"></i> {{file.md5|slice:0:6}}
-    </span>
+          <span title="MD5: {{file.md5}}">
+            <i class="ui icon hashtag"></i> {{file.md5|slice:0:6}}
+          </span>
         </div>
         <div class="header">
           {{file.requirement.name}}
         </div>
-        <div class="meta">
-          <span>{{file.size | size}}</span>
+        <div class="meta-clear">
+          <div class="meta left floated">
+            <span>{{file.size | size}}</span>
+          </div>
+          <div class="meta right floated" *ngIf="diffs">
+            <app-file-diff-label [diff]="diffs[file.id]" [apiBase]="apiBase"></app-file-diff-label>
+          </div>
         </div>
       </div>
       <div class="extra content">

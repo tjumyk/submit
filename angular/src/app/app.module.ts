@@ -61,9 +61,8 @@ import { PopupContentComponent } from './popup-content/popup-content.component';
 import { DailySubmissionChartComponent } from './daily-submission-chart/daily-submission-chart.component';
 import { AutoTestConclusionSummaryChartsComponent } from './auto-test-conclusion-summary-charts/auto-test-conclusion-summary-charts.component';
 import { ChartComponent } from './chart/chart.component';
-import { FileDiffViewerComponent } from './file-diff-viewer/file-diff-viewer.component';
 import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
-import { SubmissionDiffViewComponent } from './submission-diff-view/submission-diff-view.component';
+import { FileDiffLabelComponent } from './file-diff-label/file-diff-label.component';
 
 @NgModule({
   declarations: [
@@ -123,9 +122,8 @@ import { SubmissionDiffViewComponent } from './submission-diff-view/submission-d
     DailySubmissionChartComponent,
     AutoTestConclusionSummaryChartsComponent,
     ChartComponent,
-    FileDiffViewerComponent,
     CodeHighlightComponent,
-    SubmissionDiffViewComponent,
+    FileDiffLabelComponent,
   ],
   imports: [
     BrowserModule,

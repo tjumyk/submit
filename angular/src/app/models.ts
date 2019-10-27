@@ -361,7 +361,18 @@ export class NotebookPreview{
 }
 
 export class SubmissionFileDiff{
-  from_file: SubmissionFile;
-  to_file: SubmissionFile;
-  diff: string;
+  from_file_id: number;
+  to_file_id: number;
+  from_submission_id: number;
+  to_submission_id: number;
+
+  binary: boolean;
+  same: boolean;
+
+  additions?: number;
+  deletions?: number;
+  diff?: string;
+
+  from_file?: SubmissionFile;
+  to_file?: SubmissionFile;
 }

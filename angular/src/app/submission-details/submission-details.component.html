@@ -20,11 +20,9 @@
     </div>
   </div>
 
-  <app-submission-card [submission]="submission"></app-submission-card>
+  <app-submission-card [submission]="submission" (error)="error=$event"></app-submission-card>
 
   <ng-container *ngIf="task.evaluation_method=='auto_test'">
     <app-submission-auto-tests-view [submission]="submission" [task]="task" (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
-
-  <app-submission-diff-view [submission]="submission" (error)="error=$event"></app-submission-diff-view>
 </div>
