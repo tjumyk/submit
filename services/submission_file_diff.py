@@ -1,5 +1,6 @@
 import difflib
 import os
+from collections import OrderedDict
 from functools import lru_cache
 
 from error import BasicError
@@ -55,6 +56,8 @@ class SubmissionFileDiffService:
         'sql',
         'md', 'markdown'
     }
+    _result_cache = OrderedDict()  # (from_id, to_id) -> (additions, deletions) FIFO order
+    _result_cache_max_size = 1024
 
     @classmethod
     def _is_text_file(cls, requirement: FileRequirement) -> bool:
@@ -80,13 +83,23 @@ class SubmissionFileDiffService:
         if from_file.md5 == to_file.md5:  # skip actual diff if md5 match
             return SubmissionFileDiff(from_file, to_file, binary=False, same=True)
 
+        # assume contents of a submission file never change given a specific ID
+        cache_key = (from_file.id, to_file.id)
+        if not with_diff_content:  # check if we already have the results in cache
+            cache = cls._result_cache.get(cache_key)
+            if cache:
+                cls._result_cache.move_to_end(cache_key)  # move the key to the 'freshest' side
+                additions, deletions = cache
+                return SubmissionFileDiff(from_file, to_file, binary=False, same=False,
+                                          additions=additions, deletions=deletions)
+
         # check file sizes before reading files
         if from_file.size > cls._max_file_size:
             raise SubmissionFileDiffServiceError('from file is too big')
         if to_file.size > cls._max_file_size:
             raise SubmissionFileDiffServiceError('to file is too big')
 
-        # assume any submission file at a specific path is never changed
+        # assume the 'physical file' at the path of a submission file is never changed
         from_content = cached_read_file(os.path.join(data_root, from_file.path))
         to_content = cached_read_file(os.path.join(data_root, to_file.path))
 
@@ -110,6 +123,11 @@ class SubmissionFileDiffService:
                 if not line.startswith('---'):
                     deletions += 1
         diff_text = ''.join(diff_lines) if with_diff_content else None
+
+        # save (partial) results into cache and take care of the size of the cache
+        cls._result_cache[cache_key] = (additions, deletions)
+        while len(cls._result_cache) > cls._result_cache_max_size:
+            cls._result_cache.popitem(last=False)
 
         return SubmissionFileDiff(from_file, to_file, binary=False, same=False,
                                   additions=additions, deletions=deletions, diff=diff_text)
