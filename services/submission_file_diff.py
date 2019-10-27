@@ -36,7 +36,7 @@ class SubmissionFileDiff:
         return d
 
 
-@lru_cache(maxsize=256)
+@lru_cache(maxsize=128)
 def cached_read_file(path: str):
     with open(path) as f:
         return f.readlines()
