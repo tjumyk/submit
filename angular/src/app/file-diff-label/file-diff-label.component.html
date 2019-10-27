@@ -1,12 +1,13 @@
-<ng-container *ngIf="diff">
+<ng-container *ngIf="diff; else initVersion">
   <ng-container *ngIf="!diff.same; else sameFile">
     <ng-container *ngIf="!diff.binary; else binaryDiff">
-      <a href="{{apiBase}}/{{diff.to_submission_id}}/files/{{diff.to_file_id}}/diff" target="_blank" title="Compare with the previous submission">
+      <a class="diff-link" href="{{apiBase}}/{{diff.to_submission_id}}/files/{{diff.to_file_id}}/diff" target="_blank" title="Compare with the previous version">
         <span class="addition">+{{diff.additions}}</span>
         <span class="deletion">-{{diff.deletions}}</span>
       </a>
     </ng-container>
   </ng-container>
-  <ng-template #sameFile><span title="Same as the previous submission" class="same-file">Same File</span></ng-template>
-  <ng-template #binaryDiff><span title="Has binary difference from the previous submission" class="binary-diff">Binary Diff</span></ng-template>
+  <ng-template #sameFile><span title="Same as the previous version" class="same-file">Same File</span></ng-template>
+  <ng-template #binaryDiff><span title="Has binary difference from the previous version" class="binary-diff">Binary Diff</span></ng-template>
 </ng-container>
+<ng-template #initVersion><span title="Initial version in the submission history" class="init-version">Initial Version</span></ng-template>
