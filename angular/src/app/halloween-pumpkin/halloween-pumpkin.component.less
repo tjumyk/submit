@@ -1,0 +1,57 @@
+:host{
+  display: block;
+  background: #1b1c1d;
+  padding: 3rem;
+  cursor: pointer;
+  &>img{
+    width: 100%;
+    height: auto;
+    opacity: .1;
+    transition: opacity 2s linear;
+  }
+  &.active{
+    cursor: default;
+    &>img{
+      opacity: 0;
+      animation: pumpkin 10s linear;
+    }
+  }
+}
+
+@keyframes pumpkin {
+  0% {
+    opacity: .1;
+  }
+  30%{
+    opacity: .1;
+    transform: translateY(0);
+  }
+  40%{
+    opacity: .4;
+    transform: translateY(-5%);
+  }
+  50%{
+    opacity: .2;
+    transform: translateY(0);
+  }
+  60%{
+    opacity: .4;
+    transform: translateY(-5%);
+  }
+  70%{
+    opacity: .2;
+    transform: translateY(0);
+  }
+  80%{
+    opacity: .1;
+  }
+  94% {
+    opacity: .1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

@@ -37,6 +37,9 @@
           <i class="icon exclamation triangle yellow" *ngIf="messageCheckError" title="{{messageCheckError.msg}}"></i>
         </a>
       </div>
+
+      <app-halloween-pumpkin *ngIf="specialDate=='halloween'"></app-halloween-pumpkin>
+
       <div class="ui inverted vertical fluid bottom menu">
         <a class="item" routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" routerLinkActive="active" (click)="resetMobileMenu()">
           <i class="icon cogs"></i>Management

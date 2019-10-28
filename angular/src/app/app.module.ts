@@ -63,6 +63,7 @@ import { AutoTestConclusionSummaryChartsComponent } from './auto-test-conclusion
 import { ChartComponent } from './chart/chart.component';
 import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
 import { FileDiffLabelComponent } from './file-diff-label/file-diff-label.component';
+import { HalloweenPumpkinComponent } from './halloween-pumpkin/halloween-pumpkin.component';
 
 @NgModule({
   declarations: [
@@ -124,6 +125,7 @@ import { FileDiffLabelComponent } from './file-diff-label/file-diff-label.compon
     ChartComponent,
     CodeHighlightComponent,
     FileDiffLabelComponent,
+    HalloweenPumpkinComponent,
   ],
   imports: [
     BrowserModule,
