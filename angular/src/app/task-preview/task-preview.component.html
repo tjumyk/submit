@@ -25,19 +25,6 @@
     <div class="content">
       <div class="ui grid stackable">
         <div class="column">
-          <div class="ui message info icon">
-            <i class="icon info circle"></i>
-            <div class="content">
-              <div class="header">You are previewing this task</div>
-              <ul class="list">
-                <li>You can only see limited information about this task right now.</li>
-                <ng-container *ngIf="task.is_team_task">
-                  <li>You can create a new team at any time (in the 'My Team' tab below) but you are not allowed to join an existing team after the <b>Team Join Close Time</b> (as specified below).</li>
-                </ng-container>
-              </ul>
-            </div>
-          </div>
-
           <div class="ui labeled icon task-actions menu stackable">
             <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
             <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
