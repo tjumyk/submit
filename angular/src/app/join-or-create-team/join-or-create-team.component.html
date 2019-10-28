@@ -72,9 +72,16 @@
       </div>
     </div>
 
-    <div class="ui message warning" *ngIf="teamJoinClosed">
-      <i class="ui icon exclamation triangle"></i> Team join has been closed.
-    </div>
+    <ng-container *ngIf="!teamJoinClosed; else teamJoinClosedMsg">
+      <div class="ui message info" *ngIf="teamJoinCloseIn">
+        <i class="ui icon info circle"></i> Team join will be closed {{teamJoinCloseIn}}.
+      </div>
+    </ng-container>
+    <ng-template #teamJoinClosedMsg>
+      <div class="ui message warning">
+        <i class="ui icon exclamation triangle"></i> Team join has been closed.
+      </div>
+    </ng-template>
 
     <table class="ui table unstackable">
       <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th class="collapsing">Operations</th></tr></thead>

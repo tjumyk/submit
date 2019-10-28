@@ -21,6 +21,7 @@ export class JoinOrCreateTeamComponent implements OnInit, OnDestroy {
   task: Task;
   user: User;
 
+  teamJoinCloseIn: string;
   teamJoinClosed: boolean;
   timeTrackerHandler: number;
 
@@ -87,9 +88,17 @@ export class JoinOrCreateTeamComponent implements OnInit, OnDestroy {
 
     const timeTracker = () => {
       if (!task.team_join_close_time) {
+        this.teamJoinCloseIn = undefined;
         this.teamJoinClosed = false
       } else {
-        this.teamJoinClosed = moment(task.team_join_close_time).isSameOrBefore(moment())
+        const m_join_close = moment(task.team_join_close_time);
+        const m_now = moment();
+        this.teamJoinClosed = m_join_close.isSameOrBefore(m_now);
+        if(this.teamJoinClosed){
+          this.teamJoinCloseIn = undefined;
+        }else{
+          this.teamJoinCloseIn = m_join_close.from(m_now);
+        }
       }
     };
     timeTracker();
