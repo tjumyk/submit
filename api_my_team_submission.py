@@ -177,12 +177,12 @@ def auto_test_and_results(sid):
         if not is_same_team:
             return jsonify(msg="not your team's submission"), 403
 
-        update_after = request.args.get('update-after')
+        update_after = request.args.get('update_after')
         if update_after is not None:
             try:
                 update_after = float(update_after)
             except (TypeError, ValueError):
-                return jsonify(msg='invalid update-after'), 400
+                return jsonify(msg='invalid update_after'), 400
 
         timestamp = int(time.time())
         tests = [AutoTestService.test_to_dict(test)

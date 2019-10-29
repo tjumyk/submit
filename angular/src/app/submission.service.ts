@@ -61,7 +61,7 @@ export class SubmissionService {
                         updateAfterTimestamp: number=undefined): Observable<AutoTestList> {
     let params = new HttpParams();
     if(updateAfterTimestamp)
-      params = params.append('update-after', `${updateAfterTimestamp}`);
+      params = params.append('update_after', `${updateAfterTimestamp}`);
     return this.http.get<AutoTestList>(`${apiBase}/${id}/auto-tests`, {params})
   }
 
