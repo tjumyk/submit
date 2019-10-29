@@ -8,7 +8,7 @@ from typing import Optional, List, Dict, Tuple
 
 import tzlocal
 from celery.result import AsyncResult
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import FileStorage
 
@@ -660,27 +660,53 @@ class SubmissionService:
         return test, result
 
     @staticmethod
-    def get_auto_tests(submission: Submission, joined_load_output_files=False) -> List[AutoTest]:
+    def get_auto_tests(submission: Submission, joined_load_output_files=False, include_private: bool = False,
+                       update_after_timestamp: float = None, timestamp_safe_margin: float = 3.0) \
+            -> List[AutoTest]:
         if submission is None:
             raise SubmissionServiceError('submission is required')
 
         query = db.session.query(AutoTest)
         if joined_load_output_files:
             query = query.options(joinedload(AutoTest.output_files))
-        return query.filter(AutoTest.submission_id == submission.id) \
-            .order_by(AutoTest.id).all()
+
+        filters = [AutoTest.submission_id == submission.id]
+        if not include_private:
+            filters.extend((
+                AutoTest.config_id == AutoTestConfig.id,
+                AutoTestConfig.is_private == False
+            ))
+        if update_after_timestamp:
+            # Exclude tests that finished before the given timestamp (with a safe margin)
+            timestamp = datetime.utcfromtimestamp(update_after_timestamp - timestamp_safe_margin)
+            filters.append(or_(AutoTest.stopped_at.is_(None), AutoTest.stopped_at > timestamp))
+
+        return query.filter(*filters).order_by(AutoTest.id).all()
 
     @staticmethod
-    def get_last_auto_tests(submission: Submission) -> List[Tuple[AutoTestConfig, AutoTest]]:
+    def get_last_auto_tests(submission: Submission, include_private: bool = False,
+                            update_after_timestamp: float = None, timestamp_safe_margin: float = 3.0) \
+            -> List[AutoTest]:
         if submission is None:
             raise SubmissionServiceError('submission is required')
 
+        filters = [AutoTest.submission_id == submission.id]
+        if not include_private:
+            filters.extend((
+                AutoTest.config_id == AutoTestConfig.id,
+                AutoTestConfig.is_private == False
+            ))
+
+        if update_after_timestamp:
+            # Exclude tests that finished before the given timestamp (with a safe margin)
+            timestamp = datetime.utcfromtimestamp(update_after_timestamp - timestamp_safe_margin)
+            filters.append(or_(AutoTest.stopped_at.is_(None), AutoTest.stopped_at > timestamp))
+
         sub_query = db.session.query(func.max(AutoTest.id).label('last_test_id')) \
-            .filter(AutoTest.submission_id == submission.id) \
+            .filter(*filters) \
             .group_by(AutoTest.config_id).subquery()
-        return db.session.query(AutoTestConfig, AutoTest) \
-            .filter(AutoTestConfig.id == AutoTest.config_id,
-                    AutoTest.id == sub_query.c.last_test_id) \
+        return db.session.query(AutoTest) \
+            .filter(AutoTest.id == sub_query.c.last_test_id) \
             .order_by(AutoTest.config_id).all()
 
     @classmethod

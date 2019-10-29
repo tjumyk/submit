@@ -1,5 +1,14 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {AutoTest, AutoTestConfig, ErrorMessage, FileRequirement, Material, Submission, Task, User} from "../models";
+import {
+  AutoTest,
+  AutoTestConfig,
+  ErrorMessage,
+  FileRequirement,
+  Material,
+  Submission,
+  Task,
+  User
+} from "../models";
 import {AutoTestConfigTypeInfo, SubmissionService} from "../submission.service";
 import {finalize} from "rxjs/operators";
 import {AccountService} from "../account.service";
@@ -77,6 +86,8 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
     }
 
     let firstLoad = true;
+    let updateAfterTimestamp = undefined;
+
     const autoTestsTracker = () => {
       let needRefresh = false;
       if (firstLoad) {
@@ -96,9 +107,17 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
         return; // skip request since all (current) works finished
       }
 
-      this.submissionService.getAutoTestAndResults(this.submission.id, this.apiBase).subscribe(
-        tests => {
+      this.submissionService.getAutoTestAndResults(this.submission.id, this.apiBase, updateAfterTimestamp).subscribe(
+        testList => {
           this.firstLoadComplete = true;
+
+          let tests: AutoTest[];
+          if(testList.hasOwnProperty('timestamp')){  // new dict format
+            updateAfterTimestamp = testList.timestamp;
+            tests = testList.tests;
+          }else{  // old list format
+            tests = testList;
+          }
 
           for (let test of tests) {
             const config = this.configs[test.config_id];

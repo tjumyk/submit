@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timedelta
 from functools import wraps
 
+import time
 from flask import Blueprint, jsonify, current_app as app, send_from_directory, request, render_template
 
 from auth_connect.oauth import requires_login
@@ -169,8 +170,18 @@ def test_and_results(sid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        return jsonify([AutoTestService.test_to_dict(t, with_advanced_fields=True)
-                        for t in SubmissionService.get_auto_tests(submission, joined_load_output_files=True)])
+        update_after = request.args.get('update-after')
+        if update_after is not None:
+            try:
+                update_after = float(update_after)
+            except (TypeError, ValueError):
+                return jsonify(msg='invalid update-after'), 400
+
+        timestamp = int(time.time())
+        tests = [AutoTestService.test_to_dict(t, with_advanced_fields=True)
+                 for t in SubmissionService.get_auto_tests(submission, joined_load_output_files=True,
+                                                           include_private=True, update_after_timestamp=update_after)]
+        return jsonify(tests=tests, timestamp=timestamp)
     except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

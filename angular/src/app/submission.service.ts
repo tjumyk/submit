@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {AutoTest, AutoTestConfig, Submission, SubmissionFileDiff} from "./models";
 
@@ -57,16 +57,11 @@ export class SubmissionService {
     return this.getSubmission(id, this.myTeamApi)
   }
 
-  getAutoTestAndResults(id: number, apiBase: string=this.api): Observable<AutoTest[]> {
-    return this.http.get<AutoTest[]>(`${apiBase}/${id}/auto-tests`)
-  }
-
-  getMyAutoTestAndResults(id: number): Observable<AutoTest[]> {
-    return this.getAutoTestAndResults(id, this.myApi)
-  }
-
-  getMyTeamAutoTestAndResults(id: number): Observable<AutoTest[]> {
-    return this.getAutoTestAndResults(id, this.myTeamApi)
+  getAutoTestAndResults(id: number, apiBase: string=this.api, updateAfterTimestamp: number=undefined): Observable<any> {
+    let params = new HttpParams();
+    if(updateAfterTimestamp)
+      params = params.append('update-after', `${updateAfterTimestamp}`);
+    return this.http.get(`${apiBase}/${id}/auto-tests`, {params})
   }
 
   getDiffs(id:number, apiBase: string=this.api):Observable<{[fid:number]: SubmissionFileDiff}>{

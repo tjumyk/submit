@@ -175,12 +175,16 @@ def auto_test_and_results(sid):
         if not is_same_team:
             return jsonify(msg="not your team's submission"), 403
 
-        tests = []
-        for config, test in SubmissionService.get_last_auto_tests(submission):
-            if config.is_private:  # skip private tests
-                continue
-            tests.append(AutoTestService.test_to_dict(test))
+        update_after = request.args.get('update-after')
+        if update_after is not None:
+            try:
+                update_after = float(update_after)
+            except (TypeError, ValueError):
+                return jsonify(msg='invalid update-after'), 400
 
-        return jsonify(tests)
+        # return old list format for compatibility with outdated front-end code in students' browsers
+        return jsonify([AutoTestService.test_to_dict(test)
+                        for test in SubmissionService.get_last_auto_tests(submission, include_private=False,
+                                                                          update_after_timestamp=update_after)])
     except (SubmissionServiceError, TeamServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
