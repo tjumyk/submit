@@ -285,6 +285,8 @@ export class AutoTest {
   submission?: Submission;
   config?: AutoTestConfig;
   output_files?: AutoTestOutputFile[];
+
+  pending_tests_ahead?: number;
 }
 
 export class AutoTestOutputFile {

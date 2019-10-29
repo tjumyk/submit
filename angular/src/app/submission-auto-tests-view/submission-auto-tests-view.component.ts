@@ -127,6 +127,8 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
               oldTest.stopped_at = test.stopped_at;
 
               oldTest.output_files = test.output_files;
+
+              oldTest.pending_tests_ahead = test.pending_tests_ahead;
             } else { // new test
               this.autoTestGroups[test.config_id].push(test);  // note the group must have been created
               this.autoTests[test.id] = test;

@@ -91,7 +91,23 @@ class AutoTestService:
         Get a dumped dictionary with additional information from the temporary result
         """
         test_obj = test.to_dict(with_advanced_fields=with_advanced_fields)
-        if not test.final_state:  # running tests
-            result_obj = cls.result_to_dict(cls.get_result(test), with_advanced_fields=with_advanced_fields)
+        if not test.final_state:  # pending/running tests
+            result = cls.get_result(test)
+            result_obj = cls.result_to_dict(result, with_advanced_fields=with_advanced_fields)
             test_obj.update(result_obj)  # merge temporary result
+            if result.state == 'PENDING':
+                test_obj['pending_tests_ahead'] = cls.get_pending_tests_ahead(test)
         return test_obj
+
+    @classmethod
+    def get_pending_tests_ahead(cls, test: AutoTest) -> int:
+        if test is None:
+            raise AutoTestServiceError('auto_test is required')
+
+        # assume all tests with the same config type go into the same task queue (although in fact not necessarily)
+        config = test.config
+        return db.session.query(func.count()) \
+            .filter(AutoTest.started_at.is_(None),
+                    AutoTestConfig.id == AutoTest.config_id,
+                    AutoTestConfig.type == config.type,
+                    AutoTest.id < test.id).scalar()
