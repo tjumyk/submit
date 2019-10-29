@@ -378,3 +378,8 @@ export class SubmissionFileDiff{
   from_file?: SubmissionFile;
   to_file?: SubmissionFile;
 }
+
+export class AutoTestList{
+  tests: AutoTest[];
+  timestamp: number;
+}

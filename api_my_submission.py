@@ -1,3 +1,5 @@
+import time
+
 from flask import Blueprint, jsonify, send_from_directory, current_app as app, request, render_template
 
 from auth_connect.oauth import requires_login
@@ -120,9 +122,10 @@ def auto_test_and_results(sid):
             except (TypeError, ValueError):
                 return jsonify(msg='invalid update-after'), 400
 
-        # return old list format for compatibility with outdated front-end code in students' browsers
-        return jsonify([AutoTestService.test_to_dict(test)
-                        for test in SubmissionService.get_last_auto_tests(submission, include_private=False,
-                                                                          update_after_timestamp=update_after)])
+        timestamp = int(time.time())
+        tests = [AutoTestService.test_to_dict(test)
+                 for test in SubmissionService.get_last_auto_tests(submission, include_private=False,
+                                                                   update_after_timestamp=update_after)]
+        return jsonify(tests=tests, timestamp=timestamp)
     except (SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

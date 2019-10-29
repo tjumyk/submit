@@ -110,16 +110,9 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
       this.submissionService.getAutoTestAndResults(this.submission.id, this.apiBase, updateAfterTimestamp).subscribe(
         testList => {
           this.firstLoadComplete = true;
+          updateAfterTimestamp = testList.timestamp;
 
-          let tests: AutoTest[];
-          if(testList.hasOwnProperty('timestamp')){  // new dict format
-            updateAfterTimestamp = testList.timestamp;
-            tests = testList.tests;
-          }else{  // old list format
-            tests = testList;
-          }
-
-          for (let test of tests) {
+          for (let test of testList.tests) {
             const config = this.configs[test.config_id];
             if (!config) {  // TODO load new config
               console.warn(`ignoring test ${test.id} as its config is not loaded`);
