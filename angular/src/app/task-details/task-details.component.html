@@ -14,7 +14,7 @@
           <a class="action" href="api/tasks/{{taskId}}/download-materials-zip" [title]="'Download All as Zip' + (hasPrivateMaterial ? ' (public only)': '')"><i class="icon file archive outline"></i></a>
         </ng-container>
       </div>
-      <div class="ui cards">
+      <div class="ui stackable file cards">
         <a href="api/materials/{{mat.id}}/download" class="ui card" *ngFor="let mat of task.materials">
           <div class="content">
             <i class="ui right floated red lock icon" *ngIf="mat.is_private" title="Private"></i>
