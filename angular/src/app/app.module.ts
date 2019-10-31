@@ -65,6 +65,7 @@ import { CodeHighlightComponent } from './code-highlight/code-highlight.componen
 import { FileDiffLabelComponent } from './file-diff-label/file-diff-label.component';
 import { HalloweenPumpkinComponent } from './halloween-pumpkin/halloween-pumpkin.component';
 import { SpecialDateCardComponent } from './special-date-card/special-date-card.component';
+import { AprilFoolBoxComponent } from './april-fool-box/april-fool-box.component';
 
 @NgModule({
   declarations: [
@@ -128,6 +129,7 @@ import { SpecialDateCardComponent } from './special-date-card/special-date-card.
     FileDiffLabelComponent,
     HalloweenPumpkinComponent,
     SpecialDateCardComponent,
+    AprilFoolBoxComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,45 @@
+:host{
+  display: block;
+  background: #1b1c1d;
+  padding: 1rem;
+}
+.ad{
+  position: relative;
+  background: url("tutor.jpg");
+  background-size: cover;
+  padding: 1rem 1rem 2rem;
+
+  .header{
+    text-shadow: 1px 1px 4px white;
+  }
+
+  .sub.header{
+    text-shadow: none;
+    background: rgba(0,0,0,.4);
+    color: white;
+    padding: .2rem .4rem;
+    border-radius: .2rem;
+  }
+
+  .hd{
+    color: #fbbd08;
+    animation: glow 1s linear infinite;
+  }
+
+  .bottom.label{
+    padding: .3em .4em;
+    background: rgba(256,256,256, .5);
+  }
+}
+
+@keyframes glow {
+  0%{
+    text-shadow: 0 0 0 gold;
+  }
+  50%{
+    text-shadow: 0 0 10px gold;
+  }
+  100%{
+    text-shadow: 0 0 0 gold;
+  }
+}
