@@ -79,15 +79,17 @@
     </ng-container>
 
     <ng-container *ngIf="(test.final_state || test.state) == 'PENDING'">
-      <div class="ui text loader active">
-        Waiting for worker bot...
-        <ng-container *ngIf="test.pending_tests_ahead">
-          <br/>
-          {{test.pending_tests_ahead}}
-          <ng-container *ngIf="test.pending_tests_ahead==1; else multiPendingAhead">test</ng-container>
-          <ng-template #multiPendingAhead>tests</ng-template>
-          ahead in the queue
-        </ng-container>
+      <div class="pending-loader-wrapper">
+        <div class="ui text loader active inline centered">
+          Waiting for worker bot...
+          <ng-container *ngIf="test.pending_tests_ahead">
+            <br/>
+            {{test.pending_tests_ahead}}
+            <ng-container *ngIf="test.pending_tests_ahead==1; else multiPendingAhead">test</ng-container>
+            <ng-template #multiPendingAhead>tests</ng-template>
+            ahead in the queue
+          </ng-container>
+        </div>
       </div>
     </ng-container>
 
