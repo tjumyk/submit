@@ -5,7 +5,6 @@ import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-term',
@@ -29,9 +28,6 @@ export class TermComponent implements OnInit, OnDestroy {
   messages_unread_count: number;
 
   showMobileMenu: boolean;
-
-  specialDate: string;
-  specialDateCheckHandler: number;
 
   constructor(
     private accountService: AccountService,
@@ -59,7 +55,6 @@ export class TermComponent implements OnInit, OnDestroy {
             this.accessRoles = TermService.getAccessRoles(this.term, this.user);
 
             this.setupMessageCheck();
-            this.setupSpecialDateCheck();
           },
           error => this.initError = error.error
         )
@@ -71,7 +66,6 @@ export class TermComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     clearInterval(this.message_check_handler);
-    clearInterval(this.specialDateCheckHandler);
     this.termService.unreadMessagesCountTrigger = () => undefined;
   }
 
@@ -102,22 +96,6 @@ export class TermComponent implements OnInit, OnDestroy {
     this.termService.unreadMessagesCountTrigger = () => doMessageCheck();
     this.message_check_handler = setInterval(messageChecker, this.termService.messageRefreshPeriod);
     doMessageCheck();
-  }
-
-  private setupSpecialDateCheck(){
-    const checker = ()=>{
-      const now = moment();
-      const month = now.get('month') + 1;
-      const day = now.get('date');
-
-      if(month == 10 && day == 31){
-        this.specialDate = 'halloween';
-        return;
-      }
-      this.specialDate = undefined;
-    };
-    checker();
-    this.specialDateCheckHandler = setInterval(checker, 10 * 60 * 1000);
   }
 
 }

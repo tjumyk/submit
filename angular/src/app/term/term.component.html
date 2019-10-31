@@ -37,7 +37,7 @@
         </a>
       </div>
 
-      <app-halloween-pumpkin *ngIf="specialDate=='halloween'"></app-halloween-pumpkin>
+      <app-special-date-card></app-special-date-card>
 
       <div class="ui inverted vertical fluid bottom menu">
         <a class="item" routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" routerLinkActive="active" (click)="resetMobileMenu()">

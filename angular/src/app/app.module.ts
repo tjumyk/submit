@@ -64,6 +64,7 @@ import { ChartComponent } from './chart/chart.component';
 import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
 import { FileDiffLabelComponent } from './file-diff-label/file-diff-label.component';
 import { HalloweenPumpkinComponent } from './halloween-pumpkin/halloween-pumpkin.component';
+import { SpecialDateCardComponent } from './special-date-card/special-date-card.component';
 
 @NgModule({
   declarations: [
@@ -126,6 +127,7 @@ import { HalloweenPumpkinComponent } from './halloween-pumpkin/halloween-pumpkin
     CodeHighlightComponent,
     FileDiffLabelComponent,
     HalloweenPumpkinComponent,
+    SpecialDateCardComponent,
   ],
   imports: [
     BrowserModule,
