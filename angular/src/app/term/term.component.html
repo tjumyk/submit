@@ -34,7 +34,6 @@
         <a class="item" routerLink="/terms/{{term.id}}/messages" routerLinkActive="active" (click)="resetMobileMenu()">
           <i class="icon envelope"></i> Messages
           <div class="ui green label" *ngIf="messages_unread_count">{{messages_unread_count}}</div>
-          <i class="icon exclamation triangle yellow" *ngIf="messageCheckError" title="{{messageCheckError.msg}}"></i>
         </a>
       </div>
 
