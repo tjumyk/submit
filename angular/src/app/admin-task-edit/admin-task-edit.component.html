@@ -775,7 +775,7 @@
       <!-- Special considerations tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='special_considerations'}">
         <table class="ui table unstackable celled bottom attached">
-          <thead><tr><th>ID</th><th>User/Team</th><th>Due Time Extension (hours)</th><th>Submission Attempt Limit Extension</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th>User/Team</th><th>Due Time Extension (hours)</th><th>Submission Attempt Limit Extension</th><th>Created At</th><th>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let spec of task.special_considerations; index as i">
             <td>{{spec.id}}</td>
@@ -787,6 +787,7 @@
             </td>
             <td>{{spec.due_time_extension}}</td>
             <td>{{spec.submission_attempt_limit_extension}}</td>
+            <td>{{spec.created_at | date:'medium'}}</td>
             <td>
               <a class="ui icon button mini red" (click)="deleteSpecialConsideration(spec, i ,btnDeleteSpecialConsideration)" #btnDeleteSpecialConsideration><i class="icon trash"></i></a>
             </td>
