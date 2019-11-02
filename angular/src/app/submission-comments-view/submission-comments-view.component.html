@@ -1,0 +1,52 @@
+<div class="ui comments">
+  <h3 class="ui dividing header">Comments</h3>
+
+  <ng-container *ngIf="comments">
+    <div class="ui message info" *ngIf="enableStudentHelp && !comments.length">
+      <div class="header">Need Help?</div>
+      <ul class="list">
+        <li>You may add a comment to request some help for <b>this particular submission</b>.</li>
+        <li>The tutors will receive a notification about your new comment but the timely response is <b>not</b> guaranteed.</li>
+        <li></li>
+        <li>Do not put any generic question here. Other course management system, e.g. Piazza, is the right place for that.</li>
+      </ul>
+    </div>
+    <div class="comment" *ngFor="let comment of comments; index as i">
+      <div class="avatar">
+        <ng-container *ngIf="comment.author; else sysAvatar">
+          <ng-container *ngIf="comment.author.avatar; else authorNoAvatar">
+            <img src="{{comment.author.avatar}}?size=64">
+          </ng-container>
+        </ng-container>
+        <ng-template #sysAvatar><img src="static/assets/logo-64.png"></ng-template>
+        <ng-template #authorNoAvatar><i class="icon big user circle"></i></ng-template>
+      </div>
+      <div class="content">
+      <span class="author">
+        <ng-container *ngIf="comment.author; else sysName">
+          <app-user-mini-card [user]="comment.author" [enablePopup]="true" [enableAvatar]="false" [enableAdmin]="isAdmin"></app-user-mini-card>
+        </ng-container>
+        <ng-template #sysName>System</ng-template>
+      </span>
+        <div class="metadata">
+          <span class="date">{{comment.modified_at|date:'medium'}}</span>
+          <span class="date" *ngIf="comment._modified_at_from_now">({{comment._modified_at_from_now}})</span>
+        </div>
+        <div class="text">{{comment.content}}</div>
+        <div class="actions" *ngIf="user.id == comment.author_id">
+          <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}">
+    <div class="field">
+      <textarea [(ngModel)]="editorContent" name="content" required #editorContentModel="ngModel"
+                placeholder="Your comment...(at most 512 characters)" maxlength="512"></textarea>
+    </div>
+    <button type="submit" class="ui labeled icon button primary">
+      <i class="icon edit"></i> Add Comment
+    </button>
+  </form>
+</div>

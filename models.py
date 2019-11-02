@@ -628,3 +628,29 @@ class EmailSubscription(db.Model):
                                                                        cascade="all, delete-orphan"))
     channel = db.relationship('MessageChannel', lazy=False, backref=db.backref('email_subscriptions',
                                                                                cascade="all, delete-orphan"))
+
+
+class SubmissionComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    content = db.Column(db.String(512), nullable=False)
+
+    submission = db.relationship('Submission', backref=db.backref('comments'))
+    author = db.relationship('UserAlias', backref=db.backref('submission_comments'))
+
+    def __repr__(self):
+        return '<SubmissionComment %r>' % self.id
+
+    def to_dict(self, with_submission=False, with_author=True) -> dict:
+        d = dict(id=self.id, submission_id=self.submission_id, author_id=self.author_id,
+                 created_at=self.created_at, modified_at=self.modified_at, content=self.content)
+        if with_submission:
+            d['submission'] = self.submission.to_dict()
+        if with_author:
+            d['author'] = self.author.to_dict() if self.author_id is not None else None
+        return d

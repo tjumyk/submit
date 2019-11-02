@@ -3,6 +3,7 @@ import time
 from flask import Blueprint, jsonify, send_from_directory, current_app as app, request, render_template
 
 from auth_connect.oauth import requires_login
+from models import db
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.submission import SubmissionService, SubmissionServiceError
@@ -127,5 +128,62 @@ def auto_test_and_results(sid):
                  for test in SubmissionService.get_last_auto_tests(submission, include_private=False,
                                                                    update_after_timestamp=update_after)]
         return jsonify(tests=tests, timestamp=timestamp)
+    except (SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@my_submission_api.route('/<int:sid>/comments', methods=['GET', 'POST'])
+@requires_login
+def do_comments(sid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+
+        if submission.submitter_id != user.id:
+            return jsonify(msg='not your submission'), 403
+
+        if request.method == 'GET':
+            return jsonify([c.to_dict() for c in SubmissionService.get_comments(submission)])
+        else:  # POST
+            comment = SubmissionService.add_comment(submission, user, request.json.get('content'))
+            db.session.commit()
+            return jsonify(comment.to_dict()), 201
+    except (SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@my_submission_api.route('/<int:sid>/comments/<int:cid>', methods=['PUT', 'DELETE'])
+@requires_login
+def do_comment(sid, cid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+
+        if submission.submitter_id != user.id:
+            return jsonify(msg='not your submission'), 403
+
+        comment = SubmissionService.get_comment(cid)
+        if comment is None:
+            return jsonify(msg='comment not found'), 404
+
+        if comment.author_id is None or user.id != comment.author_id:
+            return jsonify(msg='not your comment'), 403
+
+        if request.method == 'PUT':
+            SubmissionService.update_comment(comment, request.json.get('content'))
+            db.session.commit()
+            return jsonify(comment.to_dict())
+        else:  # DELETE
+            db.session.delete(comment)
+            db.session.commit()
+            return "", 204
     except (SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

@@ -13,7 +13,8 @@ from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import FileStorage
 
 from error import BasicError
-from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest, AutoTestConfig
+from models import Submission, Task, UserAlias, Team, SubmissionFile, db, UserTeamAssociation, AutoTest, AutoTestConfig, \
+    SubmissionComment
 from services.auto_test import AutoTestService
 from services.task import TaskService
 from testbot import bot
@@ -133,6 +134,8 @@ class LatePenalty:
 
 
 class SubmissionService:
+    _COMMENT_MAX_LENGTH = 512
+
     @staticmethod
     def get(_id: int) -> Optional[Submission]:
         if _id is None:
@@ -1045,3 +1048,44 @@ class SubmissionService:
                     Submission.id < submission.id) \
             .order_by(Submission.id.desc()) \
             .first()
+
+    @staticmethod
+    def get_comment(_id: int) -> Optional[SubmissionComment]:
+        if _id is None:
+            raise SubmissionServiceError('id is required')
+        if type(_id) is not int:
+            raise SubmissionServiceError('id must be an integer')
+        return SubmissionComment.query.get(_id)
+
+    @staticmethod
+    def get_comments(submission: Submission) -> List[SubmissionComment]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        return SubmissionComment.query.with_parent(submission).all()
+
+    @classmethod
+    def add_comment(cls, submission: Submission, author: Optional[UserAlias], content: str) -> SubmissionComment:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+        if content is None:
+            raise SubmissionServiceError('content is required')
+
+        if len(content) > cls._COMMENT_MAX_LENGTH:
+            raise SubmissionServiceError('content too long')
+
+        comment = SubmissionComment(submission=submission, author=author, content=content)
+        db.session.add(comment)
+        return comment
+
+    @classmethod
+    def update_comment(cls, comment: SubmissionComment, content: str):
+        if comment is None:
+            raise SubmissionServiceError('comment is required')
+        if content is None:
+            raise SubmissionServiceError('content is required')
+
+        if len(content) > cls._COMMENT_MAX_LENGTH:
+            raise SubmissionServiceError('content too long')
+
+        comment.content = content

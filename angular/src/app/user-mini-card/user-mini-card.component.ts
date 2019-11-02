@@ -11,6 +11,9 @@ export class UserMiniCardComponent implements OnInit {
   user: User;
 
   @Input()
+  enableAvatar: boolean = true;
+
+  @Input()
   enablePopup: boolean = false;
 
   @Input()

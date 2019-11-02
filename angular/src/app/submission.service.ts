@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {AutoTest, AutoTestConfig, AutoTestList, Submission, SubmissionFileDiff} from "./models";
+import {AutoTest, AutoTestConfig, AutoTestList, Submission, SubmissionComment, SubmissionFileDiff} from "./models";
 
 export class AutoTestConfigTypeInfo {
   id: string;
@@ -67,6 +67,22 @@ export class SubmissionService {
 
   getDiffs(id:number, apiBase: string=this.api):Observable<{[fid:number]: SubmissionFileDiff}>{
     return this.http.get<{[fid:number]: SubmissionFileDiff}>(`${apiBase}/${id}/diff`)
+  }
+
+  getComments(sid: number, apiBase: string = this.api): Observable<SubmissionComment[]> {
+    return this.http.get<SubmissionComment[]>(`${apiBase}/${sid}/comments`)
+  }
+
+  addComment(sid: number, content: string, apiBase: string = this.api): Observable<SubmissionComment> {
+    return this.http.post<SubmissionComment>(`${apiBase}/${sid}/comments`, {content})
+  }
+
+  updateComment(sid: number, cid: number, content: string, apiBase: string = this.api): Observable<SubmissionComment> {
+    return this.http.put<SubmissionComment>(`${apiBase}/${sid}/comments/${cid}`, {content})
+  }
+
+  removeComment(sid: number, cid: number, apiBase: string = this.api): Observable<any> {
+    return this.http.delete(`${apiBase}/${sid}/comments/${cid}`)
   }
 
   getAutoTestStatusColor(status: string): string {

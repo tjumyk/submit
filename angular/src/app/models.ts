@@ -383,3 +383,17 @@ export class AutoTestList{
   tests: AutoTest[];
   timestamp: number;
 }
+
+export class SubmissionComment{
+  id: number;
+  submission_id: number;
+  author_id?: number;
+
+  created_at: string;
+  modified_at: string;
+
+  content: string;
+
+  submission?: Submission;
+  author?: User;
+}

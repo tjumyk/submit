@@ -16,4 +16,7 @@
     <app-submission-auto-tests-view [submission]="submission" [task]="task" [apiBase]="submissionService.myTeamApi"
                                     (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
+
+  <app-submission-comments-view [submission]="submission" [apiBase]="submissionService.myTeamApi"
+                                [enableStudentHelp]="true" (error)="error=$event"></app-submission-comments-view>
 </div>

@@ -1,9 +1,9 @@
 import json
 import os
+import time
 from datetime import datetime, timedelta
 from functools import wraps
 
-import time
 from flask import Blueprint, jsonify, current_app as app, send_from_directory, request, render_template
 
 from auth_connect.oauth import requires_login
@@ -382,4 +382,69 @@ def worker_output_file(sid, wid, fid):
         data_folder = app.config['DATA_FOLDER']
         return send_from_directory(data_folder, file.save_path, as_attachment=True)
     except AutoTestServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@submission_api.route('/<int:sid>/comments', methods=['GET', 'POST'])
+@requires_login
+def do_comments(sid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+        roles = TermService.get_access_roles(submission.task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        if request.method == 'GET':
+            return jsonify([c.to_dict() for c in SubmissionService.get_comments(submission)])
+        else:  # POST
+            comment = SubmissionService.add_comment(submission, user, request.json.get('content'))
+            db.session.commit()
+            return jsonify(comment.to_dict()), 201
+    except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@submission_api.route('/<int:sid>/comments/<int:cid>', methods=['PUT', 'DELETE'])
+@requires_login
+def do_comment(sid, cid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        submission = SubmissionService.get(sid)
+        if submission is None:
+            return jsonify(msg='submission not found'), 404
+        roles = TermService.get_access_roles(submission.task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        comment = SubmissionService.get_comment(cid)
+        if comment is None:
+            return jsonify(msg='comment not found'), 404
+
+        if comment.author_id is None or user.id != comment.author_id:
+            return jsonify(msg='not your comment'), 403
+
+        if request.method == 'PUT':
+            SubmissionService.update_comment(comment, request.json.get('content'))
+            db.session.commit()
+            return jsonify(comment.to_dict())
+        else:  # DELETE
+            db.session.delete(comment)
+            db.session.commit()
+            return "", 204
+    except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

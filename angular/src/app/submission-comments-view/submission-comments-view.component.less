@@ -1,0 +1,23 @@
+:host{
+  display: block;
+}
+.ui.comments{
+  max-width: none;
+}
+.actions>a{
+  &.disabled{
+    cursor: default;
+    pointer-events: none!important;
+  }
+  &.delete{
+    &:after{
+      content: 'Delete';
+    }
+    &.loading:after{
+      content: 'Deleting...';
+    }
+  }
+}
+.comment .text{
+  white-space: pre-wrap;
+}
