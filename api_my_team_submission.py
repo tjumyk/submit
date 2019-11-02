@@ -1,3 +1,4 @@
+import html
 import time
 from datetime import datetime
 
@@ -243,7 +244,8 @@ def do_comments(sid):
                 submission_path = 'team-submissions/%d/%d' % (team.id, submission.id)
                 mail_args = dict(site=app.config['SITE'], term=term, task=task,
                                  submission=submission, submission_path=submission_path,
-                                 comment=comment, author_name=author_name)
+                                 comment=comment, comment_escaped_content=html.escape(comment.content),
+                                 author_name=author_name)
                 msg_content = build_message_with_template('submission_new_comment', mail_args)
                 msg_channel = MessageService.get_channel_by_name('comment')
                 msg, mails = MessageSenderService.send_to_group(msg_channel, term, msg_content, None,
