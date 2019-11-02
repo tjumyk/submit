@@ -1,0 +1,14 @@
+New Comment from {author_name} for Submission {submission.id}
+Hi,
+
+{author_name} just added a new comment for Submission {submission.id}.
+
+---
+{comment.content}
+---
+
+Please click the following button or find the submission page to see the full list of comments.
+
+{site[root_url]}{site[base_url]}terms/{term.id}/tasks/{task.id}/{submission_path}
+
+{site[name]}

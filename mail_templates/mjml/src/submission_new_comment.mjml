@@ -1,0 +1,23 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./include/head.mjml"/>
+  </mj-head>
+  
+  <mj-body>
+    <mj-include path="./include/header.mjml" />
+    
+    <mj-section background-color='#fff' padding='20px'>
+      <mj-column>
+        <mj-text>
+          <h2>Hi,</h2>
+          <p><b>{{author_name}}</b> just added a new comment for <b>Submission {{submission.id}}</b>.</p>
+          <blockquote style="white-space: pre-wrap">{{comment.content}}</blockquote>
+          <p>Please click the following button or find the submission page to see the full list of comments.</p>
+        </mj-text>
+        <mj-button padding-top="10px" href='{{site[root_url]}}{{site[base_url]}}terms/{{term.id}}/tasks/{{task.id}}/{{submission_path}}'>Submission Details</mj-button>
+      </mj-column>
+    </mj-section>
+    
+    <mj-include path="./include/footer.mjml" />
+  </mj-body>
+</mjml>

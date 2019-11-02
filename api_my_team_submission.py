@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from flask import Blueprint, jsonify, send_from_directory, current_app as app, request, render_template
 
@@ -6,10 +7,13 @@ from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService
 from services.auto_test import AutoTestService, AutoTestServiceError
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.submission_file_diff import SubmissionFileDiffService, SubmissionFileDiffServiceError
 from services.submission_file_viewer import SubmissionFileViewerService
 from services.team import TeamService, TeamServiceError
+from utils.message import build_message_with_template
 
 my_team_submission_api = Blueprint('my_team_submission_api', __name__)
 
@@ -226,10 +230,34 @@ def do_comments(sid):
         if request.method == 'GET':
             return jsonify([c.to_dict() for c in SubmissionService.get_comments(submission)])
         else:  # POST
+            last_comment = SubmissionService.get_last_comment(submission)
             comment = SubmissionService.add_comment(submission, user, request.json.get('content'))
+
+            # check if need to send an email
+            if last_comment is None or last_comment.author_id != user.id \
+                    or datetime.utcnow() - last_comment.modified_at > SubmissionService.COMMENT_SESSION_EXPIRY:
+                task = submission.task
+                term = task.term
+                course = term.course
+                author_name = '%s (%s)' % (user.nickname, user.name) if user.nickname else user.name
+                submission_path = 'team-submissions/%d/%d' % (team.id, submission.id)
+                mail_args = dict(site=app.config['SITE'], term=term, task=task,
+                                 submission=submission, submission_path=submission_path,
+                                 comment=comment, author_name=author_name)
+                msg_content = build_message_with_template('submission_new_comment', mail_args)
+                msg_channel = MessageService.get_channel_by_name('comment')
+                msg, mails = MessageSenderService.send_to_group(msg_channel, term, msg_content, None,
+                                                                course.tutor_group, hide_peers=False)
+            else:
+                mails = []
+
             db.session.commit()
+            for mail in mails:
+                mail.send()
+
             return jsonify(comment.to_dict()), 201
-    except (SubmissionServiceError, TeamServiceError, AutoTestServiceError) as e:
+    except (SubmissionServiceError, TeamServiceError, AutoTestServiceError, MessageServiceError,
+            MessageSenderServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

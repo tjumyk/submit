@@ -135,6 +135,7 @@ class LatePenalty:
 
 class SubmissionService:
     _COMMENT_MAX_LENGTH = 512
+    COMMENT_SESSION_EXPIRY = timedelta(minutes=5)
 
     @staticmethod
     def get(_id: int) -> Optional[Submission]:
@@ -1089,3 +1090,10 @@ class SubmissionService:
             raise SubmissionServiceError('content too long')
 
         comment.content = content
+
+    @staticmethod
+    def get_last_comment(submission: Submission) -> Optional[SubmissionComment]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        return SubmissionComment.query.with_parent(submission).order_by(SubmissionComment.id.desc()).first()

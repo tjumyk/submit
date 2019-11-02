@@ -406,10 +406,46 @@ def do_comments(sid):
         if request.method == 'GET':
             return jsonify([c.to_dict() for c in SubmissionService.get_comments(submission)])
         else:  # POST
+            last_comment = SubmissionService.get_last_comment(submission)
             comment = SubmissionService.add_comment(submission, user, request.json.get('content'))
+
+            # check if need to send an email
+            if last_comment is None or last_comment.author_id != user.id \
+                    or datetime.utcnow() - last_comment.modified_at > SubmissionService.COMMENT_SESSION_EXPIRY:
+                task = submission.task
+                term = task.term
+                author_name = user.nickname or user.name  # use nickname to hide the internal name
+                if task.is_team_task:
+                    submission_path = 'my-team-submissions/%d' % submission.id
+                else:
+                    submission_path = 'my-submissions/%d' % submission.id
+                mail_args = dict(site=app.config['SITE'], term=term, task=task,
+                                 submission=submission, submission_path=submission_path,
+                                 comment=comment, author_name=author_name)
+                msg_content = build_message_with_template('submission_new_comment', mail_args)
+                msg_channel = MessageService.get_channel_by_name('comment')
+                if task.is_team_task:
+                    ass = TeamService.get_team_association(task, submission.submitter)
+                    if not ass:
+                        return jsonify(msg='submitter not in a team'), 500
+                    team = ass.team
+                    msgs, mails = MessageSenderService.send_to_users(msg_channel, term, msg_content, None,
+                                                                     [_ass.user for _ass in team.user_associations],
+                                                                     hide_peers=False)
+                else:
+                    msg, mail = MessageSenderService.send_to_user(msg_channel, term, msg_content, None,
+                                                                  submission.submitter)
+                    mails = [mail] if mail else []
+            else:
+                mails = []
+
             db.session.commit()
+            for mail in mails:
+                mail.send()
+
             return jsonify(comment.to_dict()), 201
-    except (SubmissionServiceError, TermServiceError, AutoTestServiceError) as e:
+    except (SubmissionServiceError, TermServiceError, TeamServiceError, AutoTestServiceError, MessageServiceError,
+            MessageSenderServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
