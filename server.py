@@ -1,5 +1,6 @@
 import os
 
+import click
 from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account_api
@@ -89,9 +90,14 @@ def init_db():
 
 
 @app.cli.command()
-def init_email_subscriptions():
+@click.option('-c', '--channel_name')
+def init_email_subscriptions(channel_name: str):
+    channel = None
+    if channel_name is not None:
+        channel = MessageService.get_channel_by_name(channel_name)
+
     for user in AccountService.get_all_users():
-        MessageService.init_new_user_subscriptions(user)
+        MessageService.init_new_user_subscriptions(user, channel)
     db.session.commit()
 
 

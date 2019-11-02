@@ -11,6 +11,13 @@ class MessageServiceError(BasicError):
 
 
 class MessageService:
+    _DEFAULT_CHANNELS = {
+        'task': 'Messages about Tasks',
+        'team': 'Messages about Teams',
+        'auto_test': 'Messages about Auto Tests',
+        'comment': 'Messages about Comments',
+    }
+
     @staticmethod
     def get(_id: int) -> Optional[Message]:
         if _id is None:
@@ -195,14 +202,16 @@ class MessageService:
                                                           user_groups_alias.c.group_id == group.id,
                                                           EmailSubscription.channel_id == channel.id).all()
 
-    @staticmethod
-    def init_default_channels():
-        MessageService.add_channel('task', 'Messages about Tasks')
-        MessageService.add_channel('team', 'Messages about Teams')
-        MessageService.add_channel('auto_test', 'Messages about Auto Tests')
+    @classmethod
+    def init_default_channels(cls):
+        for name, description in cls._DEFAULT_CHANNELS.items():
+            if not MessageService.get_channel_by_name(name):
+                MessageService.add_channel(name, description)
 
     @classmethod
-    def init_new_user_subscriptions(cls, user: UserAlias):
-        cls.set_email_subscription(user, cls.get_channel_by_name('task'), True)
-        cls.set_email_subscription(user, cls.get_channel_by_name('team'), True)
-        cls.set_email_subscription(user, cls.get_channel_by_name('auto_test'), True)
+    def init_new_user_subscriptions(cls, user: UserAlias, channel: MessageChannel = None):
+        if channel is None:  # subscribe all channels
+            for name in cls._DEFAULT_CHANNELS.keys():
+                cls.set_email_subscription(user, cls.get_channel_by_name(name), True)
+        else:  # subscribe the specified channel only
+            cls.set_email_subscription(user, channel, True)
