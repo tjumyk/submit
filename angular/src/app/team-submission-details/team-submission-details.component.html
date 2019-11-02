@@ -21,6 +21,7 @@
   <app-submission-card [submission]="submission" (error)="error=$event"></app-submission-card>
 
   <ng-container *ngIf="task.evaluation_method=='auto_test'">
-    <app-submission-auto-tests-view [submission]="submission" [task]="task" (error)="error=$event"></app-submission-auto-tests-view>
+    <app-submission-auto-tests-view [submission]="submission" [task]="task" [isAdmin]="isAdmin"
+                                    (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
 </div>

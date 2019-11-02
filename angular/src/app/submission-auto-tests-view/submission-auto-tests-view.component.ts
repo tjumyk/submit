@@ -26,14 +26,13 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
   submission: Submission;
   @Input()
   apiBase: string;
+  @Input()
+  isAdmin: boolean = false;
 
   @Output()
   error: EventEmitter<ErrorMessage> = new EventEmitter();
 
   autoTestConfigTypes: {[id: string]: AutoTestConfigTypeInfo};
-
-  user: User;
-  isAdmin: boolean;
 
   firstLoadComplete: boolean;
 
@@ -49,7 +48,6 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
   autoTestsTrackerHandler: number;
 
   constructor(
-    private accountService: AccountService,
     private adminService: AdminService,
     private submissionService: SubmissionService
   ) {
@@ -58,14 +56,7 @@ export class SubmissionAutoTestsViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.accountService.getCurrentUser().subscribe(
-      user => {
-        this.user = user;
-        this.isAdmin = AccountService.isAdmin(user);
-
-        this.setup();
-      }
-    );
+    this.setup();
   }
 
   ngOnDestroy(): void {
