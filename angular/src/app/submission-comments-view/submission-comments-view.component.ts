@@ -97,7 +97,7 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
     let excerpt = comment.content.substr(0, 32);
     if(excerpt.length < comment.content.length)
       excerpt += '...';
-    if (!confirm(`Really want to delete comment "${excerpt}"?`))
+    if (!confirm(`Really want to delete comment "${excerpt}"?\n\nThe E-mails and messages that contain this comment will not be deleted.`))
       return;
 
     btn.classList.add('disabled', 'loading');
