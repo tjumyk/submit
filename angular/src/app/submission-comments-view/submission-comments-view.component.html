@@ -34,8 +34,23 @@
         </div>
         <div class="text">{{comment.content}}</div>
         <div class="actions" *ngIf="user.id == comment.author_id">
+          <a class="edit" (click)="editComment(comment)">Edit</a>
           <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>
         </div>
+        <form *ngIf="comment._editing" class="ui reply form" #fUpdate="ngForm" (ngSubmit)="updateComment(fUpdate, comment)"
+              [ngClass]="{'loading': comment._updating}">
+          <div class="field">
+            <textarea [(ngModel)]="comment._editor_content" name="content" required #updateEditorContentModel="ngModel"
+                placeholder="Your comment...(at most 512 characters)" maxlength="512"></textarea>
+          </div>
+          <button type="submit" class="ui button green"
+                  [ngClass]="{'disabled': updateEditorContentModel.invalid && (updateEditorContentModel.touched || updateEditorContentModel.dirty || fUpdate.submitted)}">
+            <i class="icon check"></i> Save
+          </button>
+          <button type="button" class="ui button red" (click)="cancelEditComment(comment)">
+            <i class="icon times"></i> Cancel
+          </button>
+        </form>
       </div>
     </div>
   </ng-container>
@@ -45,7 +60,8 @@
       <textarea [(ngModel)]="editorContent" name="content" required #editorContentModel="ngModel"
                 placeholder="Your comment...(at most 512 characters)" maxlength="512"></textarea>
     </div>
-    <button type="submit" class="ui labeled icon button primary">
+    <button type="submit" class="ui labeled icon button primary"
+            [ngClass]="{'disabled': editorContentModel.invalid && (editorContentModel.touched || editorContentModel.dirty || f.submitted)}">
       <i class="icon edit"></i> Add Comment
     </button>
   </form>

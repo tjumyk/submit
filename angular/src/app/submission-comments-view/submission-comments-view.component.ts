@@ -93,6 +93,37 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
     )
   }
 
+  editComment(comment: SubmissionComment){
+    comment['_editor_content'] = comment.content;
+    comment['_editing'] = true;
+  }
+
+  cancelEditComment(comment: SubmissionComment){
+    comment['_editing'] = false;
+  }
+
+  updateComment(f: NgForm, comment:SubmissionComment) {
+    if (f.invalid)
+      return;
+
+    comment['_updating'] = true;
+    this.submissionService.updateComment(this.submission.id, comment.id, comment['_editor_content'], this.apiBase).pipe(
+      finalize(() => {
+        comment['_updating'] = false;
+        comment['_editing'] = false;
+        comment['_editor_content'] = undefined;
+      })
+    ).subscribe(
+      _comment => {
+        comment.content = _comment.content;
+        comment.modified_at = _comment.modified_at;
+
+        this.updateTimeFields(comment);
+      },
+      error=>this.error.emit(error.error)
+    )
+  }
+
   removeComment(comment: SubmissionComment, btn: HTMLElement, index: number) {
     let excerpt = comment.content.substr(0, 32);
     if(excerpt.length < comment.content.length)
