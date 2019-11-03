@@ -41,7 +41,7 @@ export class TaskDetailsComponent implements OnInit {
     'solution': 'star outline'
   };
 
-  notebookPreviews: { [mid: number]: NotebookPreview[] } = {};
+  notebookPreviews: NotebookPreview[][];
 
   constructor(
     private accountService: AccountService,
@@ -91,7 +91,11 @@ export class TaskDetailsComponent implements OnInit {
 
   private setupNotebooksPreview() {
     this.numGetNotebookJobs = 0;
+    this.notebookPreviews = [];
     for (let mat of this.task.materials) {
+      const matNotebooks: NotebookPreview[] = [];
+      this.notebookPreviews.push(matNotebooks);  // create an empty list for each material and keep the order
+
       if (mat.type == 'specification') {
         ++this.numGetNotebookJobs;
         this.materialService.getNotebooks(mat.id).pipe(
@@ -100,9 +104,9 @@ export class TaskDetailsComponent implements OnInit {
           notebooks => {
             for (let nb of notebooks) {
               nb.material = mat;
-              nb.url = this.sanitizer.bypassSecurityTrustResourceUrl(`api/materials/${nb.material_id}/notebooks/${nb.name}/`)
+              nb.url = this.sanitizer.bypassSecurityTrustResourceUrl(`api/materials/${nb.material_id}/notebooks/${nb.name}/`);
+              matNotebooks.push(nb)
             }
-            this.notebookPreviews[mat.id] = notebooks
           },
           error => this.error = error.error
         );
