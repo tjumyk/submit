@@ -1128,7 +1128,7 @@ class SubmissionService:
 
         results = []
         for submission, total, last_comment in db.session.query(Submission, sub_query.c.total,
-                                                               SubmissionComment) \
+                                                                SubmissionComment) \
                 .filter(Submission.id == sub_query.c.sid, SubmissionComment.id == sub_query.c.last_cid) \
                 .order_by(SubmissionComment.modified_at).all():
             results.append(SubmissionCommentSummary(submission, total, last_comment))
