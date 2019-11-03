@@ -67,6 +67,7 @@ import { HalloweenPumpkinComponent } from './halloween-pumpkin/halloween-pumpkin
 import { SpecialDateCardComponent } from './special-date-card/special-date-card.component';
 import { AprilFoolBoxComponent } from './april-fool-box/april-fool-box.component';
 import { SubmissionCommentsViewComponent } from './submission-comments-view/submission-comments-view.component';
+import { CommentsComponent } from './comments/comments.component';
 
 @NgModule({
   declarations: [
@@ -132,6 +133,7 @@ import { SubmissionCommentsViewComponent } from './submission-comments-view/subm
     SpecialDateCardComponent,
     AprilFoolBoxComponent,
     SubmissionCommentsViewComponent,
+    CommentsComponent,
   ],
   imports: [
     BrowserModule,

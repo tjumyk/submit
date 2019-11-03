@@ -397,3 +397,9 @@ export class SubmissionComment{
   submission?: Submission;
   author?: User;
 }
+
+export class SubmissionCommentSummary{
+  submission: Submission;
+  total_comments: number;
+  last_comment: SubmissionComment;
+}

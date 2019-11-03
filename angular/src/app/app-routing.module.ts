@@ -37,6 +37,7 @@ import {HelpComponent} from "./help/help.component";
 import {AboutComponent} from "./about/about.component";
 import {MessageDetailComponent} from "./message-detail/message-detail.component";
 import {EmailSubscriptionsComponent} from "./email-subscriptions/email-subscriptions.component";
+import {CommentsComponent} from "./comments/comments.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -76,7 +77,8 @@ const routes: Routes = [
           {path: 'my-team', component: MyTeamComponent},
           {path: 'my-team/join-or-create', component: JoinOrCreateTeamComponent},
           {path: 'teams', component: TeamsComponent},
-          {path: 'teams/:team_id', component: TeamComponent}
+          {path: 'teams/:team_id', component: TeamComponent},
+          {path: 'comments', component: CommentsComponent}
         ]
       },
       {path: 'messages', component: MessagesComponent},

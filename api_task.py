@@ -11,8 +11,8 @@ from typing import Optional
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
-from auth_connect.oauth import requires_login
 from anti_plagiarism.code_analysis import CodeSegmentIndex
+from auth_connect.oauth import requires_login
 from models import db, SpecialConsideration, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
@@ -1236,4 +1236,27 @@ def task_find_submission_by_auto_test_id(task_id, test_id):
 
         return jsonify(submission.to_dict())
     except (AccountServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:task_id>/comment-summaries')
+@requires_login
+def task_comment_summaries(task_id):
+    try:
+        task = TaskService.get(task_id)
+        if task is None:
+            return jsonify('task not found'), 404
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='no user info'), 500
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        return jsonify([s.to_dict() for s in SubmissionService.get_comment_summaries(task)])
+    except (AccountServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

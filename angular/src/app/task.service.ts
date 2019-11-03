@@ -3,7 +3,7 @@ import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/ht
 import {Observable, of} from "rxjs";
 import {
   AutoTest, DailySubmissionSummary,
-  Submission,
+  Submission, SubmissionCommentSummary,
   SubmissionStatus,
   Task,
   Team,
@@ -232,5 +232,9 @@ export class TaskService {
 
   findSubmissionByAutoTestID(task_id: number, test_id: number): Observable<Submission>{
     return this.http.get<Submission>(`${this.api}/${task_id}/find-submission-by-auto-test-id/${test_id}`)
+  }
+
+  getSubmissionCommentSummaries(task_id: number): Observable<SubmissionCommentSummary[]>{
+    return this.http.get<SubmissionCommentSummary[]>(`${this.api}/${task_id}/comment-summaries`)
   }
 }

@@ -70,6 +70,18 @@ class DailySubmissionSummary:
         return dict(date=self.date, total=self.total)
 
 
+class SubmissionCommentSummary:
+    def __init__(self, submission: Submission, total_comments: int,
+                 last_comment: SubmissionComment):
+        self.submission = submission
+        self.total_comments = total_comments
+        self.last_comment = last_comment
+
+    def to_dict(self):
+        return dict(submission=self.submission.to_dict(with_submitter=True), total_comments=self.total_comments,
+                    last_comment=self.last_comment.to_dict())
+
+
 class LatePenalty:
     """
     In this implementation, I just store the cut numbers as-is because I'm lazy now. A better implementation is to store
@@ -1101,3 +1113,23 @@ class SubmissionService:
             raise SubmissionServiceError('submission is required')
 
         return SubmissionComment.query.with_parent(submission).order_by(SubmissionComment.id.desc()).first()
+
+    @staticmethod
+    def get_comment_summaries(task: Task) -> List[SubmissionCommentSummary]:
+        if task is None:
+            raise SubmissionServiceError('task is required')
+
+        sub_query = db.session.query(Submission.id.label('sid'), func.count().label('total'),
+                                     func.max(SubmissionComment.id).label('last_cid')) \
+            .filter(Submission.task_id == task.id,
+                    SubmissionComment.submission_id == Submission.id) \
+            .group_by(Submission) \
+            .subquery()
+
+        results = []
+        for submission, total, last_comment in db.session.query(Submission, sub_query.c.total,
+                                                               SubmissionComment) \
+                .filter(Submission.id == sub_query.c.sid, SubmissionComment.id == sub_query.c.last_cid) \
+                .order_by(SubmissionComment.modified_at).all():
+            results.append(SubmissionCommentSummary(submission, total, last_comment))
+        return results
