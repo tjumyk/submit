@@ -154,13 +154,16 @@ def do_comments(sid):
         if request.method == 'GET':
             return jsonify([c.to_dict() for c in SubmissionService.get_comments(submission)])
         else:  # POST
+            task = submission.task
+            if task.close_time and task.close_time < datetime.utcnow():
+                return jsonify(msg='task has closed'), 400
+
             last_comment = SubmissionService.get_last_comment(submission)
             comment = SubmissionService.add_comment(submission, user, request.json.get('content'))
 
             # check if need to send an email
             if last_comment is None or last_comment.author_id != user.id \
                     or datetime.utcnow() - last_comment.modified_at > SubmissionService.COMMENT_SESSION_EXPIRY:
-                task = submission.task
                 term = task.term
                 course = term.course
                 author_name = '%s (%s)' % (user.nickname, user.name) if user.nickname else user.name
