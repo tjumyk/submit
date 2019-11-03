@@ -1072,6 +1072,8 @@ class SubmissionService:
         if content is None:
             raise SubmissionServiceError('content is required')
 
+        if not content:
+            raise SubmissionServiceError('content must not be empty')
         if len(content) > cls._COMMENT_MAX_LENGTH:
             raise SubmissionServiceError('content too long')
 
@@ -1086,6 +1088,8 @@ class SubmissionService:
         if content is None:
             raise SubmissionServiceError('content is required')
 
+        if not content:
+            raise SubmissionServiceError('content must not be empty')
         if len(content) > cls._COMMENT_MAX_LENGTH:
             raise SubmissionServiceError('content too long')
 
