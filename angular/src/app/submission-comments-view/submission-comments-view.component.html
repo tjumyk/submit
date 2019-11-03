@@ -2,7 +2,7 @@
   <h3 class="ui dividing header">Comments</h3>
 
   <ng-container *ngIf="comments">
-    <div class="ui message info" *ngIf="enableStudentHelp && !comments.length">
+    <div class="ui message info" *ngIf="!isAdminOrTutor && !comments.length">
       <div class="header">Need Help?</div>
       <ul class="list">
         <li>You may add a comment to request some help for <b>this particular submission</b>.</li>
@@ -33,7 +33,7 @@
           <span class="date" *ngIf="comment._modified_at_from_now">({{comment._modified_at_from_now}})</span>
         </div>
         <div class="text">{{comment.content}}</div>
-        <div class="actions" *ngIf="user.id == comment.author_id">
+        <div class="actions" *ngIf="isAdminOrTutor && user.id == comment.author_id">
           <a class="edit" (click)="editComment(comment)">Edit</a>
           <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>
         </div>

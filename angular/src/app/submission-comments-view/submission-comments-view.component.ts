@@ -17,7 +17,7 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
   @Input()
   apiBase: string;
   @Input()
-  enableStudentHelp: boolean;
+  isAdminOrTutor: boolean = false;
 
   @Output()
   error: EventEmitter<ErrorMessage> = new EventEmitter();
