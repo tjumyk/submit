@@ -25,6 +25,6 @@
                                     (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
 
-  <app-submission-comments-view [submission]="submission" (error)="error=$event"
-                                [isAdminOrTutor]="true"></app-submission-comments-view>
+  <app-submission-comments-view [submission]="submission" [task]="task" [isAdminOrTutor]="true"
+                                (error)="error=$event"></app-submission-comments-view>
 </div>

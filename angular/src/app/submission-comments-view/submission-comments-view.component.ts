@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {ErrorMessage, Submission, SubmissionComment, User} from "../models";
+import {ErrorMessage, Submission, Task, SubmissionComment, User} from "../models";
 import {SubmissionService} from "../submission.service";
 import {finalize} from "rxjs/operators";
 import * as moment from "moment";
@@ -12,6 +12,8 @@ import {NgForm} from "@angular/forms";
   styleUrls: ['./submission-comments-view.component.less']
 })
 export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
+  @Input()
+  task: Task;
   @Input()
   submission: Submission;
   @Input()

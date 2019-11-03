@@ -17,6 +17,6 @@
                                     (error)="error=$event"></app-submission-auto-tests-view>
   </ng-container>
 
-  <app-submission-comments-view [submission]="submission" [apiBase]="submissionService.myApi"
+  <app-submission-comments-view [submission]="submission" [task]="task" [apiBase]="submissionService.myApi"
                                 (error)="error=$event"></app-submission-comments-view>
 </div>

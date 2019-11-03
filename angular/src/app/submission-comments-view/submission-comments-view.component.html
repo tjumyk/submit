@@ -5,10 +5,9 @@
     <div class="ui message info" *ngIf="!isAdminOrTutor && !comments.length">
       <div class="header">Need Help?</div>
       <ul class="list">
-        <li>You may add a comment to request some help for <b>this particular submission</b>.</li>
-        <li>The tutors will receive a notification about your new comment but the timely response is <b>not</b> guaranteed.</li>
-        <li></li>
-        <li>Do not put any generic question here. Other course management system, e.g. Piazza, is the right place for that.</li>
+        <li>You may add a comment to request the tutors' help or report any technical problems for <b>this particular submission</b>.</li>
+        <li><b>Do not</b> put any generic questions here. Other course management system, e.g. Piazza, is the right place for discussing and <b>sharing</b> those questions.</li>
+        <li>These comments are only visible to {{task.is_team_task ? 'your team': 'you'}}, the tutors and the system administrators.</li>
       </ul>
     </div>
     <div class="comment" *ngFor="let comment of comments; index as i">
