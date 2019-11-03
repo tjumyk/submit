@@ -43,6 +43,7 @@
             <textarea [(ngModel)]="comment._editor_content" name="content" required #updateEditorContentModel="ngModel"
                 placeholder="Your comment...(at most 512 characters)" maxlength="512"></textarea>
           </div>
+          <div class="ui message info"><i class="icon info circle"></i> The E-mails and messages that contain this comment will not be updated.</div>
           <button type="submit" class="ui button green"
                   [ngClass]="{'disabled': updateEditorContentModel.invalid && (updateEditorContentModel.touched || updateEditorContentModel.dirty || fUpdate.submitted)}">
             <i class="icon check"></i> Save
