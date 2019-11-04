@@ -3,7 +3,6 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {Message, Task, Term, User} from "./models";
 import {tap} from "rxjs/operators";
-import Cookie from "js-cookie";
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +16,19 @@ export class TermService {
   get messageRefreshPeriod(){
     return this._messageRefreshPeriod;
   }
+
   private _enableMessageRefresh: boolean;
-  private disableMessageRefreshCookieName = 'submit_disable_message_refresh';
+  private disableMessageRefreshKey = 'submit_disable_message_refresh';
   get enableMessageRefresh(){
     return this._enableMessageRefresh;
   }
   set enableMessageRefresh(enabled: boolean){
     this._enableMessageRefresh = enabled;
+    // persist setting in local storage
     if(enabled)
-      Cookie.remove(this.disableMessageRefreshCookieName);
+      window.localStorage.removeItem(this.disableMessageRefreshKey);
     else
-      Cookie.set(this.disableMessageRefreshCookieName, 1)
+      window.localStorage.setItem(this.disableMessageRefreshKey, 'true')
   }
 
   // A global trigger to enforce an instant update to the unread count of the messages
@@ -36,7 +37,8 @@ export class TermService {
   constructor(
     private http: HttpClient
   ) {
-    this._enableMessageRefresh = !Cookie.get(this.disableMessageRefreshCookieName)
+    // get settings from local storage
+    this._enableMessageRefresh = window.localStorage.getItem(this.disableMessageRefreshKey) !== 'true'
   }
 
   static getAccessRoles(term:Term, user:User):Set<string>{

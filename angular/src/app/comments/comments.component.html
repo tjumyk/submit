@@ -2,6 +2,19 @@
 <div class="ui loader text active" *ngIf="loadingSummaries">Loading comment summaries...</div>
 
 <ng-container *ngIf="summaries">
+  <div class="ui segment">
+    <div class="ui statistics mini">
+      <div class="statistic">
+        <div class="value"><i class="icon comments"></i> {{totalComments}}</div>
+        <div class="label">Comments</div>
+      </div>
+      <div class="statistic">
+        <div class="value"><i class="icon paper plane"></i> {{summaries.length}}</div>
+        <div class="label">Submissions w/ Comments</div>
+      </div>
+    </div>
+  </div>
+
   <div class="ui top attached segment">
     <div class="ui input icon">
       <input type="text" name="searchKey" #inputSearchKey (keyup)="searchKey.next(inputSearchKey.value)" placeholder="Search...">

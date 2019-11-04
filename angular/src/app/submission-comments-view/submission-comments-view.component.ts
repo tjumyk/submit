@@ -26,6 +26,7 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
 
   user: User;
   isAdmin: boolean;
+  isTaskClosed: boolean;
 
   loadingComments: boolean;
   comments: SubmissionComment[];
@@ -39,6 +40,7 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.checkTaskCloseTime();
     this.accountService.getCurrentUser().subscribe(
       user => {
         this.user = user;
@@ -69,9 +71,14 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
       for (let comment of this.comments) {
         this.updateTimeFields(comment)
       }
+      this.checkTaskCloseTime();
     };
     timeTracker();
     this.timeTrackerHandler = setInterval(timeTracker, 10 * 1000);
+  }
+
+  private checkTaskCloseTime(){
+    this.isTaskClosed = this.task.close_time && moment().isAfter(moment(this.task.close_time));
   }
 
   private updateTimeFields(comment: SubmissionComment) {

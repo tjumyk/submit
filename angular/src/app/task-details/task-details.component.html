@@ -41,8 +41,8 @@
     <div class="ui loader inline centered active text">Scanning Jupyter Notebooks...</div>
   </div>
 
-  <ng-container *ngFor="let item of notebookPreviews | keyvalue">
-    <div class="ui segment" *ngFor="let notebook of item.value">
+  <ng-container *ngFor="let matNotebooks of notebookPreviews">
+    <div class="ui segment" *ngFor="let notebook of matNotebooks">
       <div class="ui top attached label notebook">
         <a class="title" href="api/materials/{{notebook.material_id}}/download" title="Download">
           {{notebook.material.name}}

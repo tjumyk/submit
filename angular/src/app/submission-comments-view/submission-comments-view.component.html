@@ -2,7 +2,7 @@
   <h3 class="ui dividing header">Comments</h3>
 
   <ng-container *ngIf="comments">
-    <div class="ui message info" *ngIf="!isAdminOrTutor && !comments.length">
+    <div class="ui message info" *ngIf="!isAdminOrTutor && !comments.length && !isTaskClosed">
       <div class="header">Need Help?</div>
       <ul class="list">
         <li>You may add a comment to request the tutors' help or report any technical problems for <b>this particular submission</b>.</li>
@@ -55,7 +55,12 @@
     </div>
   </ng-container>
 
-  <form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}">
+  <div *ngIf="isTaskClosed" class="ui message">
+    <i class="icon info circle"></i>
+    {{isAdminOrTutor ? 'The students' : 'You'}} are not allowed to add new comments since the task has closed.
+  </div>
+
+  <form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}" *ngIf="isAdminOrTutor || !isTaskClosed">
     <div class="field">
       <textarea [(ngModel)]="editorContent" name="content" required #editorContentModel="ngModel"
                 placeholder="Your comment...(at most 512 characters)" maxlength="512"></textarea>
