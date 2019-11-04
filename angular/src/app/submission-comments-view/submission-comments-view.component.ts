@@ -90,6 +90,7 @@ export class SubmissionCommentsViewComponent implements OnInit, OnDestroy {
       comment => {
         this.comments.push(comment);
         this.updateTimeFields(comment);
+        f.resetForm();
       },
       error=>this.error.emit(error.error)
     )
