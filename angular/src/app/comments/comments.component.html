@@ -32,7 +32,7 @@
                             [user]="summary.last_comment.author" [enableAdmin]="isAdmin" [enablePopup]="true"></app-user-mini-card>
         <ng-template #system>System</ng-template>
       </td>
-      <td>{{summary.last_comment.modified_at | date: 'medium'}}</td>
+      <td>{{summary.last_comment.modified_at | date: 'short'}}</td>
       <td [title]="summary.last_comment.content">
         <ng-container *ngIf="summary.last_comment.content.length <= excerptThreshold; else excerpt">{{summary.last_comment.content}}</ng-container>
         <ng-template #excerpt>{{summary.last_comment.content|slice: 0:excerptThreshold}}...</ng-template>
