@@ -50,7 +50,7 @@ class CourseService:
             raise CourseServiceError('duplicate code or name')
 
         if is_new_tutor_group:
-            tutor_group = AccountService.add_group(tutor_group_name, 'Tutor of %s' % code)
+            tutor_group = AccountService.add_group(tutor_group_name, 'Tutors of %s' % code)
         else:
             tutor_group = AccountService.get_group_by_name(tutor_group_name)
             if tutor_group is None:
