@@ -201,6 +201,18 @@ export class AdminService {
     )
   }
 
+  syncUser(uid: number): Observable<User>{
+    return this.http.get<User>(`${this.api}/users/${uid}/sync`).pipe(
+      tap((user) => this.logger.info(`Synchronised user ${user.name}`))
+    )
+  }
+
+  syncGroup(gid: number): Observable<Group> {
+    return this.http.get<Group>(`${this.api}/groups/${gid}/sync`).pipe(
+      tap((group) => this.logger.info(`Synchronised group ${group.name}`))
+    )
+  }
+
   deleteUser(user_id: number): Observable<any> {
     return this.http.delete(`${this.api}/users/${user_id}`).pipe(
       tap(()=>this.logger.info(`Deleted user alias (id=${user_id})`))

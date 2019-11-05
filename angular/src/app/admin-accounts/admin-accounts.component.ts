@@ -100,6 +100,68 @@ export class AdminAccountsComponent implements OnInit {
     )
   }
 
+  syncUser(user: User, btn: HTMLElement) {
+    btn.classList.add('disabled', 'loading');
+    this.adminService.syncUser(user.id).pipe(
+      finalize(() => {
+        btn.classList.remove('disabled', 'loading');
+      })
+    ).subscribe(
+      (_user) => {
+        user.email = _user.email;
+        user.avatar = _user.avatar;
+        user.nickname = _user.nickname;
+        user.groups = _user.groups;  // I am lazy
+      },
+      (error) => this.error = error.error
+    )
+  }
+
+  syncGroup(group: Group, btn: HTMLElement) {
+    btn.classList.add('disabled', 'loading');
+    this.adminService.syncGroup(group.id).pipe(
+      finalize(() => {
+        btn.classList.remove('disabled', 'loading');
+      })
+    ).subscribe(
+      (_group) => {
+        group.description = _group.description;
+
+        // Also update the groups of the currently loaded users in a lazy way (linear scan).
+        // This api may also add new users but they are ignored here because
+        //   (1) the api may only return user ids rather than full user objects for efficiency.
+        //   (2) also, it brings more cost to append new table rows and redo the filtering or sorting.
+        // A page refresh is okay.
+        const user_ids = new Set();
+        for (let uid of _group['user_ids']) {
+          user_ids.add(uid);
+        }
+        for (let user of this.userPages.items) {
+          let groupIndex = -1;
+          let i = 0;
+          for (let g of user.groups) {
+            if (g.id == _group.id) {
+              groupIndex = i;
+              break;
+            }
+            ++i;
+          }
+          if (user_ids.has(user.id)) {
+            user_ids.delete(user.id);
+            if (groupIndex == -1)
+              user.groups.push(group)
+          } else {
+            if (groupIndex >= 0)
+              user.groups.splice(groupIndex, 1)
+          }
+        }
+        if(user_ids.size > 0)
+          alert(`${user_ids.size} new users added. You need to refresh the page if you want to see them.`)
+      },
+      (error) => this.error = error.error
+    )
+  }
+
   deleteUser(user: User, btn: HTMLElement) {
     if (!confirm(`Really want to delete user "${user.name}"? Only local alias will be deleted.`))
       return;

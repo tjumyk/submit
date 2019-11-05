@@ -124,6 +124,36 @@ def admin_sync_groups():
         return jsonify(msg=e.msg, detail=e.detail), 500
 
 
+@admin_api.route('/users/<int:uid>/sync')
+@requires_admin
+def admin_user_sync(uid):
+    try:
+        user = AccountService.get_user(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        user_alias = AccountService.sync_user_by_id(user.id)
+        db.session.commit()
+        return jsonify(user_alias.to_dict())
+    except AccountServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/groups/<int:gid>/sync')
+@requires_admin
+def admin_group_sync(gid):
+    try:
+        group = AccountService.get_group(gid)
+        if group is None:
+            return jsonify(msg='group not found'), 404
+
+        group_alias = AccountService.sync_group_by_id(group.id, sync_group_users=True)
+        db.session.commit()
+        return jsonify(group_alias.to_dict(with_user_ids=True))
+    except AccountServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin_api.route('/courses', methods=['GET', 'POST'])
 @requires_admin
 def admin_courses():

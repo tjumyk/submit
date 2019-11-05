@@ -65,13 +65,21 @@ class AccountService:
         except oauth.OAuthError as e:
             raise AccountServiceError('Failed to add new group', e.msg)
 
-    @staticmethod
-    def sync_users():
+    @classmethod
+    def sync_users(cls):
         for user in oauth.get_users():
-            AccountService.sync_user(user)
+            cls.sync_user(user)
 
-    @staticmethod
-    def sync_user(user):
+    @classmethod
+    def sync_user_by_id(cls, uid: int) -> UserAlias:
+        try:
+            user = oauth.get_user_by_id(uid)
+            return cls.sync_user(user)
+        except oauth.OAuthError as e:
+            raise AccountServiceError('Failed to sync user %d' % uid, e.msg)
+
+    @classmethod
+    def sync_user(cls, user: oauth.User) -> UserAlias:
         """
         Sync OAuth user and groups with local copy (alias).
 
@@ -85,8 +93,78 @@ class AccountService:
         if user is None:
             raise AccountServiceError('user is required')
 
-        # sync user
-        user_alias = UserAlias.query.get(user.id)
+        user_alias = cls._sync_user(user)
+
+        groups = {g.id: g for g in user.groups}
+        group_ids = set(groups.keys())
+        groups_local = {g.id: g for g in GroupAlias.query.filter(GroupAlias.id.in_(groups.keys()))}
+        groups_synced = {gid: cls._sync_group(group, groups_local.get(gid), skip_get_alias=True)
+                         for gid, group in groups.items()}
+
+        local_user_groups = {g.id: g for g in user_alias.groups}
+        local_user_group_ids = set(local_user_groups)
+
+        for gid in local_user_group_ids - group_ids:
+            user_alias.groups.remove(local_user_groups[gid])  # remove deleted link
+        for gid in group_ids - local_user_group_ids:
+            user_alias.groups.append(groups_synced[gid])  # add missing link
+
+        return user_alias
+
+    @classmethod
+    def sync_groups(cls):
+        for group in oauth.get_groups():
+            cls.sync_group(group)
+
+    @classmethod
+    def sync_group_by_id(cls, gid: int, sync_group_users: bool = False) -> GroupAlias:
+        try:
+            group = oauth.get_group_by_id(gid)
+            group_users = None
+            if sync_group_users:
+                group_users = oauth.get_users_in_group(group.id)
+            return cls.sync_group(group, group_users)
+        except oauth.OAuthError as e:
+            raise AccountServiceError('Failed to sync group %d' % gid, e.msg)
+
+    @classmethod
+    def sync_group(cls, group: oauth.Group, group_users: List[oauth.User] = None) -> GroupAlias:
+        """
+        Sync the group and associated users (if provided).
+        """
+        if group is None:
+            raise AccountServiceError('group is required')
+
+        group_alias = cls._sync_group(group)
+
+        if group_users is not None:
+            users = {u.id: u for u in group_users}
+            user_ids = set(users)
+            users_local = {u.id: u for u in db.session.query(UserAlias).filter(UserAlias.id.in_(user_ids)).all()}
+            users_synced = {uid: cls._sync_user(user, users_local.get(uid), skip_get_alias=True)
+                            for uid, user in users.items()}
+
+            local_group_users = {u.id: u for u in group_alias.users}
+            local_group_user_ids = set(local_group_users)
+
+            # remove users from local group
+            for uid in local_group_user_ids - user_ids:
+                group_alias.users.remove(local_group_users[uid])
+            # add users to local group
+            for uid in user_ids - local_group_user_ids:
+                group_alias.users.append(users_synced[uid])
+
+        return group_alias
+
+    @staticmethod
+    def _sync_user(user: oauth.User, user_alias: UserAlias = None, skip_get_alias: bool = False) -> UserAlias:
+        """
+        Sync a remote user to local user alias.
+        Associated groups are not synced here.
+        """
+        if user_alias is None and not skip_get_alias:
+            user_alias = UserAlias.query.get(user.id)
+
         if user_alias is None:
             if user.nickname:
                 _filter = or_(UserAlias.name == user.name, UserAlias.email == user.email,
@@ -94,7 +172,7 @@ class AccountService:
             else:
                 _filter = or_(UserAlias.name == user.name, UserAlias.email == user.email)
             if db.session.query(func.count()).filter(_filter).scalar():
-                raise AccountServiceError('failed to sync user', 'User name, email has been occupied')
+                raise AccountServiceError('failed to sync user', 'User name, nickname or email has been occupied')
             user_alias = UserAlias(id=user.id, name=user.name, email=user.email, nickname=user.nickname,
                                    avatar=user.avatar)
             db.session.add(user_alias)
@@ -112,68 +190,30 @@ class AccountService:
                 user_alias.nickname = user.nickname
             if user_alias.avatar != user.avatar:
                 user_alias.avatar = user.avatar
-
-        # prepare group sync
-        remote_groups = {g.id: g for g in user.groups}
-        local_groups = {g.id: g for g in GroupAlias.query.filter(GroupAlias.id.in_(remote_groups.keys()))}
-        local_linked_groups = {g.id: g for g in user_alias.groups}
-        remote_group_ids = set(remote_groups.keys())
-        local_group_ids = set(local_groups.keys())
-        local_linked_group_ids = set(local_linked_groups.keys())
-
-        # check local group consistency
-        for gid in local_group_ids:
-            remote_group = remote_groups[gid]
-            group_alias = local_groups[gid]
-            if group_alias.name != remote_group.name:
-                raise AccountServiceError('failed to sync groups', 'Inconsistent group name')
-            # update other fields
-            if group_alias.description != remote_group.description:
-                group_alias.description = remote_group.description
-
-        # add missing groups
-        missing_group_ids = remote_group_ids - local_group_ids
-        if missing_group_ids:
-            missing_groups = [remote_groups[gid] for gid in missing_group_ids]
-            if db.session.query(func.count()).filter(GroupAlias.name.in_([g.name for g in missing_groups])).scalar():
-                raise AccountServiceError('failed to sync groups', 'Group name has been occupied')
-            for group in missing_groups:
-                group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)
-                user_alias.groups.append(group_alias)  # also add missing links
-
-        # fix links
-        for gid in local_linked_group_ids - local_group_ids:
-            user_alias.groups.remove(local_linked_groups[gid])  # remove deleted link
-        for gid in local_group_ids - local_linked_group_ids:
-            user_alias.groups.append(local_groups[gid])  # add missing link
+        return user_alias
 
     @staticmethod
-    def sync_groups():
-        # prepare group sync
-        remote_groups = {g.id: g for g in oauth.get_groups()}
-        local_groups = {g.id: g for g in GroupAlias.query.filter(GroupAlias.id.in_(remote_groups.keys()))}
-        remote_group_ids = set(remote_groups.keys())
-        local_group_ids = set(local_groups.keys())
+    def _sync_group(group: oauth.Group, group_alias: GroupAlias = None, skip_get_alias: bool = False) -> GroupAlias:
+        """
+        Sync a remote group to local group alias.
+        Associated users are not synced here.
+        """
+        if group_alias is None and not skip_get_alias:
+            group_alias = GroupAlias.query.get(group.id)
 
-        # check local group consistency
-        for gid in local_group_ids:
-            remote_group = remote_groups[gid]
-            group_alias = local_groups[gid]
-            if group_alias.name != remote_group.name:
-                raise AccountServiceError('failed to sync groups', 'Inconsistent group name')
+        if group_alias is None:
+            if db.session.query(func.count()).filter(GroupAlias.name == group.name).scalar():
+                raise AccountServiceError('failed to sync group', 'Group name has been occupied')
+            group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)
+            db.session.add(group_alias)
+        else:
+            if group_alias.name != group.name:
+                raise AccountServiceError('failed to sync group', 'Inconsistent group name')
             # update other fields
-            if group_alias.description != remote_group.description:
-                group_alias.description = remote_group.description
+            if group_alias.description != group.description:
+                group_alias.description = group.description
 
-        # add missing groups
-        missing_group_ids = remote_group_ids - local_group_ids
-        if missing_group_ids:
-            missing_groups = [remote_groups[gid] for gid in missing_group_ids]
-            if db.session.query(func.count()).filter(GroupAlias.name.in_([g.name for g in missing_groups])).scalar():
-                raise AccountServiceError('failed to sync groups', 'Group name has been occupied')
-            for group in missing_groups:
-                group_alias = GroupAlias(id=group.id, name=group.name, description=group.description)
-                db.session.add(group_alias)
+        return group_alias
 
     @staticmethod
     def search_user_by_name(name, limit=5) -> List[UserAlias]:

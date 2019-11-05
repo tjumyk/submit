@@ -32,6 +32,7 @@
           <th (click)="sortField('name', thName)" #thName>Name</th>
           <th (click)="sortField('email', thEmail)" #thEmail>E-mail</th>
           <th (click)="sortField('nickname', thNickName)" #thNickName>Nickname</th>
+          <th>Groups</th>
           <th>Ops</th>
         </tr>
         </thead>
@@ -43,8 +44,12 @@
           <td>{{ user.email }}</td>
           <td>{{ user.nickname }}</td>
           <td>
-            <div class="ui small buttons">
+            <span class="ui label mini" *ngFor="let group of user.groups" [title]="group.description">{{group.name}}</span>
+          </td>
+          <td>
+            <div class="ui mini buttons">
               <a target="_blank" href="admin/users/{{ user.id }}" class="ui button icon"><i class="icon edit"></i></a>
+              <a class="ui button primary icon" (click)="syncUser(user, btnSyncUser)" #btnSyncUser><i class="icon sync"></i></a>
               <a #btnDeleteUser class="ui button icon red" (click)="deleteUser(user, btnDeleteUser)"><i class="icon trash"></i></a>
             </div>
           </td>
@@ -74,8 +79,9 @@
           <td>{{ group.name }}</td>
           <td>{{ group.description }}</td>
           <td>
-            <div class="ui small buttons">
+            <div class="ui mini buttons">
               <a target="_blank" href="admin/groups/{{ group.id }}" class="ui button icon"><i class="icon edit"></i></a>
+              <a class="ui button primary icon" (click)="syncGroup(group, btnSyncGroup)" #btnSyncGroup><i class="icon sync"></i></a>
               <a #btnDeleteGroup class="ui button icon red" (click)="deleteGroup(group, i, btnDeleteGroup)"><i class="icon trash"></i></a>
             </div>
           </td>
