@@ -1260,3 +1260,55 @@ def task_comment_summaries(task_id):
         return jsonify([s.to_dict() for s in SubmissionService.get_comment_summaries(task)])
     except (AccountServiceError, TermServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/download-user-submissions/<int:user_id>')
+@task_api.route('/<int:tid>/download-team-submissions/<int:team_id>')
+@requires_login
+def task_download_submissions(tid, user_id=None, team_id=None):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        if not task.is_team_task and team_id is not None:
+            return jsonify(msg='only for team task'), 400
+
+        if team_id is not None:
+            team = TeamService.get(team_id)
+            if team is None:
+                return jsonify(msg='team not found'), 404
+            if team.task_id != tid:
+                return jsonify(msg='target team does not belong to this task'), 400
+            submissions = SubmissionService.get_for_team(team)
+            target_name = team.name
+        else:
+            target_user = AccountService.get_user(user_id)
+            if target_user is None:
+                return jsonify(msg='user not found'), 404
+            submissions = SubmissionService.get_for_task_and_user(task, target_user)
+            target_name = target_user.name
+
+        data_folder = app.config['DATA_FOLDER']
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_name = '%s.zip' % target_name
+            zip_path = os.path.join(tmp_dir, zip_name)
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as f_zip:
+                for sub in submissions:
+                    for sub_file in sub.files:
+                        f_zip.write(os.path.join(data_folder, sub_file.path),
+                                    os.path.join(target_name, str(sub.id), sub_file.requirement.name))
+            return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
+                                       cache_timeout=0)
+    except (TaskServiceError, TermServiceError, AccountServiceError, TeamServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
