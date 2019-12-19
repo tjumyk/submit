@@ -28,7 +28,7 @@ class NotebookToolkit:
     def _make_work_dir(cls):
         work_root = os.path.join(tempfile.gettempdir(), cls.WORK_FOLDER_NAME)
         if not os.path.exists(work_root):
-            os.makedirs(work_root, mode=0o700)
+            os.makedirs(work_root, mode=0o700, exist_ok=True)  # set 'exist_ok' to accept race conditions
         return tempfile.mkdtemp(dir=work_root)
 
     @classmethod
