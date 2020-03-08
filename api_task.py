@@ -578,8 +578,8 @@ def task_my_submissions(tid):
             return jsonify(msg='only for students'), 403
 
         if request.method == 'GET':
-            if not task.open_time or datetime.utcnow() < task.open_time:
-                return jsonify(msg='task has not yet open'), 403
+            # if not task.open_time or datetime.utcnow() < task.open_time:
+            #     return jsonify(msg='task has not yet open'), 403
             return jsonify([s.to_dict() for s in SubmissionService.get_for_task_and_user(task, user)])
         else:  # POST
             # time check will be done in SubmissionService.add method
@@ -600,7 +600,9 @@ def task_my_submissions(tid):
                 save_paths[req_id] = os.path.join(folder, req.name)
 
             # create new submission
-            new_submission, submissions_to_clear, submitted_for_team = SubmissionService.add(task, user, files, save_paths)
+            allow_before_open = 'admin' in roles or 'tutor' in roles
+            new_submission, submissions_to_clear, submitted_for_team = \
+                SubmissionService.add(task, user, files, save_paths, allow_before_open)
 
             # clear outdated submissions according to history limit
             file_paths_to_remove = []
@@ -727,8 +729,8 @@ def task_my_submissions_last_auto_tests(tid):
         if 'student' not in roles:
             return jsonify(msg='only for students'), 403
 
-        if not task.open_time or datetime.utcnow() < task.open_time:
-            return jsonify(msg='task has not yet open'), 403
+        # if not task.open_time or datetime.utcnow() < task.open_time:
+        #     return jsonify(msg='task has not yet open'), 403
 
         last_tests = SubmissionService.get_last_auto_tests_for_task_and_user(task, user)
         return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
@@ -755,8 +757,8 @@ def task_my_submissions_auto_test_conclusions(tid):
         if 'student' not in roles:
             return jsonify(msg='only for students'), 403
 
-        if not task.open_time or datetime.utcnow() < task.open_time:
-            return jsonify(msg='task has not yet open'), 403
+        # if not task.open_time or datetime.utcnow() < task.open_time:
+        #     return jsonify(msg='task has not yet open'), 403
 
         return jsonify(SubmissionService.get_auto_test_conclusions_for_task_and_user(task, user))
     except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
@@ -790,8 +792,8 @@ def task_my_team_submissions(tid):
             return jsonify(msg='team is not finalised'), 403
 
         # time check
-        if not task.open_time or datetime.utcnow() < task.open_time:
-            return jsonify(msg='task has not yet open'), 403
+        # if not task.open_time or datetime.utcnow() < task.open_time:
+        #     return jsonify(msg='task has not yet open'), 403
 
         return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team)])
     except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError) as e:
@@ -825,8 +827,8 @@ def task_my_team_submissions_last_auto_tests(tid):
             return jsonify(msg='team is not finalised'), 403
 
         # time check
-        if not task.open_time or datetime.utcnow() < task.open_time:
-            return jsonify(msg='task has not yet open'), 403
+        # if not task.open_time or datetime.utcnow() < task.open_time:
+        #     return jsonify(msg='task has not yet open'), 403
 
         last_tests = SubmissionService.get_last_auto_tests_for_team(team)
         return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
@@ -862,8 +864,8 @@ def task_my_team_submissions_auto_test_conclusions(tid):
             return jsonify(msg='team is not finalised'), 403
 
         # time check
-        if not task.open_time or datetime.utcnow() < task.open_time:
-            return jsonify(msg='task has not yet open'), 403
+        # if not task.open_time or datetime.utcnow() < task.open_time:
+        #     return jsonify(msg='task has not yet open'), 403
 
         return jsonify(SubmissionService.get_auto_test_conclusions_for_team(team))
     except (TaskServiceError, TermServiceError, TeamServiceError, SubmissionServiceError, AutoTestServiceError) as e:

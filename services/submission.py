@@ -531,7 +531,8 @@ class SubmissionService:
             .all()
 
     @staticmethod
-    def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str]) \
+    def add(task: Task, submitter: UserAlias, files: Dict[int, FileStorage], save_paths: Dict[int, str],
+            allow_before_open: bool = False) \
             -> Tuple[Submission, List[Submission], Optional[Team]]:
         # assume role has been checked (to minimize dependency)
 
@@ -542,7 +543,7 @@ class SubmissionService:
 
         # time check
         now = datetime.utcnow()
-        if not task.open_time or now < task.open_time:
+        if not allow_before_open and (not task.open_time or now < task.open_time):
             raise SubmissionServiceError('task has not yet open')
         if task.close_time and now > task.close_time:
             raise SubmissionServiceError('task has closed')
