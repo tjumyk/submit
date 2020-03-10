@@ -21,7 +21,7 @@
               </div>
             </div>
           </h2>
-          <div class="ui menu vertical fluid">
+          <div class="ui menu vertical fluid" *ngIf="item.value.length">
             <a class="item" *ngFor="let term of item.value" routerLink="terms/{{ term.id }}">
               <i class="icon angle right"></i>
               <span>{{ term.year }} </span>
