@@ -73,6 +73,7 @@ export class Task {
   submission_history_limit?: number;
 
   evaluation_method?: string;
+  is_final_marks_released: boolean;
 
   created_at: string;
   modified_at: string;
@@ -402,4 +403,18 @@ export class SubmissionCommentSummary{
   submission: Submission;
   total_comments: number;
   last_comment: SubmissionComment;
+}
+
+export class FinalMarks{
+  user_id: number;
+  task_id: number;
+
+  marks: number;
+  comment?: string;
+
+  created_at: string;
+  modified_at: string;
+
+  user?:User;
+  task?:Task;
 }

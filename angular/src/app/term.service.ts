@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable, of} from "rxjs";
-import {Message, Task, Term, User} from "./models";
+import {FinalMarks, Message, Task, Term, User} from "./models";
 import {tap} from "rxjs/operators";
 
 @Injectable({
@@ -97,5 +97,13 @@ export class TermService {
 
   markAllMessagesRead(term_id: number): Observable<any>{
     return this.http.get(`${this.api}/${term_id}/mark-all-messages-read`)
+  }
+
+  getStudents(term_id: number): Observable<User[]>{
+    return this.http.get<User[]>(`${this.api}/${term_id}/students`)
+  }
+
+  getMyFinalMarks(term_id: number): Observable<FinalMarks[]>{
+    return this.http.get<FinalMarks[]>(`${this.api}/${term_id}/my-final-marks`)
   }
 }

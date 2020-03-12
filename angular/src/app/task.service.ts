@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import {
-  AutoTest, DailySubmissionSummary,
+  AutoTest, DailySubmissionSummary, FinalMarks,
   Submission, SubmissionCommentSummary,
   SubmissionStatus,
   Task,
@@ -236,5 +236,13 @@ export class TaskService {
 
   getSubmissionCommentSummaries(task_id: number): Observable<SubmissionCommentSummary[]>{
     return this.http.get<SubmissionCommentSummary[]>(`${this.api}/${task_id}/comment-summaries`)
+  }
+
+  getFinalMarks(task_id: number): Observable<FinalMarks[]> {
+    return this.http.get<FinalMarks[]>(`${this.api}/${task_id}/final-marks`)
+  }
+
+  getMyFinalMarks(task_id: number): Observable<FinalMarks>{
+    return this.http.get<FinalMarks>(`${this.api}/${task_id}/my-final-marks`)
   }
 }

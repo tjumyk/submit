@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService, AccountServiceError
+from services.final_marks import FinalMarksService, FinalMarksServiceError
 from services.messsage import MessageService, MessageServiceError
 from services.term import TermService, TermServiceError
 
@@ -110,4 +111,49 @@ def term_messages_mark_all_read(term_id):
         db.session.commit()
         return "", 204
     except (AccountServiceError, MessageServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@term_api.route('/<int:term_id>/students')
+@requires_login
+def term_students(term_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        term = TermService.get(term_id)
+        if term is None:
+            return jsonify(msg='term not found'), 404
+        roles = TermService.get_access_roles(term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        group = AccountService.get_group(term.student_group_id)
+        if group is None:
+            return jsonify(msg='student group not found'), 500
+        return jsonify([u.to_dict() for u in group.users])
+    except (AccountServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@term_api.route('/<int:term_id>/my-final-marks')
+@requires_login
+def my_final_marks(term_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        term = TermService.get(term_id)
+        if term is None:
+            return jsonify(msg='term not found'), 404
+
+        records = FinalMarksService.get_for_user_term(user, term)
+        return jsonify([r.to_dict() for r in records])
+    except (AccountServiceError, TermServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

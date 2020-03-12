@@ -38,6 +38,8 @@ import {AboutComponent} from "./about/about.component";
 import {MessageDetailComponent} from "./message-detail/message-detail.component";
 import {EmailSubscriptionsComponent} from "./email-subscriptions/email-subscriptions.component";
 import {CommentsComponent} from "./comments/comments.component";
+import {FinalMarksComponent} from "./final-marks/final-marks.component";
+import {FinalMarksImportComponent} from "./final-marks-import/final-marks-import.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -78,7 +80,14 @@ const routes: Routes = [
           {path: 'my-team/join-or-create', component: JoinOrCreateTeamComponent},
           {path: 'teams', component: TeamsComponent},
           {path: 'teams/:team_id', component: TeamComponent},
-          {path: 'comments', component: CommentsComponent}
+          {path: 'comments', component: CommentsComponent},
+          {
+            path: 'final-marks',
+            children:[
+              {path: '', pathMatch: 'full', component: FinalMarksComponent},
+              {path: 'import', component: FinalMarksImportComponent}
+            ]
+          }
         ]
       },
       {path: 'messages', component: MessagesComponent},

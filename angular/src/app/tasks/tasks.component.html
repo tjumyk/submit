@@ -23,6 +23,9 @@
               <div class="task column" *ngFor="let task of item.value">
                 <div class="ui fluid card raised">
                   <div class="content">
+                    <div class="marks stamp" *ngIf="task._marks">
+                      {{task._marks.marks}}
+                    </div>
                     <div class="header">{{ task.title }}</div>
                     <div class="description">
                       <p class="task-description" *ngIf="task.description">

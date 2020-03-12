@@ -1,0 +1,9 @@
+<div class="ui dimmer modals page transition" (click)="dimmerClicked($event, dimmer)" #dimmer
+     [ngClass]="{'hidden': !shown && !_show, 'in': !shown && _show, 'visible active': shown, 'out': shown && !_show, 'animating fade': shown != _show, 'show': shown||_show}"
+     [ngStyle]="{'animation-duration.ms': _show != shown ? animationDuration: null}">
+  <div class="ui modal transition" #modal
+       [ngClass]="{'hidden': !shown && !_show, 'in': !shown && _show, 'visible active': shown, 'out': shown && !_show, 'animating scale': shown != _show, 'show': shown||_show}"
+       [ngStyle]="{'animation-duration.ms': _show != shown ? animationDuration: null}">
+    <ng-content></ng-content>
+  </div>
+</div>

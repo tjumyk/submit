@@ -11,10 +11,14 @@ from models import db, Submission, UserTeamAssociation, Team
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.course import CourseService, CourseServiceError
+from services.final_marks import FinalMarksService, FinalMarksServiceError
+from services.message_sender import MessageSenderService, MessageSenderServiceError
+from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
+from utils.message import build_message_with_template
 from utils.upload import handle_upload, handle_post_upload, UploadError, md5sum
 
 admin_api = Blueprint('admin_api', __name__)
@@ -798,4 +802,74 @@ def admin_run_auto_test(cid):
             ret.append(test_obj)
         return jsonify(ret), 201
     except (SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/final-marks', methods=['POST'])
+@requires_admin
+def do_final_marks(tid):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        params = request.json
+        user = AccountService.get_user(params.get('user_id'))
+        if user is None:
+            return jsonify(msg='user not found'), 404
+        record = FinalMarksService.set(task, user, params.get('marks'), params.get('comment'))
+
+        db.session.commit()
+        return jsonify(record.to_dict(with_advanced_fields=True))
+    except (AccountServiceError, TaskServiceError, FinalMarksServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/batch-final-marks', methods=['POST'])
+@requires_admin
+def do_batch_final_marks(tid):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        data = request.json
+        user_names = [row[0] for row in data]
+        if len(set(user_names)) != len(user_names):
+            return jsonify(msg='duplicate user names in list'), 400
+        users = AccountService.get_user_by_name_list(user_names)
+        if len(users) != len(user_names):
+            return jsonify(msg='some users not found'), 400
+        processed_data = []
+        for user_name, marks, comment in data:
+            processed_data.append((users[user_name], marks, comment))
+        new_records, updated_records = FinalMarksService.batch_set(task, processed_data)
+
+        db.session.commit()
+        return jsonify(new=len(new_records), updated=len(updated_records))
+    except (AccountServiceError, TaskServiceError, FinalMarksServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/release-final-marks')
+@requires_admin
+def release_final_marks(tid):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        FinalMarksService.release(task)
+
+        term = task.term
+        mail_args = dict(site=app.config['SITE'], term=term, task=task)
+        msg_content = build_message_with_template('task_final_marks_released', mail_args)
+        msg_channel = MessageService.get_channel_by_name('task')
+        msg, mails = MessageSenderService.send_to_group(msg_channel, term, msg_content, None, term.student_group)
+
+        db.session.commit()
+        for mail in mails:
+            mail.send()
+        return "", 204
+    except (TaskServiceError, FinalMarksServiceError, MessageServiceError, MessageSenderServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

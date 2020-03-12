@@ -11,6 +11,9 @@
       <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
       <div class="content">
         {{ task.title }}
+        <div class="sub header marks" *ngIf="marks">
+          My Final Marks: {{marks.marks}}
+        </div>
       </div>
     </h1>
   </div>
@@ -41,6 +44,7 @@
               <a routerLink="user-submissions" routerLinkActive="active" class="item" *ngIf="!task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
               <a routerLink="team-submissions" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
               <a routerLink="comments" routerLinkActive="active" class="item"><i class="icon comments"></i>Comments</a>
+              <a routerLink="final-marks" routerLinkActive="active" class="item"><i class="icon star"></i>Final Marks</a>
             </div>
           </div>
 

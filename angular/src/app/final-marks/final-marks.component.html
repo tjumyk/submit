@@ -1,0 +1,73 @@
+<app-error-message [error]="error"></app-error-message>
+<div class="ui loader text active" *ngIf="loadingStudents">Loading student list...</div>
+<div class="ui loader text active" *ngIf="loadingMarks">Loading final marks...</div>
+
+<ng-container *ngIf="task && !task.is_final_marks_released">
+  <div class="ui grid" *ngIf="isAdmin; else notAdmin">
+    <div class="column">
+      <a class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> Import</a>
+      <button class="ui button primary" [class.loading]="releasing" [class.disabled]="releasing" (click)="release()"><i class="icon check"></i> Release</button>
+    </div>
+  </div>
+  <ng-template #notAdmin>
+    <div class="ui message warning"><i class="icon triangle exclamation"></i> The following final marks have not been released.</div>
+  </ng-template>
+</ng-container>
+
+<ng-container *ngIf="students">
+
+  <table class="ui table compact celled">
+    <thead><tr><th>#</th><th>User Name</th><th>Marks</th><th>Comment</th><th>Created At</th><th>Updated At</th><th>Ops</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let s of students; index as i">
+      <td>{{i + 1}}</td>
+      <td>
+        <app-user-mini-card [user]="s" [enableAdmin]="isAdmin" [enablePopup]="true"></app-user-mini-card>
+      </td>
+      <ng-container *ngIf="s._marks; else noMarks">
+        <td>{{s._marks.marks}}</td>
+        <td>{{s._marks.comment}}</td>
+        <td>{{s._marks.created_at|date:'short'}}</td>
+        <td>{{s._marks.modified_at|date:'short'}}</td>
+      </ng-container>
+      <ng-template #noMarks>
+        <td></td><td></td><td></td><td></td>
+      </ng-template>
+      <td>
+        <div class="ui mini buttons">
+          <button *ngIf="!task.is_final_marks_released" class="ui button icon" (click)="startEdit(s, f)"><i class="icon edit"></i></button>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <app-modal [(show)]="showEditModal" modalClass="mini">
+    <i class="close icon" (click)="showEditModal=false"></i>
+    <div class="header">
+      <app-user-mini-card [user]="studentMap[editForm.user_id]" *ngIf="studentMap[editForm.user_id]"></app-user-mini-card>
+    </div>
+    <div class="content">
+      <app-error-message [error]="editError"></app-error-message>
+      <form class="ui form" (ngSubmit)="submitEdit(f)" #f="ngForm" [ngClass]="{'loading': submittingEdit}">
+        <div class="field required" [ngClass]="{'error': (f.submitted || marks_model.touched || marks_model.dirty) && marks_model.invalid}">
+          <label>Marks</label>
+          <input type="number" [(ngModel)]="editForm.marks" name="marks" #marks_model="ngModel" required>
+          <div class="errors" *ngIf="marks_model.errors">
+            <label *ngIf="marks_model.errors.required"><i class="times icon"></i> Marks is required</label>
+          </div>
+        </div>
+        <div class="field"  [ngClass]="{'error': (f.submitted || comment_model.touched || comment_model.dirty) && comment_model.invalid}">
+          <label>Comment (Optional)</label>
+          <input type="text" [(ngModel)]="editForm.comment" name="comment" #comment_model="ngModel" maxlength="128">
+          <div class="errors" *ngIf="comment_model.errors">
+            <label *ngIf="comment_model.errors.maxlength"><i class="times icon"></i>Comment is too long</label>
+          </div>
+        </div>
+        <button type="submit" class="ui button fluid primary">
+          <i class="icon check"></i> Save
+        </button>
+      </form>
+    </div>
+  </app-modal>
+</ng-container>

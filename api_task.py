@@ -16,6 +16,7 @@ from auth_connect.oauth import requires_login
 from models import db, SpecialConsideration, UserTeamAssociation
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
+from services.final_marks import FinalMarksService, FinalMarksServiceError
 from services.message_sender import MessageSenderService, MessageSenderServiceError
 from services.messsage import MessageService, MessageServiceError
 from services.submission import SubmissionService, SubmissionServiceError
@@ -1313,4 +1314,50 @@ def task_download_submissions(tid, user_id=None, team_id=None):
             return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
                                        cache_timeout=0)
     except (TaskServiceError, TermServiceError, AccountServiceError, TeamServiceError, SubmissionServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/final-marks')
+@requires_login
+def do_final_marks(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        return jsonify([m.to_dict(with_user=False, with_advanced_fields=True)
+                        for m in FinalMarksService.get_for_task(task)])
+    except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/my-final-marks')
+@requires_login
+def do_my_final_marks(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        if not task.is_final_marks_released:
+            return jsonify(msg='final marks not released'), 403
+        record = FinalMarksService.get(user, task)
+        if record is None:
+            return "", 204
+        return jsonify(record.to_dict())
+    except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

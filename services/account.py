@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from sqlalchemy import or_, func
 
@@ -32,6 +32,17 @@ class AccountService:
         if not name:
             raise AccountServiceError('name is required')
         return UserAlias.query.filter_by(name=name).first()
+
+    @staticmethod
+    def get_user_by_name_list(name_list: List[str]) -> Dict[str, UserAlias]:
+        if name_list is None:
+            raise AccountServiceError('name list is required')
+        for name in name_list:
+            if not isinstance(name, str):
+                raise AccountServiceError('name list must only contain strings')
+            if not name:
+                raise AccountServiceError('name list must not contain empty strings')
+        return {u.name: u for u in db.session.query(UserAlias).filter(UserAlias.name.in_(name_list))}
 
     @staticmethod
     def get_group(_id) -> Optional[GroupAlias]:

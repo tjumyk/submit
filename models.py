@@ -217,6 +217,8 @@ class Task(db.Model):
 
     evaluation_method = db.Column(db.String(32))
 
+    is_final_marks_released = db.Column(db.Boolean, nullable=False, default=False)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -232,7 +234,8 @@ class Task(db.Model):
                  type=self.type, title=self.title, description=self.description,
                  open_time=self.open_time, due_time=self.due_time,
                  is_team_task=self.is_team_task, team_min_size=self.team_min_size, team_max_size=self.team_max_size,
-                 team_join_close_time=self.team_join_close_time)
+                 team_join_close_time=self.team_join_close_time,
+                 is_final_marks_released=self.is_final_marks_released)
         if with_term:
             d['term'] = self.term.to_dict()
         if with_details:
@@ -653,4 +656,33 @@ class SubmissionComment(db.Model):
             d['submission'] = self.submission.to_dict()
         if with_author:
             d['author'] = self.author.to_dict() if self.author_id is not None else None
+        return d
+
+
+class FinalMarks(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'), primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), primary_key=True)
+
+    marks = db.Column(db.Float, nullable=False)
+    comment = db.Column(db.String(128))
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('UserAlias', backref=db.backref('final_marks'))
+    task = db.relationship('Task', backref=db.backref('final_marks'))
+
+    def __repr__(self):
+        return '<FinalMarks %d:%d>' % (self.user_id, self.task_id)
+
+    def to_dict(self, with_user: bool = False, with_task: bool = False, with_advanced_fields: bool = False):
+        d = dict(user_id=self.user_id, task_id=self.task_id, marks=self.marks)
+        if with_user:
+            d['user'] = self.user.to_dict(with_groups=False)
+        if with_task:
+            d['task'] = self.task.to_dict()
+        if with_advanced_fields:
+            d['comment'] = self.comment
+            d['created_at'] = self.created_at
+            d['modified_at'] = self.modified_at
         return d

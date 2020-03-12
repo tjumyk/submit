@@ -68,6 +68,9 @@ import { SpecialDateCardComponent } from './special-date-card/special-date-card.
 import { AprilFoolBoxComponent } from './april-fool-box/april-fool-box.component';
 import { SubmissionCommentsViewComponent } from './submission-comments-view/submission-comments-view.component';
 import { CommentsComponent } from './comments/comments.component';
+import { FinalMarksComponent } from './final-marks/final-marks.component';
+import { FinalMarksImportComponent } from './final-marks-import/final-marks-import.component';
+import {ModalComponent} from "./modal/modal.component";
 
 @NgModule({
   declarations: [
@@ -134,6 +137,9 @@ import { CommentsComponent } from './comments/comments.component';
     AprilFoolBoxComponent,
     SubmissionCommentsViewComponent,
     CommentsComponent,
+    FinalMarksComponent,
+    FinalMarksImportComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,

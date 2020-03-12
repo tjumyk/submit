@@ -101,5 +101,21 @@ export class TasksComponent implements OnInit, OnDestroy {
 
     timeTracker();
     this.timeTrackerHandler = setInterval(timeTracker, 10000);
+
+    if (this.accessRoles.has('student')) {
+      this.termService.getMyFinalMarks(this.termId).subscribe(
+        records => {
+          for(let record of records){
+            for(let task of tasks){
+              if(task.id == record.task_id){
+                task['_marks'] = record;
+                break;
+              }
+            }
+          }
+        },
+        error => this.error = error.error
+      )
+    }
   }
 }

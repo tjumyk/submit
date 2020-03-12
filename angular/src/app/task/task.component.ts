@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ErrorMessage, Task, Term, User} from "../models";
+import {ErrorMessage, FinalMarks, Task, Term, User} from "../models";
 import {CategoryInfo, TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -32,6 +32,8 @@ export class TaskComponent implements OnInit, OnDestroy {
   printTaskTeamSize = TaskService.printTaskTeamSize;
 
   latePenalty: LatePenalty;
+
+  marks: FinalMarks;
 
   constructor(
     private accountService: AccountService,
@@ -95,6 +97,13 @@ export class TaskComponent implements OnInit, OnDestroy {
     };
     timeTracker();
     this.timeTrackerHandler = setInterval(timeTracker, 10000);
+
+    if (task.is_final_marks_released && this.accessRoles.has('student')) {
+      this.taskService.getMyFinalMarks(this.taskId).subscribe(
+        marks => this.marks = marks,
+        error => this.error = error.error
+      )
+    }
   }
 
 }

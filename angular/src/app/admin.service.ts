@@ -12,7 +12,8 @@ import {
   SpecialConsideration,
   Task,
   Term,
-  User
+  User,
+  FinalMarks
 } from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
@@ -124,6 +125,19 @@ export class TestEnvironmentValidationResult{
   docker_run_config?: {};
   pip_requirements?: string[];
   error?: ErrorMessage;
+}
+
+export class SetFinalMarksRequest{
+  user_id: number;
+  marks: number;
+  comment?: string;
+}
+
+export type BatchSetFinalMarksRequest = [string, number, string|null][]
+
+export class BatchSetFinalMarksResponse{
+  new: number;
+  updated: number;
 }
 
 @Injectable({
@@ -378,5 +392,17 @@ export class AdminService {
     if(last_submissions_only)
       params = params.append('last_submissions_only', "true");
     return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/run`, {params: params})
+  }
+
+  setFinalMarks(task_id: number, form: SetFinalMarksRequest): Observable<FinalMarks> {
+    return this.http.post<FinalMarks>(`${this.api}/tasks/${task_id}/final-marks`, form)
+  }
+
+  batchSetFinalMarks(task_id: number, request: BatchSetFinalMarksRequest): Observable<BatchSetFinalMarksResponse> {
+    return this.http.post<BatchSetFinalMarksResponse>(`${this.api}/tasks/${task_id}/batch-final-marks`, request)
+  }
+
+  releaseFinalMarks(task_id: number): Observable<any>{
+    return this.http.get(`${this.api}/tasks/${task_id}/release-final-marks`)
   }
 }
