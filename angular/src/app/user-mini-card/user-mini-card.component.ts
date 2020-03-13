@@ -19,6 +19,9 @@ export class UserMiniCardComponent implements OnInit {
   @Input()
   enableAdmin: boolean = false;
 
+  @Input()
+  preferNickname: boolean = true;
+
   constructor() {
   }
 

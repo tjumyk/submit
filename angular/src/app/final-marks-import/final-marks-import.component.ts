@@ -61,7 +61,7 @@ export class FinalMarksImportComponent implements OnInit {
     // detect if table has header
     if (this.hasHeader === undefined) {
       this.hasHeader = false;
-      let keywords = new Set(['id', 'name', 'user name', 'username', 'userid']);
+      let keywords = new Set(['id', 'name', 'user name', 'username', 'userid', 'user']);
       for (let col of this.table.columns) {
         if (keywords.has(col.head.toLowerCase())) {
           this.hasHeader = true;
