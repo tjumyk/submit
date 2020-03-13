@@ -35,7 +35,7 @@
       </ng-template>
       <td>
         <div class="ui mini buttons">
-          <button *ngIf="!task.is_final_marks_released" class="ui button icon" (click)="startEdit(s, f)"><i class="icon edit"></i></button>
+          <button *ngIf="isAdmin&&!task.is_final_marks_released" class="ui button icon" (click)="startEdit(s, f)"><i class="icon edit"></i></button>
         </div>
       </td>
     </tr>
