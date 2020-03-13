@@ -4,7 +4,7 @@ import {finalize} from "rxjs/operators";
 import {AccountService} from "../account.service";
 import {AdminService, SetFinalMarksRequest} from "../admin.service";
 import {TaskService} from "../task.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {TermService} from "../term.service";
 import {NgForm} from "@angular/forms";
 
@@ -38,7 +38,8 @@ export class FinalMarksComponent implements OnInit {
               private taskService: TaskService,
               private route: ActivatedRoute,
               private termService: TermService,
-              private adminService: AdminService) {
+              private adminService: AdminService,
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -129,6 +130,22 @@ export class FinalMarksComponent implements OnInit {
     ).subscribe(
       () => {
         this.task.is_final_marks_released = true;
+      },
+      error => this.error = error.error
+    )
+  }
+
+  goToTeamSubmissions(user: User, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    this.taskService.getTeamAssociation(this.taskId, user.id).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ass => {
+        if (ass) {
+          this.router.navigate(['terms', this.task.term_id, 'tasks', this.taskId, 'team-submissions', ass.team_id])
+        } else {
+          alert('Team not found')
+        }
       },
       error => this.error = error.error
     )

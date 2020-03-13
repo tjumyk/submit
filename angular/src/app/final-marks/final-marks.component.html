@@ -35,7 +35,11 @@
       </ng-template>
       <td>
         <div class="ui mini buttons">
-          <button *ngIf="isAdmin&&!task.is_final_marks_released" class="ui button icon" (click)="startEdit(s, f)"><i class="icon edit"></i></button>
+          <button *ngIf="isAdmin&&!task.is_final_marks_released" class="ui button icon" (click)="startEdit(s, f)" title="Edit Marks"><i class="icon edit"></i></button>
+          <a *ngIf="!task.is_team_task;else btnTeamSubmissionsWrap" class="ui button icon" routerLink="/terms/{{task.term_id}}/tasks/{{taskId}}/user-submissions/{{s.id}}" title="Submissions"><i class="icon search"></i></a>
+          <ng-template #btnTeamSubmissionsWrap>
+            <button class="ui button icon" title="Submissions" (click)="goToTeamSubmissions(s, btnTeamSubmissions)" #btnTeamSubmissions><i class="icon search"></i></button>
+          </ng-template>
         </div>
       </td>
     </tr>
