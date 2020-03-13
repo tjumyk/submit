@@ -1151,15 +1151,28 @@ def task_export_results(tid):
         conclusions = SubmissionService.get_auto_test_conclusions_for_task(task, include_private_tests=True)
 
         if task.is_team_task:
+            expand_team_members = request.args.get('members') == 'true'
             summaries = SubmissionService.get_team_summaries(task)
             with StringIO() as buffer:
-                buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
-                buffer.write('\n')
-                for summary in summaries:
-                    team_conclusions = conclusions.get(summary.team.id, {})
-                    buffer.write('\t'.join([str(summary.team.id), summary.team.name] +
-                                           [str(team_conclusions.get(c.id)) for c in configs]))
+                if not expand_team_members:
+                    buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
                     buffer.write('\n')
+                    for summary in summaries:
+                        team_conclusions = conclusions.get(summary.team.id, {})
+                        buffer.write('\t'.join([str(summary.team.id), summary.team.name] +
+                                               [str(team_conclusions.get(c.id)) for c in configs]))
+                        buffer.write('\n')
+                else:
+                    buffer.write('\t'.join(['TeamID', 'TeamName', 'UserID', 'UserName'] + [c.name for c in configs]))
+                    buffer.write('\n')
+                    for summary in summaries:
+                        team = summary.team
+                        team_conclusions = conclusions.get(team.id, {})
+                        conclusion_columns = [str(team_conclusions.get(c.id)) for c in configs]
+                        for ass in team.user_associations:
+                            buffer.write('\t'.join([str(team.id), team.name, str(ass.user.id), ass.user.name] +
+                                                   conclusion_columns))
+                            buffer.write('\n')
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
         else:
             summaries = SubmissionService.get_user_summaries(task)
