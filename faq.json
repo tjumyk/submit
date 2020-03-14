@@ -25,7 +25,7 @@
   },
   {
     "question": "Will the results of the auto testings be the final marks of the corresponding tasks?",
-    "answer": "Not necessarily. Auto testings are only designed to be a quick feedback to help you spot any serious or common bugs. Depends on the complexity of the task, we may need to run separate offline tests with larger datasets or in a larger scale to fully evaluate your work. However, your final marks shouldn't be too bad if you achieved a good result in the auto tests. Besides, we may also need careful manual inspections to deal with any special cases. The tutors may let you know the final marks with other means."
+    "answer": "Not necessarily. Auto testings are only designed to be a quick feedback to help you spot any serious or common bugs. Depending on the complexity of the task, we may need to run separate offline tests with larger datasets or in a larger scale to fully evaluate your work. However, your final marks shouldn't be too bad if you achieved a good result in the auto tests. Besides, we may also need careful manual inspections to deal with any special cases. The final marks will appear under the task titles once they are released."
   },
   {
     "question": "How to disable certain Email notifications?",
