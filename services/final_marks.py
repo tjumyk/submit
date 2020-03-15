@@ -1,4 +1,4 @@
-from typing import Optional, List, Iterable, Tuple
+from typing import Optional, List, Tuple
 
 from error import BasicError
 from models import FinalMarks, db, Task, UserAlias, Term
@@ -96,7 +96,7 @@ class FinalMarksService:
             if user is None:
                 raise FinalMarksServiceError('user is None in row %d' % i)
             if not any(g.id == student_group_id for g in user.groups):
-                raise FinalMarksServiceError('user %s is not a student of this term' % user.name)
+                continue  # not a student of this term
             if marks is None:
                 raise FinalMarksServiceError('marks for user %s is None' % user.name)
             if not isinstance(marks, (float, int)):
