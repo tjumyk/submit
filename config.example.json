@@ -60,5 +60,12 @@
     "due_notify_hours": [24],
     "team_join_close_notify_hours": [24],
     "max_recipients_per_mail": 100
+  },
+  "SYNC_WORKER": {
+    "work_folder": "/tmp/submit_sync_work",
+    "period": 86400,
+    "local_term_id": 1,
+    "remote_term_id": 1,
+    "remote_server": "http://example.com:8888"
   }
 }
