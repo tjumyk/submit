@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import {ErrorMessage, FinalMarks, Task, User} from "../models";
-import {finalize} from "rxjs/operators";
+import {ErrorMessage, FinalMarks, SuccessMessage, Task, User} from "../models";
+import {debounceTime, finalize} from "rxjs/operators";
 import {AccountService} from "../account.service";
 import {AdminService, SetFinalMarksRequest} from "../admin.service";
 import {TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TermService} from "../term.service";
 import {NgForm} from "@angular/forms";
+import {makeSortField, Pagination} from "../table-util";
+import {Subject} from "rxjs";
+import * as moment from "moment";
 
 
 @Component({
@@ -16,16 +19,16 @@ import {NgForm} from "@angular/forms";
 })
 export class FinalMarksComponent implements OnInit {
   error: ErrorMessage;
+  success: SuccessMessage;
 
   taskId: number;
   task: Task;
   isAdmin: boolean;
 
-  loadingStudents: boolean;
+  loadingUsers: boolean;
   loadingMarks: boolean;
-  students: User[];
-  studentMap: { [uid: number]: User };
-  marks: { [uid: number]: FinalMarks };
+  userPages: Pagination<User>;
+  userMap: { [uid: number]: User };
 
   showEditModal: boolean;
   editForm: SetFinalMarksRequest = new SetFinalMarksRequest();
@@ -33,6 +36,9 @@ export class FinalMarksComponent implements OnInit {
   submittingEdit: boolean;
 
   releasing: boolean;
+
+  userSearchKey = new Subject<string>();
+  sortField: (field: string, th: HTMLElement) => any;
 
   constructor(private accountService: AccountService,
               private taskService: TaskService,
@@ -45,6 +51,13 @@ export class FinalMarksComponent implements OnInit {
   ngOnInit() {
     this.taskId = parseInt(this.route.snapshot.parent.parent.paramMap.get('task_id'));
 
+    this.userSearchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      (key) => this.userPages.search(key),
+      error => this.error = error.error
+    );
+
     this.accountService.getCurrentUser().subscribe(
       user => {
         this.isAdmin = AccountService.isAdmin(user);
@@ -53,15 +66,27 @@ export class FinalMarksComponent implements OnInit {
           task => {
             this.task = task;
 
-            this.loadingStudents = true;
+            this.loadingUsers = true;
             this.termService.getStudents(task.term_id).pipe(
-              finalize(() => this.loadingStudents = false)
+              finalize(() => this.loadingUsers = false)
             ).subscribe(
-              students => {
-                this.students = students;
-                this.studentMap = {};
-                for (let s of students) {
-                  this.studentMap[s.id] = s;
+              users => {
+                this.userPages = new Pagination<User>(users, 500);
+                this.userPages.setSearchMatcher((item, key) => {
+                  const keyLower = key.toLowerCase();
+                  if (item.name.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  if (item.id.toString().indexOf(keyLower) >= 0)
+                    return true;
+                  if (item.nickname && item.nickname.toLowerCase().indexOf(keyLower) >= 0)
+                    return true;
+                  return false;
+                });
+                this.sortField = makeSortField(this.userPages);
+
+                this.userMap = {};
+                for (let u of users) {
+                  this.userMap[u.id] = u;
                 }
 
                 this.loadingMarks = true;
@@ -70,9 +95,11 @@ export class FinalMarksComponent implements OnInit {
                 ).subscribe(
                   marks => {
                     for (let m of marks) {
-                      let student = this.studentMap[m.user_id];
-                      if (student) {
-                        student['_marks'] = m
+                      m['_created_at_time'] = moment(m.created_at).unix();
+                      m['_modified_at_time'] = moment(m.modified_at).unix();
+                      let _u = this.userMap[m.user_id];
+                      if (_u) {
+                        _u['_marks'] = m
                       }
                     }
                   },
@@ -111,7 +138,7 @@ export class FinalMarksComponent implements OnInit {
       finalize(() => this.submittingEdit = false)
     ).subscribe(
       marks => {
-        let student = this.studentMap[marks.user_id];
+        let student = this.userMap[marks.user_id];
         if (student)
           student['_marks'] = marks;
         this.showEditModal = false
@@ -130,6 +157,7 @@ export class FinalMarksComponent implements OnInit {
     ).subscribe(
       () => {
         this.task.is_final_marks_released = true;
+        this.success = {msg: 'Final marks have been released successfully'}
       },
       error => this.error = error.error
     )

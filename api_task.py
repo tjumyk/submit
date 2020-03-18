@@ -1349,7 +1349,7 @@ def do_final_marks(tid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        return jsonify([m.to_dict(with_user=False, with_advanced_fields=True)
+        return jsonify([m.to_dict(with_user=False, with_comment=True, with_advanced_fields=True)
                         for m in FinalMarksService.get_for_task(task)])
     except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
@@ -1372,5 +1372,38 @@ def do_my_final_marks(tid):
         if record is None:
             return "", 204
         return jsonify(record.to_dict())
+    except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/export-final-marks')
+@requires_login
+def export_final_marks(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        with StringIO() as buffer:
+            buffer.write('\t'.join(['ID', 'Name', 'Marks', 'Comment']))
+            buffer.write('\n')
+            for record in FinalMarksService.get_for_task(task, order_by_user_name=True):
+                marks = record.marks
+                if int(marks) == marks:  # convert marks to int if value is not changed
+                    marks = int(marks)
+                buffer.write('\t'.join([str(record.user_id), record.user.name, str(marks), record.comment or '']))
+                buffer.write('\n')
+            return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

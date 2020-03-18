@@ -820,7 +820,7 @@ def do_final_marks(tid):
         record = FinalMarksService.set(task, user, params.get('marks'), params.get('comment'))
 
         db.session.commit()
-        return jsonify(record.to_dict(with_advanced_fields=True))
+        return jsonify(record.to_dict(with_comment=True, with_advanced_fields=True))
     except (AccountServiceError, TaskServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

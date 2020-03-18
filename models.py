@@ -675,14 +675,16 @@ class FinalMarks(db.Model):
     def __repr__(self):
         return '<FinalMarks %d:%d>' % (self.user_id, self.task_id)
 
-    def to_dict(self, with_user: bool = False, with_task: bool = False, with_advanced_fields: bool = False):
+    def to_dict(self, with_user: bool = False, with_task: bool = False, with_comment: bool = False,
+                with_advanced_fields: bool = False):
         d = dict(user_id=self.user_id, task_id=self.task_id, marks=self.marks)
         if with_user:
             d['user'] = self.user.to_dict(with_groups=False)
         if with_task:
             d['task'] = self.task.to_dict()
-        if with_advanced_fields:
+        if with_comment:
             d['comment'] = self.comment
+        if with_advanced_fields:
             d['created_at'] = self.created_at
             d['modified_at'] = self.modified_at
         return d

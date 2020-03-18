@@ -136,7 +136,7 @@ def term_students(term_id):
         group = AccountService.get_group(term.student_group_id)
         if group is None:
             return jsonify(msg='student group not found'), 500
-        return jsonify([u.to_dict() for u in group.users])
+        return jsonify([u.to_dict() for u in sorted(group.users, key=lambda u:u.name)])
     except (AccountServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

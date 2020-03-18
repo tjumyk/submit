@@ -1,26 +1,48 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingStudents">Loading student list...</div>
+<app-success-message [success]="success"></app-success-message>
+<div class="ui loader text active" *ngIf="loadingUsers">Loading user list...</div>
 <div class="ui loader text active" *ngIf="loadingMarks">Loading final marks...</div>
 
-<ng-container *ngIf="task && !task.is_final_marks_released">
-  <div class="ui grid" *ngIf="isAdmin; else notAdmin">
-    <div class="column">
-      <a class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> Import</a>
-      <button class="ui button primary" [class.loading]="releasing" [class.disabled]="releasing" (click)="release()"><i class="icon check"></i> Release</button>
+<ng-container *ngIf="userPages">
+  <div class="ui message warning" *ngIf="!task.is_final_marks_released&&!isAdmin"><i class="icon triangle exclamation"></i> The following final marks have not been released.</div>
+
+  <div class="ui top attached clearing segment">
+    <div class="ui right floated menu secondary fitted">
+      <div class="item">
+        <div class="ui basic buttons small">
+          <a *ngIf="!task.is_final_marks_released && isAdmin" class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> Import</a>
+          <a class="ui button" href="api/tasks/{{taskId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
+        </div>
+      </div>
+      <div class="item" *ngIf="!task.is_final_marks_released && isAdmin">
+        <button class="ui button primary small" [class.loading]="releasing" [class.disabled]="releasing" (click)="release()"><i class="icon check"></i> Release</button>
+      </div>
+    </div>
+    <div class="ui left floated menu secondary fitted">
+      <div class="item">
+        <div class="ui input icon">
+          <input type="text" name="userSearchKey" #inputUserSearch (keyup)="userSearchKey.next(inputUserSearch.value)"
+                 placeholder="Search User...">
+          <i class="icon search"></i>
+        </div>
+      </div>
     </div>
   </div>
-  <ng-template #notAdmin>
-    <div class="ui message warning"><i class="icon triangle exclamation"></i> The following final marks have not been released.</div>
-  </ng-template>
-</ng-container>
-
-<ng-container *ngIf="students">
-
-  <table class="ui table compact celled unstackable">
-    <thead><tr><th>#</th><th>User</th><th>Marks</th><th>Comment</th><th>Created At</th><th>Updated At</th><th>Ops</th></tr></thead>
+  <table class="ui table compact celled unstackable sortable attached">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th (click)="sortField('name', thUser)" #thUser>User</th>
+      <th (click)="sortField('_marks.marks', thMarks)" #thMarks>Marks</th>
+      <th (click)="sortField('_marks.comment', thComment)" #thComment>Comment</th>
+      <th (click)="sortField('_marks._created_at_time', thCreatedAt)" #thCreatedAt>Created At</th>
+      <th (click)="sortField('_marks._modified_at_time', thModifiedAt)" #thModifiedAt>Updated At</th>
+      <th>Ops</th>
+    </tr>
+    </thead>
     <tbody>
-    <tr *ngFor="let s of students; index as i">
-      <td>{{i + 1}}</td>
+    <tr *ngFor="let s of userPages.pageItems; index as i">
+      <td>{{i + userPages.startRow}}</td>
       <td>
         <app-user-mini-card [user]="s" [enableAdmin]="isAdmin" [enablePopup]="true" [preferNickname]="false"></app-user-mini-card>
       </td>
@@ -45,11 +67,12 @@
     </tr>
     </tbody>
   </table>
+  <app-table-pagination-toolbar class="bottom attached" [pagination]="userPages"></app-table-pagination-toolbar>
 
   <app-modal [(show)]="showEditModal" modalClass="mini">
     <i class="close icon" (click)="showEditModal=false"></i>
     <div class="header">
-      <app-user-mini-card [user]="studentMap[editForm.user_id]" *ngIf="studentMap[editForm.user_id]" [preferNickname]="false"></app-user-mini-card>
+      <app-user-mini-card [user]="userMap[editForm.user_id]" *ngIf="userMap[editForm.user_id]" [preferNickname]="false"></app-user-mini-card>
     </div>
     <div class="content">
       <app-error-message [error]="editError"></app-error-message>
