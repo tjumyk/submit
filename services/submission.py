@@ -1076,7 +1076,7 @@ class SubmissionService:
         if submission is None:
             raise SubmissionServiceError('submission is required')
 
-        return SubmissionComment.query.with_parent(submission).all()
+        return SubmissionComment.query.with_parent(submission).order_by(SubmissionComment.id).all()
 
     @classmethod
     def add_comment(cls, submission: Submission, author: Optional[UserAlias], content: str) -> SubmissionComment:
