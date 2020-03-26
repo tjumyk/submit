@@ -1398,7 +1398,8 @@ def export_final_marks(tid):
         with StringIO() as buffer:
             buffer.write('\t'.join(['ID', 'Name', 'Marks', 'Comment']))
             buffer.write('\n')
-            for record in FinalMarksService.get_for_task(task, order_by_user_name=True):
+            for record in sorted(FinalMarksService.get_for_task(task, joined_load_user=True),
+                                 key=lambda x: x.user.name):
                 marks = record.marks
                 if int(marks) == marks:  # convert marks to int if value is not changed
                     marks = int(marks)

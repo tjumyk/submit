@@ -1,5 +1,7 @@
 from typing import Optional, List, Tuple
 
+from sqlalchemy.orm import joinedload
+
 from error import BasicError
 from models import FinalMarks, db, Task, UserAlias, Term
 
@@ -40,20 +42,14 @@ class FinalMarksService:
             .all()
 
     @staticmethod
-    def get_for_task(task: Task, order_by_user_name: bool = False) -> List[FinalMarks]:
+    def get_for_task(task: Task, joined_load_user: bool = False) -> List[FinalMarks]:
         if task is None:
             raise FinalMarksServiceError('task is required')
 
-        if order_by_user_name:
-            return db.session.query(FinalMarks) \
-                .filter(FinalMarks.task_id == task.id,
-                        FinalMarks.user_id == UserAlias.id) \
-                .order_by(UserAlias.name) \
-                .all()
-        else:
-            return db.session.query(FinalMarks) \
-                .filter(FinalMarks.task_id == task.id) \
-                .all()
+        query = db.session.query(FinalMarks)
+        if joined_load_user:
+            query = query.options(joinedload(FinalMarks.user))
+        return query.filter(FinalMarks.task_id == task.id).all()
 
     @classmethod
     def set(cls, task: Task, user: UserAlias, marks: float, comment: Optional[str]) -> FinalMarks:
