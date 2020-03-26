@@ -71,6 +71,7 @@ import { CommentsComponent } from './comments/comments.component';
 import { FinalMarksComponent } from './final-marks/final-marks.component';
 import { FinalMarksImportComponent } from './final-marks-import/final-marks-import.component';
 import {ModalComponent} from "./modal/modal.component";
+import { TermFinalMarksComponent } from './term-final-marks/term-final-marks.component';
 
 @NgModule({
   declarations: [
@@ -139,7 +140,8 @@ import {ModalComponent} from "./modal/modal.component";
     CommentsComponent,
     FinalMarksComponent,
     FinalMarksImportComponent,
-    ModalComponent
+    ModalComponent,
+    TermFinalMarksComponent
   ],
   imports: [
     BrowserModule,

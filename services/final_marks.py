@@ -26,6 +26,19 @@ class FinalMarksService:
             .first()
 
     @staticmethod
+    def get_for_term(term: Term, joined_load_user: bool = False) -> List[FinalMarks]:
+        if term is None:
+            raise FinalMarksServiceError('term is required')
+
+        query = db.session.query(FinalMarks)
+        if joined_load_user:
+            query = query.options(joinedload(FinalMarks.user))
+        return query \
+            .filter(FinalMarks.task_id == Task.id,
+                    Task.term_id == term.id) \
+            .all()
+
+    @staticmethod
     def get_for_user_term(user: UserAlias, term: Term, include_unreleased: bool = False) -> List[FinalMarks]:
         if user is None:
             raise FinalMarksServiceError('user is required')

@@ -106,4 +106,8 @@ export class TermService {
   getMyFinalMarks(term_id: number): Observable<FinalMarks[]>{
     return this.http.get<FinalMarks[]>(`${this.api}/${term_id}/my-final-marks`)
   }
+
+  getFinalMarks(term_id: number): Observable<FinalMarks[]>{
+    return this.http.get<FinalMarks[]>(`${this.api}/${term_id}/final-marks`)
+  }
 }

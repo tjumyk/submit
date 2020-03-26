@@ -1,3 +1,6 @@
+from collections import defaultdict
+from io import StringIO
+
 from flask import Blueprint, jsonify, request
 
 from auth_connect.oauth import requires_login
@@ -137,6 +140,85 @@ def term_students(term_id):
         if group is None:
             return jsonify(msg='student group not found'), 500
         return jsonify([u.to_dict() for u in sorted(group.users, key=lambda u:u.name)])
+    except (AccountServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@term_api.route('/<int:term_id>/final-marks')
+@requires_login
+def term_final_marks(term_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        term = TermService.get(term_id)
+        if term is None:
+            return jsonify(msg='term not found'), 404
+        roles = TermService.get_access_roles(term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        return jsonify([m.to_dict(with_comment=True) for m in FinalMarksService.get_for_term(term)])
+    except (AccountServiceError, TermServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@term_api.route('/<int:term_id>/export-final-marks')
+@requires_login
+def term_export_final_marks(term_id):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        term = TermService.get(term_id)
+        if term is None:
+            return jsonify(msg='term not found'), 404
+        roles = TermService.get_access_roles(term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        tasks = term.tasks
+        users_map = {}
+        marks_map = defaultdict(dict)
+        for m in FinalMarksService.get_for_term(term, joined_load_user=True):
+            users_map[m.user_id] = m.user
+            marks_map[m.user_id][m.task_id] = m
+
+        with StringIO() as buffer:
+            headers = ['ID', 'Name']
+            for task in tasks:
+                headers.append(task.title + ' Marks')
+                headers.append(task.title + ' Comment')
+
+            buffer.write('\t'.join(headers))
+            buffer.write('\n')
+            for u in sorted(users_map.values(), key=lambda x: x.name):
+                row = [str(u.id), u.name]
+                for task in tasks:
+                    m = marks_map[u.id].get(task.id)
+                    if m:
+                        marks = m.marks
+                        if int(marks) == marks:  # convert marks to int if value is not changed
+                            marks = int(marks)
+                        row.append(str(marks))
+                        row.append(m.comment or '')
+                    else:
+                        row.append('')
+                        row.append('')
+                buffer.write('\t'.join(row))
+                buffer.write('\n')
+            return buffer.getvalue(), {'Content-Type': 'text/plain'}
+
     except (AccountServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

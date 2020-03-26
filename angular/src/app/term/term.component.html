@@ -35,6 +35,10 @@
           <i class="icon envelope"></i> Messages
           <div class="ui green label" *ngIf="messages_unread_count">{{messages_unread_count}}</div>
         </a>
+        <a *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')"
+           class="item" routerLink="/terms/{{term.id}}/final-marks" routerLinkActive="active" (click)="resetMobileMenu()">
+          <i class="icon map star"></i> Final Marks
+        </a>
       </div>
 
       <app-special-date-card></app-special-date-card>

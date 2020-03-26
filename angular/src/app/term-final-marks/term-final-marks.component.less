@@ -1,0 +1,33 @@
+.ui.sortable.table thead .disable-sort th{
+  background: #f9fafb;
+  color: rgba(0,0,0,.87);
+  cursor: default;
+}
+
+:host{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header.container{
+  padding: 3em 3em 0;
+}
+.main.container{
+  margin: 0 3em;
+  flex: 1;
+  &>.grid{
+    height: 100%;
+  }
+}
+@media (max-width: 767px){
+  .header.container{
+    padding: 3em 1em 0;
+  }
+  .main.container{
+    margin: 0;
+  }
+  .task.column{
+    max-width: none;
+  }
+}

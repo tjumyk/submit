@@ -40,6 +40,7 @@ import {EmailSubscriptionsComponent} from "./email-subscriptions/email-subscript
 import {CommentsComponent} from "./comments/comments.component";
 import {FinalMarksComponent} from "./final-marks/final-marks.component";
 import {FinalMarksImportComponent} from "./final-marks-import/final-marks-import.component";
+import {TermFinalMarksComponent} from "./term-final-marks/term-final-marks.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -91,7 +92,8 @@ const routes: Routes = [
         ]
       },
       {path: 'messages', component: MessagesComponent},
-      {path: 'messages/:msg_id', component: MessageDetailComponent}
+      {path: 'messages/:msg_id', component: MessageDetailComponent},
+      {path: 'final-marks', component: TermFinalMarksComponent}
     ]
   },
   {

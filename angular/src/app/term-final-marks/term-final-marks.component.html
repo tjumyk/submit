@@ -1,0 +1,76 @@
+<div class="header container">
+  <h1 class="ui header">
+    <i class="icon star outline"></i> Final Marks
+  </h1>
+</div>
+<div class="ui divider"></div>
+
+<div class="main container">
+  <div class="ui grid stackable">
+    <div class="column">
+      <app-error-message [error]="error"></app-error-message>
+
+      <div class="ui loader text active" *ngIf="loadingTasks">Loading tasks...</div>
+      <div class="ui loader text active" *ngIf="loadingUsers">Loading user list...</div>
+      <div class="ui loader text active" *ngIf="loadingMarks">Loading final marks...</div>
+
+      <ng-container *ngIf="userPages">
+        <div class="ui top attached clearing segment">
+          <div class="ui right floated menu secondary fitted">
+            <div class="item">
+              <div class="ui basic buttons small">
+                <a class="ui button" href="api/terms/{{termId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
+              </div>
+            </div>
+          </div>
+          <div class="ui left floated menu secondary fitted">
+            <div class="item">
+              <div class="ui input icon">
+                <input type="text" name="userSearchKey" #inputUserSearch (keyup)="userSearchKey.next(inputUserSearch.value)"
+                       placeholder="Search User...">
+                <i class="icon search"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table class="ui table compact celled unstackable sortable attached">
+          <thead>
+          <tr class="disable-sort">
+            <th colspan="2"></th>
+            <ng-container *ngFor="let task of tasks">
+              <th colspan="2">
+                <a routerLink="/terms/{{termId}}/tasks/{{task.id}}/final-marks">
+                  <i class="icon" [ngClass]="categories[task.type].icon"></i>
+                  {{task.title}}
+                  <i class="icon check green" *ngIf="task.is_final_marks_released" title="Released"></i>
+                </a>
+              </th>
+            </ng-container>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th (click)="sortField('name', thUser)" #thUser>User</th>
+            <ng-container *ngFor="let task of tasks">
+              <th (click)="sortField('_marks.'+task.id+'.marks', thMarks)" #thMarks>Marks</th>
+              <th (click)="sortField('_marks.'+task.id+'.comment', thComment)" #thComment>Comment</th>
+            </ng-container>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let s of userPages.pageItems; index as i">
+            <td>{{i + userPages.startRow}}</td>
+            <td>
+              <app-user-mini-card [user]="s" [enableAdmin]="isAdmin" [enablePopup]="true" [preferNickname]="false"></app-user-mini-card>
+            </td>
+            <ng-container *ngFor="let task of tasks">
+              <td>{{s._marks[task.id]?.marks}}</td>
+              <td>{{s._marks[task.id]?.comment}}</td>
+            </ng-container>
+          </tr>
+          </tbody>
+        </table>
+        <app-table-pagination-toolbar class="bottom attached" [pagination]="userPages"></app-table-pagination-toolbar>
+      </ng-container>
+    </div>
+  </div>
+</div>
