@@ -3,6 +3,17 @@
   Older submissions have been removed due to the history limit of this task.
 </div>
 
+<div class="ui message info special" *ngIf="status?.special_consideration">
+  <i class="icon heart outline"></i>
+  Special Consideration:
+  <div class="ui label basic" *ngIf="status.special_consideration.due_time_extension">
+    Due Time +{{status.special_consideration.due_time_extension}}h
+  </div>
+  <div class="ui label basic" *ngIf="status.special_consideration.submission_attempt_limit_extension">
+    Attempt Limit +{{status.special_consideration.submission_attempt_limit_extension}}
+  </div>
+</div>
+
 <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
 <table class="ui table unstackable" *ngIf="submissions">
   <thead>
