@@ -187,7 +187,7 @@ def term_export_final_marks(term_id):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        tasks = term.tasks
+        tasks = sorted(term.tasks, key=lambda t: t.id)
         users_map = {}
         marks_map = defaultdict(dict)
         for m in FinalMarksService.get_for_term(term, joined_load_user=True):
