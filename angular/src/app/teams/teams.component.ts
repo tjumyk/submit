@@ -119,7 +119,12 @@ export class TeamsComponent implements OnInit {
     this.adminService.deleteTeam(team.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
-      () => this.teams.splice(index, 1),
+      () => {
+        this.teams.splice(index, 1);
+        this.teamPages.reload();
+        this.totalUsersInTeams -= team.total_user_associations;
+        // TODO update users not in teams?
+      },
       error => this.error = error.error
     )
   }
