@@ -22,7 +22,7 @@ from utils.message import build_message_with_template
 
 submission_api = Blueprint('submission_api', __name__)
 
-_task_duration_notification_threshold = timedelta(minutes=1)
+_task_duration_notification_threshold = timedelta(minutes=5)
 
 
 def requires_worker(f):
