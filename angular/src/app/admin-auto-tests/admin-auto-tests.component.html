@@ -1,10 +1,11 @@
 <app-error-message [error]="error"></app-error-message>
 
-<div class="ui loader text active" *ngIf="loading">Loading Summaries...</div>
-
 <ng-container *ngIf="summaries">
   <div class="ui segment" *ngFor="let item of summaries|keyvalue">
-    <div class="ui label top attached">{{item.key}}</div>
+    <div class="ui label top attached">
+      <i class="icon" [ngClass]="autoTestConfigTypes[item.key].icon"></i>
+      <span [title]="item.key">{{autoTestConfigTypes[item.key].name}}</span>
+    </div>
     <div class="ui four statistics">
       <div class="ui statistic blue">
         <div class="label">Active</div>
