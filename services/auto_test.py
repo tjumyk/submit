@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Optional
 
 from celery.result import AsyncResult
@@ -13,6 +14,8 @@ class AutoTestServiceError(BasicError):
 
 
 class AutoTestService:
+    _summary_head_limit = 10
+
     @staticmethod
     def get(_id: int) -> Optional[AutoTest]:
         if _id is None:
@@ -86,7 +89,7 @@ class AutoTestService:
         return d
 
     @classmethod
-    def test_to_dict(cls, test: AutoTest, with_advanced_fields=False) -> dict:
+    def test_to_dict(cls, test: AutoTest, with_advanced_fields=False, with_pending_tests_ahead=True) -> dict:
         """
         Get a dumped dictionary with additional information from the temporary result
         """
@@ -95,7 +98,7 @@ class AutoTestService:
             result = cls.get_result(test)
             result_obj = cls.result_to_dict(result, with_advanced_fields=with_advanced_fields)
             test_obj.update(result_obj)  # merge temporary result
-            if result.state == 'PENDING':
+            if result.state == 'PENDING' and with_pending_tests_ahead:
                 test_obj['pending_tests_ahead'] = cls.get_pending_tests_ahead(test)
         return test_obj
 
@@ -111,3 +114,37 @@ class AutoTestService:
                     AutoTestConfig.id == AutoTest.config_id,
                     AutoTestConfig.type == config.type,
                     AutoTest.id < test.id).scalar()
+
+    @classmethod
+    def get_summaries(cls, with_advanced_fields=False) -> dict:
+        # counts
+        counts = defaultdict(dict)
+        for _type, state, count in db.session.query(AutoTestConfig.type, AutoTest.final_state, func.count()) \
+                .filter(AutoTest.config_id == AutoTestConfig.id) \
+                .group_by(AutoTestConfig.type, AutoTest.final_state):
+            if not state:
+                state = 'active'
+            counts[_type][state.lower()] = count
+        for _type, _counts in counts.items():
+            _counts['total'] = sum(_counts.values())
+            for state in ['active', 'success', 'failure']:
+                _counts[state] = _counts.get(state, 0)
+
+        # head of queues
+        heads = {}
+        for _type, start_id in db.session.query(AutoTestConfig.type, func.min(AutoTest.id)) \
+                .filter(AutoTest.config_id == AutoTestConfig.id,
+                        AutoTest.final_state != 'SUCCESS',
+                        AutoTest.final_state != 'FAILURE') \
+                .group_by(AutoTestConfig.type):
+
+            heads[_type] = [cls.test_to_dict(t, with_advanced_fields=with_advanced_fields,
+                                             with_pending_tests_ahead=False)
+                            for t in db.session.query(AutoTest)
+                                .filter(AutoTest.id >= start_id,
+                                        AutoTest.config_id == AutoTestConfig.id,
+                                        AutoTestConfig.type == _type)
+                                .order_by(AutoTest.id)
+                                .limit(cls._summary_head_limit)]
+
+        return dict({_type: dict(counts=counts[_type], heads=heads.get(_type)) for _type in counts})

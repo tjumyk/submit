@@ -41,6 +41,7 @@ import {CommentsComponent} from "./comments/comments.component";
 import {FinalMarksComponent} from "./final-marks/final-marks.component";
 import {FinalMarksImportComponent} from "./final-marks-import/final-marks-import.component";
 import {TermFinalMarksComponent} from "./term-final-marks/term-final-marks.component";
+import {AdminAutoTestsComponent} from "./admin-auto-tests/admin-auto-tests.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', component: HomeComponent},
@@ -108,6 +109,7 @@ const routes: Routes = [
       {path: 'courses/:course_id', component: AdminCourseEditComponent},
       {path: 'terms/:team_id', component: AdminTermEditComponent},
       {path: 'tasks/:task_id', component: AdminTaskEditComponent},
+      {path: 'auto-tests', component: AdminAutoTestsComponent}
     ]
   },
   {path: 'email-subscriptions', component: EmailSubscriptionsComponent},

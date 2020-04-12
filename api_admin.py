@@ -873,3 +873,12 @@ def release_final_marks(tid):
         return "", 204
     except (TaskServiceError, FinalMarksServiceError, MessageServiceError, MessageSenderServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/auto-test-summaries')
+@requires_admin
+def auto_test_summaries():
+    try:
+        return jsonify(AutoTestService.get_summaries(with_advanced_fields=True))
+    except AutoTestServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

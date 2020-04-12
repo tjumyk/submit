@@ -418,3 +418,9 @@ export class FinalMarks{
   user?:User;
   task?:Task;
 }
+
+export class AutoTestSummary{
+  counts: {[state: string]: number};
+  heads?: AutoTest[];
+}
+export type AutoTestSummaries = {[type: string]: AutoTestSummary};

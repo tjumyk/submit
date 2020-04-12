@@ -13,7 +13,8 @@ import {
   Task,
   Term,
   User,
-  FinalMarks
+  FinalMarks,
+  AutoTestSummaries
 } from "./models";
 import {Logger, LogService} from "./log.service";
 import {map, tap} from "rxjs/operators";
@@ -404,5 +405,9 @@ export class AdminService {
 
   releaseFinalMarks(task_id: number): Observable<any>{
     return this.http.get(`${this.api}/tasks/${task_id}/release-final-marks`)
+  }
+
+  getAutoTestSummaries(): Observable<AutoTestSummaries> {
+    return this.http.get<AutoTestSummaries>(`${this.api}/auto-test-summaries`)
   }
 }
