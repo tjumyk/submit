@@ -459,7 +459,7 @@ def task_my_team_submission_status(tid):
         else:
             status = SubmissionStatus(None, ass, None)
         return jsonify(status.to_dict())
-    except (TaskServiceError, TermServiceError) as e:
+    except (TaskServiceError, TermServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -491,7 +491,7 @@ def task_team_submissions(tid, team_id):
 
         return jsonify([s.to_dict(with_submitter=True) for s in SubmissionService.get_for_team(team,
                                                                                                include_cleared=True)])
-    except (TaskServiceError, TermServiceError, SubmissionServiceError) as e:
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -525,7 +525,7 @@ def task_team_submissions_last_auto_tests(tid, team_id):
                                                                     include_private_tests=True)
         return jsonify({sid: {cid: AutoTestService.test_to_dict(test) for cid, test in tests.items()}
                         for sid, tests in last_tests.items()})
-    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -556,7 +556,7 @@ def task_team_submissions_auto_test_conclusions(tid, team_id):
         # allow access even before the opening time
 
         return jsonify(SubmissionService.get_auto_test_conclusions_for_team(team, include_private_tests=True))
-    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+    except (TaskServiceError, TermServiceError, SubmissionServiceError, AutoTestServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
