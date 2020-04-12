@@ -134,8 +134,7 @@ class AutoTestService:
         heads = {}
         for _type, start_id in db.session.query(AutoTestConfig.type, func.min(AutoTest.id)) \
                 .filter(AutoTest.config_id == AutoTestConfig.id,
-                        AutoTest.final_state != 'SUCCESS',
-                        AutoTest.final_state != 'FAILURE') \
+                        AutoTest.final_state == None) \
                 .group_by(AutoTestConfig.type):
 
             heads[_type] = [cls.test_to_dict(t, with_advanced_fields=with_advanced_fields,
