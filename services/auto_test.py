@@ -117,6 +117,7 @@ class AutoTestService:
 
     @classmethod
     def get_summaries(cls, with_advanced_fields=False) -> dict:
+        from .team import TeamService, TeamServiceError
         # counts
         counts = defaultdict(dict)
         for _type, state, count in db.session.query(AutoTestConfig.type, AutoTest.final_state, func.count()) \
@@ -125,10 +126,10 @@ class AutoTestService:
             if not state:
                 state = 'active'
             counts[_type][state.lower()] = count
-        for _type, _counts in counts.items():
-            _counts['total'] = sum(_counts.values())
+        for _type, type_counts in counts.items():
+            type_counts['total'] = sum(type_counts.values())
             for state in ['active', 'success', 'failure']:
-                _counts[state] = _counts.get(state, 0)
+                type_counts[state] = type_counts.get(state, 0)
 
         # head of queues
         heads = {}
@@ -137,13 +138,30 @@ class AutoTestService:
                         AutoTest.final_state == None) \
                 .group_by(AutoTestConfig.type):
 
-            heads[_type] = [cls.test_to_dict(t, with_advanced_fields=with_advanced_fields,
-                                             with_pending_tests_ahead=False)
-                            for t in db.session.query(AutoTest)
-                                .filter(AutoTest.id >= start_id,
-                                        AutoTest.config_id == AutoTestConfig.id,
-                                        AutoTestConfig.type == _type)
-                                .order_by(AutoTest.id)
-                                .limit(cls._summary_head_limit)]
+            type_heads = []
+            for t in db.session.query(AutoTest) \
+                    .filter(AutoTest.id >= start_id,
+                            AutoTest.config_id == AutoTestConfig.id,
+                            AutoTest.final_state == None,
+                            AutoTestConfig.type == _type) \
+                    .order_by(AutoTest.id) \
+                    .limit(cls._summary_head_limit):
+                d = cls.test_to_dict(t, with_advanced_fields=with_advanced_fields, with_pending_tests_ahead=False)
+                task = t.submission.task
+                submitter = t.submission.submitter
+                if task.is_team_task:
+                    try:
+                        ass = TeamService.get_team_association(task, submitter)
+                    except TeamServiceError as e:
+                        raise AutoTestServiceError('failed to get team association', e.msg)
+                    if not ass:
+                        raise AutoTestServiceError('no team association found')
+                    d['_link'] = '/terms/%d/tasks/%d/team-submissions/%d/%d' % (task.term_id, task.id, ass.team_id,
+                                                                                t.submission_id)
+                else:
+                    d['_link'] = '/terms/%d/tasks/%d/user-submissions/%d/%d' % (task.term_id, task.id, submitter.id,
+                                                                                t.submission_id)
+                type_heads.append(d)
+            heads[_type] = type_heads
 
         return dict({_type: dict(counts=counts[_type], heads=heads.get(_type)) for _type in counts})

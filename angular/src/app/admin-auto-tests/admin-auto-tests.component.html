@@ -28,9 +28,10 @@
     <table class="ui unstackable celled very compact table" *ngIf="item.value.heads">
       <thead>
       <tr>
-        <th>#</th><th>ID</th><th>Config ID</th><th>Work ID</th>
-        <th>Hostname</th><th>PID</th><th>State</th><th>Final State</th><th>Result</th><th>Exception Class</th><th>Exception Message</th><th>Exception Traceback</th>
+        <th>#</th><th>ID</th><th>Config ID</th><th>Submission ID</th><th>Work ID</th>
+        <th>Hostname</th><th>PID</th><th>State</th><th>Final State</th>
         <th>Created At</th><th>Started At</th><th>Stopped At</th>
+        <th class="collapsing">Ops</th>
       </tr>
       </thead>
       <tbody>
@@ -38,20 +39,20 @@
         <td>{{i+1}}</td>
         <td>{{test.id}}</td>
         <td>{{test.config_id}}</td>
+        <td>{{test.submission_id}}</td>
         <td>{{test.work_id}}</td>
 
         <td>{{test.hostname}}</td>
         <td>{{test.pid}}</td>
         <td>{{test.state}}</td>
         <td>{{test.final_state}}</td>
-        <td><i class="icon search" [title]="test.result|json" *ngIf="test.result"></i></td>
-        <td>{{test.exception_class}}</td>
-        <td>{{test.exception_message}}</td>
-        <td><i class="icon search" [title]="test.exception_traceback|json" *ngIf="test.exception_traceback"></i></td>
 
         <td>{{test.created_at|date:'short'}}</td>
         <td>{{test.started_at|date:'short'}}</td>
         <td>{{test.stopped_at|date:'short'}}</td>
+        <td class="collapsing">
+          <a [routerLink]="test['_link']" class="ui button icon mini"><i class="icon search"></i></a>
+        </td>
       </tr>
       </tbody>
     </table>
