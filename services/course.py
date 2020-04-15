@@ -14,7 +14,6 @@ class CourseServiceError(BasicError):
 class CourseService:
     code_max_length = 16
     name_max_length = 128
-    description_max_length = 512
     profile_fields = {
         'icon'
     }
