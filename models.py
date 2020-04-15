@@ -641,7 +641,7 @@ class SubmissionComment(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    content = db.Column(db.String(512), nullable=False)
+    content = db.Column(db.String(1024), nullable=False)
 
     submission = db.relationship('Submission', backref=db.backref('comments'))
     author = db.relationship('UserAlias', backref=db.backref('submission_comments'))

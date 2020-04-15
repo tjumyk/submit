@@ -146,7 +146,7 @@ class LatePenalty:
 
 
 class SubmissionService:
-    _COMMENT_MAX_LENGTH = 512
+    _COMMENT_MAX_LENGTH = 1024
     COMMENT_SESSION_EXPIRY = timedelta(minutes=5)
 
     @staticmethod
