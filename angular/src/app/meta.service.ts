@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {QAndA, VersionInfo} from "./models";
+import {ClockInfo, QAndA, VersionInfo} from "./models";
 
 @Injectable({
   providedIn: 'root'
@@ -19,5 +19,9 @@ export class MetaService {
 
   getFAQ():Observable<QAndA[]>{
     return this.http.get<QAndA[]>(`${this.api}/faq`)
+  }
+
+  getClock():Observable<ClockInfo>{
+    return this.http.get<ClockInfo>(`${this.api}/clock`)
   }
 }

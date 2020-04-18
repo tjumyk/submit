@@ -5,6 +5,7 @@ import {TermService} from "../term.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
+import {MetaService} from "../meta.service";
 
 @Component({
   selector: 'app-term',
@@ -29,11 +30,15 @@ export class TermComponent implements OnInit, OnDestroy {
 
   showMobileMenu: boolean;
 
+  clockDeltaMaxRange = 5000; // ms
+  clockDeltaMaxOffset = 60000; // ms
+
   constructor(
     private accountService: AccountService,
     private termService: TermService,
     private route: ActivatedRoute,
-    private titleService: TitleService
+    private titleService: TitleService,
+    private metaService: MetaService
   ) {
   }
 
@@ -55,13 +60,13 @@ export class TermComponent implements OnInit, OnDestroy {
             this.accessRoles = TermService.getAccessRoles(this.term, this.user);
 
             this.setupMessageCheck();
+            this.setupClockCheck();
           },
           error => this.initError = error.error
         )
       },
-      error=>this.initError=error.error
+      error => this.initError = error.error
     );
-
   }
 
   ngOnDestroy(){
@@ -98,4 +103,21 @@ export class TermComponent implements OnInit, OnDestroy {
     doMessageCheck();
   }
 
+  private setupClockCheck() {
+    let tStart = new Date().getTime();
+    this.metaService.getClock().subscribe(
+      clock => {
+        let tEnd = new Date().getTime();
+        let tServer = clock.time * 1000; // second to millisecond
+        let deltaLowerBound = tServer - tEnd;
+        let deltaUpperBound = tServer - tStart;
+        if (Math.abs(deltaUpperBound - deltaLowerBound) <= this.clockDeltaMaxRange) {
+          let delta = Math.abs((deltaUpperBound + deltaLowerBound) / 2);
+          if (delta > this.clockDeltaMaxOffset) {
+            alert('Your system clock is not correct. Some functions might be impacted.\n\nPlease calibrate your system clock and then restart your browser.')
+          }
+        }
+      }
+    )
+  }
 }

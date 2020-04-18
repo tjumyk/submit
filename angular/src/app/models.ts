@@ -424,3 +424,7 @@ export class AutoTestSummary{
   heads?: AutoTest[];
 }
 export type AutoTestSummaries = {[type: string]: AutoTestSummary};
+
+export class ClockInfo{
+  time: number;
+}

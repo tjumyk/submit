@@ -1,5 +1,6 @@
 import json
 import subprocess
+import time
 
 from flask import Blueprint, jsonify
 
@@ -22,3 +23,9 @@ def get_faq():
     with open('faq.json') as f_faq:
         faq = json.load(f_faq)
     return jsonify(faq)
+
+
+@meta_api.route('/clock')
+@requires_login
+def get_clock():
+    return jsonify(time=time.time())
