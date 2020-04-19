@@ -127,6 +127,9 @@ export class Submission {
 
   created_at: string;
   modified_at: string;
+
+  prev_id?: number;
+  next_id?: number;
 }
 
 export class SubmissionFile {

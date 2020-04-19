@@ -53,7 +53,8 @@ def do_submission(sid):
         submission = SubmissionService.get(sid)
         if submission is None:
             return jsonify(msg='submission not found'), 404
-        roles = TermService.get_access_roles(submission.task.term, user)
+        task = submission.task
+        roles = TermService.get_access_roles(task.term, user)
 
         # role check
         if not roles:
@@ -61,8 +62,19 @@ def do_submission(sid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
-        return jsonify(submission.to_dict(with_submitter=True, with_files=True, with_advanced_fields=True))
-    except (SubmissionServiceError, TermServiceError) as e:
+        if task.is_team_task:
+            ass = TeamService.get_team_association(task, submission.submitter)
+            if ass is None:
+                return jsonify(msg='team association not found'), 400
+            prev_submission, next_submission = SubmissionService.get_neighbour_submissions_for_team(submission, ass)
+        else:
+            prev_submission, next_submission = SubmissionService.get_neighbour_submissions_for_submitter(submission)
+
+        d = submission.to_dict(with_submitter=True, with_files=True, with_advanced_fields=True)
+        d['prev_id'] = prev_submission.id if prev_submission else None
+        d['next_id'] = next_submission.id if next_submission else None
+        return jsonify(d)
+    except (SubmissionServiceError, TermServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

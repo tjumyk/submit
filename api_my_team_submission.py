@@ -40,15 +40,21 @@ def do_submission(sid):
             return jsonify(msg='team is not finalised'), 403
 
         # same team check
-        is_same_team = False
+        submitter_ass = None
         for _ass in team.user_associations:
             if _ass.user_id == submission.submitter_id:
-                is_same_team = True
+                submitter_ass = _ass
                 break
-        if not is_same_team:
+        if submitter_ass is None:
             return jsonify(msg="not your team's submission"), 403
 
-        return jsonify(submission.to_dict(with_files=True, with_submitter=True))
+        prev_submission, next_submission = \
+            SubmissionService.get_neighbour_submissions_for_team(submission, submitter_ass)
+
+        d = submission.to_dict(with_files=True, with_submitter=True)
+        d['prev_id'] = prev_submission.id if prev_submission else None
+        d['next_id'] = next_submission.id if next_submission else None
+        return jsonify(d)
     except (SubmissionServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

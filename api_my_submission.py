@@ -32,7 +32,12 @@ def do_submission(sid):
         if submission.submitter_id != user.id:
             return jsonify(msg='not your submission'), 403
 
-        return jsonify(submission.to_dict(with_files=True))
+        prev_submission, next_submission = SubmissionService.get_neighbour_submissions_for_submitter(submission)
+
+        d = submission.to_dict(with_files=True)
+        d['prev_id'] = prev_submission.id if prev_submission else None
+        d['next_id'] = next_submission.id if next_submission else None
+        return jsonify(d)
     except SubmissionServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

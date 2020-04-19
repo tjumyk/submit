@@ -1134,3 +1134,63 @@ class SubmissionService:
                 .order_by(SubmissionComment.modified_at).all():
             results.append(SubmissionCommentSummary(submission, total, last_comment))
         return results
+
+    @staticmethod
+    def get_neighbour_submissions_for_submitter(submission: Submission) \
+            -> Tuple[Optional[Submission], Optional[Submission]]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        # Find the previous/next submission submitted by the same user. Be careful, a submission may be cleared.
+        prev_sub = db.session.query(Submission) \
+            .filter(Submission.task_id == submission.task_id,
+                    Submission.submitter_id == submission.submitter_id,
+                    Submission.is_cleared == False,
+                    Submission.id < submission.id) \
+            .order_by(Submission.id.desc()) \
+            .first()
+        next_sub = db.session.query(Submission) \
+            .filter(Submission.task_id == submission.task_id,
+                    Submission.submitter_id == submission.submitter_id,
+                    Submission.is_cleared == False,
+                    Submission.id > submission.id) \
+            .order_by(Submission.id) \
+            .first()
+        return prev_sub, next_sub
+
+    @staticmethod
+    def get_neighbour_submissions_for_team(submission: Submission, ass: UserTeamAssociation = None) \
+            -> Tuple[Optional[Submission], Optional[Submission]]:
+        if submission is None:
+            raise SubmissionServiceError('submission is required')
+
+        if ass is None:  # if not provided, find it.
+            task = submission.task
+            from .team import TeamService
+            ass = TeamService.get_team_association(task, submission.submitter)
+            if ass is None:
+                raise SubmissionServiceError('submitter not in a team')
+        else:  # check it
+            if ass.user_id != submission.submitter_id:
+                raise SubmissionServiceError('invalid user-team association')
+            if ass.team.task_id != submission.task_id:
+                raise SubmissionServiceError('team does not belong to the task')
+
+        # Find the previous/next submission submitted by the same team. Be careful, a submission may be cleared.
+        prev_sub = db.session.query(Submission) \
+            .filter(Submission.task_id == submission.task_id,
+                    Submission.submitter_id == UserTeamAssociation.user_id,
+                    UserTeamAssociation.team_id == ass.team_id,
+                    Submission.is_cleared == False,
+                    Submission.id < submission.id) \
+            .order_by(Submission.id.desc()) \
+            .first()
+        next_sub = db.session.query(Submission) \
+            .filter(Submission.task_id == submission.task_id,
+                    Submission.submitter_id == UserTeamAssociation.user_id,
+                    UserTeamAssociation.team_id == ass.team_id,
+                    Submission.is_cleared == False,
+                    Submission.id > submission.id) \
+            .order_by(Submission.id) \
+            .first()
+        return prev_sub, next_sub

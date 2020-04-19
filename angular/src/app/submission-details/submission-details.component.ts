@@ -37,7 +37,6 @@ export class SubmissionDetailsComponent implements OnInit {
   ngOnInit() {
     this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
     this.userId = parseInt(this.route.snapshot.paramMap.get('user_id'));
-    this.submissionId = parseInt(this.route.snapshot.paramMap.get('submission_id'));
 
     this.accountService.getCurrentUser().subscribe(
       user=>{
@@ -48,12 +47,22 @@ export class SubmissionDetailsComponent implements OnInit {
           task => {
             this.task = task;
 
-            this.loadingSubmission = true;
-            this.submissionService.getSubmission(this.submissionId).pipe(
-              finalize(() => this.loadingSubmission = false)
-            ).subscribe(
-              submission => this.setupSubmission(submission),
-              error => this.error = error.error
+            this.route.paramMap.subscribe(
+              paramMap=>{
+                // reset
+                this.submissionId = undefined;
+                this.submission = undefined;
+
+                // load
+                this.submissionId = parseInt(paramMap.get('submission_id'));
+                this.loadingSubmission = true;
+                this.submissionService.getSubmission(this.submissionId).pipe(
+                  finalize(() => this.loadingSubmission = false)
+                ).subscribe(
+                  submission => this.setupSubmission(submission),
+                  error => this.error = error.error
+                )
+              }
             )
           },
           error => this.error = error.error
