@@ -27,7 +27,7 @@
         </div>
         <ng-template #memberMessages>
           <div class="ui message warning icon" *ngIf="!status.team_association.team.is_finalised">
-            <i class="icon gavel"></i>
+            <i class="icon lock open"></i>
             <div class="content">
               <div class="header">Your team has not been finalised</div>
               <p *ngIf="status.team_association.team.creator_id==user.id; else memberNotFinalisedHint">Please finalise the team first.</p>

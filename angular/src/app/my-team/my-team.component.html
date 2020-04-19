@@ -128,7 +128,7 @@
     <div class="column team-operations" *ngIf="team.creator_id==user.id">
       <div class="ui buttons two">
         <a class="ui button primary" (click)="finaliseTeam(btnFinaliseTeam)" #btnFinaliseTeam [ngClass]="{'disabled': hasPendingRequests()}">
-          <i class="icon gavel"></i> Finalise Team
+          <i class="icon lock"></i> Finalise Team
         </a>
         <a class="ui button red" (click)="dismissTeam(btnDismissTeam)" #btnDismissTeam>
           <i class="icon trash"></i> Dismiss Team
