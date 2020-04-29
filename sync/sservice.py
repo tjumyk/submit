@@ -175,7 +175,7 @@ class SyncService:
                         Team.task_id == task.id,
                         Team.is_finalised == True):
             user_associations[ass.team_id].append(
-                UserAssociationData(ass.user.name, ass.created_at, ass.modified_at))
+                UserAssociationData(ass.user.name, str(ass.created_at), str(ass.modified_at)))
 
         for team in db.session.query(Team) \
                 .options(joinedload(Team.creator)) \
@@ -183,7 +183,7 @@ class SyncService:
                         Team.is_finalised == True) \
                 .order_by(Team.id):
             results.append(TeamData(team.name, team.creator.name, team.slogan,
-                                    team.created_at, team.modified_at,
+                                    str(team.created_at), str(team.modified_at),
                                     user_associations[team.id]))
 
         return results
