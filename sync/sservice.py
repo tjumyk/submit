@@ -191,7 +191,7 @@ class SyncService:
     @classmethod
     def import_teams(cls, task: Task, data: List[TeamData]) -> List[Team]:
         imported_teams = []
-        existing_team_names = set(db.session.query(Team.name)
+        existing_team_names = set(tup[0] for tup in db.session.query(Team.name)
                                   .filter(Team.task_id == task.id,
                                           Team.name.in_({t.name for t in data})))
         user_names = set(t.creator_name for t in data)
