@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 
 class SubmissionFileData:
@@ -119,3 +119,44 @@ class SubmissionData:
         return SubmissionData(files=[SubmissionFileData.from_dict(f) for f in files],
                               auto_tests=[AutoTestData.from_dict(t) for t in auto_tests],
                               **_data)
+
+
+class UserAssociationData:
+    def __init__(self, user_name: str, created_at: str, modified_at: str):
+        self.user_name = user_name
+        self.created_at = created_at
+        self.modified_at = modified_at
+
+    def to_dict(self) -> dict:
+        return dict(self.__dict__)
+
+    @staticmethod
+    def from_dict(data: dict):
+        return UserAssociationData(**data)
+
+
+class TeamData:
+    def __init__(self, name: str, creator_name: str, slogan: Optional[str],
+                 created_at: str, modified_at: str,
+                 user_associations: List[UserAssociationData]):
+        self.name = name
+        self.creator_name = creator_name
+        self.slogan = slogan
+        self.created_at = created_at
+        self.modified_at = modified_at
+        self.user_associations = user_associations
+
+    def to_dict(self) -> dict:
+        d = {}
+        for k, v in self.__dict__.items():
+            if k == 'user_associations':
+                v = [ass.to_dict() for ass in v]
+            d[k] = v
+        return d
+
+    @staticmethod
+    def from_dict(data: dict):
+        _data = dict(data)
+        associations = _data.pop('user_associations')
+        return TeamData(user_associations=[UserAssociationData.from_dict(ass) for ass in associations],
+                        **_data)

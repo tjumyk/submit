@@ -1,5 +1,6 @@
 import os
 from base64 import b64encode, b64decode
+from collections import defaultdict
 from datetime import datetime
 from typing import List, Tuple, Iterable
 
@@ -7,9 +8,10 @@ from flask import current_app as app
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Task, db, Submission, AutoTest, SubmissionFile, AutoTestOutputFile
+from models import Task, db, Submission, AutoTest, SubmissionFile, AutoTestOutputFile, Team, UserTeamAssociation
 from services.account import AccountService
-from sync.smodel import SubmissionData, SubmissionFileData, AutoTestOutputFileData, AutoTestData
+from sync.smodel import SubmissionData, SubmissionFileData, AutoTestOutputFileData, AutoTestData, TeamData, \
+    UserAssociationData
 
 _DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
 
@@ -162,3 +164,66 @@ class SyncService:
 
         db.session.commit()
         return imported_submissions
+
+    @classmethod
+    def get_finalized_teams(cls, task: Task) -> List[TeamData]:
+        results = []
+        user_associations = defaultdict(list)
+        for ass in db.session.query(UserTeamAssociation) \
+                .options(joinedload(UserTeamAssociation.user)) \
+                .filter(UserTeamAssociation.team_id == Team.id,
+                        Team.task_id == task.id,
+                        Team.is_finalised == True):
+            user_associations[ass.team_id].append(
+                UserAssociationData(ass.user.name, ass.created_at, ass.modified_at))
+
+        for team in db.session.query(Team) \
+                .options(joinedload(Team.creator)) \
+                .filter(Team.task_id == task.id,
+                        Team.is_finalised == True) \
+                .order_by(Team.id):
+            results.append(TeamData(team.name, team.creator.name, team.slogan,
+                                    team.created_at, team.modified_at,
+                                    user_associations[team.id]))
+
+        return results
+
+    @classmethod
+    def import_teams(cls, task: Task, data: List[TeamData]) -> List[Team]:
+        imported_teams = []
+        existing_team_names = set(db.session.query(Team.name)
+                                  .filter(Team.task_id == task.id,
+                                          Team.name.in_({t.name for t in data})))
+        user_names = set(t.creator_name for t in data)
+        user_names.update({ass.user_name for t in data for ass in t.user_associations})
+        users = AccountService.get_user_by_name_list(list(user_names))
+
+        for team in data:
+            if team.name in existing_team_names:
+                continue
+
+            # import team itself
+            creator = users.get(team.creator_name)
+            if creator is None:
+                raise SyncServiceError('creator not found: %s' % team.creator_name)
+            new_team = Team(task_id=task.id, creator_id=creator.id, name=team.name, slogan=team.slogan,
+                            is_finalised=True,  # must be finalized
+                            created_at=datetime.strptime(team.created_at, _DATETIME_FORMAT),
+                            modified_at=datetime.strptime(team.modified_at, _DATETIME_FORMAT))
+            db.session.add(new_team)
+
+            # import the team's user associations
+            for ass in team.user_associations:
+                user = users.get(ass.user_name)
+                if user is None:
+                    raise SyncServiceError('associated user not found: %s' % ass.user_name)
+                new_ass = UserTeamAssociation(user_id=user.id, team=new_team,
+                                              is_invited=False, is_user_agreed=True, is_creator_agreed=True,
+                                              created_at=datetime.strptime(ass.created_at, _DATETIME_FORMAT),
+                                              modified_at=datetime.strptime(ass.modified_at, _DATETIME_FORMAT))
+                db.session.add(new_ass)
+
+            imported_teams.append(new_team)
+
+        db.session.commit()
+        return imported_teams

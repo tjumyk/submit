@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 
 from models import db, Task
 from services.task import TaskServiceError
+from sync.smodel import TeamData
 from sync.sservice import SyncService, SubmissionData, SyncServiceError
 
 app = Flask(__name__)
@@ -58,6 +59,19 @@ def import_submissions(term_id, task_title):
 
         submissions = SyncService.import_submissions(task, [SubmissionData.from_dict(d) for d in request.json])
         return jsonify(imported=len(submissions))
+    except (TaskServiceError, SyncServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
+
+
+@app.route('/api/terms/<int:term_id>/tasks/<string:task_title>/teams', methods=['POST'])
+def import_teams(term_id, task_title):
+    try:
+        task = db.session.query(Task).filter(Task.term_id == term_id, Task.title == task_title).first()
+        if task is None:
+            return jsonify(msg='task %s not found' % task_title), 404
+
+        teams = SyncService.import_teams(task, [TeamData.from_dict(d) for d in request.json])
+        return jsonify(imported=len(teams))
     except (TaskServiceError, SyncServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 

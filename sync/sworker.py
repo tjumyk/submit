@@ -50,10 +50,22 @@ def _exec_work():
                 continue
             logger.info('Processing %s...' % task.title)
 
+            if task.is_team_task:
+                logger.info('Getting local teams...')
+                teams_data = SyncService.get_finalized_teams(task)
+
+                logger.info('Sync teams...')
+                resp = requests.post('%s/api/terms/%d/tasks/%s/teams' %
+                                     (remote_server, remote_term_id, task.title),
+                                     json=[t.to_dict() for t in teams_data])
+                if resp.status_code // 100 != 2:
+                    raise RuntimeError('[%d] %s' % (resp.status_code, resp.content))
+                logger.info('Team sync completed: %r' % resp.content)
+
             logger.info('Getting local submissions...')
             sub_list = SyncService.list_submissions(task, 0)
 
-            logger.info('Requesting diff...')
+            logger.info('Requesting submission diff...')
             resp = requests.post('%s/api/terms/%d/tasks/%s/submissions/diff' %
                                  (remote_server, remote_term_id, task.title),
                                  json=sub_list)
@@ -66,7 +78,7 @@ def _exec_work():
             logger.info('Diff size: %d' % len(diff_list))
 
             if not diff_list:
-                logger.info('Skip sync')
+                logger.info('Skip submission sync')
                 continue
 
             if not os.path.exists(work_sub_folder):
@@ -76,19 +88,19 @@ def _exec_work():
             with open(os.path.join(work_sub_folder, 'diff_list_%s.json' % task.title.replace(' ', '_')), 'w') as fo:
                 fo.write(json.dumps(sub_list, indent=2))
 
-            logger.info('Preparing data to sync...')
+            logger.info('Preparing data to sync submissions...')
             diff_data = SyncService.prepare_submissions(diff_list)
 
             with open(os.path.join(work_sub_folder, 'diff_data_%s.json' % task.title.replace(' ', '_')), 'w') as fo:
                 fo.write(json.dumps([s.to_dict() for s in diff_data], indent=2))
 
-            logger.info('Syncing...')
+            logger.info('Syncing submissions...')
             resp = requests.post('%s/api/terms/%d/tasks/%s/submissions' %
                                  (remote_server, remote_term_id, task.title),
                                  json=[s.to_dict() for s in diff_data])
             if resp.status_code // 100 != 2:
                 raise RuntimeError('[%d] %s' % (resp.status_code, resp.content))
-            logger.info('Sync completed: %r' % resp.content)
+            logger.info('Submission sync completed: %r' % resp.content)
 
 
 def main():
