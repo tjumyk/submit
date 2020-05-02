@@ -50,15 +50,16 @@ class MaterialPreviewService:
         with open(html_path) as f_html:
             html = f_html.read()
             doc = BeautifulSoup(html, 'html.parser')
+            body = doc.body
             # fix images
-            for img in doc.select('img'):
+            for img in body.select('img'):
                 img_src = img.get('src')
                 if not img_src or img_src.startswith('/') \
                         or img_src.startswith('http://') or img_src.startswith('https://'):
                     continue
                 img['src'] = 'api/materials/%d/notebooks/%s/' % (material.id, quote(notebook_name)) + img_src
             # fix anchors
-            for anchor in doc.select('a'):
+            for anchor in body.select('a'):
                 href = anchor.get('href')
                 if not href:
                     continue
@@ -67,9 +68,12 @@ class MaterialPreviewService:
                 elif href.startswith('#'):
                     anchor.extract()
             # remove ids
-            for x in doc.select('[id]'):
+            for x in body.select('[id]'):
                 del x['id']
-            inline_html = ''.join(str(c) for c in doc.body.children)
+            # remove style tags
+            for style in body.select('style'):
+                style.extract()
+            inline_html = ''.join(str(c) for c in body.children)
         return inline_html
 
     @classmethod
