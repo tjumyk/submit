@@ -118,7 +118,7 @@ def material_get_notebook_content(mid, path: str):
             # when 'custom.css' is requested and the notebook itself does not have one, the default 'notebook.css' in
             # the root folder will be used
             if sub_path == 'custom.css' and not os.path.exists(os.path.join(notebook.base_dir, sub_path)):
-                return send_from_directory(app.root_path, 'notebook.css')
+                return send_from_directory(app.root_path, 'notebook-page.css')
 
             return send_from_directory(notebook.base_dir, sub_path, cache_timeout=0)
     except (TaskServiceError, TermServiceError) as e:

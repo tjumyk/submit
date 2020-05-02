@@ -1,0 +1,8 @@
+<div class="ui top attached label notebook">
+  <a class="title" href="api/materials/{{notebook.material_id}}/download" title="Download">
+    {{notebook.material.name}}
+  </a>
+  <span class="sub title" *ngIf="notebook.name != notebook.material.name"><i class="icon angle double right"></i> {{notebook.name}}</span>
+  <a class="action" [href]="notebook.url" target="_blank" title="Open in a new tab"><i class="icon external alternate"></i></a>
+</div>
+<div class="body" #body [innerHTML]="notebook.inline_html"></div>

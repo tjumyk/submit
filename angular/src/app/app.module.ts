@@ -73,6 +73,7 @@ import { FinalMarksImportComponent } from './final-marks-import/final-marks-impo
 import {ModalComponent} from "./modal/modal.component";
 import { TermFinalMarksComponent } from './term-final-marks/term-final-marks.component';
 import { AdminAutoTestsComponent } from './admin-auto-tests/admin-auto-tests.component';
+import { NotebookViewComponent } from './notebook-view/notebook-view.component';
 
 @NgModule({
   declarations: [
@@ -143,7 +144,8 @@ import { AdminAutoTestsComponent } from './admin-auto-tests/admin-auto-tests.com
     FinalMarksImportComponent,
     ModalComponent,
     TermFinalMarksComponent,
-    AdminAutoTestsComponent
+    AdminAutoTestsComponent,
+    NotebookViewComponent
   ],
   imports: [
     BrowserModule,

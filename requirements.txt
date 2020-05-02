@@ -12,3 +12,4 @@ python-magic
 nbconvert
 IPython
 tzlocal
+beautifulsoup4

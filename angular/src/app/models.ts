@@ -364,6 +364,7 @@ export class NotebookPreview{
   // additional
   material?: Material;
   url?: SafeResourceUrl;
+  inline_html: string;
 }
 
 export class SubmissionFileDiff{

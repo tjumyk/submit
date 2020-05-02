@@ -44,3 +44,9 @@ body ::-webkit-scrollbar-thumb:hover {
     background-color: #cce2ff;
     color: rgba(0,0,0,.87);
 }
+
+/* Adjust highlight pre */
+.highlight > pre{
+    white-space: pre;
+    overflow-x: auto;
+}
