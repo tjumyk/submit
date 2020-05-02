@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, send_from_directory, current_app as app, r
 from api_submission import requires_worker
 from auth_connect.oauth import requires_login
 from services.account import AccountService
-from services.material_preview import MaterialPreviewService
+from services.material_preview import MaterialPreviewService, MaterialPreviewServiceError
 from services.task import TaskService, TaskServiceError
 from services.term import TermService, TermServiceError
 
@@ -76,7 +76,7 @@ def material_get_notebooks(mid):
 
         notebooks = MaterialPreviewService.get_notebooks(material, app.config['DATA_FOLDER'])
         return jsonify([nb.to_dict() for nb in notebooks])
-    except (TaskServiceError, TermServiceError) as e:
+    except (TaskServiceError, TermServiceError, MaterialPreviewServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -121,5 +121,5 @@ def material_get_notebook_content(mid, path: str):
                 return send_from_directory(app.root_path, 'notebook-page.css')
 
             return send_from_directory(notebook.base_dir, sub_path, cache_timeout=0)
-    except (TaskServiceError, TermServiceError) as e:
+    except (TaskServiceError, TermServiceError, MaterialPreviewServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
