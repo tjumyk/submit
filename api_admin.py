@@ -913,9 +913,10 @@ def import_give(tid: int):
             for student_id, submissions_info in importer.import_archive(archive_path, extract_dir):
                 student = AccountService.sync_user_by_name(student_id)
 
-                for (_time, files) in submissions_info:
-                    save_folder = os.path.join('tasks', str(task.id), 'submissions', student.name,
-                                               str(_time.timestamp()))
+                for idx, (_time, files) in enumerate(submissions_info):
+                    # add suffix to each timestamp to avoid path conflict
+                    _timestamp = str(_time.timestamp()) + str(idx)
+                    save_folder = os.path.join('tasks', str(task.id), 'submissions', student.name, _timestamp)
                     new_submission = Submission(task_id=task.id, submitter_id=student.id,
                                                 created_at=_time, modified_at=_time)
                     db.session.add(new_submission)
