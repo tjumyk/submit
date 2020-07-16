@@ -88,6 +88,16 @@
           <i class="icon heart outline"></i>
         </a>
       </div>
+
+      <div class="import-give">
+        <button class="ui button fluid" (click)="inputGiveArchive.click()" [ngClass]="{'loading disabled': importingGive}"><i class="icon upload"></i> Import Give Submissions</button>
+        <form>
+          <input type="file" accept=".zip,.tar,.tar.gz" name="give_archive" style="display: none" #inputGiveArchive (change)="importGive(inputGiveArchive)">
+        </form>
+        <div class="ui bottom attached progress" *ngIf="importGiveProgress">
+          <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>
+        </div>
+      </div>
     </div>
     <!-- End of Left menu -->
 

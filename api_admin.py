@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request, current_app as app, send_from_dir
 from sqlalchemy import func
 
 from auth_connect.oauth import requires_admin
-from models import db, Submission, UserTeamAssociation, Team
+from models import db, Submission, UserTeamAssociation, Team, SubmissionFile
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.course import CourseService, CourseServiceError
@@ -18,6 +18,7 @@ from services.submission import SubmissionService, SubmissionServiceError
 from services.task import TaskService, TaskServiceError
 from services.team import TeamService, TeamServiceError
 from services.term import TermService, TermServiceError
+from utils.give import GiveImporter, GiveImporterError
 from utils.message import build_message_with_template
 from utils.upload import handle_upload, handle_post_upload, UploadError, md5sum
 
@@ -763,8 +764,8 @@ def admin_run_auto_test(cid):
                     filters.extend([UserTeamAssociation.user_id == Submission.submitter_id,
                                     UserTeamAssociation.team_id == Team.id,
                                     Team.task_id == task.id])
-                    last_sids = db.session.query(UserTeamAssociation.team_id, func.max(Submission.id).label('sid'))\
-                        .filter(*filters)\
+                    last_sids = db.session.query(UserTeamAssociation.team_id, func.max(Submission.id).label('sid')) \
+                        .filter(*filters) \
                         .group_by(UserTeamAssociation.team_id).subquery()
                     submissions = db.session.query(Submission).filter(Submission.id == last_sids.c.sid)
             else:
@@ -881,4 +882,66 @@ def auto_test_summaries():
     try:
         return jsonify(AutoTestService.get_summaries(with_advanced_fields=True))
     except AutoTestServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/import-give', methods=['POST'])
+@requires_admin
+def import_give(tid: int):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        archive = request.files.get('archive')
+        if not archive:
+            return jsonify(msg='archive file is required'), 400
+
+        requirement_map = {r.name: r for r in task.file_requirements}
+        data_folder = app.config['DATA_FOLDER']
+
+        num_submitters = 0
+        num_submissions = 0
+        with tempfile.TemporaryDirectory() as work_dir:
+            archive_path = os.path.join(work_dir, archive.filename)
+            archive.save(archive_path)
+            extract_dir = os.path.join(work_dir, '_extract')
+            os.mkdir(extract_dir)
+
+            copy_info = []
+            importer = GiveImporter(requirement_map.keys())
+            for student_id, submissions_info in importer.import_archive(archive_path, extract_dir):
+                student = AccountService.sync_user_by_name(student_id)
+
+                for (_time, files) in submissions_info:
+                    save_folder = os.path.join('tasks', str(task.id), 'submissions', student.name,
+                                               str(_time.timestamp()))
+                    new_submission = Submission(task_id=task.id, submitter_id=student.id,
+                                                created_at=_time, modified_at=_time)
+                    db.session.add(new_submission)
+
+                    for file_name, tmp_path in files.items():
+                        requirement = requirement_map[file_name]
+                        save_path = os.path.join(save_folder, file_name)
+                        size = os.stat(tmp_path).st_size
+                        md5 = md5sum(tmp_path)
+                        new_file = SubmissionFile(submission=new_submission, requirement_id=requirement.id,
+                                                  path=save_path, size=size, md5=md5,
+                                                  created_at=_time, modified_at=_time)
+                        db.session.add(new_file)
+                        copy_info.append((tmp_path, save_path))
+                    num_submissions += 1
+                num_submitters += 1
+
+            # do actual file copies at last
+            for tmp_path, save_path in copy_info:
+                to_path = os.path.join(data_folder, save_path)
+                to_dir_path = os.path.dirname(to_path)
+                if not os.path.exists(to_dir_path):
+                    os.makedirs(to_dir_path)
+                shutil.copy(tmp_path, to_path)
+
+        db.session.commit()
+        return jsonify(num_submitters=num_submitters, num_submissions=num_submissions)
+    except (TaskServiceError, GiveImporterError, AccountServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

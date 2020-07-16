@@ -3,6 +3,7 @@ import {
   AutoTestConfig,
   ErrorMessage,
   FileRequirement,
+  ImportGiveResponse,
   Material,
   SpecialConsideration,
   SuccessMessage,
@@ -68,6 +69,9 @@ export class AdminTaskEditComponent implements OnInit {
 
   editingLatePenalty: boolean;
   activeTab: string;
+
+  importingGive: boolean;
+  importGiveProgress: number;
 
   constructor(
     private adminService: AdminService,
@@ -407,4 +411,36 @@ export class AdminTaskEditComponent implements OnInit {
     )
   }
 
+  importGive(input: HTMLInputElement) {
+    if (!input || !input.files.length)
+      return;
+
+    const file = input.files.item(0);
+    if (!confirm(`Will import give submissions from "${file.name}", continue?`)) {
+      input.value = '';  // reset input
+      return;
+    }
+
+    this.importingGive = true;
+    this.importGiveProgress = 0;
+    this.adminService.importGive(this.taskId, file).pipe(
+      finalize(() => {
+        this.importingGive = false;
+        this.importGiveProgress = undefined;
+        input.value = '';  // reset input
+      })
+    ).subscribe(
+      event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            this.importGiveProgress = Math.round(100 * event.loaded / event.total);
+            break;
+          case HttpEventType.Response:
+            const resp = event.body as ImportGiveResponse;
+            this.success = {msg: `Imported ${resp.num_submissions} submissions from ${resp.num_submitters} submitters successfully.`}
+        }
+      },
+      error => this.secondaryError = error.error
+    )
+  }
 }

@@ -432,3 +432,8 @@ export type AutoTestSummaries = {[type: string]: AutoTestSummary};
 export class ClockInfo{
   time: number;
 }
+
+export class ImportGiveResponse{
+  num_submitters: number;
+  num_submissions: number;
+}

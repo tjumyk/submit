@@ -403,11 +403,18 @@ export class AdminService {
     return this.http.post<BatchSetFinalMarksResponse>(`${this.api}/tasks/${task_id}/batch-final-marks`, request)
   }
 
-  releaseFinalMarks(task_id: number): Observable<any>{
+  releaseFinalMarks(task_id: number): Observable<any> {
     return this.http.get(`${this.api}/tasks/${task_id}/release-final-marks`)
   }
 
   getAutoTestSummaries(): Observable<AutoTestSummaries> {
     return this.http.get<AutoTestSummaries>(`${this.api}/auto-test-summaries`)
+  }
+
+  importGive(task_id: number, archive_file: File): Observable<HttpEvent<any>> {
+    const form = new FormData();
+    form.append('archive', archive_file);
+    const req = new HttpRequest('POST', `${this.api}/tasks/${task_id}/import-give`, form, {reportProgress: true})
+    return this.http.request(req);
   }
 }

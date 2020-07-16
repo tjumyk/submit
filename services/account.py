@@ -90,6 +90,14 @@ class AccountService:
             raise AccountServiceError('Failed to sync user %d' % uid, e.msg)
 
     @classmethod
+    def sync_user_by_name(cls, name: str) -> UserAlias:
+        try:
+            user = oauth.get_user_by_name(name)
+            return cls.sync_user(user)
+        except oauth.OAuthError as e:
+            raise AccountServiceError('Failed to sync user %s' % name, e.msg)
+
+    @classmethod
     def sync_user(cls, user: oauth.User) -> UserAlias:
         """
         Sync OAuth user and groups with local copy (alias).
