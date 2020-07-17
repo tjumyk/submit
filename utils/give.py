@@ -60,6 +60,9 @@ class GiveImporter:
         if not folder_files:  # empty folder
             return []
 
+        if self._log_name not in folder_files:
+            raise GiveImporterError('no log file in student folder: %s' % folder_path)
+
         tars = []
         log = GiveLog.parse(os.path.join(folder_path, self._log_name))
         default_file = None
@@ -119,7 +122,7 @@ class GiveImporter:
                 dir_list = os.listdir(root)
 
         for name in sorted(dir_list):
-            if name.startswith('.'):
+            if name.startswith('.') or name == '__MACOSX':
                 continue
             path = os.path.join(root, name)
             if not os.path.isdir(path):
