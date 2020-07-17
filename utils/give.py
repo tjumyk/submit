@@ -55,12 +55,16 @@ class GiveImporter:
     def __init__(self, required_file_names: Iterable[str]):
         self.required_file_names = set(required_file_names)
 
-    def _import_student_folder(self, student_id: str, folder_path: str):
+    def _import_student_folder(self, student_id: str, folder_path: str) -> list:
+        folder_files = os.listdir(folder_path)
+        if not folder_files:  # empty folder
+            return []
+
         tars = []
         log = GiveLog.parse(os.path.join(folder_path, self._log_name))
         default_file = None
         numbered_files = {}
-        for file_name in os.listdir(folder_path):
+        for file_name in folder_files:
             if file_name == self._default_submission_name:
                 default_file = file_name
             else:
