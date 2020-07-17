@@ -901,7 +901,8 @@ def import_give(tid: int):
         data_folder = app.config['DATA_FOLDER']
 
         num_submitters = 0
-        num_submissions = 0
+        num_imported_submissions = 0
+        num_skipped_submissions = 0
         with tempfile.TemporaryDirectory() as work_dir:
             archive_path = os.path.join(work_dir, archive.filename)
             archive.save(archive_path)
@@ -913,7 +914,17 @@ def import_give(tid: int):
             for student_id, submissions_info in importer.import_archive(archive_path, extract_dir):
                 student = AccountService.sync_user_by_name(student_id)
 
+                existing_created_at = {
+                    row[0] for row in db.session.query(Submission.created_at)
+                    .filter(Submission.task_id == task.id,
+                            Submission.submitter_id == student.id)
+                    .all()
+                }
                 for idx, (_time, files) in enumerate(submissions_info):
+                    if _time in existing_created_at:
+                        num_skipped_submissions += 1
+                        continue  # avoid re-importing same submission
+
                     # add suffix to each timestamp to avoid path conflict
                     _timestamp = str(_time.timestamp()) + str(idx)
                     save_folder = os.path.join('tasks', str(task.id), 'submissions', student.name, _timestamp)
@@ -931,7 +942,7 @@ def import_give(tid: int):
                                                   created_at=_time, modified_at=_time)
                         db.session.add(new_file)
                         copy_info.append((tmp_path, save_path))
-                    num_submissions += 1
+                    num_imported_submissions += 1
                 num_submitters += 1
 
             # do actual file copies at last
@@ -943,6 +954,7 @@ def import_give(tid: int):
                 shutil.copy(tmp_path, to_path)
 
         db.session.commit()
-        return jsonify(num_submitters=num_submitters, num_submissions=num_submissions)
+        return jsonify(num_submitters=num_submitters, num_imported_submissions=num_imported_submissions,
+                       num_skipped_submissions=num_skipped_submissions)
     except (TaskServiceError, GiveImporterError, AccountServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

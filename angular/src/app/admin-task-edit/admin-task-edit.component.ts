@@ -437,7 +437,10 @@ export class AdminTaskEditComponent implements OnInit {
             break;
           case HttpEventType.Response:
             const resp = event.body as ImportGiveResponse;
-            this.success = {msg: `Imported ${resp.num_submissions} submissions from ${resp.num_submitters} submitters successfully.`}
+            if (resp.num_skipped_submissions)
+              this.success = {msg: `Imported ${resp.num_imported_submissions} submissions (${resp.num_skipped_submissions} skipped) from ${resp.num_submitters} submitters.`}
+            else
+              this.success = {msg: `Imported ${resp.num_imported_submissions} submissions from ${resp.num_submitters} submitters.`}
         }
       },
       error => this.secondaryError = error.error

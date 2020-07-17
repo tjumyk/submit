@@ -435,5 +435,6 @@ export class ClockInfo{
 
 export class ImportGiveResponse{
   num_submitters: number;
-  num_submissions: number;
+  num_imported_submissions: number;
+  num_skipped_submissions: number;
 }
