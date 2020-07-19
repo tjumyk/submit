@@ -49,16 +49,23 @@ class GiveLog:
 
 class GiveImporter:
     _default_submission_name = 'submission.tar'
+    _pre_submission_name = 'pre-submission.tar'
     _log_name = 'log'
     _numbered_submission_name_pattern = re.compile(r'^sub(\d+).tar$')
 
-    def __init__(self, required_file_names: Iterable[str]):
+    def __init__(self, required_file_names: Iterable[str], pre_submission_fallback: bool = True):
         self.required_file_names = set(required_file_names)
+        self.pre_submission_fallback = pre_submission_fallback
 
-    def _import_student_folder(self, student_id: str, folder_path: str) -> list:
+    def _scan_submission_tars(self, folder_path: str) -> list:
         folder_files = os.listdir(folder_path)
         if not folder_files:  # empty folder
             return []
+
+        if len(folder_files) == 1 and folder_files[0] == self._pre_submission_name and self.pre_submission_fallback:
+            _time = datetime.utcfromtimestamp(os.stat(os.path.join(folder_path, self._pre_submission_name)).st_mtime)
+            print('[Waring] Fallback to use pre-submission in %s' % folder_path, file=sys.stderr)
+            return [(self._pre_submission_name, _time)]
 
         if self._log_name not in folder_files:
             raise GiveImporterError('no log file in student folder: %s' % folder_path)
@@ -80,9 +87,11 @@ class GiveImporter:
             tars.append((file, entry.time))
         if default_file:
             tars.append((self._default_submission_name, log.entries[-1].time))
+        return tars
 
+    def _import_student_folder(self, student_id: str, folder_path: str) -> list:
         all_extracted = []
-        for file_name, time in tars:
+        for file_name, time in self._scan_submission_tars(folder_path):
             extract_dir = os.path.join(folder_path, '%s_extracted' % file_name)
             if os.path.exists(extract_dir):
                 raise GiveImporterError('extract folder for tar already exists')
@@ -113,13 +122,15 @@ class GiveImporter:
         except IOError as e:
             raise GiveImporterError('failed to unpack archive', str(e)) from e
 
-        root = extract_dir
+        # find the "root" folder, which contains a list of student folders, by locating any default submission file
+        root = None
+        for dir_path, dir_names, file_names in os.walk(extract_dir):
+            if self._default_submission_name in file_names:
+                root, _ = os.path.split(dir_path)
+                break
+        if root is None:
+            raise GiveImporterError('failed to find a submission')
         dir_list = os.listdir(root)
-        if len(dir_list) == 1:
-            child = os.path.join(root, dir_list[0])
-            if os.path.isdir(child):  # there is a wrapper folder
-                root = child
-                dir_list = os.listdir(root)
 
         for name in sorted(dir_list):
             if name.startswith('.') or name == '__MACOSX':
