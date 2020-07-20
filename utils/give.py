@@ -53,9 +53,12 @@ class GiveImporter:
     _log_name = 'log'
     _numbered_submission_name_pattern = re.compile(r'^sub(\d+).tar$')
 
-    def __init__(self, required_file_names: Iterable[str], pre_submission_fallback: bool = True):
+    def __init__(self, required_file_names: Iterable[str],
+                 pre_submission_fallback: bool = True,
+                 skip_overwritten: bool = True):
         self.required_file_names = set(required_file_names)
         self.pre_submission_fallback = pre_submission_fallback
+        self.skip_overwritten = skip_overwritten
 
     def _scan_submission_tars(self, folder_path: str) -> list:
         folder_files = os.listdir(folder_path)
@@ -82,6 +85,10 @@ class GiveImporter:
                 if match:
                     numbered_files[int(match.group(1))] = file_name
 
+        if not self.skip_overwritten:
+            for entry in log.entries[0: -len(numbered_files) - 1]:
+                # keep an item in the returned list but set file name as None to indicate that it has been overwritten
+                tars.append((None, entry.time))
         for entry in log.entries[-len(numbered_files) - 1: -1]:
             file = numbered_files.get(entry.number)
             tars.append((file, entry.time))
@@ -92,6 +99,10 @@ class GiveImporter:
     def _import_student_folder(self, student_id: str, folder_path: str) -> list:
         all_extracted = []
         for file_name, time in self._scan_submission_tars(folder_path):
+            if file_name is None:  # submission tar has been overwritten
+                all_extracted.append((time, None))  # pass 'None' to the output
+                continue
+
             extract_dir = os.path.join(folder_path, '%s_extracted' % file_name)
             if os.path.exists(extract_dir):
                 raise GiveImporterError('extract folder for tar already exists')
