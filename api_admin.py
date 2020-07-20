@@ -794,7 +794,8 @@ def admin_run_auto_test(cid):
 
         if skip_successful:
             last_tids = db.session.query(AutoTest.submission_id, func.max(AutoTest.id).label('tid')) \
-                .filter(AutoTest.submission_id.in_([s.id for s in submissions])) \
+                .filter(AutoTest.submission_id.in_([s.id for s in submissions]),
+                        AutoTest.config_id == config.id) \
                 .group_by(AutoTest.submission_id).subquery()
             successful_sids = set(r[0] for r in db.session.query(AutoTest.submission_id) \
                                   .filter(AutoTest.id == last_tids.c.tid, AutoTest.final_state == 'SUCCESS').all())
