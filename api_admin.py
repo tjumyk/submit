@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request, current_app as app, send_from_dir
 from sqlalchemy import func
 
 from auth_connect.oauth import requires_admin
-from models import db, Submission, UserTeamAssociation, Team, SubmissionFile
+from models import db, Submission, UserTeamAssociation, Team, SubmissionFile, AutoTest
 from services.account import AccountService, AccountServiceError
 from services.auto_test import AutoTestService, AutoTestServiceError
 from services.course import CourseService, CourseServiceError
@@ -740,6 +740,7 @@ def admin_run_auto_test(cid):
         ]
 
         last_submissions_only = request.args.get('last_submissions_only') == 'true'
+        skip_successful = request.args.get('skip_successful') == 'true'
 
         if task.is_team_task:
             team_id = request.args.get('team_id')
@@ -791,6 +792,14 @@ def admin_run_auto_test(cid):
             else:
                 submissions = db.session.query(Submission).filter(*filters).order_by(Submission.id)
 
+        if skip_successful:
+            last_tids = db.session.query(AutoTest.submission_id, func.max(AutoTest.id).label('tid')) \
+                .filter(AutoTest.submission_id.in_([s.id for s in submissions])) \
+                .group_by(AutoTest.submission_id).subquery()
+            successful_sids = set(r[0] for r in db.session.query(AutoTest.submission_id) \
+                                  .filter(AutoTest.id == last_tids.c.tid, AutoTest.final_state == 'SUCCESS').all())
+            submissions = [s for s in submissions if s.id not in successful_sids]
+
         result_tuples = []
         for submission in submissions:
             result_tuples.append(SubmissionService.run_auto_test(submission, config))
@@ -801,7 +810,7 @@ def admin_run_auto_test(cid):
             test_obj = test.to_dict(with_advanced_fields=True)
             test_obj.update(AutoTestService.result_to_dict(result, with_advanced_fields=True))  # merge temporary result
             ret.append(test_obj)
-        return jsonify(ret), 201
+        return jsonify(ret), 200
     except (SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

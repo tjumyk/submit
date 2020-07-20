@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {finalize} from "rxjs/operators";
-import {AutoTestConfig, ErrorMessage, Task, Team, User} from "../models";
+import {AutoTestConfig, ErrorMessage, SuccessMessage, Task, Team, User} from "../models";
 import {AccountService} from "../account.service";
 import {AdminService} from "../admin.service";
 
@@ -18,9 +18,12 @@ export class RunAutoTestCardComponent implements OnInit {
 
   activeConfig: AutoTestConfig;
   lastSubmissionsOnly: boolean;
+  skipSuccessful: boolean;
   requestingRunAutoTest: boolean;
 
-  @Output() error: EventEmitter<ErrorMessage> = new EventEmitter();
+  showModal: boolean;
+  modalError: ErrorMessage;
+  modelSuccess: SuccessMessage;
 
   constructor(
     private accountService: AccountService,
@@ -32,7 +35,7 @@ export class RunAutoTestCardComponent implements OnInit {
       user => {
         this.isAdmin = AccountService.isAdmin(user);
       },
-      error => this.error.emit(error.error)
+      error => this.modalError = error.error
     )
   }
 
@@ -41,36 +44,29 @@ export class RunAutoTestCardComponent implements OnInit {
     if (config == null)
       return;
 
-    let needPrompt = true;
-    let target_header = "all the submissions";
-    if (this.lastSubmissionsOnly)
-      target_header = "all the last submissions";
-    let target = `${target_header} in ${this.task.title}`;
-    let api = this.adminService.runAutoTests(config.id, null, null, this.lastSubmissionsOnly);
+    let api = this.adminService.runAutoTests(config.id, null, null,
+      this.lastSubmissionsOnly, this.skipSuccessful);
 
     if (this.task.is_team_task) {
       if (this.team) {
-        target = `${target_header} from team "${this.team.name}" (ID=${this.team.id}) in ${this.task.title}`;
-        api = this.adminService.runAutoTests(config.id, null, this.team.id, this.lastSubmissionsOnly);
+        api = this.adminService.runAutoTests(config.id, null, this.team.id,
+          this.lastSubmissionsOnly, this.skipSuccessful);
       }
     } else {
       if (this.user) {
-        target = `${target_header} from user "${this.user.name}" (ID=${this.user.id}) in ${this.task.title}`;
-        api = this.adminService.runAutoTests(config.id, this.user.id, null, this.lastSubmissionsOnly);
+        api = this.adminService.runAutoTests(config.id, this.user.id, null,
+          this.lastSubmissionsOnly, this.skipSuccessful);
       }
     }
-
-    if (needPrompt && !confirm(`Really want to run auto test "${config.name}" (ID=${config.id}) for ${target}?`))
-      return;
 
     this.requestingRunAutoTest = true;
     api.pipe(
       finalize(() => this.requestingRunAutoTest = false)
     ).subscribe(
       test => {
-        alert(`Started auto test "${config.name}" (ID=${config.id}) for ${test.length} submissions`)
+        this.modelSuccess = {msg: `Started auto test "${config.name}" on ${test.length} submissions`}
       },
-      error => this.error.emit(error.error)
+      error => this.modalError = error.error
     )
   }
 

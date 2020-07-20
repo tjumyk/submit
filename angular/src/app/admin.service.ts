@@ -384,7 +384,8 @@ export class AdminService {
   }
 
   runAutoTests(config_id: number, user_id: number = null, team_id: number = null,
-               last_submissions_only: boolean = false):Observable<AutoTest[]> {
+               last_submissions_only: boolean = false,
+               skip_successful: boolean = false):Observable<AutoTest[]> {
     let params = new HttpParams();
     if (user_id !== null)
       params = params.append('user_id', user_id.toString());
@@ -392,6 +393,8 @@ export class AdminService {
       params = params.append('team_id', team_id.toString());
     if(last_submissions_only)
       params = params.append('last_submissions_only', "true");
+    if(skip_successful)
+      params = params.append('skip_successful', "true");
     return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/run`, {params: params})
   }
 
