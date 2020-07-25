@@ -5,6 +5,8 @@
   "MAX_CONTENT_LENGTH": 2147483648,
   "SESSION_COOKIE_NAME": "submit_session",
 
+  "DETECT_REQUEST_REGIONS": [],
+
   "MAIL": {
     "display_name": "submit@UNSWKG",
     "from": "admin@unswkg",
@@ -35,6 +37,9 @@
       "accept_ext": ["png", "jpg", "jpeg", "gif", "svg"],
       "size_limit": 262144
     }
+  },
+  "GEOIP": {
+    "country": null
   },
   "AUTO_TEST":{
     "broker": "amqp://",

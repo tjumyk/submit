@@ -13,3 +13,4 @@ nbconvert
 IPython
 tzlocal
 beautifulsoup4
+geoip2
