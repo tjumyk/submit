@@ -53,7 +53,7 @@
                         <div class="item" *ngIf="task.is_team_task">
                           <i class="icon hand paper outline"></i>
                           <div class="content">
-                            Join team before: <span *ngIf="task.team_join_close_time; else timeTbd">{{ task.team_join_close_time|date:'short' }} ({{task._team_join_close_time_from_now}})</span>
+                            Team join close: <span *ngIf="task.team_join_close_time; else timeTbd">{{ task.team_join_close_time|date:'short' }} ({{task._team_join_close_time_from_now}})</span>
                           </div>
                         </div>
                       </div>
