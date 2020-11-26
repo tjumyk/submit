@@ -87,16 +87,10 @@
           Special Considerations
           <i class="icon heart outline"></i>
         </a>
-      </div>
-
-      <div class="import-give">
-        <button class="ui button fluid" (click)="inputGiveArchive.click()" [ngClass]="{'loading disabled': importingGive}"><i class="icon upload"></i> Import Give Submissions</button>
-        <form>
-          <input type="file" accept=".zip,.tar,.tar.gz" name="give_archive" style="display: none" #inputGiveArchive (change)="importGive(inputGiveArchive)">
-        </form>
-        <div class="ui bottom attached progress" *ngIf="importGiveProgress">
-          <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>
-        </div>
+        <a class="item" (click)="activeTab='import_export'" [ngClass]="{'active': activeTab=='import_export'}">
+          Import / Export
+          <i class="icon exchange"></i>
+        </a>
       </div>
     </div>
     <!-- End of Left menu -->
@@ -851,6 +845,21 @@
         <!--End of New Special Consideration-->
       </div>
       <!-- End of Special considerations tab -->
+
+      <!-- Start of Import/Export tab -->
+      <div class="ui tab" [class.active]="activeTab=='import_export'">
+        <div class="ui header dividing">Import</div>
+        <button class="ui button labeled icon" (click)="inputGiveArchive.click()" [ngClass]="{'loading disabled': importingGive}"><i class="icon share vertically flipped"></i> Import Give Submissions</button>
+        <form class="hidden">
+          <input type="file" accept=".zip,.tar,.tar.gz" name="give_archive" #inputGiveArchive (change)="importGive(inputGiveArchive)">
+        </form>
+        <div class="ui bottom attached progress" *ngIf="importGiveProgress">
+          <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>
+        </div>
+
+        <div class="ui header dividing">Export</div>
+        <a class="ui button labeled icon" href="api/admin/tasks/{{taskId}}/export-submissions"><i class="icon share"></i> Export Submissions</a>
+      </div>
     </div>
     <!-- End of Right tab container -->
   </div>

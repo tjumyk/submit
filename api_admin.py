@@ -2,8 +2,9 @@ import os
 import re
 import shutil
 import tempfile
+import zipfile
 
-from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
+from flask import Blueprint, jsonify, request, current_app as app, send_from_directory, json
 from sqlalchemy import func
 
 from auth_connect.oauth import requires_admin
@@ -968,3 +969,38 @@ def import_give(tid: int):
                        num_skipped_submissions=num_skipped_submissions)
     except (TaskServiceError, GiveImporterError, AccountServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/export-submissions')
+@requires_admin
+def export_submissions(tid: int):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        data_folder = app.config['DATA_FOLDER']
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            term = task.term
+            zip_name = '%s-%dS%s-%s.zip' % (term.course.code, term.year, term.semester, task.title)
+            zip_path = os.path.join(tmp_dir, zip_name)
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as f_zip:
+                for sub in task.submissions:
+                    if sub.is_cleared:
+                        continue
+                    submitter_name = sub.submitter.name
+                    submission_folder = os.path.join('submissions', submitter_name, str(sub.created_at))
+                    for sub_file in sub.files:
+                        f_zip.write(os.path.join(data_folder, sub_file.path),
+                                    os.path.join(submission_folder, sub_file.requirement.name))
+                if task.is_team_task:
+                    teams_info = []
+                    for team in TeamService.get_for_task(task, joined_load_user_associations=True):
+                        member_names = [ass.user.name for ass in team.user_associations]
+                        teams_info.append(dict(name=team.name, members=member_names))
+                    f_zip.writestr('teams.json', json.dumps(teams_info))
+            return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
+                                       cache_timeout=0)
+    except (TaskServiceError, TeamServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
