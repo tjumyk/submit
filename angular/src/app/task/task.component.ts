@@ -33,7 +33,7 @@ export class TaskComponent implements OnInit, OnDestroy {
 
   latePenalty: LatePenalty;
 
-  marks: FinalMarks;
+  myFinalMarks: FinalMarks;
 
   constructor(
     private accountService: AccountService,
@@ -100,7 +100,7 @@ export class TaskComponent implements OnInit, OnDestroy {
 
     if (task.is_final_marks_released && this.accessRoles.has('student')) {
       this.taskService.getMyFinalMarks(this.taskId).subscribe(
-        marks => this.marks = marks,
+        marks => this.myFinalMarks = marks,
         error => this.error = error.error
       )
     }

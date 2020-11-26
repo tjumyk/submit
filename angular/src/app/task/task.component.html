@@ -11,8 +11,10 @@
       <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
       <div class="content">
         {{ task.title }}
-        <div class="sub header marks" *ngIf="marks">
-          My Final Marks: {{marks.marks}}
+      </div>
+      <div class="final-marks" *ngIf="myFinalMarks">
+        <div class="ui red left pointing basic label large">
+          My Final Marks: {{myFinalMarks.marks}}
         </div>
       </div>
     </h1>
