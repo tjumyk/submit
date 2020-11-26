@@ -28,6 +28,7 @@ import {HttpEventType} from "@angular/common/http";
 import {TaskService} from "../task.service";
 import {TitleService} from "../title.service";
 import {SubmissionService} from "../submission.service";
+import {getLocalTimezone} from "../time-util";
 
 @Component({
   selector: 'app-admin-task-edit',
@@ -73,6 +74,8 @@ export class AdminTaskEditComponent implements OnInit {
   importingGive: boolean;
   importGiveProgress: number;
 
+  localTimeZone: string;
+
   constructor(
     private adminService: AdminService,
     private submissionService: SubmissionService,
@@ -86,6 +89,7 @@ export class AdminTaskEditComponent implements OnInit {
 
   ngOnInit() {
     this.taskId = parseInt(this.route.snapshot.paramMap.get('task_id'));
+    this.localTimeZone = getLocalTimezone() || 'local timezone';
 
     this.loadingTask = true;
     this.adminService.getTask(this.taskId).pipe(

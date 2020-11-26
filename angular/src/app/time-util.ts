@@ -17,3 +17,16 @@ export function printDuration(totalSeconds: number): string {
   output += totalSeconds + 's';
   return output
 }
+
+export function getLocalTimezone(): string {
+  if (Intl && Intl.DateTimeFormat) {
+    let fmt = new Intl.DateTimeFormat();
+    if (fmt.resolvedOptions) {
+      let opts = fmt.resolvedOptions();
+      if (opts.timeZone) {
+        return opts.timeZone;
+      }
+    }
+  }
+  return null;
+}
