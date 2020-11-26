@@ -35,8 +35,6 @@ export class TaskComponent implements OnInit, OnDestroy {
 
   marks: FinalMarks;
 
-  timeFormat = 'MMM d, y, h:mm:ss a z';
-
   constructor(
     private accountService: AccountService,
     private termService: TermService,
