@@ -34,6 +34,7 @@ export class TaskComponent implements OnInit, OnDestroy {
   latePenalty: LatePenalty;
 
   myFinalMarks: FinalMarks;
+  showMyFinalMarksModal: boolean;
 
   constructor(
     private accountService: AccountService,

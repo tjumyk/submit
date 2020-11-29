@@ -74,9 +74,33 @@
   }
 }
 
-.final-marks{
+.header .final-marks{
   font-size: 1rem;
   display: table-cell;
   vertical-align: middle;
   padding-left: 1rem;
+}
+.content.final-marks-detail{
+  text-align: center;
+  font-size: 1.5em;
+  .marks{
+    font-size: 2em;
+    color: #db2828;
+    margin-bottom: 1rem;
+    .line{
+      border-color: #db2828;
+      border-bottom: 3px solid;
+      margin-bottom: 3px;
+      max-width: 24%;
+      margin-left: auto;
+      margin-right: auto;
+      transform: rotate(-5deg);
+      &:last-child{
+        max-width: 15%;
+      }
+    }
+  }
+  .comment{
+    white-space: pre-wrap;
+  }
 }

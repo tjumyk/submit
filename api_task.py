@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -1371,7 +1372,7 @@ def do_my_final_marks(tid):
         record = FinalMarksService.get(user, task)
         if record is None:
             return "", 204
-        return jsonify(record.to_dict())
+        return jsonify(record.to_dict(with_comment=True))
     except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -1395,6 +1396,7 @@ def export_final_marks(tid):
         if 'admin' not in roles and 'tutor' not in roles:
             return jsonify(msg='only for admins or tutors'), 403
 
+        basic_str_pattern = re.compile(r'^[ -~]*$')
         with StringIO() as buffer:
             buffer.write('\t'.join(['ID', 'Name', 'Marks', 'Comment']))
             buffer.write('\n')
@@ -1403,7 +1405,13 @@ def export_final_marks(tid):
                 marks = record.marks
                 if int(marks) == marks:  # convert marks to int if value is not changed
                     marks = int(marks)
-                buffer.write('\t'.join([str(record.user_id), record.user.name, str(marks), record.comment or '']))
+                comment = record.comment
+                if comment:
+                    if not basic_str_pattern.fullmatch(comment):
+                        comment = "json:" + json.dumps(comment)
+                else:
+                    comment = ''
+                buffer.write('\t'.join([str(record.user_id), record.user.name, str(marks), comment]))
                 buffer.write('\n')
             return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (AccountServiceError, TaskServiceError, TermServiceError, FinalMarksServiceError) as e:

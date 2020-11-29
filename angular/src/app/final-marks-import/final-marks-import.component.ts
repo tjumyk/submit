@@ -88,7 +88,15 @@ export class FinalMarksImportComponent implements OnInit {
         continue;
       let fields = [];
       for (let field of line.split('\t')) {
-        fields.push(field.trim());
+        let val = field.trim();
+        if(val && val.startsWith('json:')){
+          try {
+            val = JSON.parse(val.substring(5))
+          }catch (e){
+            console.warn(e)
+          }
+        }
+        fields.push(val);
       }
 
       if (!lines.length) {

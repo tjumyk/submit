@@ -13,9 +13,9 @@
         {{ task.title }}
       </div>
       <div class="final-marks" *ngIf="myFinalMarks">
-        <div class="ui red left pointing basic label large">
+        <a class="ui red left pointing basic label large" (click)="showMyFinalMarksModal=true">
           My Final Marks: {{myFinalMarks.marks}}
-        </div>
+        </a>
       </div>
     </h1>
   </div>
@@ -220,5 +220,20 @@
 
 
   </div>
+
+  <app-modal [(show)]="showMyFinalMarksModal" modalClass="mini" *ngIf="myFinalMarks">
+    <div class="header">My Final Marks - {{task.title}}</div>
+    <div class="content final-marks-detail">
+      <div class="marks">
+        {{myFinalMarks.marks}}
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="comment" *ngIf="myFinalMarks.comment">{{myFinalMarks.comment}}</div>
+    </div>
+    <div class="actions">
+      <button class="ui button" (click)="showMyFinalMarksModal=false">Close</button>
+    </div>
+  </app-modal>
 
 </div>

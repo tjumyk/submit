@@ -64,7 +64,7 @@
             </td>
             <ng-container *ngFor="let task of tasks">
               <td>{{s._marks[task.id]?.marks}}</td>
-              <td>{{s._marks[task.id]?.comment}}</td>
+              <td class="comment">{{s._marks[task.id]?.comment}}</td>
             </ng-container>
           </tr>
           </tbody>

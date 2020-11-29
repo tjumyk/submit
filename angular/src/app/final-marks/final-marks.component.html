@@ -48,7 +48,7 @@
       </td>
       <ng-container *ngIf="s._marks; else noMarks">
         <td>{{s._marks.marks}}</td>
-        <td>{{s._marks.comment}}</td>
+        <td class="comment">{{s._marks.comment}}</td>
         <td>{{s._marks.created_at|date:'short'}}</td>
         <td>{{s._marks.modified_at|date:'short'}}</td>
       </ng-container>
@@ -86,7 +86,7 @@
         </div>
         <div class="field"  [ngClass]="{'error': (f.submitted || comment_model.touched || comment_model.dirty) && comment_model.invalid}">
           <label>Comment (Optional)</label>
-          <input type="text" [(ngModel)]="editForm.comment" name="comment" #comment_model="ngModel" maxlength="128">
+          <textarea [(ngModel)]="editForm.comment" name="comment" #comment_model="ngModel" maxlength="128" rows="3"></textarea>
           <div class="errors" *ngIf="comment_model.errors">
             <label *ngIf="comment_model.errors.maxlength"><i class="times icon"></i>Comment is too long</label>
           </div>
