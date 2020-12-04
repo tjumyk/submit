@@ -1128,6 +1128,36 @@ def task_auto_test_conclusions(tid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@task_api.route('/<int:tid>/last-late-penalties')
+@requires_login
+def task_last_late_penalties(tid):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+        roles = TermService.get_access_roles(task.term, user)
+
+        # role check
+        if not roles:
+            return jsonify(msg='access forbidden'), 403
+        if 'admin' not in roles and 'tutor' not in roles:
+            return jsonify(msg='only for admins or tutors'), 403
+
+        # allow access even before the opening time
+
+        last_penalties = {}
+        for unit_id, penalties in SubmissionService.get_late_penalties_for_task(task):
+            if penalties:
+                # pick the late penalty for the last submission of each unit (User/Team)
+                last_penalties[unit_id] = penalties[max(penalties.keys())]
+        return jsonify(last_penalties)
+    except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @task_api.route('/<int:tid>/export-results')
 @requires_login
 def task_export_results(tid):
