@@ -64,6 +64,7 @@
       <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Attempts</th>
       <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime>First Attempt</th>
       <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Attempt</th>
+      <th *ngIf="lastLatePenalties" (click)="sortField('_last_late_penalty', thLastLatePenalty)" #thLastLatePenalty>Last Late Penalty</th>
       <th *ngFor="let config of task.auto_test_configs"
           (click)="sortField('_auto_test_conclusion_'+config.id, thAutoTestConfig)" #thAutoTestConfig>
         {{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i>
@@ -76,6 +77,7 @@
       <td>{{summary.total_submissions}}</td>
       <td>{{summary.first_submit_time | date:'short'}}</td>
       <td>{{summary.last_submit_time | date:'short'}}</td>
+      <td *ngIf="lastLatePenalties">{{summary['_last_late_penalty']|percent}}</td>
       <td *ngFor="let config of task.auto_test_configs">
         <ng-container *ngIf="summary['_auto_test_conclusion_'+config.id] != null">
           <ng-container *ngIf="config.result_conclusion_type != 'json'; else jsonConclusion">
