@@ -1148,14 +1148,9 @@ def task_last_late_penalties(tid):
 
         # allow access even before the opening time
 
-        all_penalties = SubmissionService.get_late_penalties_for_task(task)
-        if all_penalties is None:
+        last_penalties = SubmissionService.get_last_late_penalties_for_task(task)
+        if last_penalties is None:
             return '', 204
-        last_penalties = {}
-        for unit_id, penalties in all_penalties.items():
-            if penalties:
-                # pick the late penalty for the last submission of each unit (User/Team)
-                last_penalties[unit_id] = penalties[max(penalties.keys())]
         return jsonify(last_penalties)
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
@@ -1183,40 +1178,66 @@ def task_export_results(tid):
 
         configs = task.auto_test_configs
         conclusions = SubmissionService.get_auto_test_conclusions_for_task(task, include_private_tests=True)
+        last_late_penalties = SubmissionService.get_last_late_penalties_for_task(task)
 
         if task.is_team_task:
             expand_team_members = request.args.get('members') == 'true'
             summaries = SubmissionService.get_team_summaries(task)
             with StringIO() as buffer:
                 if not expand_team_members:
-                    buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
-                    buffer.write('\n')
-                    for summary in summaries:
-                        team_conclusions = conclusions.get(summary.team.id, {})
-                        buffer.write('\t'.join([str(summary.team.id), summary.team.name] +
-                                               [str(team_conclusions.get(c.id)) for c in configs]))
-                        buffer.write('\n')
-                else:
-                    buffer.write('\t'.join(['TeamID', 'TeamName', 'UserID', 'UserName'] + [c.name for c in configs]))
+                    header = ['ID', 'Name']
+                    if last_late_penalties is not None:
+                        header.append('Last Late Penalty')
+                    header.extend([c.name for c in configs])
+                    buffer.write('\t'.join(header))
                     buffer.write('\n')
                     for summary in summaries:
                         team = summary.team
                         team_conclusions = conclusions.get(team.id, {})
+                        values = [str(team.id), team.name]
+                        if last_late_penalties is not None:
+                            values.append(str(last_late_penalties.get(team.id)))
+                        values.extend([str(team_conclusions.get(c.id)) for c in configs])
+                        buffer.write('\t'.join(values))
+                        buffer.write('\n')
+                else:
+                    header = ['TeamID', 'TeamName', 'UserID', 'UserName']
+                    if last_late_penalties is not None:
+                        header.append('Last Late Penalty')
+                    header.extend([c.name for c in configs])
+                    buffer.write('\t'.join(header))
+                    buffer.write('\n')
+                    for summary in summaries:
+                        team = summary.team
+                        team_conclusions = conclusions.get(team.id, {})
+                        team_last_late_penalty = str(last_late_penalties.get(team.id)) \
+                            if last_late_penalties is not None else None
                         conclusion_columns = [str(team_conclusions.get(c.id)) for c in configs]
                         for ass in team.user_associations:
-                            buffer.write('\t'.join([str(team.id), team.name, str(ass.user.id), ass.user.name] +
-                                                   conclusion_columns))
+                            values = [str(team.id), team.name, str(ass.user.id), ass.user.name]
+                            if last_late_penalties is not None:
+                                values.append(team_last_late_penalty)
+                            values.extend(conclusion_columns)
+                            buffer.write('\t'.join(values))
                             buffer.write('\n')
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
         else:
             summaries = SubmissionService.get_user_summaries(task)
             with StringIO() as buffer:
-                buffer.write('\t'.join(['ID', 'Name'] + [c.name for c in configs]))
+                header = ['ID', 'Name']
+                if last_late_penalties is not None:
+                    header.append('Last Late Penalty')
+                header.extend([c.name for c in configs])
+                buffer.write('\t'.join(header))
                 buffer.write('\n')
                 for summary in summaries:
-                    user_conclusions = conclusions.get(summary.user.id, {})
-                    buffer.write('\t'.join([str(summary.user.id), summary.user.name] +
-                                           [str(user_conclusions.get(c.id)) for c in configs]))
+                    user = summary.user
+                    user_conclusions = conclusions.get(user.id, {})
+                    values = [str(user.id), user.name]
+                    if last_late_penalties is not None:
+                        values.append(str(last_late_penalties.get(user.id)))
+                    values.extend([str(user_conclusions.get(c.id)) for c in configs])
+                    buffer.write('\t'.join(values))
                     buffer.write('\n')
                 return buffer.getvalue(), {'Content-Type': 'text/plain'}
     except (TaskServiceError, TermServiceError, AccountServiceError, SubmissionServiceError, AutoTestServiceError) as e:

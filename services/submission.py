@@ -930,6 +930,18 @@ class SubmissionService:
         return ret
 
     @classmethod
+    def get_last_late_penalties_for_task(cls, task: Task) -> Optional[Dict[int, int]]:
+        all_penalties = cls.get_late_penalties_for_task(task)
+        if all_penalties is None:
+            return None
+        last_penalties = {}
+        for unit_id, penalties in all_penalties.items():
+            if penalties:
+                # pick the late penalty for the last submission of each unit (User/Team)
+                last_penalties[unit_id] = penalties[max(penalties.keys())]
+        return last_penalties
+
+    @classmethod
     def get_late_penalties_for_task(cls, task: Task) -> Optional[Dict[int, Dict[int, float]]]:
         if task is None:
             raise SubmissionServiceError('task is required')
