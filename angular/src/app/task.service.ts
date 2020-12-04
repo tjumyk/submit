@@ -28,6 +28,8 @@ export class NewTeamForm {
   slogan?: string;
 }
 
+export type LastLatePenaltiesResponse = {[unit_id: number]: number};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -244,5 +246,9 @@ export class TaskService {
 
   getMyFinalMarks(task_id: number): Observable<FinalMarks>{
     return this.http.get<FinalMarks>(`${this.api}/${task_id}/my-final-marks`)
+  }
+
+  getLastLatePenalties(task_id: number): Observable<LastLatePenaltiesResponse>{
+    return this.http.get<LastLatePenaltiesResponse>(`${this.api}/${task_id}/last-late-penalties`)
   }
 }

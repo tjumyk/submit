@@ -1148,7 +1148,6 @@ def task_last_late_penalties(tid):
 
         # allow access even before the opening time
 
-
         all_penalties = SubmissionService.get_late_penalties_for_task(task)
         if all_penalties is None:
             return '', 204

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {DailySubmissionSummary, ErrorMessage, Task, UserSubmissionSummary} from "../models";
 import {AccountService} from "../account.service";
-import {AllAutoTestConclusionsMap, TaskService} from "../task.service";
+import {AllAutoTestConclusionsMap, LastLatePenaltiesResponse, TaskService} from "../task.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {debounceTime, finalize} from "rxjs/operators";
 import {SubmissionService} from "../submission.service";
@@ -28,6 +28,9 @@ export class SubmissionsComponent implements OnInit {
 
   loadingDailySummaries: boolean;
   dailySummaries: DailySubmissionSummary[];
+
+  loadingLastLatePenalties: boolean;
+  lastLatePenalties: LastLatePenaltiesResponse;
 
   userSearchKey = new Subject<string>();
   sortField: (field: string, th: HTMLElement) => any;
@@ -109,6 +112,22 @@ export class SubmissionsComponent implements OnInit {
               finalize(() => this.loadingDailySummaries = false)
             ).subscribe(
               _summaries => this.dailySummaries = _summaries,
+              error => this.error = error.error
+            )
+
+            this.loadingAutoTestConclusions = true;
+            this.taskService.getLastLatePenalties(this.taskId).pipe(
+              finalize(() => this.loadingLastLatePenalties = false)
+            ).subscribe(
+              lastPenalties => {
+                this.lastLatePenalties = lastPenalties;
+
+                if(lastPenalties){
+                  for (let item of this.userSummaries) {
+                    item['_last_late_penalty'] = lastPenalties[item.user.id];
+                  }
+                }
+              },
               error => this.error = error.error
             )
           },
