@@ -1148,8 +1148,12 @@ def task_last_late_penalties(tid):
 
         # allow access even before the opening time
 
+
+        all_penalties = SubmissionService.get_late_penalties_for_task(task)
+        if all_penalties is None:
+            return '', 204
         last_penalties = {}
-        for unit_id, penalties in SubmissionService.get_late_penalties_for_task(task):
+        for unit_id, penalties in all_penalties.items():
             if penalties:
                 # pick the late penalty for the last submission of each unit (User/Team)
                 last_penalties[unit_id] = penalties[max(penalties.keys())]
