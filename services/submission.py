@@ -930,7 +930,7 @@ class SubmissionService:
         return ret
 
     @classmethod
-    def get_last_late_penalties_for_task(cls, task: Task) -> Optional[Dict[int, int]]:
+    def get_last_late_penalties_for_task(cls, task: Task) -> Optional[Dict[int, float]]:
         all_penalties = cls.get_late_penalties_for_task(task)
         if all_penalties is None:
             return None
