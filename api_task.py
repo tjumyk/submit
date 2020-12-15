@@ -1185,7 +1185,7 @@ def task_export_results(tid):
             summaries = SubmissionService.get_team_summaries(task)
             with StringIO() as buffer:
                 if not expand_team_members:
-                    header = ['ID', 'Name']
+                    header = ['ID', 'Name', 'Last Attempt (UTC Time)']
                     if last_late_penalties is not None:
                         header.append('Last Late Penalty')
                     header.extend([c.name for c in configs])
@@ -1194,14 +1194,14 @@ def task_export_results(tid):
                     for summary in summaries:
                         team = summary.team
                         team_conclusions = conclusions.get(team.id, {})
-                        values = [str(team.id), team.name]
+                        values = [str(team.id), team.name, str(summary.last_submit_time)]
                         if last_late_penalties is not None:
                             values.append(str(last_late_penalties.get(team.id)))
                         values.extend([str(team_conclusions.get(c.id)) for c in configs])
                         buffer.write('\t'.join(values))
                         buffer.write('\n')
                 else:
-                    header = ['TeamID', 'TeamName', 'UserID', 'UserName']
+                    header = ['TeamID', 'TeamName', 'UserID', 'UserName', 'Last Attempt (UTC Time)']
                     if last_late_penalties is not None:
                         header.append('Last Late Penalty')
                     header.extend([c.name for c in configs])
@@ -1214,7 +1214,8 @@ def task_export_results(tid):
                             if last_late_penalties is not None else None
                         conclusion_columns = [str(team_conclusions.get(c.id)) for c in configs]
                         for ass in team.user_associations:
-                            values = [str(team.id), team.name, str(ass.user.id), ass.user.name]
+                            values = [str(team.id), team.name, str(ass.user.id), ass.user.name,
+                                      str(summary.last_submit_time)]
                             if last_late_penalties is not None:
                                 values.append(team_last_late_penalty)
                             values.extend(conclusion_columns)
@@ -1224,7 +1225,7 @@ def task_export_results(tid):
         else:
             summaries = SubmissionService.get_user_summaries(task)
             with StringIO() as buffer:
-                header = ['ID', 'Name']
+                header = ['ID', 'Name', 'Last Attempt (UTC Time)']
                 if last_late_penalties is not None:
                     header.append('Last Late Penalty')
                 header.extend([c.name for c in configs])
@@ -1233,7 +1234,7 @@ def task_export_results(tid):
                 for summary in summaries:
                     user = summary.user
                     user_conclusions = conclusions.get(user.id, {})
-                    values = [str(user.id), user.name]
+                    values = [str(user.id), user.name, str(summary.last_submit_time)]
                     if last_late_penalties is not None:
                         values.append(str(last_late_penalties.get(user.id)))
                     values.extend([str(user_conclusions.get(c.id)) for c in configs])
