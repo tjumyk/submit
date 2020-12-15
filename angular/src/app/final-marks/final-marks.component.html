@@ -11,7 +11,7 @@
       <div class="item">
         <div class="ui basic buttons small">
           <a *ngIf="!task.is_final_marks_released && isAdmin" class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> Import</a>
-          <a class="ui button" href="api/tasks/{{taskId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
+          <a class="ui button" download="{{task.title|filename}}-final-marks.tsv" href="api/tasks/{{taskId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
         </div>
       </div>
       <div class="item" *ngIf="!task.is_final_marks_released && isAdmin">

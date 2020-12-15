@@ -19,7 +19,10 @@
           <div class="ui right floated menu secondary fitted">
             <div class="item">
               <div class="ui basic buttons small">
-                <a class="ui button" href="api/terms/{{termId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
+                <a class="ui button" href="api/terms/{{termId}}/export-final-marks" target="_blank"
+                   download="{{term.course.code}}-{{term.year}}S{{term.semester}}-final-marks.tsv">
+                  <i class="icon share"></i> Export
+                </a>
               </div>
             </div>
           </div>
