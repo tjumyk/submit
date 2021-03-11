@@ -44,7 +44,7 @@ export class AdminCourseNewComponent implements OnInit {
 
   autoFillForm(){
     if(this.form.code){
-      let shortCode = this.form.code.substr(-4, 4);
+      let shortCode = this.adminService.shortenCourseCode(this.form.code);
       this.form.tutor_group_name = `${shortCode}_tutor`
     }else{
       this.form.tutor_group_name = ''

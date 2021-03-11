@@ -177,7 +177,7 @@ export class AdminCourseEditComponent implements OnInit {
 
   autoFillForm(){
     if(this.newTermForm.year && this.newTermForm.semester){
-      let shortCode = this.course.code.substr( -4, 4);
+      let shortCode = this.adminService.shortenCourseCode(this.course.code);
       let shortYear = this.newTermForm.year % 100;
       let shortSemester = this.newTermForm.semester[0];
       this.newTermForm.student_group_name = `${shortCode}_${shortYear}s${shortSemester}_student`

@@ -420,4 +420,12 @@ export class AdminService {
     const req = new HttpRequest('POST', `${this.api}/tasks/${task_id}/import-give`, form, {reportProgress: true})
     return this.http.request(req);
   }
+
+  shortenCourseCode(code: string): string{
+    let match = code.match(/^[a-zA-Z]+(\d+)$/);
+    if(match){ // digits only
+      return match[1];
+    }
+    return code.toLowerCase();
+  }
 }
