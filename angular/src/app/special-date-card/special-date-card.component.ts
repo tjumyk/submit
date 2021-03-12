@@ -19,14 +19,14 @@ export class SpecialDateCardComponent implements OnInit, OnDestroy {
       const month = now.get('month') + 1;
       const day = now.get('date');
 
-      if (month == 4 && day == 1) {
-        this.specialDate = 'april-fool';
-        return;
-      }
-      if (month == 10 && day == 31) {
-        this.specialDate = 'halloween';
-        return;
-      }
+      // if (month == 4 && day == 1) {
+      //   this.specialDate = 'april-fool';
+      //   return;
+      // }
+      // if (month == 10 && day == 31) {
+      //   this.specialDate = 'halloween';
+      //   return;
+      // }
       this.specialDate = undefined;
     };
     checker();

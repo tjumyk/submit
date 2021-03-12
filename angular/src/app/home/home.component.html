@@ -3,7 +3,10 @@
     <div class="ten wide column">
       <h2 class="ui center aligned fluid header">
         <img src="static/assets/logo-256.png">
-        UNSWKG Submit
+        <div class="content">
+          DSEG Submit
+          <div class="sub header">作业管理系统</div>
+        </div>
       </h2>
       <app-error-message [error]="error"></app-error-message>
       <div class="ui active inline centered text loader" *ngIf="loadingUser || loadingCourses">
