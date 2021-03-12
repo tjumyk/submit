@@ -49,7 +49,7 @@
                 <div class="header">Open Time</div>
                 <div class="description">
                   <div *ngIf="task.open_time; else timeTbd">
-                    <div>{{ task.open_time|date:'medium' }}</div>
+                    <div>{{ task.open_time|date:'medium' }} {{task.open_time|date: 'z'}}</div>
                     <div>({{task._open_time_from_now}})</div>
                   </div>
                 </div>
@@ -61,7 +61,7 @@
                 <div class="header">Due Time</div>
                 <div class="description">
                   <div *ngIf="task.due_time; else timeTbd">
-                    <div>{{ task.due_time|date:'medium' }}</div>
+                    <div>{{ task.due_time|date:'medium' }} {{task.due_time|date: 'z'}}</div>
                     <div>({{task._due_time_from_now}})</div>
                   </div>
                 </div>
@@ -98,7 +98,7 @@
                 <div class="header">Team Join Close Time</div>
                 <div class="description">
                   <div *ngIf="task.team_join_close_time; else timeTbd">
-                    <div>{{ task.team_join_close_time|date:'medium' }}</div>
+                    <div>{{ task.team_join_close_time|date:'medium' }} {{task.team_join_close_time|date: 'z'}}</div>
                     <div>({{task._team_join_close_time_from_now}})</div>
                   </div>
                 </div>
