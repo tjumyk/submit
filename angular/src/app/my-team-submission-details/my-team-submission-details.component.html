@@ -1,12 +1,12 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
-<div class="ui text loader active" *ngIf="loadingSubmission">Loading submission info...</div>
+<div class="ui text loader active" *ngIf="loadingSubmission" i18n>Loading submission info...</div>
 
 <div *ngIf="submission">
   <div class="ui breadcrumb">
-    <a class="section" routerLink="..">Team Submissions</a>
+    <a class="section" routerLink=".." i18n>Team Submissions</a>
     <i class="icon right angle divider"></i>
-    <div class="active section">Submission {{submission.id}}</div>
+    <div class="active section"><ng-container i18n>Submission</ng-container> {{submission.id}}</div>
   </div>
 
   <app-submission-card [submission]="submission" [apiBase]="submissionService.myTeamApi"

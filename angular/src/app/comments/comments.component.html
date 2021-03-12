@@ -1,16 +1,16 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingSummaries">Loading comment summaries...</div>
+<div class="ui loader text active" *ngIf="loadingSummaries" i18n>Loading comment summaries...</div>
 
 <ng-container *ngIf="summaries">
   <div class="ui segment">
     <div class="ui statistics mini">
       <div class="statistic">
         <div class="value"><i class="icon comments"></i> {{totalComments}}</div>
-        <div class="label">Comments</div>
+        <div class="label" i18n>Comments</div>
       </div>
       <div class="statistic">
         <div class="value"><i class="icon paper plane"></i> {{summaries.length}}</div>
-        <div class="label">Submissions w/ Comments</div>
+        <div class="label" i18n>Submissions w/ Comments</div>
       </div>
     </div>
   </div>
@@ -25,13 +25,13 @@
     <thead>
     <tr>
       <th>#</th>
-      <th (click)="sortField('submission.id', thSubmissionID)" #thSubmissionID>Submission ID</th>
-      <th (click)="sortField('submission.submitter_id', thSubmitter)" #thSubmitter>Submitter</th>
-      <th (click)="sortField('total_comments', thTotalComments)" #thTotalComments>Total Comments</th>
-      <th (click)="sortField('last_comment.author_id', thLastCommenter)" #thLastCommenter>Last Commenter</th>
-      <th (click)="sortField('_last_comment_time', thLastCommentTime)" #thLastCommentTime>Last Comment Time</th>
-      <th (click)="sortField('last_comment.content', thLastCommentContent)" #thLastCommentContent>Last Comment Content</th>
-      <th>Ops</th>
+      <th (click)="sortField('submission.id', thSubmissionID)" #thSubmissionID i18n>Submission ID</th>
+      <th (click)="sortField('submission.submitter_id', thSubmitter)" #thSubmitter i18n>Submitter</th>
+      <th (click)="sortField('total_comments', thTotalComments)" #thTotalComments i18n>Total Comments</th>
+      <th (click)="sortField('last_comment.author_id', thLastCommenter)" #thLastCommenter i18n>Last Commenter</th>
+      <th (click)="sortField('_last_comment_time', thLastCommentTime)" #thLastCommentTime i18n>Last Comment Time</th>
+      <th (click)="sortField('last_comment.content', thLastCommentContent)" #thLastCommentContent i18n>Last Comment Content</th>
+      <th i18n>Ops</th>
     </tr>
     </thead>
     <tbody>
@@ -43,7 +43,7 @@
       <td>
         <app-user-mini-card *ngIf="summary.last_comment.author; else system"
                             [user]="summary.last_comment.author" [enableAdmin]="isAdmin" [enablePopup]="true"></app-user-mini-card>
-        <ng-template #system>System</ng-template>
+        <ng-template #system><ng-container i18n>System</ng-container></ng-template>
       </td>
       <td>{{summary.last_comment.modified_at | date: 'short'}}</td>
       <td [title]="summary.last_comment.content">

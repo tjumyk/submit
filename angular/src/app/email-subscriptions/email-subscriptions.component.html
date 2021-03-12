@@ -4,11 +4,11 @@
       <app-error-message [error]="error"></app-error-message>
 
       <div class="ui raised segment">
-        <div class="ui text loader active inline centered" *ngIf="loadingChannels">Loading channels...</div>
+        <div class="ui text loader active inline centered" *ngIf="loadingChannels" i18n>Loading channels...</div>
 
         <ng-container *ngIf="channels">
           <h3 class="ui header">
-            <i class="icon bell outline"></i> Email Subscriptions
+            <i class="icon bell outline"></i> <ng-container i18n>Email Subscriptions</ng-container>
           </h3>
           <div class="ui form">
             <div class="grouped fields">
@@ -25,8 +25,8 @@
 
       <div class="ui grid center aligned">
         <div class="column">
-          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> Back</a>
-          <a class="ui basic button" routerLink="/"><i class="icon home"></i> Home</a>
+          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> <ng-container i18n>Back</ng-container></a>
+          <a class="ui basic button" routerLink="/"><i class="icon home"></i> <ng-container i18n>Home</ng-container></a>
         </div>
       </div>
     </div>

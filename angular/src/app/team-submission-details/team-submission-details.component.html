@@ -1,20 +1,20 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui text loader active" *ngIf="loadingTeam">Loading team info...</div>
-<div class="ui text loader active" *ngIf="loadingSubmission">Loading submission info...</div>
+<div class="ui text loader active" *ngIf="loadingTeam" i18n>Loading team info...</div>
+<div class="ui text loader active" *ngIf="loadingSubmission" i18n>Loading submission info...</div>
 
 <div *ngIf="submission">
   <div class="ui grid stackable two column">
     <div class="column">
       <div class="ui breadcrumb">
-        <a class="section" routerLink="../..">Submissions</a>
+        <a class="section" routerLink="../.." i18n>Submissions</a>
         <i class="icon right angle divider"></i>
         <a class="section" routerLink="..">{{team.name}}</a>
         <i class="icon right angle divider"></i>
-        <div class="active section">Submission {{submission.id}}</div>
+        <div class="active section"><ng-container i18n>Submission</ng-container> {{submission.id}}</div>
       </div>
     </div>
     <div class="column right aligned">
-      <a class="ui button mini" routerLink="../../../teams/{{teamId}}"><i class="icon users"></i>Team Info</a>
+      <a class="ui button mini" routerLink="../../../teams/{{teamId}}"><i class="icon users"></i><ng-container i18n>Team Info</ng-container></a>
     </div>
   </div>
 

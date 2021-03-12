@@ -1,16 +1,16 @@
 <div class="ui message info" *ngIf="rowOffset">
   <i class="icon info circle"></i>
-  Older submissions have been removed due to the history limit of this task.
+  <ng-container i18n>Older submissions have been removed due to the history limit of this task.</ng-container>
 </div>
 
 <div class="ui message info special" *ngIf="status?.special_consideration">
   <i class="icon heart outline"></i>
-  Special Consideration:
+  <ng-container i18n>Special Consideration</ng-container>:
   <div class="ui label basic" *ngIf="status.special_consideration.due_time_extension">
-    Due Time +{{status.special_consideration.due_time_extension}}h
+    <ng-container i18n>Due Time</ng-container> +{{status.special_consideration.due_time_extension}}h
   </div>
   <div class="ui label basic" *ngIf="status.special_consideration.submission_attempt_limit_extension">
-    Attempt Limit +{{status.special_consideration.submission_attempt_limit_extension}}
+    <ng-container i18n>Attempt Limit</ng-container> +{{status.special_consideration.submission_attempt_limit_extension}}
   </div>
 </div>
 
@@ -18,9 +18,9 @@
 <table class="ui table unstackable" *ngIf="submissions">
   <thead>
   <tr>
-    <th>#</th><th>ID</th><th *ngIf="task.is_team_task">Submitter</th><th>Submitted At</th>
+    <th>#</th><th>ID</th><th *ngIf="task.is_team_task" i18n>Submitter</th><th i18n>Submitted At</th>
     <th *ngFor="let config of task.auto_test_configs">{{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i></th>
-    <th>Operations</th>
+    <th i18n>Operations</th>
   </tr>
   </thead>
   <tbody>

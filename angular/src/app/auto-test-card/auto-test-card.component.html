@@ -1,10 +1,10 @@
 <div class="ui summary segment" [class.admin]="isAdmin" [ngClass]="getStatusClass(test.final_state || test.state)">
   <a class="ui bottom attached toggle label" (click)="toggleDetails()" [ngClass]="{'activated': showDetails}">
     <ng-container *ngIf="showDetails; else detailsHidden">
-      <i class="icon chevron up" ></i> Hide Details <i class="icon chevron up" ></i>
+      <i class="icon chevron up" ></i> <ng-container i18n>Hide Details</ng-container> <i class="icon chevron up" ></i>
     </ng-container>
     <ng-template #detailsHidden>
-      <i class="icon chevron down" ></i> Show Details <i class="icon chevron down" ></i>
+      <i class="icon chevron down" ></i> <ng-container i18n>Show Details</ng-container> <i class="icon chevron down" ></i>
     </ng-template>
   </a>
   <a class="ui right corner red label" (click)="deleteAutoTest(test, btnDeleteAutoTest)" #btnDeleteAutoTest *ngIf="isAdmin">
@@ -81,7 +81,7 @@
     <ng-container *ngIf="(test.final_state || test.state) == 'PENDING'">
       <div class="pending-loader-wrapper">
         <div class="ui text loader active inline centered">
-          Waiting for worker bot...
+          <ng-container i18n>Waiting for worker bot...</ng-container>
           <ng-container *ngIf="test.pending_tests_ahead">
             <br/>
             {{test.pending_tests_ahead}}
@@ -97,25 +97,25 @@
       <div class="ui small timer statistics" *ngIf="test._elapse_seconds!==undefined">
         <div class="statistic">
           <div class="value">{{test._elapse_hours|number:'2.0-0'}}</div>
-          <div class="label">Hours</div>
+          <div class="label" i18n>Hours</div>
         </div>
         <div class="statistic">
           <div class="value">{{test._elapse_minutes|number:'2.0-0'}}</div>
-          <div class="label">Minutes</div>
+          <div class="label" i18n>Minutes</div>
         </div>
         <div class="statistic">
           <div class="value">{{test._elapse_seconds|number:'2.0-0'}}</div>
-          <div class="label">Seconds</div>
+          <div class="label" i18n>Seconds</div>
         </div>
       </div>
     </ng-container>
 
     <ng-container *ngIf="(test.final_state || test.state) == 'RETRY'">
-      <div class="ui text loader active">Retrying...</div>
+      <div class="ui text loader active" i18n>Retrying...</div>
     </ng-container>
 
     <ng-container *ngIf="(test.final_state || test.state) == 'REVOKED'">
-      <div class="ui header">Test has been revoked.</div>
+      <div class="ui header" i18n>Test has been revoked.</div>
     </ng-container>
   </div>
 </div>
@@ -123,42 +123,42 @@
 <div class="ui segment details" *ngIf="showDetails" #detailsPanel>
   <div class="ui list horizontal">
     <div class="item">
-      <div class="header">State</div>
+      <div class="header" i18n>State</div>
       <span [ngStyle]="{'color': getStatusColor(test.final_state || test.state)}">
         {{test.final_state || test.state}}
       </span>
     </div>
     <div class="item" *ngIf="test.work_id">
-      <div class="header">Work ID</div>
+      <div class="header" i18n>Work ID</div>
       {{test.work_id}}
     </div>
     <div class="item" *ngIf="test.hostname">
-      <div class="header">Worker</div>
+      <div class="header" i18n>Worker</div>
       {{test.hostname}}
     </div>
     <div class="item" *ngIf="test.pid">
-      <div class="header">PID</div>
+      <div class="header" i18n>PID</div>
       {{test.pid}}
     </div>
   </div>
 
   <div class="ui list horizontal">
     <div class="item">
-      <div class="header">Created At</div>
+      <div class="header" i18n>Created At</div>
       {{test.created_at | date: 'medium'}}
     </div>
     <div class="item">
-      <div class="header">Started At</div>
+      <div class="header" i18n>Started At</div>
       <span *ngIf="test.started_at; else noStartTime">{{test.started_at | date: 'medium'}}</span>
       <ng-template #noStartTime>N/A</ng-template>
     </div>
     <div class="item">
-      <div class="header">Stopped At</div>
+      <div class="header" i18n>Stopped At</div>
       <span *ngIf="test.stopped_at; else noStopTime">{{test.stopped_at | date: 'medium'}}</span>
       <ng-template #noStopTime>N/A</ng-template>
     </div>
     <div class="item">
-      <div class="header">Duration</div>
+      <div class="header" i18n>Duration</div>
       <span *ngIf="test.started_at && test.stopped_at; else noDuration">{{computeDuration(test.started_at, test.stopped_at)}}</span>
       <ng-template #noDuration>N/A</ng-template>
     </div>
@@ -170,13 +170,13 @@
       <pre class="code"><code>{{test.exception_traceback}}</code></pre>
     </div>
     <div *ngIf="test.result != null && config.result_render_html && extractConclusion(test, config) != null">
-      <div class="ui divider horizontal">Raw Result</div>
+      <div class="ui divider horizontal" i18n>Raw Result</div>
       <pre class="code"><code>{{test.result|json}}</code></pre>
     </div>
     <div *ngIf="test.output_files && test.output_files.length">
-      <div class="ui divider horizontal">Output Files</div>
+      <div class="ui divider horizontal" i18n>Output Files</div>
       <table class="ui table unstackable">
-        <thead><tr><th>#</th><th>ID</th><th>Path</th><th>Created At</th><th>Operations</th></tr></thead>
+        <thead><tr><th>#</th><th>ID</th><th i18n>Path</th><th i18n>Created At</th><th i18n>Operations</th></tr></thead>
         <tbody>
         <tr *ngFor="let file of test.output_files; index as j">
           <td>{{j+1}}</td>

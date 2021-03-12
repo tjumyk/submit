@@ -1,13 +1,13 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
 
-<div class="ui active text loader" *ngIf="loadingCourse">Loading course info...</div>
+<div class="ui active text loader" *ngIf="loadingCourse" i18n>Loading course info...</div>
 
 <div class="ui grid stackable two column" *ngIf="course">
   <div class="one column row">
     <div class="column">
       <div class="ui breadcrumb">
-        <a class="section" routerLink="..">Courses</a>
+        <a class="section" routerLink=".." i18n>Courses</a>
         <i class="icon right angle divider"></i>
         <div class="section active">{{ course.code }}</div>
       </div>
@@ -34,15 +34,15 @@
               {{course.id}}
             </div>
             <div class="item">
-              <div class="header">Code</div>
+              <div class="header" i18n>Code</div>
               {{course.code}}
             </div>
             <div class="item">
-              <div class="header">Name</div>
+              <div class="header" i18n>Name</div>
               {{course.name}}
             </div>
             <div class="item">
-              <div class="header">Tutor Group</div>
+              <div class="header" i18n>Tutor Group</div>
               <a target="_blank" href="admin/groups/{{ course.tutor_group.id }}">{{ course.tutor_group.name }}</a>
             </div>
           </div>
@@ -60,12 +60,12 @@
         <div class="column">
           <form class="ui form" [ngClass]="{'loading': uploadingIcon}">
             <div class="field">
-              <label>Icon</label>
+              <label i18n>Icon</label>
               <input type="file" hidden name="icon" #icon_input [accept]="iconValidator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
               <img class="ui small centered image" [src]="course.icon" *ngIf="course.icon">
-              <div class="text muted" *ngIf="!course.icon">(No icon)</div>
+              <div class="text muted" *ngIf="!course.icon" i18n>(No icon)</div>
             </div>
-            <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
+            <button class="ui primary button" type="button" (click)="icon_input.click()" i18n>Upload Icon</button>
             <p>Max size: {{iconValidator.filter.size_limit/1024 | number}}KB</p>
           </form>
         </div>
@@ -80,11 +80,11 @@
     <!--Terms-->
     <div class="ui top attached segment">
       <div class="ui header">
-        <i class="icon calendar outline"></i> Terms
+        <i class="icon calendar outline"></i> <ng-container i18n>Terms</ng-container>
       </div>
     </div>
     <table class="ui bottom attached table unstackable celled">
-      <thead><tr><th>ID</th><th>Year</th><th>Semester</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>ID</th><th i18n>Year</th><th i18n>Semester</th><th class="collapsing" i18n>Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let term of course.terms, index as i">
         <td>{{term.id}}</td>
@@ -105,13 +105,13 @@
     <div class="ui segment">
       <div class="ui header dividing">
         <i class="icon plus"></i>
-        New Term
+        <ng-container i18n>New Term</ng-container>
       </div>
 
       <form class="ui form" #f="ngForm" (ngSubmit)="addTerm(f)" [ngClass]="{'loading': addingTerm}">
         <div class="field required"
              [ngClass]="{'error': (f.submitted || yearModel.touched || yearModel.dirty) && yearModel.invalid}">
-          <label>Year</label>
+          <label i18n>Year</label>
           <input type="number" name="year" placeholder="year of term" required min="2000" max="2200" [(ngModel)]="newTermForm.year" #yearModel="ngModel" (change)="autoFillForm()">
           <div class="errors">
             <label *ngIf="yearModel.errors?.required"><i class="icon times"></i>Year is required</label>
@@ -120,7 +120,7 @@
           </div>
         </div>
         <div class="field required" [ngClass]="{'error': (f.submitted || semesterModel.touched || semesterModel.dirty) && semesterModel.invalid}">
-          <label>Semester</label>
+          <label i18n>Semester</label>
           <select name="semester" [(ngModel)]="newTermForm.semester" #semesterModel="ngModel" required (change)="autoFillForm()">
             <option value="1">1</option>
             <option value="2">2</option>
@@ -132,7 +132,7 @@
           </div>
         </div>
         <div class="field required" [ngClass]="{'error': (student_group_name_model.touched || student_group_name_model.dirty || f.submitted) && student_group_name_model.invalid}">
-          <label>Student Group Name</label>
+          <label i18n>Student Group Name</label>
           <input type="text" name="student_group_name" placeholder='Group name for students of this term (at most 24 characters)'
                  required maxlength="24"
                  [(ngModel)]="newTermForm.student_group_name" #student_group_name_model="ngModel">
@@ -144,10 +144,10 @@
         <div class="field">
           <div class="ui input checkbox" (click)="checkboxNewStudentGroup.click()">
             <input type="checkbox" #checkboxNewStudentGroup class="hidden" tabindex="0" name="is_new_student_group" [(ngModel)]="newTermForm.is_new_student_group">
-            <label>Create new student group</label>
+            <label i18n>Create new student group</label>
           </div>
         </div>
-        <button type="submit" class="ui button primary fluid">Add Term</button>
+        <button type="submit" class="ui button primary fluid" i18n>Add Term</button>
       </form>
     </div>
     <!--End of New Term-->

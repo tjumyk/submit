@@ -1,21 +1,21 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
-<div class="ui loader text active" *ngIf="loadingUsers">Loading user list...</div>
-<div class="ui loader text active" *ngIf="loadingMarks">Loading final marks...</div>
+<div class="ui loader text active" *ngIf="loadingUsers" i18n>Loading user list...</div>
+<div class="ui loader text active" *ngIf="loadingMarks" i18n>Loading final marks...</div>
 
 <ng-container *ngIf="userPages">
-  <div class="ui message warning" *ngIf="!task.is_final_marks_released&&!isAdmin"><i class="icon triangle exclamation"></i> The following final marks have not been released.</div>
+  <div class="ui message warning" *ngIf="!task.is_final_marks_released&&!isAdmin"><i class="icon triangle exclamation"></i> <ng-container i18n>The following final marks have not been released.</ng-container></div>
 
   <div class="ui top attached clearing segment">
     <div class="ui right floated menu secondary fitted">
       <div class="item">
         <div class="ui basic buttons small">
-          <a *ngIf="!task.is_final_marks_released && isAdmin" class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> Import</a>
-          <a class="ui button" download="{{task.title|filename}}-final-marks.tsv" href="api/tasks/{{taskId}}/export-final-marks" target="_blank"><i class="icon share"></i> Export</a>
+          <a *ngIf="!task.is_final_marks_released && isAdmin" class="ui button" routerLink="import" [class.disabled]="releasing"><i class="icon share vertically flipped"></i> <ng-container i18n>Import</ng-container></a>
+          <a class="ui button" download="{{task.title|filename}}-final-marks.tsv" href="api/tasks/{{taskId}}/export-final-marks" target="_blank"><i class="icon share"></i> <ng-container i18n>Export</ng-container></a>
         </div>
       </div>
       <div class="item" *ngIf="!task.is_final_marks_released && isAdmin">
-        <button class="ui button primary small" [class.loading]="releasing" [class.disabled]="releasing" (click)="release()"><i class="icon check"></i> Release</button>
+        <button class="ui button primary small" [class.loading]="releasing" [class.disabled]="releasing" (click)="release()"><i class="icon check"></i> <ng-container i18n>Release</ng-container></button>
       </div>
     </div>
     <div class="ui left floated menu secondary fitted">
@@ -32,12 +32,12 @@
     <thead>
     <tr>
       <th>#</th>
-      <th (click)="sortField('name', thUser)" #thUser>User</th>
-      <th (click)="sortField('_marks.marks', thMarks)" #thMarks>Marks</th>
-      <th (click)="sortField('_marks.comment', thComment)" #thComment>Comment</th>
-      <th (click)="sortField('_marks._created_at_time', thCreatedAt)" #thCreatedAt>Created At</th>
-      <th (click)="sortField('_marks._modified_at_time', thModifiedAt)" #thModifiedAt>Updated At</th>
-      <th>Ops</th>
+      <th (click)="sortField('name', thUser)" #thUser i18n>User</th>
+      <th (click)="sortField('_marks.marks', thMarks)" #thMarks i18n>Marks</th>
+      <th (click)="sortField('_marks.comment', thComment)" #thComment i18n>Comment</th>
+      <th (click)="sortField('_marks._created_at_time', thCreatedAt)" #thCreatedAt i18n>Created At</th>
+      <th (click)="sortField('_marks._modified_at_time', thModifiedAt)" #thModifiedAt i18n>Updated At</th>
+      <th i18n>Ops</th>
     </tr>
     </thead>
     <tbody>
@@ -78,21 +78,21 @@
       <app-error-message [error]="editError"></app-error-message>
       <form class="ui form" (ngSubmit)="submitEdit(f)" #f="ngForm" [ngClass]="{'loading': submittingEdit}">
         <div class="field required" [ngClass]="{'error': (f.submitted || marks_model.touched || marks_model.dirty) && marks_model.invalid}">
-          <label>Marks</label>
+          <label i18n>Marks</label>
           <input type="number" [(ngModel)]="editForm.marks" name="marks" #marks_model="ngModel" required>
           <div class="errors" *ngIf="marks_model.errors">
             <label *ngIf="marks_model.errors.required"><i class="times icon"></i> Marks is required</label>
           </div>
         </div>
         <div class="field"  [ngClass]="{'error': (f.submitted || comment_model.touched || comment_model.dirty) && comment_model.invalid}">
-          <label>Comment (Optional)</label>
+          <label i18n>Comment (Optional)</label>
           <textarea [(ngModel)]="editForm.comment" name="comment" #comment_model="ngModel" maxlength="128" rows="3"></textarea>
           <div class="errors" *ngIf="comment_model.errors">
             <label *ngIf="comment_model.errors.maxlength"><i class="times icon"></i>Comment is too long</label>
           </div>
         </div>
         <button type="submit" class="ui button fluid primary">
-          <i class="icon check"></i> Save
+          <i class="icon check"></i> <ng-container i18n>Save</ng-container>
         </button>
       </form>
     </div>

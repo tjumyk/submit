@@ -9,8 +9,8 @@
           <img src="static/assets/logo-256.png">
           <div class="content">
             UNSWKG Submit
-            <div class="sub header" *ngIf="version">Version: {{version.commit}}</div>
-            <div class="sub header">Author: <a href="https://github.com/tjumyk" target="_blank">Yukai (Kelvin) Miao</a></div>
+            <div class="sub header" *ngIf="version"><ng-container i18n>Version</ng-container>: {{version.commit}}</div>
+            <div class="sub header"><ng-container i18n>Author</ng-container>: <a href="https://github.com/tjumyk" target="_blank">Yukai (Kelvin) Miao</a></div>
             <div class="sub header">Copyright &copy; <a href="https://kg.cse.unsw.edu.au" target="_blank">UNSW Knowledge Graph Group</a></div>
           </div>
         </h3>
@@ -19,8 +19,8 @@
 
       <div class="ui grid center aligned">
         <div class="column">
-          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> Back</a>
-          <a class="ui basic button" routerLink="/"><i class="icon home"></i> Home</a>
+          <a class="ui basic button" (click)="navigateBack()"><i class="icon left chevron"></i> <ng-container i18n>Back</ng-container></a>
+          <a class="ui basic button" routerLink="/"><i class="icon home"></i> <ng-container i18n>Home</ng-container></a>
         </div>
       </div>
     </div>

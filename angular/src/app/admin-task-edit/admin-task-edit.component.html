@@ -1,11 +1,11 @@
 <app-error-message [error]="error"></app-error-message>
 
-<div class="ui text loader active" *ngIf="loadingTask">Loading task info...</div>
+<div class="ui text loader active" *ngIf="loadingTask" i18n>Loading task info...</div>
 
 <ng-container *ngIf="task">
   <!-- Breadcrumb -->
   <div class="ui breadcrumb">
-    <a class="section" routerLink="../../courses">Courses</a>
+    <a class="section" routerLink="../../courses" i18n>Courses</a>
     <i class="icon right angle divider"></i>
     <a class="section" routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
     <i class="icon right angle divider"></i>
@@ -19,7 +19,7 @@
     <!-- Header -->
     <div class="ui clearing segment">
       <a routerLink="/terms/{{task.term_id}}/tasks/{{task.id}}" class="ui right floated button mini">
-        <i class="icon eye"></i> View
+        <i class="icon eye"></i> <ng-container i18n>View</ng-container>
       </a>
       <div class="ui header left floated">
         <i class="icon" [ngClass]="categories[task.type].icon"></i>
@@ -36,23 +36,23 @@
           {{ task.id }}
         </div>
         <div class="item">
-          <div class="header">Type</div>
+          <div class="header" i18n>Type</div>
           {{ task.type | titlecase }}
         </div>
         <div class="item">
-          <div class="header">Created At</div>
+          <div class="header" i18n>Created At</div>
           {{ task.created_at | date: 'medium'}}
         </div>
         <div class="item">
-          <div class="header">Updated At</div>
+          <div class="header" i18n>Updated At</div>
           {{ task.modified_at | date: 'medium' }}
         </div>
         <div class="item">
-          <div class="header">Course</div>
+          <div class="header" i18n>Course</div>
           <a routerLink="../../courses/{{ task.term.course.id }}">{{ task.term.course.code }}</a>
         </div>
         <div class="item">
-          <div class="header">Term</div>
+          <div class="header" i18n>Term</div>
           <a routerLink="../../terms/{{ task.term.id }}">{{ task.term.year }} Semester {{ task.term.semester }}</a>
         </div>
       </div>
@@ -68,27 +68,27 @@
     <div class="four wide column">
       <div class="ui fluid vertical pointing menu">
         <a class="item" (click)="activeTab='basic'" [ngClass]="{'active': activeTab=='basic'}">
-          Basic
+          <ng-container i18n>Basic</ng-container>
           <i class="icon info circle"></i>
         </a>
         <a class="item" (click)="activeTab='materials'" [ngClass]="{'active': activeTab=='materials'}">
-          Materials
+          <ng-container i18n>Materials</ng-container>
           <i class="icon copy"></i>
         </a>
         <a class="item" (click)="activeTab='requirements'" [ngClass]="{'active': activeTab=='requirements'}">
-          Requirements
+          <ng-container i18n>Requirements</ng-container>
           <i class="icon copy outline"></i>
         </a>
         <a class="item" (click)="activeTab='auto_test_configs'; editingAutoTestConfig=null" [ngClass]="{'active': activeTab=='auto_test_configs'}">
-          Auto Test Configurations
+          <ng-container i18n>Auto Test Configurations</ng-container>
           <i class="icon terminal"></i>
         </a>
         <a class="item" (click)="activeTab='special_considerations'" [ngClass]="{'active': activeTab=='special_considerations'}">
-          Special Considerations
+          <ng-container i18n>Special Considerations</ng-container>
           <i class="icon heart outline"></i>
         </a>
         <a class="item" (click)="activeTab='import_export'" [ngClass]="{'active': activeTab=='import_export'}">
-          Import / Export
+          <ng-container i18n>Import / Export</ng-container>
           <i class="icon exchange"></i>
         </a>
       </div>
@@ -104,7 +104,7 @@
             <div class="fields">
               <div class="three wide field">
                 <div class="field required">
-                  <label>Task Type</label>
+                  <label i18n>Task Type</label>
                   <select name="type" [(ngModel)]="form.type" required>
                     <option value="lab">Lab</option>
                     <option value="assignment">Assignment</option>
@@ -114,7 +114,7 @@
               </div>
               <div class="thirteen wide field">
                 <div class="field required" [ngClass]="{'error': (f.submitted||titleModel.dirty||titleModel.touched) && titleModel.invalid}">
-                  <label>Title</label>
+                  <label i18n>Title</label>
                   <input type="text" name="title" [(ngModel)]="form.title" #titleModel="ngModel" placeholder="Title of the task (at most 128 characters)" required maxlength="128">
                   <div class="errors">
                     <label *ngIf="titleModel.errors?.required">Title is required</label>
@@ -124,7 +124,7 @@
               </div>
             </div>
             <div class="field">
-              <label>Description (Optional)</label>
+              <label i18n>Description (Optional)</label>
               <textarea name="description" rows="6" [(ngModel)]="form.description" placeholder="Short description of the task"></textarea>
             </div>
 
@@ -132,20 +132,20 @@
               <div class="two column row">
                 <div class="column">
                   <div class="field">
-                    <label>Open Time ({{localTimeZone}})</label>
+                    <label><ng-container i18n>Open Time</ng-container> ({{localTimeZone}})</label>
                     <input type="datetime-local" name="open_time" [(ngModel)]="form.open_time">
                   </div>
                   <div class="field">
-                    <label>Due Time ({{localTimeZone}})</label>
+                    <label><ng-container i18n>Due Time</ng-container> ({{localTimeZone}})</label>
                     <input type="datetime-local" name="due_time" [(ngModel)]="form.due_time">
                   </div>
                   <div class="field">
-                    <label>Close Time ({{localTimeZone}})</label>
+                    <label><ng-container i18n>Close Time</ng-container> ({{localTimeZone}})</label>
                     <input type="datetime-local" name="close_time" [(ngModel)]="form.close_time">
                   </div>
                   <div class="late-penalty-edit-wrapper">
                     <div class="field" [ngClass]="{'error': (f.submitted||latePenaltyModel.dirty||latePenaltyModel.touched) && latePenaltyModel.invalid}">
-                      <label>Late Penalty</label>
+                      <label i18n>Late Penalty</label>
                       <input #inputLatePenalty type="text" placeholder="Late penalty list" name="late_penalty" maxlength="128" [(ngModel)]="form.late_penalty"
                              pattern=" *\d+(\.\d+)?( +\d+(\.\d+)?)* *" #latePenaltyModel="ngModel"
                              (focus)="editingLatePenalty=true" (blur)="editingLatePenalty=false">
@@ -156,7 +156,7 @@
                     </div>
                     <div class="ui left rail" [hidden]="!editingLatePenalty">
                       <div class="ui message info">
-                        <div class="header">Late Penalty Syntax</div>
+                        <div class="header" i18n>Late Penalty Syntax</div>
                         <ul class="list">
                           <li>It should be <b>a list of float numbers separated by space characters</b>.</li>
                           <li>Each number represents a penalty percentage <b>for a day</b>. E.g. "0.4 0.3 0.2 0.1" means 40% deduction for the first day, 30% deduction for the second day and so on.</li>
@@ -171,39 +171,39 @@
                   <div class="field">
                     <div class="ui input checkbox" (click)="checkboxIsTeamTask.click()">
                       <input type="checkbox" name="is_team_task" [(ngModel)]="form.is_team_task" class="hidden" #checkboxIsTeamTask>
-                      <label>Team task?</label>
+                      <label i18n>Team task?</label>
                     </div>
                   </div>
                   <div class="fields" *ngIf="form.is_team_task">
                     <div class="eight wide field">
-                      <label>Team Min Size</label>
+                      <label i18n>Team Min Size</label>
                       <input type="number" min="1" placeholder="Minimal size" name="team_min_size" [(ngModel)]="form.team_min_size" step="1">
                     </div>
                     <div class="eight wide field">
-                      <label>Team Max Size</label>
+                      <label i18n>Team Max Size</label>
                       <input type="number" min="1" placeholder="Maximal size" name="team_max_size" [(ngModel)]="form.team_max_size" step="1">
                     </div>
                   </div>
                   <div class="field" *ngIf="form.is_team_task">
-                    <label>Team Join Close Time ({{localTimeZone}})</label>
+                    <label><ng-container i18n>Team Join Close Time</ng-container> ({{localTimeZone}})</label>
                     <input type="datetime-local" name="team_join_close_time" [(ngModel)]="form.team_join_close_time">
                   </div>
                 </div>
 
                 <div class="column">
                   <div class="field">
-                    <label>Submission Attempt Limit</label>
+                    <label i18n>Submission Attempt Limit</label>
                     <input type="number" min="1" placeholder="Max submission attempts for a user/team" name="submission_attempt_limit" [(ngModel)]="form.submission_attempt_limit" step="1">
                   </div>
                   <div class="field">
-                    <label>Submission History Limit</label>
+                    <label i18n>Submission History Limit</label>
                     <input type="number" min="1" placeholder="Max submission histories to keep" name="submission_history_limit" [(ngModel)]="form.submission_history_limit" step="1">
                   </div>
                   <div class="field">
-                    <label>Evaluation Method</label>
+                    <label i18n>Evaluation Method</label>
                     <select name="evaluation_method" [(ngModel)]="form.evaluation_method">
-                      <option [ngValue]="null">Offline</option>
-                      <option value="auto_test">Auto Testing</option>
+                      <option [ngValue]="null" i18n>Offline</option>
+                      <option value="auto_test" i18n>Auto Testing</option>
                     </select>
                   </div>
                 </div>
@@ -211,7 +211,7 @@
 
               <div class="one column row">
                 <div class="column">
-                  <button class="ui button primary fluid" type="submit">Save</button>
+                  <button class="ui button primary fluid" type="submit" i18n>Save</button>
                 </div>
               </div>
             </div>
@@ -223,7 +223,7 @@
       <!-- Materials tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='materials'}">
         <table class="ui bottom attached table celled unstackable">
-          <thead><tr><th>ID</th><th>Type</th><th>Name</th><th>Visibility</th><th>Updated At</th><th>Description</th><th>Size</th><th>MD5 Hash</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th i18n>Type</th><th i18n>Name</th><th i18n>Visibility</th><th i18n>Updated At</th><th i18n>Description</th><th i18n>Size</th><th i18n>MD5 Hash</th><th i18n>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let mat of task.materials; index as i">
             <td>{{ mat.id }}</td>
@@ -268,7 +268,7 @@
                     <i class="icon file"></i>
                     <i class="icon plus right bottom corner"></i>
                   </i>
-                  New Material
+                  <ng-container i18n>New Material</ng-container>
                 </h4>
               </div>
               <div class="ui segment">
@@ -277,7 +277,7 @@
                 </div>
                 <form class="ui form" [ngClass]="{'loading': addingMaterial}" #fNewMaterial="ngForm" (ngSubmit)="addMaterial(fNewMaterial, inputMaterialFile.files)">
                   <div class="field required" [ngClass]="{'error': materialTypeModel.invalid && (materialTypeModel.touched || materialTypeModel.dirty || fNewMaterial.submitted)}">
-                    <label>Material Type</label>
+                    <label i18n>Material Type</label>
                     <select name="type" [(ngModel)]="newMaterialForm.type" required #materialTypeModel="ngModel">
                       <option value="specification">Specification</option>
                       <option value="code">Code</option>
@@ -291,7 +291,7 @@
                     </div>
                   </div>
                   <div class="field required" [ngClass]="{'error': (materialFileModel.invalid && (materialFileModel.touched || materialFileModel.dirty || fNewMaterial.submitted))}">
-                    <label>File</label>
+                    <label i18n>File</label>
                     <input type="file" name="file" (change)="updateFileName(inputMaterialFile.files)" #inputMaterialFile #materialFileModel="ngModel" required [(ngModel)]="materialFakePath">
                     <div class="errors">
                       <label *ngIf="materialFileModel.errors?.required">Material file is required</label>
@@ -300,17 +300,17 @@
                   <div class="field">
                     <div class="ui input checkbox" (click)="checkboxMaterialIsPrivate.click()">
                       <input type="checkbox" tabindex="0" class="hidden" #checkboxMaterialIsPrivate name="is_private" [(ngModel)]="newMaterialForm.is_private">
-                      <label>Private</label>
+                      <label i18n>Private</label>
                     </div>
                   </div>
                   <div class="field">
                     <div class="ui input checkbox" (click)="checkboxUseFileName.click()">
                       <input type="checkbox" class="hidden" tabindex="0" #checkboxUseFileName name="useFileName" [(ngModel)]="materialUseOriginalName">
-                      <label>Use original file name</label>
+                      <label i18n>Use original file name</label>
                     </div>
                   </div>
                   <div class="field required" *ngIf="!materialUseOriginalName" [ngClass]="{'error': materialNameModel.invalid && (fNewMaterial.submitted || materialNameModel.touched || materialNameModel.dirty)}">
-                    <label>File Name</label>
+                    <label i18n>File Name</label>
                     <input type="text" name="name" required maxlength="128" pattern="^[^\s?#/\\|()&]+$"
                            [(ngModel)]="newMaterialForm.name" #materialNameModel="ngModel">
                     <div class="errors">
@@ -320,10 +320,10 @@
                     </div>
                   </div>
                   <div class="field">
-                    <label>Description (Optional)</label>
+                    <label i18n>Description (Optional)</label>
                     <textarea name="description" rows="3" [(ngModel)]="newMaterialForm.description" placeholder="Description of the material"></textarea>
                   </div>
-                  <button class="ui fluid primary button" type="submit">Add Material</button>
+                  <button class="ui fluid primary button" type="submit" i18n>Add Material</button>
                 </form>
               </div>
             </div>
@@ -336,7 +336,7 @@
       <!-- Requirements tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='requirements'}">
         <table class="ui bottom attached table celled unstackable">
-          <thead><tr><th>ID</th><th>Name</th><th>Updated At</th><th>Description</th><th>Optional?</th><th>Size Limit</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Updated At</th><th i18n>Description</th><th i18n>Optional?</th><th i18n>Size Limit</th><th i18n>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let req of task.file_requirements; index as i">
             <td>{{ req.id }}</td>
@@ -346,7 +346,7 @@
             <td>{{ req.is_optional }}</td>
             <td>
               <span *ngIf="req.size_limit!=null; else sizeNoLimit">{{ req.size_limit | size }}</span>
-              <ng-template #sizeNoLimit>(No limit)</ng-template>
+              <ng-template #sizeNoLimit i18n>(No limit)</ng-template>
             </td>
             <td>
               <a class="ui button small red icon" (click)="deleteFileRequirement(req, i, btnDeleteFileRequirement)" #btnDeleteFileRequirement><i class="icon trash"></i></a>
@@ -365,13 +365,13 @@
                     <i class="icon file outline"></i>
                     <i class="icon plus right bottom corner"></i>
                   </i>
-                  New Requirement
+                  <ng-container i18n>New Requirement</ng-container>
                 </h4>
               </div>
               <div class="ui segment">
                 <form class="ui form" #fNewFileRequirement="ngForm" (ngSubmit)="addFileRequirement(fNewFileRequirement)" [ngClass]="{'loading': addingFileRequirement}">
                   <div class="field required" [ngClass]="{'error': (fNewFileRequirement.submitted ||fileRequirementNameModel.dirty||fileRequirementNameModel.touched) && fileRequirementNameModel.invalid}">
-                    <label>File Name</label>
+                    <label i18n>File Name</label>
                     <input type="text" name="name" placeholder="Name of the required file (at most 128 characters)"
                            [(ngModel)]="newFileRequirementForm.name" #fileRequirementNameModel="ngModel"
                            required maxlength="128" pattern="^[^\s?#/\\|()&]+$">
@@ -384,18 +384,18 @@
                   <div class="field">
                     <div class="ui input checkbox" (click)="checkboxRequirementIsOptional.click()">
                       <input type="checkbox" tabindex="0" class="hidden" #checkboxRequirementIsOptional name="is_optional" [(ngModel)]="newFileRequirementForm.is_optional">
-                      <label>Optional</label>
+                      <label i18n>Optional</label>
                     </div>
                   </div>
                   <div class="field">
-                    <label>Size Limit (Unit: Bytes) (Optional)</label>
+                    <label i18n>Size Limit (Unit: Bytes) (Optional)</label>
                     <input type="number" min="1" name="size_limit" [(ngModel)]="newFileRequirementForm.size_limit" placeholder="Size limit of the uploaded file">
                   </div>
                   <div class="field">
-                    <label>Description (Optional)</label>
+                    <label i18n>Description (Optional)</label>
                     <textarea name="description" rows="3" [(ngModel)]="newFileRequirementForm.description" placeholder="Description of the file"></textarea>
                   </div>
-                  <button class="ui fluid primary button" type="submit">Add Requirement</button>
+                  <button class="ui fluid primary button" type="submit" i18n>Add Requirement</button>
                 </form>
               </div>
             </div>
@@ -409,13 +409,13 @@
       <div class="ui tab" [ngClass]="{'active': activeTab=='auto_test_configs'}">
         <ng-container *ngIf="task.evaluation_method=='auto_test'; else noAutoTestEvaluation">
           <div class="ui menu secondary pointing">
-            <a class="item" (click)="editingAutoTestConfig=null"  [ngClass]="{'active': editingAutoTestConfig==null}">Configurations</a>
-            <a class="item active" *ngIf="editingAutoTestConfig">Editing: {{editingAutoTestConfig.name}}</a>
+            <a class="item" (click)="editingAutoTestConfig=null"  [ngClass]="{'active': editingAutoTestConfig==null}" i18n>Configurations</a>
+            <a class="item active" *ngIf="editingAutoTestConfig"><ng-container i18n>Editing</ng-container>: {{editingAutoTestConfig.name}}</a>
           </div>
 
           <ng-container *ngIf="!editingAutoTestConfig; else editAutoTestConfigPanel">
             <table class="ui bottom attached table celled unstackable">
-              <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Flags</th><th>Updated At</th><th>Trigger</th><th>Description</th><th>Ops</th></tr></thead>
+              <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Type</th><th i18n>Flags</th><th i18n>Updated At</th><th i18n>Trigger</th><th i18n>Description</th><th i18n>Ops</th></tr></thead>
               <tbody>
               <tr *ngFor="let config of task.auto_test_configs; index as i">
                 <td>{{ config.id }}</td>
@@ -434,8 +434,8 @@
                 </td>
                 <td>{{ config.modified_at | date: 'short' }}</td>
                 <td>
-                  <div *ngIf="config.trigger==null">No Trigger</div>
-                  <div *ngIf="config.trigger=='after_submit'">After Submission</div>
+                  <div *ngIf="config.trigger==null" i18n>No Trigger</div>
+                  <div *ngIf="config.trigger=='after_submit'" i18n>After Submission</div>
                 </td>
                 <td>{{ config.description }}</td>
                 <td>
@@ -458,13 +458,13 @@
                         <i class="icon terminal"></i>
                         <i class="icon plus right bottom corner"></i>
                       </i>
-                      New Configuration
+                      <ng-container i18n>New Configuration</ng-container>
                     </h4>
                   </div>
                   <div class="ui segment">
                     <form class="ui form" #fNewAutoTestConfig="ngForm" (ngSubmit)="addAutoTestConfig(fNewAutoTestConfig)" [ngClass]="{'loading': addingAutoTestConfig}">
                       <div class="field required" [ngClass]="{'error': (fNewAutoTestConfig.submitted ||autoTestConfigNameModel.dirty||autoTestConfigNameModel.touched) && autoTestConfigNameModel.invalid}">
-                        <label>Name</label>
+                        <label i18n>Name</label>
                         <input type="text" name="name" placeholder="Name (at most 128 characters)"
                                [(ngModel)]="newAutoTestConfigForm.name" #autoTestConfigNameModel="ngModel"
                                required maxlength="128">
@@ -474,7 +474,7 @@
                         </div>
                       </div>
                       <div class="field required" [ngClass]="{'error': (autoTestConfigTypeModel.touched || autoTestConfigTypeModel.dirty || fNewAutoTestConfig.submitted) && autoTestConfigTypeModel.invalid}">
-                        <label>Type</label>
+                        <label i18n>Type</label>
                         <select name="type" [(ngModel)]="newAutoTestConfigForm.type" required #autoTestConfigTypeModel="ngModel">
                           <option [ngValue]="type.key" *ngFor="let type of submissionService.autoTestConfigTypes | keyvalue">{{type.value.name}}</option>
                         </select>
@@ -485,15 +485,15 @@
                       <div class="field">
                         <div class="ui input checkbox" (click)="checkboxAutoTestConfigIsPrivate.click()">
                           <input type="checkbox" tabindex="0" class="hidden" #checkboxAutoTestConfigIsPrivate name="is_private" [(ngModel)]="newAutoTestConfigForm.is_private">
-                          <label>Private?</label>
+                          <label i18n>Private?</label>
                         </div>
                       </div>
                       <div class="field">
-                        <label>Description (Optional)</label>
+                        <label i18n>Description (Optional)</label>
                         <textarea name="description" rows="3" [(ngModel)]="newAutoTestConfigForm.description" placeholder="Description (at most 256 characters)"></textarea>
                       </div>
                       <div *ngIf="newAutoTestConfigForm.type=='docker' || newAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (autoTestConfigEnvironmentId.touched || autoTestConfigEnvironmentId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigEnvironmentId.invalid}">
-                        <label>Test Environment</label>
+                        <label i18n>Test Environment</label>
                         <select name="environment_id" [(ngModel)]="newAutoTestConfigForm.environment_id" required #autoTestConfigEnvironmentId="ngModel">
                           <ng-container *ngFor="let mat of task.materials">
                             <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
@@ -506,7 +506,7 @@
                         </div>
                       </div>
                       <div *ngIf="newAutoTestConfigForm.type=='anti-plagiarism'" class="field required" [ngClass]="{'error': (autoTestConfigFileRequirementId.touched || autoTestConfigFileRequirementId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigFileRequirementId.invalid}">
-                        <label>Target File Requirement</label>
+                        <label i18n>Target File Requirement</label>
                         <select name="file_requirement_id" [(ngModel)]="newAutoTestConfigForm.file_requirement_id" required #autoTestConfigFileRequirementId="ngModel">
                           <ng-container *ngFor="let req of task.file_requirements">
                             <option *ngIf="req.name.endsWith('.py')" [ngValue]="req.id">
@@ -519,7 +519,7 @@
                         </div>
                       </div>
                       <div *ngIf="newAutoTestConfigForm.type=='file-exists'" class="field required" [ngClass]="{'error': (autoTestConfigFileRequirementId.touched || autoTestConfigFileRequirementId.dirty || fNewAutoTestConfig.submitted) && autoTestConfigFileRequirementId.invalid}">
-                        <label>Target File Requirement</label>
+                        <label i18n>Target File Requirement</label>
                         <select name="file_requirement_id" [(ngModel)]="newAutoTestConfigForm.file_requirement_id" required #autoTestConfigFileRequirementId="ngModel">
                           <option *ngFor="let req of task.file_requirements" [ngValue]="req.id"> {{ req.name }} </option>
                         </select>
@@ -527,7 +527,7 @@
                           <label *ngIf="autoTestConfigFileRequirementId.errors?.required">Target File Requirement is required.</label>
                         </div>
                       </div>
-                      <button class="ui fluid primary button" type="submit">Add Configuration</button>
+                      <button class="ui fluid primary button" type="submit" i18n>Add Configuration</button>
                     </form>
                   </div>
                 </div>
@@ -539,9 +539,9 @@
           <ng-template #editAutoTestConfigPanel>
             <form class="ui form" #fUpdateAutoTestConfig="ngForm" (ngSubmit)="updateAutoTestConfig(fUpdateAutoTestConfig)" [ngClass]="{'loading': updatingAutoTestConfig}">
               <!-- Start Basic Section -->
-              <h3 class="ui dividing header">Basic</h3>
+              <h3 class="ui dividing header" i18n>Basic</h3>
               <div class="field required" [ngClass]="{'error': (fUpdateAutoTestConfig.submitted ||updateAutoTestConfigNameModel.dirty||updateAutoTestConfigNameModel.touched) && updateAutoTestConfigNameModel.invalid}">
-                <label>Name</label>
+                <label i18n>Name</label>
                 <input type="text" name="name" placeholder="Name (at most 128 characters)"
                        [(ngModel)]="updateAutoTestConfigForm.name" #updateAutoTestConfigNameModel="ngModel"
                        required maxlength="128">
@@ -551,7 +551,7 @@
                 </div>
               </div>
               <div class="field required" [ngClass]="{'error': (updateAutoTestConfigTypeModel.touched || updateAutoTestConfigTypeModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigTypeModel.invalid}">
-                <label>Type</label>
+                <label i18n>Type</label>
                 <select name="type" [(ngModel)]="updateAutoTestConfigForm.type" required #updateAutoTestConfigTypeModel="ngModel">
                   <option [ngValue]="type.key" *ngFor="let type of submissionService.autoTestConfigTypes | keyvalue">{{type.value.name}}</option>
                 </select>
@@ -562,32 +562,32 @@
               <div class="field">
                 <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigIsEnabled.click()">
                   <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigIsEnabled name="is_enabled" [(ngModel)]="updateAutoTestConfigForm.is_enabled">
-                  <label>Enabled?</label>
+                  <label i18n>Enabled?</label>
                 </div>
               </div>
               <div class="field">
                 <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigIsPrivate.click()">
                   <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigIsPrivate name="is_private" [(ngModel)]="updateAutoTestConfigForm.is_private">
-                  <label>Private?</label>
+                  <label i18n>Private?</label>
                 </div>
               </div>
               <div class="field">
-                <label>Description</label>
+                <label i18n>Description</label>
                 <textarea name="description" rows="3" [(ngModel)]="updateAutoTestConfigForm.description" placeholder="Description (at most 256 characters)"></textarea>
               </div>
               <!-- End Basic Section -->
 
               <!-- Start Execution Section -->
-              <h3 class="ui dividing header">Execution</h3>
+              <h3 class="ui dividing header" i18n>Execution</h3>
               <div class="field required" [ngClass]="{'error': (updateAutoTestConfigPriorityModel.touched || updateAutoTestConfigPriorityModel.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigPriorityModel.invalid}">
-                <label>Priority</label>
+                <label i18n>Priority</label>
                 <input type="number" required min="0" max="255" step="1" [(ngModel)]="updateAutoTestConfigForm.priority" name="priority" #updateAutoTestConfigPriorityModel="ngModel" placeholder="An integer. Larger value means higher priority.">
                 <div class="errors">
                   <label *ngIf="updateAutoTestConfigPriorityModel.errors?.required">Priority is required</label>
                 </div>
               </div>
               <div class="field">
-                <label>Trigger</label>
+                <label i18n>Trigger</label>
                 <select name="trigger" [(ngModel)]="updateAutoTestConfigForm.trigger">
                   <option [ngValue]="null">No Trigger (start tests manually)</option>
                   <option value="after_submit">After Submission</option>
@@ -595,7 +595,7 @@
               </div>
 
               <div *ngIf="updateAutoTestConfigForm.type=='docker' || updateAutoTestConfigForm.type=='run-script'" class="field required" [ngClass]="{'error': (updateAutoTestConfigEnvironmentId.touched || updateAutoTestConfigEnvironmentId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigEnvironmentId.invalid, 'disabled': validatingTestEnvironment}">
-                <label>Test Environment</label>
+                <label i18n>Test Environment</label>
                 <select name="environment_id" [(ngModel)]="updateAutoTestConfigForm.environment_id" required #updateAutoTestConfigEnvironmentId="ngModel" (change)="validateTestEnvironment(updateAutoTestConfigForm.environment_id)">
                   <ng-container *ngFor="let mat of task.materials">
                     <option *ngIf="mat.type=='test environment'" [ngValue]="mat.id">
@@ -612,7 +612,7 @@
 
               <ng-container *ngIf="testEnvValidationResult">
                 <div *ngIf="!testEnvValidationResult.error && testEnvValidationResult.type==updateAutoTestConfigForm.type; else testUpdateEnvValidateError" class="ui message">
-                  <div class="header">Environment Information</div>
+                  <div class="header" i18n>Environment Information</div>
                   <ul class="list">
                     <li><b>Type:</b> {{testEnvValidationResult.type}}</li>
                     <li *ngIf="testEnvValidationResult.conda_version"><b>Conda Version:</b> {{testEnvValidationResult.conda_version}}</li>
@@ -640,13 +640,13 @@
                 <div class="field">
                   <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigDockerAutoRemove.click()">
                     <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigDockerAutoRemove name="docker_auto_remove" [(ngModel)]="updateAutoTestConfigForm.docker_auto_remove">
-                    <label>Docker Auto Remove?</label>
+                    <label i18n>Docker Auto Remove?</label>
                   </div>
                 </div>
                 <div class="field">
                   <div class="ui input checkbox" (click)="checkboxUpdateAutoTestConfigDockerNetwork.click()">
                     <input type="checkbox" tabindex="0" class="hidden" #checkboxUpdateAutoTestConfigDockerNetwork name="docker_network" [(ngModel)]="updateAutoTestConfigForm.docker_network">
-                    <label>Docker Network Access Allowed?</label>
+                    <label i18n>Docker Network Access Allowed?</label>
                   </div>
                 </div>
                 <div class="field">
@@ -654,14 +654,14 @@
                   <input type="number" min="1" name="docker_cpus" [(ngModel)]="updateAutoTestConfigForm.docker_cpus" placeholder="Limit number of CPUs (can be a float number). Empty field means no limit on cpu.">
                 </div>
                 <div class="field">
-                  <label>Docker Memory (unit: MB)</label>
+                  <label i18n>Docker Memory (unit: MB)</label>
                   <input type="number" step="1" min="1" name="docker_memory" [(ngModel)]="updateAutoTestConfigForm.docker_memory" placeholder="Limit size of memory (must be an integer). Empty field means no limit on memory.">
                 </div>
               </ng-container>
 
               <ng-container *ngIf="updateAutoTestConfigForm.type=='anti-plagiarism'">
                 <div class="field required" [ngClass]="{'error': (updateAutoTestConfigFileRequirementId.touched || updateAutoTestConfigFileRequirementId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigFileRequirementId.invalid}">
-                  <label>Target File Requirement</label>
+                  <label i18n>Target File Requirement</label>
                   <select name="file_requirement_id" [(ngModel)]="updateAutoTestConfigForm.file_requirement_id" required #updateAutoTestConfigFileRequirementId="ngModel">
                     <ng-container *ngFor="let req of task.file_requirements">
                       <option *ngIf="req.name.endsWith('.py')" [ngValue]="req.id">
@@ -674,7 +674,7 @@
                   </div>
                 </div>
                 <div class="field">
-                  <label>Template File</label>
+                  <label i18n>Template File</label>
                   <select name="template_file_id" [(ngModel)]="updateAutoTestConfigForm.template_file_id">
                     <option [ngValue]="null">(None)</option>
                     <ng-container *ngFor="let mat of task.materials">
@@ -691,7 +691,7 @@
 
               <ng-container *ngIf="updateAutoTestConfigForm.type=='file-exists'">
                 <div class="field required" [ngClass]="{'error': (updateAutoTestConfigFileRequirementId.touched || updateAutoTestConfigFileRequirementId.dirty || fUpdateAutoTestConfig.submitted) && updateAutoTestConfigFileRequirementId.invalid}">
-                  <label>Target File Requirement</label>
+                  <label i18n>Target File Requirement</label>
                   <select name="file_requirement_id" [(ngModel)]="updateAutoTestConfigForm.file_requirement_id" required #updateAutoTestConfigFileRequirementId="ngModel">
                     <option *ngFor="let req of task.file_requirements" [ngValue]="req.id"> {{ req.name }} </option>
                   </select>
@@ -703,72 +703,72 @@
               <!-- End Execution Section -->
 
               <!-- Start Result Processing Section -->
-              <h3 class="ui dividing header">Result Processing</h3>
+              <h3 class="ui dividing header" i18n>Result Processing</h3>
               <div class="field">
-                <label>Result Render HTML</label>
+                <label i18n>Result Render HTML</label>
                 <textarea name="result_render_html" rows="6" [(ngModel)]="updateAutoTestConfigForm.result_render_html" placeholder="HTML for rendering test results. If this is empty, the raw result will be displayed."></textarea>
                 <ng-container *ngIf="updateAutoTestConfigForm.result_render_html">
-                  <label>Result Render HTML Preview</label>
+                  <label i18n>Result Render HTML Preview</label>
                   <div [innerHTML]="updateAutoTestConfigForm.result_render_html"></div>
                 </ng-container>
               </div>
               <div class="field">
-                <label>Result Conclusion Type</label>
+                <label i18n>Result Conclusion Type</label>
                 <select name="result_conclusion_type" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_type">
                   <optgroup label="Numeric">
-                    <option value="int">Integer</option>
-                    <option value="float">Float</option>
+                    <option value="int" i18n>Integer</option>
+                    <option value="float" i18n>Float</option>
                   </optgroup>
                   <optgroup label="Logical">
-                    <option value="bool">Boolean</option>
+                    <option value="bool" i18n>Boolean</option>
                   </optgroup>
                   <optgroup label="Text/Object">
-                    <option value="string">String</option>
+                    <option value="string" i18n>String</option>
                     <option value="json">JSON</option>
                   </optgroup>
                 </select>
               </div>
               <div class="field">
-                <label>Result Conclusion Path</label>
+                <label i18n>Result Conclusion Path</label>
                 <input type="text" name="result_conclusion_path" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_path" placeholder="Path of the conclusion in the result object. Empty path means the whole result is the conclusion.">
               </div>
               <ng-container *ngIf="updateAutoTestConfigForm.result_conclusion_type == 'int' || updateAutoTestConfigForm.result_conclusion_type == 'float'">
                 <div class="field">
-                  <label>Result Conclusion Full Marks</label>
+                  <label i18n>Result Conclusion Full Marks</label>
                   <input type="number" name="result_conclusion_full_marks" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_full_marks" placeholder="Full marks of the conclusion">
                 </div>
                 <div class="field">
                   <div class="ui input checkbox" (click)="checkboxResultConclusionApplyLatePenalty.click()">
                     <input type="checkbox" tabindex="0" class="hidden" #checkboxResultConclusionApplyLatePenalty name="result_conclusion_apply_late_penalty" [(ngModel)]="updateAutoTestConfigForm.result_conclusion_apply_late_penalty">
-                    <label>Apply Late Penalty on Result Conclusion</label>
+                    <label i18n>Apply Late Penalty on Result Conclusion</label>
                   </div>
                 </div>
               </ng-container>
               <div class="field">
-                <label>Result Conclusion Accumulate Method</label>
+                <label i18n>Result Conclusion Accumulate Method</label>
                 <select name="results_conclusion_accumulate_method" [(ngModel)]="updateAutoTestConfigForm.results_conclusion_accumulate_method">
-                  <option value="first">Use First Submission</option>
-                  <option value="last">Use Last Submission</option>
+                  <option value="first" i18n>Use First Submission</option>
+                  <option value="last" i18n>Use Last Submission</option>
                   <ng-container *ngIf="updateAutoTestConfigForm.result_conclusion_type=='int' || updateAutoTestConfigForm.result_conclusion_type=='float'">
-                    <option value="highest" >Use Highest Submission</option>
-                    <option value="lowest">Use Lowest Submission</option>
-                    <option value="average">Use Average Among Submissions</option>
+                    <option value="highest"  i18n>Use Highest Submission</option>
+                    <option value="lowest" i18n>Use Lowest Submission</option>
+                    <option value="average" i18n>Use Average Among Submissions</option>
                   </ng-container>
                   <ng-container *ngIf="updateAutoTestConfigForm.result_conclusion_type=='bool'">
-                    <option value="and">Use Logical AND among Submissions</option>
-                    <option value="or">Use Logical OR among Submissions</option>
+                    <option value="and" i18n>Use Logical AND among Submissions</option>
+                    <option value="or" i18n>Use Logical OR among Submissions</option>
                   </ng-container>
                 </select>
               </div>
-              <button class="ui fluid primary button" type="submit">Update Configuration</button>
+              <button class="ui fluid primary button" type="submit" i18n>Update Configuration</button>
             </form>
           </ng-template>
         </ng-container>
 
         <ng-template #noAutoTestEvaluation>
           <div class="ui info message">
-            <div class="header"><i class="icon circle info"></i> Auto Test Evaluation is disabled</div>
-            <p>Please choose <b>Auto Testing</b> as the evaluation method in the basic settings first.</p>
+            <div class="header"><i class="icon circle info"></i> <ng-container i18n>Auto Test Evaluation is disabled</ng-container></div>
+            <p>Please choose <b i18n>Auto Testing</b> as the evaluation method in the basic settings first.</p>
           </div>
         </ng-template>
       </div>
@@ -777,7 +777,7 @@
       <!-- Special considerations tab -->
       <div class="ui tab" [ngClass]="{'active': activeTab=='special_considerations'}">
         <table class="ui table unstackable celled bottom attached">
-          <thead><tr><th>ID</th><th>User/Team</th><th>Due Time Extension (hours)</th><th>Submission Attempt Limit Extension</th><th>Created At</th><th>Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th i18n>User/Team</th><th i18n>Due Time Extension (hours)</th><th i18n>Submission Attempt Limit Extension</th><th i18n>Created At</th><th i18n>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let spec of task.special_considerations; index as i">
             <td>{{spec.id}}</td>
@@ -807,34 +807,34 @@
                     <i class="icon heart outline"></i>
                     <i class="icon right bottom corner plus"></i>
                   </i>
-                  New Special Consideration
+                  <ng-container i18n>New Special Consideration</ng-container>
                 </h4>
               </div>
               <div class="ui segment">
                 <form class="ui form" #fNewSpecialConsideration="ngForm" (ngSubmit)="addSpecialConsideration(fNewSpecialConsideration)" [ngClass]="{'loading': addingSpecialConsideration}">
                   <div class="field" *ngIf="!task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || sepcialUserNameModel.dirty || sepcialUserNameModel.touched) && sepcialUserNameModel.invalid}">
-                    <label>User Name</label>
+                    <label i18n>User Name</label>
                     <input type="text" [(ngModel)]="newSpecialConsideration.user_name" name="user_name" required #sepcialUserNameModel="ngModel" placeholder="Name of user">
                     <div class="errors">
                       <label *ngIf="sepcialUserNameModel.errors?.required">User name is required</label>
                     </div>
                   </div>
                   <div class="field" *ngIf="task.is_team_task" [ngClass]="{'error': (fNewSpecialConsideration.submitted || specialTeamNameModel.dirty || specialTeamNameModel.touched) && specialTeamNameModel.invalid}">
-                    <label>Team Name</label>
+                    <label i18n>Team Name</label>
                     <input type="text" [(ngModel)]="newSpecialConsideration.team_name" name="team_name" required #specialTeamNameModel="ngModel" placeholder="Name of team">
                     <div class="errors">
                       <label *ngIf="specialTeamNameModel.errors?.required">Team name is required</label>
                     </div>
                   </div>
                   <div class="field">
-                    <label>Due Time Extension (hours)</label>
+                    <label i18n>Due Time Extension (hours)</label>
                     <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.due_time_extension" name="due_time_extension" placeholder="Extension of due time (in hours)">
                   </div>
                   <div class="field">
-                    <label>Submission Attempt Limit Extension</label>
+                    <label i18n>Submission Attempt Limit Extension</label>
                     <input type="number" min="0" step="1" [(ngModel)]="newSpecialConsideration.submission_attempt_limit_extension" name="submission_attempt_limit_extension" placeholder="Extension of submission attempt limit">
                   </div>
-                  <button type="submit" class="ui button primary fluid">Add Special Consideration</button>
+                  <button type="submit" class="ui button primary fluid" i18n>Add Special Consideration</button>
                 </form>
               </div>
             </div>
@@ -846,8 +846,8 @@
 
       <!-- Start of Import/Export tab -->
       <div class="ui tab" [class.active]="activeTab=='import_export'">
-        <div class="ui header dividing">Import</div>
-        <button class="ui button labeled icon" (click)="inputGiveArchive.click()" [ngClass]="{'loading disabled': importingGive}"><i class="icon share vertically flipped"></i> Import Give Submissions</button>
+        <div class="ui header dividing" i18n>Import</div>
+        <button class="ui button labeled icon" (click)="inputGiveArchive.click()" [ngClass]="{'loading disabled': importingGive}"><i class="icon share vertically flipped"></i> <ng-container i18n>Import Give Submissions</ng-container></button>
         <form class="hidden">
           <input type="file" accept=".zip,.tar,.tar.gz" name="give_archive" #inputGiveArchive (change)="importGive(inputGiveArchive)">
         </form>
@@ -855,8 +855,8 @@
           <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>
         </div>
 
-        <div class="ui header dividing">Export</div>
-        <a class="ui button labeled icon" href="api/admin/tasks/{{taskId}}/export-submissions"><i class="icon share"></i> Export Submissions</a>
+        <div class="ui header dividing" i18n>Export</div>
+        <a class="ui button labeled icon" href="api/admin/tasks/{{taskId}}/export-submissions"><i class="icon share"></i> <ng-container i18n>Export Submissions</ng-container></a>
       </div>
     </div>
     <!-- End of Right tab container -->

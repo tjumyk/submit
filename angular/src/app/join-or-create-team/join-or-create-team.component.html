@@ -1,22 +1,18 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingTeamAssociation">Loading my team...</div>
-<div class="ui loader text active" *ngIf="loadingTeams">Loading teams...</div>
+<div class="ui loader text active" *ngIf="loadingTeamAssociation" i18n>Loading my team...</div>
+<div class="ui loader text active" *ngIf="loadingTeams" i18n>Loading teams...</div>
 
 <div *ngIf="teams">
   <div class="ui header center aligned icon">
     <i class="icon circular users"></i>
     <div class="content" *ngIf="teams.length; else noExistingTeams">
-      You are not in any team now!
-      <div class="sub header">
-        Please create a new team or join an existing team
-      </div>
+      <ng-container i18n>You are not in any team now!</ng-container>
+      <div class="sub header" i18n>Please create a new team or join an existing team</div>
     </div>
     <ng-template #noExistingTeams>
       <div class="content">
-        There is no team now!
-        <div class="sub header">
-          Please create the first team!
-        </div>
+        <ng-container i18n>There is no team now!</ng-container>
+        <div class="sub header" i18n>Please create the first team!</div>
       </div>
     </ng-template>
   </div>
@@ -29,11 +25,11 @@
             <i class="icon users"></i>
             <i class="icon right bottom corner plus"></i>
           </i>
-          Create New Team
+          <ng-container i18n>Create New Team</ng-container>
         </h5>
         <form class="ui form" [ngClass]="{'loading': creatingTeam}" (ngSubmit)="createTeam(f)" #f="ngForm">
           <div class="field required" [ngClass]="{'error': (f.submitted || nameModel.dirty || nameModel.touched) && nameModel.invalid}">
-            <label>Name</label>
+            <label i18n>Name</label>
             <input type="text" name="name" placeholder="3-16 alphanumeric characters" [(ngModel)]="newTeamForm.name"
                    required minlength="3" maxlength="16" pattern="^[\w]{3,16}$" #nameModel="ngModel">
             <div class="errors">
@@ -46,21 +42,21 @@
             </div>
           </div>
           <div class="field" [ngClass]="{'error': (f.submitted||sloganModel.dirty||sloganModel.touched)&&sloganModel.invalid}">
-            <label>Slogan (Optional)</label>
+            <label i18n>Slogan (Optional)</label>
             <input type="text" name="slogan" placeholder="Use a slogan to attract others to join your team" maxlength="64"
                    [(ngModel)]="newTeamForm.slogan" #sloganModel="ngModel">
             <div class="errors">
               <label *ngIf="sloganModel.errors?.maxlength"><i class="times icon"></i> Slogan is too long</label>
             </div>
           </div>
-          <button type="submit" class="ui primary fluid button"><i class="icon plus"></i> Create</button>
+          <button type="submit" class="ui primary fluid button"><i class="icon plus"></i> <ng-container i18n>Create</ng-container></button>
         </form>
       </div>
     </div>
   </div>
 
   <ng-container *ngIf="teams.length">
-    <div class="ui divider horizontal">Or</div>
+    <div class="ui divider horizontal" i18n>Or</div>
 
     <div class="ui grid stackable centered">
       <div class="column search-team">
@@ -79,12 +75,12 @@
     </ng-container>
     <ng-template #teamJoinClosedMsg>
       <div class="ui message warning">
-        <i class="ui icon exclamation triangle"></i> Team join has been closed.
+        <i class="ui icon exclamation triangle"></i> <ng-container i18n>Team join has been closed.</ng-container>
       </div>
     </ng-template>
 
     <table class="ui table unstackable">
-      <thead><tr><th>Team ID</th><th>Team Name</th><th>Creator</th><th>Slogan</th><th>Members</th><th class="collapsing">Operations</th></tr></thead>
+      <thead><tr><th i18n>Team ID</th><th i18n>Team Name</th><th i18n>Creator</th><th i18n>Slogan</th><th i18n>Members</th><th class="collapsing" i18n>Operations</th></tr></thead>
       <tbody>
       <tr *ngFor="let t of listedTeams">
         <td>{{t.id}}</td>
@@ -95,8 +91,8 @@
         <td class="break-word">{{t.slogan}}</td>
         <td>{{t.total_user_associations}}</td>
         <td class="collapsing">
-          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam [ngClass]="{'disabled': teamJoinClosed}"><i class="icon hand paper"></i> Join</a>
-          <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> Finalised</div></ng-template>
+          <a *ngIf="!t.is_finalised; else alreadyFinalisedLabel" class="ui mini button green" (click)="applyJoin(t, btnJoinTeam)" #btnJoinTeam [ngClass]="{'disabled': teamJoinClosed}"><i class="icon hand paper"></i> <ng-container i18n>Join</ng-container></a>
+          <ng-template #alreadyFinalisedLabel><div class="ui small label"><i class="icon lock"></i> <ng-container i18n>Finalised</ng-container></div></ng-template>
         </td>
       </tr>
       </tbody>

@@ -1,18 +1,18 @@
 <div *ngIf="isAdmin" class="ui grid stackable center aligned one column">
   <div class="column">
-    <button (click)="showModal=true" class="ui button"><i class="icon terminal"></i> Run Auto Tests</button>
+    <button (click)="showModal=true" class="ui button"><i class="icon terminal"></i> <ng-container i18n>Run Auto Tests</ng-container></button>
   </div>
 
   <app-modal [(show)]="showModal" modalClass="tiny">
     <i class="close icon" (click)="showModal=false"></i>
-    <div class="ui header">Run Auto Tests</div>
+    <div class="ui header" i18n>Run Auto Tests</div>
     <div class="content">
       <app-error-message *ngIf="modalError" [error]="modalError"></app-error-message>
       <app-success-message *ngIf="modelSuccess" [success]="modelSuccess"></app-success-message>
 
       <form class="ui form" [ngClass]="{'loading': requestingRunAutoTest}">
         <div class="ui field">
-          <label>Test Config</label>
+          <label i18n>Test Config</label>
           <select name="auto_test_config" [(ngModel)]="activeConfig">
             <option *ngFor="let config of task.auto_test_configs" [ngValue]="config">{{config.name}}</option>
           </select>
@@ -27,12 +27,12 @@
         <div class="ui field">
           <div class="ui input checkbox" (click)="checkboxSkipSuccessful.click()">
             <input type="checkbox" tabindex="0" class="hidden" #checkboxSkipSuccessful name="skip_successful" [(ngModel)]="skipSuccessful">
-            <label>Skip submissions that got success in their last test</label>
+            <label i18n>Skip submissions that got success in their last test</label>
           </div>
         </div>
         <button class="ui button fluid primary" (click)="runAutoTest()" type="submit">
           <i class="icon play"></i>
-          Run
+          <ng-container i18n>Run</ng-container>
         </button>
       </form>
     </div>

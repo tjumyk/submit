@@ -4,11 +4,11 @@
   <div class="column">
     <div class="ui segment">
       <div class="ui header dividing">
-        <i class="icon plus"></i> New Course
+        <i class="icon plus"></i> <ng-container i18n>New Course</ng-container>
       </div>
       <form class="ui form" #f="ngForm" (ngSubmit)="newCourse(f)" [ngClass]="{'loading': addingCourse}">
         <div class="field required" [ngClass]="{'error': (code_model.touched || code_model.dirty || f.submitted) && code_model.invalid}">
-          <label>Code</label>
+          <label i18n>Code</label>
           <input type="text" name="code" placeholder='e.g. "COMP9318" (at most 16 characters)'
                  required maxlength="16"
                  [(ngModel)]="form.code" #code_model="ngModel" (change)="autoFillForm()">
@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="field required" [ngClass]="{'error': (name_model.touched || name_model.dirty || f.submitted) && name_model.invalid}">
-          <label>Name</label>
+          <label i18n>Name</label>
           <input type="text" name="name" placeholder='e.g. "Data Warehousing and Data Mining" (at most 128 characters)'
                  required maxlength="128"
                  [(ngModel)]="form.name" #name_model="ngModel">
@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="field required" [ngClass]="{'error': (tut_name_model.touched || tut_name_model.dirty || f.submitted) && tut_name_model.invalid}">
-          <label>Tutor Group Name</label>
+          <label i18n>Tutor Group Name</label>
           <input type="text" name="tutor_group_name" placeholder='Group name for tutors of this course (at most 24 characters)'
                  required maxlength="24"
                  [(ngModel)]="form.tutor_group_name" #tut_name_model="ngModel">
@@ -40,10 +40,10 @@
         <div class="field">
           <div class="ui input checkbox" (click)="checkboxNewTutorGroup.click()">
             <input type="checkbox" #checkboxNewTutorGroup class="hidden" tabindex="0" name="is_new_tutor_group" [(ngModel)]="form.is_new_tutor_group">
-            <label>Create new tutor group</label>
+            <label i18n>Create new tutor group</label>
           </div>
         </div>
-        <button type="submit" class="ui primary button fluid">Add Course</button>
+        <button type="submit" class="ui primary button fluid" i18n>Add Course</button>
       </form>
     </div>
   </div>

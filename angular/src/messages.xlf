@@ -1,0 +1,3403 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="201f62d52db97a78070609b56646a5c76064fa4e" datatype="html">
+        <source>System Management</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="92eee6be6de0b11c924e3ab27db30257159c0a7c" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help/help.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about/about.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/email-subscriptions/email-subscriptions.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7eec194fdb5177fb2a2b67ddfd1a5c71a943eb9d" datatype="html">
+        <source>Courses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4fe84c1d0eef5726c017f64c691145db7a61f879" datatype="html">
+        <source>Accounts</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="55a97693b88519e1e6149b7f43b70873fe7aaa21" datatype="html">
+        <source>Auto Tests</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="128e938a5b9d275fe3f7920a7d02a4aba89dba29" datatype="html">
+        <source>Loading term info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6829218544e108e152f5fa72cb79c4ccb82e0d06" datatype="html">
+        <source>View</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-card/submission-card.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b7a285515e41f0c8038d8b8e65b5199cb9928681" datatype="html">
+        <source>Course</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f6e04edea3bb3a59d5904725bfbc2c440e793001" datatype="html">
+        <source>Year</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fd273ee9ccd07488548c9b55c8652d39466b1a09" datatype="html">
+        <source>Semester</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="329c338516a1d57f152afaf2af5634550d29c9ec" datatype="html">
+        <source>Student Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="586a5fd72602b5b14ec0c55f84814de47bb21e3a" datatype="html">
+        <source>Tasks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f61c6867295f3b53d23557021f2f4e0aa1d0b8fc" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">477</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">554</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e" datatype="html">
+        <source>Title</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="548a772aeb0a609c27b2a5356c613d5b37e73f34" datatype="html">
+        <source>Ops</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-courses/admin-courses.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">780</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a0ec242f98c5eec4e6888fd2e3d86bea994a92ec" datatype="html">
+        <source>New Task</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="99d390782f2ab38cab340f93fefa8ba9af8e0a6d" datatype="html">
+        <source>Task Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a08b5b21d569205f64953ed617917b2e10eda9ca" datatype="html">
+        <source>Description (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">323</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">395</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">492</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4aaf3aba083efdb4e1e66fcc67a35695c151d81f" datatype="html">
+        <source>Add Task</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-term-edit/admin-term-edit.component.html</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f50a672f3d15ae11218b014bec146e7c74f49c2b" datatype="html">
+        <source>Loading user info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9e2826194ab19a20f3af5a1397329f05b724c94e" datatype="html">
+        <source>Loading courses...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="01bbcfc78a5595d74ff42d1a19f2fc0c88356edf" datatype="html">
+        <source>Management</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="65348691348176e0b91b7dc57b4322d0b649ce9a" datatype="html">
+        <source>Permission Denied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/forbidden/forbidden.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="03354b2489337882c5a4fd033fec9b9f4b8d109f" datatype="html">
+        <source>Page Not Found</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/not-found/not-found.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2cfa9b6c21594e6d1087a4225398a8fb3913c98f" datatype="html">
+        <source>Restart Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/error-message/error-message.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b2d20324b0e5f375311954447694cb62b6388ad7" datatype="html">
+        <source>New Course</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-courses/admin-courses.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ec0ff13bba72599c15de0e184054505fd32f26b7" datatype="html">
+        <source>Loading course list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-courses/admin-courses.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="68572de01b84c678be4bf8a27b990ecac2f41ce9" datatype="html">
+        <source>Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-courses/admin-courses.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cff1428d10d59d14e45edec3c735a27b5482db59" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-courses/admin-courses.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">467</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">544</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d2224967d9995b48e98c2d2a31906f8d4c36dc25" datatype="html">
+        <source>Loading course info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b68d38d5eb210e23b5c06911002ae890af01947a" datatype="html">
+        <source>Tutor Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="14688213d67b2f0e553d66f8255281db245502fb" datatype="html">
+        <source>Icon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8f04e282e9efb860740bf93b3a5c728d738aed63" datatype="html">
+        <source>(No icon)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cd24e51691951aa169a07817ef613e6cfdde9198" datatype="html">
+        <source>Upload Icon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="69580f2c2dbf4edf7096820ba8c393367352d774" datatype="html">
+        <source>Terms</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d8b51403e9e85ef6bd0812db64a632153de617b0" datatype="html">
+        <source>New Term</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2bbfd324992510e83736fb23eda086475ae57636" datatype="html">
+        <source>Student Group Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="741449b0ca32423656e9057b3d10c1f7f9666f3e" datatype="html">
+        <source>Create new student group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="51c2a219e9f4f2eebd3c9ad2b63127d2a6f0b16a" datatype="html">
+        <source>Add Term</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-edit/admin-course-edit.component.html</context>
+          <context context-type="linenumber">150</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c19403d8c1b9415933169df33422d1fa726306bb" datatype="html">
+        <source>Tutor Group Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3c5720eaf6edbcedf75ee74da57376f730055417" datatype="html">
+        <source>Create new tutor group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fbc15c54c61156a56fc9655138491fff0b0149ce" datatype="html">
+        <source>Add Course</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-course-new/admin-course-new.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4edeaa7c36f0576386ff78fa78a52104c5defbc6" datatype="html">
+        <source>Loading users...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dc08314bb8e7273cfa97eae4bfd6545ea932d374" datatype="html">
+        <source>Sync Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="73f47d789c2b4803c1d589ee5afe1f9daaab9374" datatype="html">
+        <source>Synced Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ad40282684357d3d79d14d036fcf26d3cef8278d" datatype="html">
+        <source>Nickname</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c22ba03540aa3217da059f45e7eab138b51a96e2" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="16fc75692eb37a55a0dd2bed06c84c69b96eead6" datatype="html">
+        <source>Loading groups...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2552dfb6b2a2ba17c6396fbe71d43a7d544fc6b8" datatype="html">
+        <source>Sync Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eee5f7f00b82539e99c68291ef2bef1d8d059600" datatype="html">
+        <source>Synced Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eec715de352a6b114713b30b640d319fa78207a0" datatype="html">
+        <source>Description</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-accounts/admin-accounts.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">575</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="36f7da4c1301cafd321b54190256e5309edbb057" datatype="html">
+        <source>Loading task info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dbb73cfc9375112c8ed02c3925ccee9899cf33d2" datatype="html">
+        <source>Created At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">780</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">179</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="88e3c6c4c5fd7d30bfa2a9a8c2f9f2d56ee639a4" datatype="html">
+        <source>Updated At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="be1c273fc76e686667bff39d321970c9487f9ee7" datatype="html">
+        <source>Term</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="380ab580741bec31346978e7cab8062d6970408d" datatype="html">
+        <source>Basic</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">542</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6fa517a21d6bb024f1da58a9f52ba77161145af1" datatype="html">
+        <source>Materials</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-details/task-details.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="74f563e1cafbbbaeb15e20840c26a194a42f38ba" datatype="html">
+        <source>Requirements</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8724223ae3ea996ef2d16f907cc8edecaf79df0e" datatype="html">
+        <source>Auto Test Configurations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4778adb9cdd3e1ff10605994bb0e4a2c02847367" datatype="html">
+        <source>Special Considerations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2d8cc40e51f29b2c8500277f95c139c1363c6abd" datatype="html">
+        <source>Import / Export</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3ace7fac0ba373a88ada1663966bb78b5723478d" datatype="html">
+        <source>Open Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4789c9f9d02c45c05fd35b974113e44d0af8b954" datatype="html">
+        <source>Due Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2cab4f31f1acc2bfb5e4841afc24fc60a5a87e13" datatype="html">
+        <source>Close Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="91b2e0576cad3090b0a574ee3138cfe82f910300" datatype="html">
+        <source>Late Penalty</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="29a24eeecb674bdf8357fe278d1f15ccb68456b8" datatype="html">
+        <source>Late Penalty Syntax</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="20de992064863b35fcf0545cf838e65af2694cc0" datatype="html">
+        <source>Team task?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a25e81b0362f0a160508dafd3df17fdb9d352b18" datatype="html">
+        <source>Team Min Size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="acf1192275a85198ad34875b379e9dea9e3cf4c7" datatype="html">
+        <source>Team Max Size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8e875513e22bed3e7203096bc5ed43e1f1a651f6" datatype="html">
+        <source>Team Join Close Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6f7df61ef2da0f68b7f546572839538d783a625d" datatype="html">
+        <source>Submission Attempt Limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">195</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="09b238cd71e19dca6659358c1c449a57796b7721" datatype="html">
+        <source>Submission History Limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">199</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6570ff6361c2bc4eb16c9326f40337933de2bb63" datatype="html">
+        <source>Evaluation Method</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">201</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2b34680062c4aed90c4d846eab42d6e99501b783" datatype="html">
+        <source>Offline</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">205</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4c997ff3a79ab906d30e88edc9c8ec52d3392533" datatype="html">
+        <source>Auto Testing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">771</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="52c9a103b812f258bcddc3d90a6e3f46871d25fe" datatype="html">
+        <source>Save</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">214</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1ad0ce40a1b15b5a1b2d1abd2dafdd90a84f722e" datatype="html">
+        <source>Visibility</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7faaaa08f56427999f3be41df1093ce4089bbd75" datatype="html">
+        <source>Size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="73b4911ae8ae6590e153edb234f9e030bfd0a2a1" datatype="html">
+        <source>MD5 Hash</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c6375199c6812ce86c49abcf2efd810e3d0bf1f6" datatype="html">
+        <source>New Material</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="70bba3ad65d43a8e0b8c1765964b129cf73fba8e" datatype="html">
+        <source>Material Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">280</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="48139a8f408fb79f24e82673e89e23c2ac314f23" datatype="html">
+        <source>File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">294</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ddd8a4986d2d1717a274a5a0fbed04988a819e69" datatype="html">
+        <source>Private</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">303</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="10cfc24611c22f34776b40098f804091cec29e9d" datatype="html">
+        <source>Use original file name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">309</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8ae7f24cac7975fccced98f430d4e406427999c6" datatype="html">
+        <source>File Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">313</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">374</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e2a89de81f4e8ee3a2f86d2a8881fa56df5e5b1b" datatype="html">
+        <source>Add Material</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">326</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="268f6414c8c287553e180e16570d4004628f040f" datatype="html">
+        <source>Optional?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b2aac35405df17b0ede2d366b25ebec6e036f46b" datatype="html">
+        <source>Size Limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">339</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="05dd0cade667b6e053faab04190c8f9a9faf180c" datatype="html">
+        <source>(No limit)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">349</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="55c053ef4e8c0d774b00a5cc9d671ce29832b9bf" datatype="html">
+        <source>New Requirement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">368</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5317cde482fdb766008de3e1ae09cf0610366abc" datatype="html">
+        <source>Optional</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">387</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="66030d57ec3340c9e8f7a985873d9001a3e32543" datatype="html">
+        <source>Size Limit (Unit: Bytes) (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">391</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="04450f69cf0a3d7cddc71b979d5c6c10ecf92d18" datatype="html">
+        <source>Add Requirement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">398</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="edd04e579025543c017d80558217d1e2788708df" datatype="html">
+        <source>Configurations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">412</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">214</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3697f8583ea42868aa269489ad366103d94aece7" datatype="html">
+        <source>Editing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">413</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="920617c6a1a4805e53bcb5af6a9c76f8387e89c6" datatype="html">
+        <source>Flags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4ef33b4d376762e82c74ca9fe1c976a376f9ee77" datatype="html">
+        <source>Trigger</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">590</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="82dae72eead14aea24aed68c035848cde6f3e66f" datatype="html">
+        <source>No Trigger</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">437</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8413d54821511f126c9a9b1b658f3581bc84ea7b" datatype="html">
+        <source>After Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">438</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="61f863d81102a7c4cf48fbda3cedf38c27b641f5" datatype="html">
+        <source>New Configuration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">461</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0e0a21aaa52e3dd7b5cf545313c085190188c12c" datatype="html">
+        <source>Private?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">488</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">571</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dc73b39aeca94c3db9c8cece3fec3f95917d35ac" datatype="html">
+        <source>Test Environment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">496</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">598</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="de6cf5259366ad90d4f3a555f3a5496c02bf36b1" datatype="html">
+        <source>Target File Requirement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">509</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">522</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">664</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">694</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="122ed140aeeeb3ef0894e6a215434a4d7da12a02" datatype="html">
+        <source>Add Configuration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">530</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8a3e75aca5376ab5fb367da8ae15ac5d41e402fb" datatype="html">
+        <source>Enabled?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">565</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2e4a7af3992601908d9179b7a6a5af210616329d" datatype="html">
+        <source>Execution</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">581</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b74af38005e8a8914e45af2ec412e11ceafef8b6" datatype="html">
+        <source>Priority</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">583</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4c58e6a8d380ef1e9f5af1aa7c78ea99283c7318" datatype="html">
+        <source>Environment Information</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">615</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cb5e0d64f54bd9f419f4d5a5b8cddc84278ca42d" datatype="html">
+        <source>Docker Auto Remove?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">643</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="759c8b1d9bd32026da432e4e236f407e54def30e" datatype="html">
+        <source>Docker Network Access Allowed?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">649</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bde2495ff6228a0e94642b60ccfba2711e7819a5" datatype="html">
+        <source>Docker Memory (unit: MB)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">657</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c3b2e3e31a33b13735d7ca0d56bf73d4e9df9c72" datatype="html">
+        <source>Template File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">677</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="aedd8a280332f2160ce878bc99be9e766653dec4" datatype="html">
+        <source>Result Processing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">706</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="041c955aa8de506b252c8a4ca182c468382ea889" datatype="html">
+        <source>Result Render HTML</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">708</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="62e7888f54776c7a1e0e29bcbd723474afcbb713" datatype="html">
+        <source>Result Render HTML Preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">711</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="56b99e188d4de9d27d1b8528f6344225bfbe782a" datatype="html">
+        <source>Result Conclusion Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">716</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e74c5eea49d263260f0073c93a9ee8b6c68f6a46" datatype="html">
+        <source>Integer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">719</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9a97eae0bcadbae74b415ee94ab8d21e982b3cac" datatype="html">
+        <source>Float</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">720</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e60350ece81e5e478a18558ce97b120a79a08f79" datatype="html">
+        <source>Boolean</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">723</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7b320cfede5dfb62207fd258205dec29002ded0b" datatype="html">
+        <source>String</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">726</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2a23140f1cf904900cab65cc58fd20786db02e64" datatype="html">
+        <source>Result Conclusion Path</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">732</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7544aa76ac03509ff21a2ee6e9313bbeddeab71b" datatype="html">
+        <source>Result Conclusion Full Marks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">737</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9017f7e48b1ae64107ddee36d9fac60afdf35eaf" datatype="html">
+        <source>Apply Late Penalty on Result Conclusion</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">743</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="55be0d500f73f9a51a8297125e7f126bf39dca92" datatype="html">
+        <source>Result Conclusion Accumulate Method</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">748</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cffb5c768ded00243bf8e23a73ac96f88c9eb831" datatype="html">
+        <source>Use First Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">750</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0248240eb8afbd6eeadd87f032067e0e2a245002" datatype="html">
+        <source>Use Last Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">751</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fd3b000124344d519c73e03efbec14ba7190c761" datatype="html">
+        <source>Use Highest Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">753</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a025b9eaf334b5367aac066996efedf7d0664421" datatype="html">
+        <source>Use Lowest Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">754</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="602746930212d35b5eb1333a651e32ba31967a81" datatype="html">
+        <source>Use Average Among Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">755</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4fa47f8ab8bcfade2611380293e4611a6a8b42db" datatype="html">
+        <source>Use Logical AND among Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">758</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ce41e7a12d0a2d85f7e1896772c0a3b0484fd1a1" datatype="html">
+        <source>Use Logical OR among Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">759</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c46bb39912f197ed3730212ba32dc13ecbf5c815" datatype="html">
+        <source>Update Configuration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">763</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8f5cfdf2b56f16bfe2abee10273cc742627dd80e" datatype="html">
+        <source>Auto Test Evaluation is disabled</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">770</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d73abf9faf082f871b020a45c1edf6029c7b3300" datatype="html">
+        <source>User/Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">780</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b96f770a58b154309b7524a69fc75fbf7d8c2f0f" datatype="html">
+        <source>Due Time Extension (hours)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">780</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">830</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c8021fe133b46c08682a2cec58d0f375d8f0d0c7" datatype="html">
+        <source>Submission Attempt Limit Extension</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">780</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">834</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dd355eb2d62a2568b8cdf4a875598ecfa98aaa08" datatype="html">
+        <source>New Special Consideration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">810</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4fcb6dbd1b656de4f606e061af0ed606d3fdc547" datatype="html">
+        <source>User Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">816</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1507076f79ba88e0f0829cc2a5c2c6a5ce47bfa4" datatype="html">
+        <source>Team Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">823</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f20f0b08400b459552e5ff586ce89df7c78143cb" datatype="html">
+        <source>Add Special Consideration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">837</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a059709f71aa4c0ac219e160e78a738682ca6a36" datatype="html">
+        <source>Import</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">849</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f81c4b91833788ec001abedd9d882643199a5d9f" datatype="html">
+        <source>Import Give Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">850</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5f19586aba912ec6eb123ec5ab609a3bcc073066" datatype="html">
+        <source>Export</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">858</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3b44bbaa6b7bf5b5e576a81da9627083c65e9f8a" datatype="html">
+        <source>Export Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-task-edit/admin-task-edit.component.html</context>
+          <context context-type="linenumber">859</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ea965d544a7dfd8185064c52cdfff553cf94d585" datatype="html">
+        <source>Messages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="87f9f08252cb3078d9f405fe4ded50dc5f532c0d" datatype="html">
+        <source>Final Marks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term/term.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0623a77f476c9b87831f522153471123b66f2b32" datatype="html">
+        <source>My Final Marks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">225</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d75a4795f42ed4cabfd217b484fe5cf785a56325" datatype="html">
+        <source>TBD</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3d3ae7deebc5949b0c1c78b9847886a94321d9fd" datatype="html">
+        <source>No</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1b9822f87ed0dc1e23b8620cb47bc0f965d2c568" datatype="html">
+        <source>No limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d75f96a7c5dd05db7ff68934d234d74b35ce3e8d" datatype="html">
+        <source>Task Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="078b82c28dba848b14cb5b61eac78315fb5c3ac0" datatype="html">
+        <source>My Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="aae1179c516ab17a281a4bec18f37401f24e367f" datatype="html">
+        <source>New Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0793b843cee4368741b3f00c9e5d5d7e1b6c2ab5" datatype="html">
+        <source>My Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-submission-details/my-submission-details.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b2fec1ab33ae0b0d541f88043e677a202b3ae6c8" datatype="html">
+        <source>Team Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submission-details/my-team-submission-details.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8a6afcf38cbb3107a31ae8636805be7f65182dc8" datatype="html">
+        <source>Teams</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e6b61e5dab50fc2b018082f8882a8bf1460dd4ca" datatype="html">
+        <source>Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-details/submission-details.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-details/team-submission-details.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c5bb9f8936cb33db2ca351a1b87a984fdf11917c" datatype="html">
+        <source>Comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3edb7243ae9bca05410473bd6892f11b44d78a8b" datatype="html">
+        <source>No late penalty</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="329d2b75711435b962da808a8ddb70a05c1616ee" datatype="html">
+        <source>Please refer to the specification</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="be9ecd325b7a7ac467533bc5dde75f932fae9f48" datatype="html">
+        <source>Is Team Task?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f20f2d5a6882190892e58b85f6ccbedfa737952" datatype="html">
+        <source>Yes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c8e30bfef7437c8a1a92e5dbca6658065d25d0cc" datatype="html">
+        <source>Team Size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-preview/task-preview.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f4e529ae5ffd73001d1ff4bbdeeb0a72e342e5c8" datatype="html">
+        <source>Close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task/task.component.html</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9d72ca1d7c148f4c617a0a42fa2f66780a518ec5" datatype="html">
+        <source>Loading team info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-details/team-submission-details.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81b97b8ea996ad1e4f9fca8415021850214884b1" datatype="html">
+        <source>Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c9039b1b13b3ef165b66b3c5d79f810ab1ebb050" datatype="html">
+        <source>Open</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e4a7c7371f20bcbf30626ae9f2a725299639d991" datatype="html">
+        <source>Finalised</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e08a77594f3d89311cdf6da5090044270909c194" datatype="html">
+        <source>User</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b23cb2a14ff517250a31b6ead223d66ab03d4635" datatype="html">
+        <source>Requested At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="95f73701e981b50eeb99408029082ada65a6dad1" datatype="html">
+        <source>Is Invited?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="163abda614c21bf984f326ee2db3e3841f1475b2" datatype="html">
+        <source>Is User Agreed?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b9dd4ddf7e196660d88a959c95b309bce993281" datatype="html">
+        <source>Is Creator Agreed?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team/team.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="30cf10e203ee276a619ca0b9ea78b23428a20bff" datatype="html">
+        <source>Loading status...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-submissions/my-submissions.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submissions/my-team-submissions.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0be9367760372daf9ac48b459f1a103cda2aa07f" datatype="html">
+        <source>You are not in any team now!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f7d48bf29a4fced307f0060e9024ba2c2146895b" datatype="html">
+        <source>Please join an existing team or create a new team first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="35668bcbbed09a49ba5e7e0071c5aa734695891b" datatype="html">
+        <source>Please accept the invitation first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3056af5f5f2be8e9b53c3f6fd26a573ee479503e" datatype="html">
+        <source>Please ask the team creator to accept your join request.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0c7f8c7bae4f60db3a559e5668d74165ae0315fc" datatype="html">
+        <source>Your team has not been finalised</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="137a0fb9ef28f21eed30523126a5755874bdf74e" datatype="html">
+        <source>Please finalise the team first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="230b33ec3e63672b939c4eeccbf3eaf99320ce13" datatype="html">
+        <source>Please ask the team creator to finalise the team first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="619bba857f732bf2a9659af83292458be57d1bea" datatype="html">
+        <source>Task has been closed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bda92088d5756ea6945400224e471608f8485bd9" datatype="html">
+        <source>You are not allowed to make new submissions after the close time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8eef5cd86cce07a63cc65821314c89a6862c6405" datatype="html">
+        <source>Due time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="598195f4dc8b54b6cc4ce44215e3c78b45c450da" datatype="html">
+        <source>Submission attempt limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2a88252d73b2af1c1fd7f7266813bf5be52a18ab" datatype="html">
+        <source>We have set a history limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="76090775de3dd9a977b7e00fec28018b51ec4a96" datatype="html">
+        <source>Hey! You are late!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bef5bd9120001fd76542681a02afd386178abfe1" datatype="html">
+        <source>Deadline approaching!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="06a6c4a4d96e026697eb6feb93e3712971113175" datatype="html">
+        <source>hours</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cd25ef11e2d8843297caf4202937023dc02d0ba8" datatype="html">
+        <source>minutes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="38bd5794dbe84081cfa7867e876245e1ddae93e7" datatype="html">
+        <source>seconds</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3bb2d877ef3ef7a032ff8b84147cd4fefbdde1e9" datatype="html">
+        <source>Attempts</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2e05842ff9c86e02b7b26519044fbd2a4917b741" datatype="html">
+        <source>Limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="71c77bb8cecdf11ec3eead24dd1ba506573fa9cd" datatype="html">
+        <source>Submit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d3f1448264072e26a1a00e3c7640eb1c6aec4006" datatype="html">
+        <source>Submit Late Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a4fefcfcf1342dd1e30a469c97e25a6c0739c5d1" datatype="html">
+        <source>No file requirements</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">145</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5c41e4dbf1dea422a36f0d0bd11c9de099665c0c" datatype="html">
+        <source>You are not required to submit anything for this task right now.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submit/submit.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="57ad628a6abd2f4c0dc3461515c160f0581cc2bc" datatype="html">
+        <source>Loading teams...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f8fa449083e8b21cd8cbe9e7725f37f8192dad02" datatype="html">
+        <source>Users in teams</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fe57701ba78f0f04ef6c83e628c62a70423ae5a0" datatype="html">
+        <source>Users not in teams</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a20424156b8816671f61879f0574a4f27d7b16b9" datatype="html">
+        <source>Creator</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="17133f5659431cd5ddae69edb100a1c3eb5283ff" datatype="html">
+        <source>Slogan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="80fa90ce67552f3f8a824f756a94327e41d3fc49" datatype="html">
+        <source>Members</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7d9b2050c14256d89dfd7260e7fde4c17f77255d" datatype="html">
+        <source>Operations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">179</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="66615ce332a2fa8d4abb649d86f1a798bb5b38d3" datatype="html">
+        <source>Loading users not in teams...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="10b1091eb944663c4ff9f6d8d8f877141ab6be7c" datatype="html">
+        <source>Users Not In Teams</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/teams/teams.component.html</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5bbb6979f8454d7b9fe8dfbfc6723146c3312a2a" datatype="html">
+        <source>Loading tasks...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b8773953735ea3584aee96b30d210c02717a89d8" datatype="html">
+        <source>Due</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="83499b9ff1ad17426a6d7e54621dc4b222882905" datatype="html">
+        <source>Team task</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e4ed3502ca9798a4db5a3862484c64e5c3388b1f" datatype="html">
+        <source>team size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6e014a0cfaa9a944e314b8ddaad33054a91821c2" datatype="html">
+        <source>Team join close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
+        <source>Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="47742fcbc8f698edfbbbb2286ecd93142983e3a5" datatype="html">
+        <source>Configs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3e2a583f531f7dd9f089f68a6968e444c372c3e8" datatype="html">
+        <source>Preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3893fed93cefef32b4cfef73c3c9c05d73ca556b" datatype="html">
+        <source>There is no task created yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/tasks/tasks.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fb8099fee5c698d744da6a144cdb1c4098d96ef1" datatype="html">
+        <source>Scanning Jupyter Notebooks...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/task-details/task-details.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="816d187f93d7b86a0a0aa59a9f73ebf77c4b6740" datatype="html">
+        <source>Loading submission summaries...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="526b3230eabac76835fd9e5ca1f0441ff7c4ebc7" datatype="html">
+        <source>Submitted Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="458a7550f28a90d3562dc12d11496dda7d814ba7" datatype="html">
+        <source>First Attempt</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0882725974bb249582ecdb909d13865aba3744da" datatype="html">
+        <source>Last Attempt</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="899416f274b79f20961f9060234b65c76ac52da9" datatype="html">
+        <source>Last Late Penalty</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions/submissions.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="698452893cf4413619b0f5976bd779806eab5a21" datatype="html">
+        <source>Loading my submissions...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-submissions/my-submissions.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="796fab6d43c926270e878ff3fe463534d1db06d7" datatype="html">
+        <source>Loading submission info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-submission-details/my-submission-details.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-details/submission-details.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submission-details/my-team-submission-details.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-details/team-submission-details.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="acc2181dea11d1063aaca7aa51dfcb36739a7384" datatype="html">
+        <source>Submission</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-submission-details/my-submission-details.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-details/submission-details.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submission-details/my-team-submission-details.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-details/team-submission-details.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e6813c3b5512d6371f91151ca704e636ba1af1c2" datatype="html">
+        <source>User Info</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-details/submission-details.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e4aa3da99a9dfe17fc01868a07c95797f15d1375" datatype="html">
+        <source>Loading my team...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="91b9afe531fbf7533df310909dec77ece3ea04bc" datatype="html">
+        <source>Reloading team info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a1f4167f9e8e679700c51674bfdc54822122a571" datatype="html">
+        <source>Your join request is waiting for the team creator&apos;s approval.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="57f7a7cd481889b9df381478393312b1023db624" datatype="html">
+        <source>Cancel Request</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9dcc4d38cafcbd18fd2e7e09060f1ac4ad05fae6" datatype="html">
+        <source>Invitation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f4713a1b4bb8b45f9605afcff5247ad019e77e3c" datatype="html">
+        <source>You have been invited to this team. You must accept or reject this invitation before any other team interactions.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6fc5e65900ae1415d3170d5d2842f0dcae1b6645" datatype="html">
+        <source>Accept</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="20c3d69c0b67a74df0aa3920485016b2080578f6" datatype="html">
+        <source>Reject</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b93c0d7a857b3c4fbbc1f2d52c086ef6e67644f1" datatype="html">
+        <source>There are pending requests for you to resolve.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9fad3b7a873ec1463781502c4ccd672bba1ef324" datatype="html">
+        <source>Please finalise your team when you confirm the member list. Only after the team is finalised, the team members can make submissions for this task.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8043d0822ac2cf394013f6b04ad7c1bf32523e06" datatype="html">
+        <source>Your team needs to be finalised by the team creator before you can make any submissions for this task.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b501c40a761cb9989f3c0134e767d22afaabcb47" datatype="html">
+        <source>Slogan (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1eede69e18c5ac9c0b0295b72cabb7e64e029e74" datatype="html">
+        <source>Hide</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8d48065fe21ab0f97a8b7c73d7e08e846d43ed1b" datatype="html">
+        <source>Joined At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="880769fac8dec233278cf7a1e7a40029e687987e" datatype="html">
+        <source>Member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bd5de8e1c07148438b5befcc98703ac30a2699fb" datatype="html">
+        <source>Requesting</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="17381d5466f884c510315b4414f63244fdf7d43f" datatype="html">
+        <source>Inviting</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="019d4bd6a5690f0cfa0ecf346a4e6bf7f0d8debb" datatype="html">
+        <source>Remove</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ecd5d1fef4a77950b7056d6afac0166fba2fb477" datatype="html">
+        <source>Finalise Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b4b172a55c9858d39fc1359006ff61779034a1f4" datatype="html">
+        <source>Dismiss Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="af8cb1dd4f4c17c3bf0e83e65bfb6f4b21b22461" datatype="html">
+        <source>You have to resolve all the pending requests before finalising the team.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="75507cd472b7e36b5b192052693b05540f83f97d" datatype="html">
+        <source>Leave Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team/my-team.component.html</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0b6b6539b2a8bc39c53af20f2959bd3dd0840df0" datatype="html">
+        <source>Loading team submissions...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submissions/my-team-submissions.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5aad026ea58549ea5f6869f1c968235c0e2ba0f3" datatype="html">
+        <source>Team submissions are not available now</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submissions/my-team-submissions.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a04fb4d25ea10402fa05db2ef225a751bc5a46aa" datatype="html">
+        <source>You must be a member of a finalised team first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/my-team-submissions/my-team-submissions.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ed9b6a49e47c01f4a59a45505fe29fda555b6ba5" datatype="html">
+        <source>Submitted Teams</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4feeec1fe087f082e51f2a64b69ef6ed77cf5675" datatype="html">
+        <source>Export (with team members)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="764a8a101f8ee5a4b98844e93406182fb078507b" datatype="html">
+        <source>Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submissions/team-submissions.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d72b33cb154f7b8e16a00c32056becfc8a8cba89" datatype="html">
+        <source>Team Info</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-details/team-submission-details.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cffac5ce52a58985a3e1352e9c237f0229a03908" datatype="html">
+        <source>Loading user submission status...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="de5d2500b63e3a109e1c1f1397353ad05cf592be" datatype="html">
+        <source>Loading user submissions...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e5908083c3ad7bec72c814af1df036321d2fa979" datatype="html">
+        <source>Download All Submissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-list/submission-list.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7f545c23ca0b058207fd163865ca9677768b6071" datatype="html">
+        <source>Loading team submission status...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/team-submission-list/team-submission-list.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c801cb80d041629f8f69c129e0c099cf800eec29" datatype="html">
+        <source>Please create a new team or join an existing team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="91fd771af3cca6e469e52dc321426e624f19848d" datatype="html">
+        <source>There is no team now!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f1f93ac958486945c22e285b63e103ba3bba0335" datatype="html">
+        <source>Please create the first team!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="af3425d3620e0ddbd086eaca5e70303e15f6be40" datatype="html">
+        <source>Create New Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
+        <source>Create</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1b518e7f8c067fa55ea797bb1b35b4a2d31dccbc" datatype="html">
+        <source>Or</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a6b60253870c673b10706adea643b191233ccca7" datatype="html">
+        <source>Team join has been closed.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="01655f05baf041fe85ff99fdf76efd35d1723d05" datatype="html">
+        <source>Team ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="db5cc0c8d9d80c653f1b78ce2bfb1b41bc84ceeb" datatype="html">
+        <source>Join</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/join-or-create-team/join-or-create-team.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bd361c6b11d75c201b1ca9d01521d1863b115bf0" datatype="html">
+        <source>Hide Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb9e5d81c1fa1ad97aef327eda0d2704877cda7b" datatype="html">
+        <source>Show Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a52118ba6da110f8c1f422bba5fc001c57942d90" datatype="html">
+        <source>Waiting for worker bot...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3bbce5fef7e1151da052a4e529453edb340e3912" datatype="html">
+        <source>Hours</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="41e62daa962947c0d23ded0981975d1bddf0bf38" datatype="html">
+        <source>Minutes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f2ed9e71a7c981db3e50ae2fedb28aff2ec4e6c" datatype="html">
+        <source>Seconds</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="042a6d5025c521be5e50cec949a3905490a35992" datatype="html">
+        <source>Retrying...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fea17894ec314e60797e8bc4b5ff0377107fed79" datatype="html">
+        <source>Test has been revoked.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="873b72903b1858a9cd6c8967521030b4d7d1435b" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b66f295cec17033ccb98c0de84deba9c2a12e641" datatype="html">
+        <source>Work ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="58c9d563a7092f63c500f9ef9154c30ca9fa1412" datatype="html">
+        <source>Worker</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="34f57e038da7bdc87730fd7b894c84b0031f7251" datatype="html">
+        <source>PID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="030a8d4c2028ba790f45cc077d01ce8ed44079af" datatype="html">
+        <source>Started At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">151</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9b1da2d898e81e38fac162e5480d4c94ffd7446e" datatype="html">
+        <source>Stopped At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a02ea1d4e7424ca989929da5e598f379940fdbf2" datatype="html">
+        <source>Duration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1706a8c7ecde0bbe91bb5bd2e8611ce689a536c3" datatype="html">
+        <source>Raw Result</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="32855796ba6720363757cd3f8731670838476db0" datatype="html">
+        <source>Output Files</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="766c66ad5cc981c531aaf3fe3a2a7a346ddc8d83" datatype="html">
+        <source>Path</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-card/auto-test-card.component.html</context>
+          <context context-type="linenumber">179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2b00cda926a537b20e3f77d0588f2548f8b5a893" datatype="html">
+        <source>Older submissions have been removed due to the history limit of this task.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5954cf57bb771d38ce57d24f9103ef36bfb9efc9" datatype="html">
+        <source>Special Consideration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c6e002ebbe8b338a48a5757351059b6400d09472" datatype="html">
+        <source>Attempt Limit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6448915262306ce2447a03725c6bcd04d7eb3814" datatype="html">
+        <source>Submitter</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-card/submission-card.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="42ee3e01d7f32da84881744c08e34cb42ccaf18c" datatype="html">
+        <source>Submitted At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submissions-table/submissions-table.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-card/submission-card.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="80ed5b776a26a78099e230e0e89d96c33ba44e24" datatype="html">
+        <source>Results</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-conclusions-card/auto-test-conclusions-card.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f3f6a406fbd8a70eb22c0a2dd280f2922c40ae04" datatype="html">
+        <source>No Result</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auto-test-conclusions-card/auto-test-conclusions-card.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b967f5d0486b95c3be688e484f3af4873fab9e53" datatype="html">
+        <source>Rows Per Page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/table-pagination-toolbar/table-pagination-toolbar.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="25b41dd018be0547db05dcf96bbccc4ce9738c47" datatype="html">
+        <source>Run Auto Tests</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/run-auto-test-card/run-auto-test-card.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/run-auto-test-card/run-auto-test-card.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="08934c8a3bc01f40750e74d07944eebfd9b57921" datatype="html">
+        <source>Test Config</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/run-auto-test-card/run-auto-test-card.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4a455670cab4d74f4e4501bdb9b29bf5afd060b2" datatype="html">
+        <source>Skip submissions that got success in their last test</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/run-auto-test-card/run-auto-test-card.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9b3d305551358858e1892169a94527e0cc4dbf5b" datatype="html">
+        <source>Run</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/run-auto-test-card/run-auto-test-card.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="948ca752cd2f11211e6c4f9c806a9c1ade56d0e5" datatype="html">
+        <source>Loading messages...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="06ac97c57691e065a4ce7119df811e89279319b4" datatype="html">
+        <source>Sender</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b0ca852bafa5037c4e64c7b18f9cd1e14b799de" datatype="html">
+        <source>Subject</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b24f1cd32cbc1ec9537af28c4fe1b8204097714b" datatype="html">
+        <source>Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="030b4423b92167200e39519599f9b863b4f7c62c" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8011e20c5bbe51602d459a860fbf29b599b55edd" datatype="html">
+        <source>System</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="open_message" datatype="html">
+        <source>Open</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e917ac0368127057a7dc72873fc103fc03432f8a" datatype="html">
+        <source>Your message box is empty.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="54fc925711a192a54f481fdad96301b8e275addc" datatype="html">
+        <source>Enable Auto Refresh</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5f18ad0aec796918970d3826f31aa09f063684a2" datatype="html">
+        <source>Mark All as Read</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="918839fc246e0fd65d62edfa38cff0ecfb325eb2" datatype="html">
+        <source>Manage Email Notifications</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/messages/messages.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6bf111e84a970eaee12218bb726a24085d6ba350" datatype="html">
+        <source>Loading FAQ...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help/help.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b6dbf2d92858e82bcf6ae5dbc8dfb4b29d82ad0" datatype="html">
+        <source>FAQ</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help/help.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cda31dbd724cf5f4fa7a4274d9120651490c8a8c" datatype="html">
+        <source>Back</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/help/help.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about/about.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/email-subscriptions/email-subscriptions.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8fe73a4787b8068b2ba61f54ab7e0f9af2ea1fc9" datatype="html">
+        <source>Version</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about/about.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d7293b61e9088c66421df2e367e0ccc00346cf9f" datatype="html">
+        <source>Author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/about/about.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="592e95ea6e292e89805fdde34feaf80381e873d1" datatype="html">
+        <source>Loading message...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5a5d65ca62a35d5292fac9d7a4eb5e3c22c3ef67" datatype="html">
+        <source>Receiver</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/message-detail/message-detail.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2a9a52cc80c4b47f888ceb347e3f696ccb7dae12" datatype="html">
+        <source>Loading channels...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/email-subscriptions/email-subscriptions.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6ea04c81a58bcb9212e885fd8d34367aafe31886" datatype="html">
+        <source>Email Subscriptions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/email-subscriptions/email-subscriptions.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dc75033a5238fdc4f462212c847a45ba8018a3fd" datatype="html">
+        <source>Download</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-card/submission-card.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="01f9c41e4e6c51a15e913a6f24cc75e95039549b" datatype="html">
+        <source>No test found for this config right now.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-auto-tests-view/submission-auto-tests-view.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d253bbc2f4d9778cdeb76895085fab2a57473f04" datatype="html">
+        <source>Same File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/file-diff-label/file-diff-label.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0840227907e3f5a7d9c515eb9bd8e05fdf67b635" datatype="html">
+        <source>Binary Diff</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/file-diff-label/file-diff-label.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a84511c793da2176f3c9e615d4014ce2a56fd731" datatype="html">
+        <source>Initial Version</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/file-diff-label/file-diff-label.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3d49900989f2bd3177663477e7a534418da5e710" datatype="html">
+        <source>Need Help?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
+        <source>Edit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="32a63d38e28746a0c6dd969e930020776677a91d" datatype="html">
+        <source>The E-mails and messages that contain this comment will not be updated.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d7b35c384aecd25a516200d6921836374613dfe7" datatype="html">
+        <source>Cancel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="73c0a017e42353ac091f4a487c3d9ada970c7dce" datatype="html">
+        <source>Add Comment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/submission-comments-view/submission-comments-view.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="52a11bbba57644bc8e47f63b7374510ebd58cd8b" datatype="html">
+        <source>Loading comment summaries...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0a9f62760639dbf91b11e4c3acb5e61acdb68f02" datatype="html">
+        <source>Submissions w/ Comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f3e443ae51d1dc61bad0d7e9df3b29fb45617b88" datatype="html">
+        <source>Submission ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5a63e97516999122ecc65de68f3c052074c777e3" datatype="html">
+        <source>Total Comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4906645a0cabf9b1bcd30fbdf1265e47c6bd8266" datatype="html">
+        <source>Last Commenter</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d9ef6e7d55e7959d37a437ba9373d0ea01382611" datatype="html">
+        <source>Last Comment Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f0cbc9c48b0584860dfd956784ec2dd640a14db4" datatype="html">
+        <source>Last Comment Content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/comments/comments.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="59976d452f7814519aa7493665dce04616e80bd8" datatype="html">
+        <source>Loading user list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3d034bea9ae72ee484f160c03e52fedc27c023e1" datatype="html">
+        <source>Loading final marks...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/term-final-marks/term-final-marks.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a6b414bf6f1a52eb7dd1a092f2eaecd2b15b3ebd" datatype="html">
+        <source>The following final marks have not been released.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="87026d98a68f73af07214f606a9cc9a27458d50d" datatype="html">
+        <source>Release</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="233e010def310e6f2ebc05e600496d26bb5cfaf9" datatype="html">
+        <source>Marks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5a5d7ee2acbfa9c91ab7f41d26bda9ff0cafe42f" datatype="html">
+        <source>Comment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="710e6a04e94375690f3d836d80a6a8e06706b66f" datatype="html">
+        <source>Comment (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks/final-marks.component.html</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="77608db37bfd5a12141eba35ce4dd911757f0902" datatype="html">
+        <source>Import Final Marks</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a2935a5a7b5e2669447b4d200569450f92669308" datatype="html">
+        <source>TSV Table</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fcdf8fcee80397daddd6238c04593276f90b95d2" datatype="html">
+        <source>Table has header</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="187da7680348030267cc1d8c2723addb1c9b8beb" datatype="html">
+        <source>User Name Column</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e3c2715ed7f11ed4ac89f4153d8557f182a6918e" datatype="html">
+        <source>Column</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="65265b04d87ee36de4b7f1ebe3174261677d3047" datatype="html">
+        <source>Marks Column</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="21f84a674187be4ee32c0b6232b676612b9b3441" datatype="html">
+        <source>Comment Column (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6660adcbc8f1c4eaf203b53416eda3fbe0ebba0c" datatype="html">
+        <source>(none)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/final-marks-import/final-marks-import.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b36e1450940b7f6028d8587568c7d669b53f7a06" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1e035e6ccfab771cad4226b2ad230cb0d4a88cba" datatype="html">
+        <source>Success</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="42188ac553d4fa4fbee2ca9ed846c5d8eee9175f" datatype="html">
+        <source>Failure</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d04d5b5d13ac9acf9750f1807f0227eeee98b247" datatype="html">
+        <source>Total</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7ebc95022baf10ada7dbb07dbe2e3bb0d330b224" datatype="html">
+        <source>Config ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9a541ec1a4319fffc16ad3b3ab2c2b6d251a829d" datatype="html">
+        <source>Hostname</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="29d27df080266facf9ef16b9c137a9b8f4e2c742" datatype="html">
+        <source>Final State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-auto-tests/admin-auto-tests.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

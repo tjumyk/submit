@@ -1,9 +1,9 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader active text" *ngIf="loadingTeam">Loading team info...</div>
+<div class="ui loader active text" *ngIf="loadingTeam" i18n>Loading team info...</div>
 
 <div *ngIf="team">
   <div class="ui breadcrumb">
-    <a routerLink=".." class="section">Teams</a>
+    <a routerLink=".." class="section" i18n>Teams</a>
     <i class="icon right angle divider"></i>
     <div class="section active">{{team.name}}</div>
   </div>
@@ -23,24 +23,24 @@
         {{ team.id }}
       </div>
       <div class="item">
-        <div class="header">Created At</div>
+        <div class="header" i18n>Created At</div>
         {{team.created_at|date:'medium'}}
       </div>
       <div class="item">
-        <div class="header">Updated At</div>
+        <div class="header" i18n>Updated At</div>
         {{team.modified_at|date:'medium'}}
       </div>
       <div class="item">
-        <div class="header">Status</div>
-        <span *ngIf="!team.is_finalised; else alreadyFinalisedText"><i class="icon lock open green"></i> Open</span>
-        <ng-template #alreadyFinalisedText><i class="icon lock"></i> Finalised</ng-template>
+        <div class="header" i18n>Status</div>
+        <span *ngIf="!team.is_finalised; else alreadyFinalisedText"><i class="icon lock open green"></i> <ng-container i18n>Open</ng-container></span>
+        <ng-template #alreadyFinalisedText><i class="icon lock"></i> <ng-container i18n>Finalised</ng-container></ng-template>
       </div>
     </div>
   </div>
 
   <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
   <table class="ui unstackable table">
-    <thead><tr><th>#</th><th>User</th><th>Requested At</th><th>Updated At</th><th>Is Invited?</th><th>Is User Agreed?</th><th>Is Creator Agreed?</th></tr></thead>
+    <thead><tr><th>#</th><th i18n>User</th><th i18n>Requested At</th><th i18n>Updated At</th><th i18n>Is Invited?</th><th i18n>Is User Agreed?</th><th i18n>Is Creator Agreed?</th></tr></thead>
     <tbody>
     <tr *ngFor="let ass of team.user_associations; index as i">
       <td>{{i+1}}</td>
@@ -59,7 +59,7 @@
 
   <div class="ui center aligned grid one column">
     <div class="column">
-      <a routerLink="../../team-submissions/{{teamId}}" class="ui button"><i class="icon paper plane outline"></i>Submissions</a>
+      <a routerLink="../../team-submissions/{{teamId}}" class="ui button"><i class="icon paper plane outline"></i><ng-container i18n>Submissions</ng-container></a>
     </div>
   </div>
 </div>

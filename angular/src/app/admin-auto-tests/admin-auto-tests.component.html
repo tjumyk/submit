@@ -8,19 +8,19 @@
     </div>
     <div class="ui four statistics">
       <div class="ui statistic blue">
-        <div class="label">Active</div>
+        <div class="label" i18n>Active</div>
         <div class="value">{{item.value.counts.active}}</div>
       </div>
       <div class="ui statistic green">
-        <div class="label">Success</div>
+        <div class="label" i18n>Success</div>
         <div class="value">{{item.value.counts.success}}</div>
       </div>
       <div class="ui statistic red">
-        <div class="label">Failure</div>
+        <div class="label" i18n>Failure</div>
         <div class="value">{{item.value.counts.failure}}</div>
       </div>
       <div class="ui statistic">
-        <div class="label">Total</div>
+        <div class="label" i18n>Total</div>
         <div class="value">{{item.value.counts.total}}</div>
       </div>
     </div>
@@ -28,10 +28,10 @@
     <table class="ui unstackable celled very compact table" *ngIf="item.value.heads">
       <thead>
       <tr>
-        <th>#</th><th>ID</th><th>Config ID</th><th>Submission ID</th><th>Work ID</th>
-        <th>Hostname</th><th>PID</th><th>State</th><th>Final State</th>
-        <th>Created At</th><th>Started At</th><th>Stopped At</th>
-        <th class="collapsing">Ops</th>
+        <th>#</th><th>ID</th><th i18n>Config ID</th><th i18n>Submission ID</th><th i18n>Work ID</th>
+        <th i18n>Hostname</th><th i18n>PID</th><th i18n>State</th><th i18n>Final State</th>
+        <th i18n>Created At</th><th i18n>Started At</th><th i18n>Stopped At</th>
+        <th class="collapsing" i18n>Ops</th>
       </tr>
       </thead>
       <tbody>

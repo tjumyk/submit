@@ -1,20 +1,20 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingTeam">Loading team info...</div>
-<div class="ui loader text active" *ngIf="loadingStatus">Loading team submission status...</div>
-<div class="ui loader text active" *ngIf="loadingSubmissions">Loading team submissions...</div>
+<div class="ui loader text active" *ngIf="loadingTeam" i18n>Loading team info...</div>
+<div class="ui loader text active" *ngIf="loadingStatus" i18n>Loading team submission status...</div>
+<div class="ui loader text active" *ngIf="loadingSubmissions" i18n>Loading team submissions...</div>
 
 <div *ngIf="submissions">
   <div class="ui grid stackable two column">
     <div class="column">
       <div class="ui breadcrumb">
-        <a routerLink="..">Submissions</a>
+        <a routerLink=".." i18n>Submissions</a>
         <i class="icon right angle divider"></i>
         <div class="section active">{{team.name}}</div>
       </div>
     </div>
     <div class="column right aligned">
-      <a class="ui button mini" routerLink="../../teams/{{teamId}}"><i class="icon users"></i>Team Info</a>
-      <a class="ui button mini" href="api/tasks/{{taskId}}/download-team-submissions/{{teamId}}"><i class="icon download"></i> Download All Submissions</a>
+      <a class="ui button mini" routerLink="../../teams/{{teamId}}"><i class="icon users"></i><ng-container i18n>Team Info</ng-container></a>
+      <a class="ui button mini" href="api/tasks/{{taskId}}/download-team-submissions/{{teamId}}"><i class="icon download"></i> <ng-container i18n>Download All Submissions</ng-container></a>
     </div>
   </div>
 

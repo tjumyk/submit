@@ -1,10 +1,10 @@
 <app-error-message [error]="error"></app-error-message>
 <div class="top attached ui segment">
-  <a routerLink="../new-course" class="ui primary button"><i class="icon plus"></i> New Course</a>
+  <a routerLink="../new-course" class="ui primary button"><i class="icon plus"></i> <ng-container i18n>New Course</ng-container></a>
 </div>
-<div class="ui active text loader" *ngIf="loadingCourses">Loading course list...</div>
+<div class="ui active text loader" *ngIf="loadingCourses" i18n>Loading course list...</div>
 <table class="ui table bottom attached unstackable celled" *ngIf="courses">
-  <thead><tr><th>ID</th><th>Code</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
+  <thead><tr><th>ID</th><th i18n>Code</th><th i18n>Name</th><th class="collapsing" i18n>Ops</th></tr></thead>
   <tbody>
   <tr *ngFor="let course of courses, index as i">
     <td>{{course.id}}</td>

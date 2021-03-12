@@ -1,6 +1,6 @@
 <div class="header container">
   <h1 class="ui header">
-    <i class="icon star outline"></i> Final Marks
+    <i class="icon star outline"></i> <ng-container i18n>Final Marks</ng-container>
   </h1>
 </div>
 <div class="ui divider"></div>
@@ -10,9 +10,9 @@
     <div class="column">
       <app-error-message [error]="error"></app-error-message>
 
-      <div class="ui loader text active" *ngIf="loadingTasks">Loading tasks...</div>
-      <div class="ui loader text active" *ngIf="loadingUsers">Loading user list...</div>
-      <div class="ui loader text active" *ngIf="loadingMarks">Loading final marks...</div>
+      <div class="ui loader text active" *ngIf="loadingTasks" i18n>Loading tasks...</div>
+      <div class="ui loader text active" *ngIf="loadingUsers" i18n>Loading user list...</div>
+      <div class="ui loader text active" *ngIf="loadingMarks" i18n>Loading final marks...</div>
 
       <ng-container *ngIf="userPages">
         <div class="ui top attached clearing segment">
@@ -21,7 +21,7 @@
               <div class="ui basic buttons small">
                 <a class="ui button" href="api/terms/{{termId}}/export-final-marks" target="_blank"
                    download="{{term.course.code}}-{{term.year}}S{{term.semester}}-final-marks.tsv">
-                  <i class="icon share"></i> Export
+                  <i class="icon share"></i> <ng-container i18n>Export</ng-container>
                 </a>
               </div>
             </div>
@@ -52,7 +52,7 @@
           </tr>
           <tr>
             <th>#</th>
-            <th (click)="sortField('name', thUser)" #thUser>User</th>
+            <th (click)="sortField('name', thUser)" #thUser i18n>User</th>
             <ng-container *ngFor="let task of tasks">
               <th (click)="sortField('_marks.'+task.id+'.marks', thMarks)" #thMarks>Marks</th>
               <th (click)="sortField('_marks.'+task.id+'.comment', thComment)" #thComment>Comment</th>

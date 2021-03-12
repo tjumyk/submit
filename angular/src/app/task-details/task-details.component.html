@@ -8,7 +8,7 @@
   <ng-container *ngIf="task.materials.length">
     <div class="ui segment">
       <div class="ui top attached blue materials label">
-        Materials
+        <ng-container i18n>Materials</ng-container>
         <ng-container *ngIf="task.materials.length>1">
           <a class="action" href="api/tasks/{{taskId}}/download-materials-zip?include_private=true" *ngIf="hasPrivateMaterial" title="Download All as Zip (include private)"><i class="icon file archive"></i></a>
           <a class="action" href="api/tasks/{{taskId}}/download-materials-zip" [title]="'Download All as Zip' + (hasPrivateMaterial ? ' (public only)': '')"><i class="icon file archive outline"></i></a>
@@ -38,7 +38,7 @@
   </ng-container>
 
   <div class="ui segment" *ngIf="numGetNotebookJobs">
-    <div class="ui loader inline centered active text">Scanning Jupyter Notebooks...</div>
+    <div class="ui loader inline centered active text" i18n>Scanning Jupyter Notebooks...</div>
   </div>
 
   <ng-container *ngFor="let matNotebooks of notebookPreviews">

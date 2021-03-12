@@ -1,5 +1,5 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader active text" *ngIf="loadingTeams">Loading teams...</div>
+<div class="ui loader active text" *ngIf="loadingTeams" i18n>Loading teams...</div>
 
 <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
 <div *ngIf="teams">
@@ -9,15 +9,15 @@
         <div class="ui statistics mini">
           <div class="statistic">
             <div class="value"><i class="icon users"></i> {{teams.length}}</div>
-            <div class="label">Teams</div>
+            <div class="label" i18n>Teams</div>
           </div>
           <div class="statistic">
             <div class="value"><i class="icon user"></i> {{totalUsersInTeams}}</div>
-            <div class="label">Users in teams</div>
+            <div class="label" i18n>Users in teams</div>
           </div>
           <div class="statistic" *ngIf="teamFreeUsers">
             <div class="value"><i class="icon user outline"></i> {{teamFreeUsers.length}}</div>
-            <div class="label">Users not in teams</div>
+            <div class="label" i18n>Users not in teams</div>
           </div>
         </div>
       </div>
@@ -34,7 +34,7 @@
     <div class="ui menu right floated secondary fitted">
       <div class="item">
         <div class="ui basic buttons small">
-          <a class="ui button" download="export-teams.tsv" href="api/tasks/{{taskId}}/export-teams" target="_blank"><i class="icon share"></i> Export</a>
+          <a class="ui button" download="export-teams.tsv" href="api/tasks/{{taskId}}/export-teams" target="_blank"><i class="icon share"></i> <ng-container i18n>Export</ng-container></a>
         </div>
       </div>
     </div>
@@ -53,12 +53,12 @@
     <tr>
       <th>#</th>
       <th (click)="sortField('id', thID)" #thID>ID</th>
-      <th (click)="sortField('name', thName)" #thName>Name</th>
-      <th (click)="sortField('is_finalised', thStatus)" #thStatus>Status</th>
-      <th (click)="sortField('creator.name', thCreator)" #thCreator>Creator</th>
-      <th (click)="sortField('slogan', thSlogan)" #thSlogan>Slogan</th>
-      <th (click)="sortField('total_user_associations', thMembers)" #thMembers>Members</th>
-      <th>Operations</th>
+      <th (click)="sortField('name', thName)" #thName i18n>Name</th>
+      <th (click)="sortField('is_finalised', thStatus)" #thStatus i18n>Status</th>
+      <th (click)="sortField('creator.name', thCreator)" #thCreator i18n>Creator</th>
+      <th (click)="sortField('slogan', thSlogan)" #thSlogan i18n>Slogan</th>
+      <th (click)="sortField('total_user_associations', thMembers)" #thMembers i18n>Members</th>
+      <th i18n>Operations</th>
     </tr>
     </thead>
     <tbody>
@@ -86,14 +86,14 @@
   </table>
   <app-table-pagination-toolbar class="bottom attached" [pagination]="teamPages"></app-table-pagination-toolbar>
 
-  <div class="ui loader active text inline centered" *ngIf="loadingTeamFreeUsers">Loading users not in teams...</div>
+  <div class="ui loader active text inline centered" *ngIf="loadingTeamFreeUsers" i18n>Loading users not in teams...</div>
   <div *ngIf="teamFreeUsers && teamFreeUsers.length">
     <h4 class="ui horizontal divider header">
       <i class="icon user outline"></i>
-      Users Not In Teams
+      <ng-container i18n>Users Not In Teams</ng-container>
     </h4>
     <table class="ui table unstackable">
-      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Nickname</th><th>Email</th><th>Operations</th></tr></thead>
+      <thead><tr><th>#</th><th>ID</th><th i18n>Name</th><th i18n>Nickname</th><th>Email</th><th i18n>Operations</th></tr></thead>
       <tbody>
       <tr *ngFor="let user of teamFreeUsers; index as i">
         <td>{{i+1}}</td>

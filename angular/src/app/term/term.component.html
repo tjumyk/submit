@@ -2,7 +2,7 @@
   <app-error-message [error]="initError"></app-error-message>
 </div>
 
-<div class="ui loader text active" *ngIf="loadingTerm">Loading term info...</div>
+<div class="ui loader text active" *ngIf="loadingTerm" i18n>Loading term info...</div>
 
 <ng-container *ngIf="term">
   <div class="ui top fixed inverted icon mobile menu" [ngClass]="{'pushed': showMobileMenu}">
@@ -14,7 +14,7 @@
     <div class="toc">
       <div class="ui vertical inverted fluid main menu">
         <a class="item" routerLink="/" (click)="resetMobileMenu()">
-          <i class="icon home"></i> Home
+          <i class="icon home"></i> <ng-container i18n>Home</ng-container>
         </a>
         <a class="item" routerLink="/terms/{{term.id}}" (click)="resetMobileMenu()">
           <h3 class="ui inverted term header">
@@ -29,15 +29,15 @@
           </h3>
         </a>
         <a class="item" routerLink="/terms/{{term.id}}/tasks" routerLinkActive="active" (click)="resetMobileMenu()">
-          <i class="icon map outline"></i> Tasks
+          <i class="icon map outline"></i> <ng-container i18n>Tasks</ng-container>
         </a>
         <a class="item" routerLink="/terms/{{term.id}}/messages" routerLinkActive="active" (click)="resetMobileMenu()">
-          <i class="icon envelope"></i> Messages
+          <i class="icon envelope"></i> <ng-container i18n>Messages</ng-container>
           <div class="ui green label" *ngIf="messages_unread_count">{{messages_unread_count}}</div>
         </a>
         <a *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')"
            class="item" routerLink="/terms/{{term.id}}/final-marks" routerLinkActive="active" (click)="resetMobileMenu()">
-          <i class="icon map star"></i> Final Marks
+          <i class="icon map star"></i> <ng-container i18n>Final Marks</ng-container>
         </a>
       </div>
 
@@ -45,7 +45,7 @@
 
       <div class="ui inverted vertical fluid bottom menu">
         <a class="item" routerLink="/admin/terms/{{ termId }}" *ngIf="isAdmin" routerLinkActive="active" (click)="resetMobileMenu()">
-          <i class="icon cogs"></i>Management
+          <i class="icon cogs"></i><ng-container i18n>Management</ng-container>
         </a>
         <a class="item" *ngIf="user" href="account/profile" target="_blank" (click)="resetMobileMenu()">
           <img class="ui avatar image" src="{{user.avatar}}?size=64" *ngIf="user.avatar; else userIcon">

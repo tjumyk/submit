@@ -1,13 +1,13 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingUser">Loading user info...</div>
-<div class="ui loader text active" *ngIf="loadingStatus">Loading user submission status...</div>
-<div class="ui loader text active" *ngIf="loadingSubmissions">Loading user submissions...</div>
+<div class="ui loader text active" *ngIf="loadingUser" i18n>Loading user info...</div>
+<div class="ui loader text active" *ngIf="loadingStatus" i18n>Loading user submission status...</div>
+<div class="ui loader text active" *ngIf="loadingSubmissions" i18n>Loading user submissions...</div>
 
 <div *ngIf="submissions">
   <div class="ui grid stackable two column">
     <div class="column">
       <div class="ui breadcrumb">
-        <a routerLink=".." class="section">Submissions</a>
+        <a routerLink=".." class="section" i18n>Submissions</a>
         <i class="icon right angle divider"></i>
         <div class="section active">
           <span *ngIf="user.nickname; else nameOnly">{{user.nickname}} ({{user.name}})</span>
@@ -16,8 +16,8 @@
       </div>
     </div>
     <div class="column right aligned">
-      <a class="ui button mini" href="admin/users/{{user.id}}" target="_blank"><i class="icon user pro"></i> User Info</a>
-      <a class="ui button mini" href="api/tasks/{{taskId}}/download-user-submissions/{{userId}}"><i class="icon download"></i> Download All Submissions</a>
+      <a class="ui button mini" href="admin/users/{{user.id}}" target="_blank"><i class="icon user pro"></i> <ng-container i18n>User Info</ng-container></a>
+      <a class="ui button mini" href="api/tasks/{{taskId}}/download-user-submissions/{{userId}}"><i class="icon download"></i> <ng-container i18n>Download All Submissions</ng-container></a>
     </div>
   </div>
 

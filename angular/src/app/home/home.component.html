@@ -7,8 +7,8 @@
       </h2>
       <app-error-message [error]="error"></app-error-message>
       <div class="ui active inline centered text loader" *ngIf="loadingUser || loadingCourses">
-        <span *ngIf="loadingUser; else loadingCoursesHint">Loading user info...</span>
-        <ng-template #loadingCoursesHint>Loading courses...</ng-template>
+        <span *ngIf="loadingUser; else loadingCoursesHint" i18n>Loading user info...</span>
+        <ng-template #loadingCoursesHint><ng-container i18n>Loading courses...</ng-container></ng-template>
       </div>
       <ng-container *ngIf="entries">
         <div class="ui raised segment" *ngFor="let item of entries | keyvalue">
@@ -31,7 +31,7 @@
         </div>
 
         <p>
-          <a class="ui violet fluid button basic" routerLink="admin" *ngIf="isAdmin"><i class="icon cogs"></i> Management</a>
+          <a class="ui violet fluid button basic" routerLink="admin" *ngIf="isAdmin"><i class="icon cogs"></i> <ng-container i18n>Management</ng-container></a>
         </p>
 
         <p>

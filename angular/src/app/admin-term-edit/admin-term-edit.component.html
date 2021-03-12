@@ -1,14 +1,14 @@
 <app-error-message [error]="error"></app-error-message>
 <app-success-message [success]="success"></app-success-message>
 
-<div class="ui text loader active" *ngIf="loadingTerm">Loading term info...</div>
+<div class="ui text loader active" *ngIf="loadingTerm" i18n>Loading term info...</div>
 
 <div class="ui grid equal width stackable" *ngIf="term">
 
   <div class="row">
     <div class="column">
       <div class="ui breadcrumb">
-        <a class="section" routerLink="../../courses">Courses</a>
+        <a class="section" routerLink="../../courses" i18n>Courses</a>
         <i class="icon right angle divider"></i>
         <a class="section" routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
         <i class="icon right angle divider"></i>
@@ -23,7 +23,7 @@
         <!-- Header -->
         <div class="ui clearing segment">
           <a class="ui right floated button mini" routerLink="/terms/{{term.id}}">
-            <i class="icon eye"></i> View
+            <i class="icon eye"></i> <ng-container i18n>View</ng-container>
           </a>
           <div class="ui left floated header">
             <i class="icon calendar outline"></i>
@@ -40,19 +40,19 @@
               {{ term.id }}
             </div>
             <div class="item">
-              <div class="header">Course</div>
+              <div class="header" i18n>Course</div>
               <a routerLink="../../courses/{{ term.course.id }}">{{ term.course.code }}</a>
             </div>
             <div class="item">
-              <div class="header">Year</div>
+              <div class="header" i18n>Year</div>
               {{ term.year }}
             </div>
             <div class="item">
-              <div class="header">Semester</div>
+              <div class="header" i18n>Semester</div>
               {{ term.semester }}
             </div>
             <div class="item">
-              <div class="header">Student Group</div>
+              <div class="header" i18n>Student Group</div>
               <a target="_blank" href="admin/groups/{{ term.student_group.id }}">{{ term.student_group.name }}</a>
             </div>
           </div>
@@ -67,11 +67,11 @@
     <!-- Tasks -->
     <div class="ui top attached segment">
       <div class="ui header">
-        <i class="icon tasks"></i> Tasks
+        <i class="icon tasks"></i> <ng-container i18n>Tasks</ng-container>
       </div>
     </div>
     <table class="ui bottom attached table unstackable celled">
-      <thead><tr><th>ID</th><th>Type</th><th>Title</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>ID</th><th i18n>Type</th><th i18n>Title</th><th class="collapsing" i18n>Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let task of term.tasks; index as i">
         <td>{{ task.id }}</td>
@@ -100,13 +100,13 @@
             <i class="icon tasks"></i>
             <i class="icon plus right bottom corner"></i>
           </i>
-          New Task
+          <ng-container i18n>New Task</ng-container>
         </div>
       </div>
       <div class="ui segment">
         <form class="ui form" #f="ngForm" (ngSubmit)="addTask(f)" [ngClass]="{'loading': addingNewTask}">
           <div class="field required" [ngClass]="{'error': (newTaskTypeModel.touched||newTaskTypeModel.dirty||f.submitted) && newTaskTypeModel.invalid }">
-            <label>Task Type</label>
+            <label i18n>Task Type</label>
             <select name="task_type" [(ngModel)]="newTaskForm.type" required #newTaskTypeModel="ngModel" (change)="autoFillTaskTitle()">
               <option value="lab">Lab</option>
               <option value="assignment">Assignment</option>
@@ -117,7 +117,7 @@
             </div>
           </div>
           <div class="field required" [ngClass]="{'error': (newTaskTitleModel.touched||newTaskTitleModel.dirty|| f.submitted) && newTaskTitleModel.invalid}">
-            <label>Title</label>
+            <label i18n>Title</label>
             <input type="text" name="task_title" [(ngModel)]="newTaskForm.title" placeholder="Title of the task (at most 128 characters)" required #newTaskTitleModel="ngModel" maxlength="128">
             <div class="errors">
               <label *ngIf="newTaskTitleModel.errors?.required">Title is required</label>
@@ -125,10 +125,10 @@
             </div>
           </div>
           <div class="field">
-            <label>Description (Optional)</label>
+            <label i18n>Description (Optional)</label>
             <textarea name="task_description" rows="3" [(ngModel)]="newTaskForm.description" placeholder="Short description of the task"></textarea>
           </div>
-          <button class="ui fluid primary button" type="submit">Add Task</button>
+          <button class="ui fluid primary button" type="submit" i18n>Add Task</button>
         </form>
       </div>
     </div>

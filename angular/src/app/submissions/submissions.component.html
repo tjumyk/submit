@@ -1,5 +1,5 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingSummaries">Loading submission summaries...</div>
+<div class="ui loader text active" *ngIf="loadingSummaries" i18n>Loading submission summaries...</div>
 
 <div *ngIf="userSummaries">
   <ng-template #defaultAvatar><i class="icon user circle"></i></ng-template>
@@ -10,11 +10,11 @@
         <div class="ui statistics mini">
           <div class="statistic">
             <div class="value"><i class="icon paper plane"></i> {{totalSubmissions}}</div>
-            <div class="label">Submissions</div>
+            <div class="label" i18n>Submissions</div>
           </div>
           <div class="statistic">
             <div class="value"><i class="icon user"></i> {{userSummaries.length}}</div>
-            <div class="label">Submitted Users</div>
+            <div class="label" i18n>Submitted Users</div>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
     <div class="ui right floated menu secondary fitted">
       <div class="item">
         <div class="ui basic buttons small">
-          <a class="ui button" download="{{task.title|filename}}-results.tsv" href="api/tasks/{{taskId}}/export-results" target="_blank"><i class="icon share"></i> Export</a>
+          <a class="ui button" download="{{task.title|filename}}-results.tsv" href="api/tasks/{{taskId}}/export-results" target="_blank"><i class="icon share"></i> <ng-container i18n>Export</ng-container></a>
         </div>
       </div>
     </div>
@@ -61,16 +61,16 @@
     <thead>
     <tr>
       <th>#</th>
-      <th (click)="sortField('user.name', thUser)" #thUser>User</th>
-      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions>Attempts</th>
-      <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime>First Attempt</th>
-      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime>Last Attempt</th>
-      <th *ngIf="lastLatePenalties" (click)="sortField('_last_late_penalty', thLastLatePenalty)" #thLastLatePenalty>Last Late Penalty</th>
+      <th (click)="sortField('user.name', thUser)" #thUser i18n>User</th>
+      <th (click)="sortField('total_submissions', thTotalSubmissions)" #thTotalSubmissions i18n>Attempts</th>
+      <th (click)="sortField('_first_submit_time', thFirstSubmitTime)" #thFirstSubmitTime i18n>First Attempt</th>
+      <th (click)="sortField('_last_submit_time', thLastSubmitTime)" #thLastSubmitTime i18n>Last Attempt</th>
+      <th *ngIf="lastLatePenalties" (click)="sortField('_last_late_penalty', thLastLatePenalty)" #thLastLatePenalty i18n>Last Late Penalty</th>
       <th *ngFor="let config of task.auto_test_configs"
           (click)="sortField('_auto_test_conclusion_'+config.id, thAutoTestConfig)" #thAutoTestConfig>
         {{config.name}} <i class="ui icon red lock" *ngIf="config.is_private"></i>
       </th>
-      <th>Ops</th></tr>
+      <th i18n>Ops</th></tr>
     </thead>
     <tbody>
     <tr *ngFor="let summary of userSummaryPages.pageItems; index as i">

@@ -1,5 +1,5 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui text loader active" *ngIf="loadingStatus">Loading status...</div>
+<div class="ui text loader active" *ngIf="loadingStatus" i18n>Loading status...</div>
 
 <div *ngIf="status" class="ui main grid centered stackable">
   <div class="column ten wide">
@@ -8,8 +8,8 @@
       <div class="ui message warning icon" *ngIf="!status.team_association">
         <i class="icon user"></i>
         <div class="content">
-          <div class="header">You are not in any team now!</div>
-          <p>Please join an existing team or create a new team first.</p>
+          <div class="header" i18n>You are not in any team now!</div>
+          <p i18n>Please join an existing team or create a new team first.</p>
         </div>
       </div>
       <div *ngIf="status.team_association">
@@ -17,22 +17,18 @@
           <i class="icon users"></i>
           <div class="content">
             <div class="header">Your membership in team "{{status.team_association.team.name}}" has not been confirmed</div>
-            <p *ngIf="status.team_association.is_invited && !status.team_association.is_user_agreed">
-              Please accept the invitation first.
-            </p>
-            <p *ngIf="!status.team_association.is_invited && !status.team_association.is_creator_agreed">
-              Please ask the team creator to accept your join request.
-            </p>
+            <p *ngIf="status.team_association.is_invited && !status.team_association.is_user_agreed" i18n>Please accept the invitation first.</p>
+            <p *ngIf="!status.team_association.is_invited && !status.team_association.is_creator_agreed" i18n>Please ask the team creator to accept your join request.</p>
           </div>
         </div>
         <ng-template #memberMessages>
           <div class="ui message warning icon" *ngIf="!status.team_association.team.is_finalised">
             <i class="icon lock open"></i>
             <div class="content">
-              <div class="header">Your team has not been finalised</div>
-              <p *ngIf="status.team_association.team.creator_id==user.id; else memberNotFinalisedHint">Please finalise the team first.</p>
+              <div class="header" i18n>Your team has not been finalised</div>
+              <p *ngIf="status.team_association.team.creator_id==user.id; else memberNotFinalisedHint" i18n>Please finalise the team first.</p>
               <ng-template #memberNotFinalisedHint>
-                <p>Please ask the team creator to finalise the team first.</p>
+                <p i18n>Please ask the team creator to finalise the team first.</p>
               </ng-template>
             </div>
           </div>
@@ -43,8 +39,8 @@
     <div class="ui message warning icon" *ngIf="isClosed">
       <i class="icon times circle outline"></i>
       <div class="content">
-        <div class="header">Task has been closed</div>
-        <p>You are not allowed to make new submissions after the close time</p>
+        <div class="header" i18n>Task has been closed</div>
+        <p i18n>You are not allowed to make new submissions after the close time</p>
       </div>
     </div>
 
@@ -57,8 +53,8 @@
           <ng-template #userSpecialHint>you</ng-template>
         </div>
         <ul class="list">
-          <li *ngIf="status.special_consideration.due_time_extension">Due time +{{status.special_consideration.due_time_extension}} hours.</li>
-          <li *ngIf="status.special_consideration.submission_attempt_limit_extension">Submission attempt limit +{{status.special_consideration.submission_attempt_limit_extension}}.</li>
+          <li *ngIf="status.special_consideration.due_time_extension"><ng-container i18n>Due time</ng-container> +{{status.special_consideration.due_time_extension}} hours.</li>
+          <li *ngIf="status.special_consideration.submission_attempt_limit_extension"><ng-container i18n>Submission attempt limit</ng-container> +{{status.special_consideration.submission_attempt_limit_extension}}.</li>
         </ul>
       </div>
     </div>
@@ -66,7 +62,7 @@
     <div class="ui message info icon" *ngIf="task.submission_history_limit!=null && (task.submission_attempt_limit==null || task.submission_history_limit < task.submission_attempt_limit)">
       <i class="icon history"></i>
       <div class="content">
-        <div class="header">We have set a history limit</div>
+        <div class="header" i18n>We have set a history limit</div>
         <ul class="list">
           <li>Only the latest {{task.submission_history_limit}} submissions
             <span *ngIf="task.is_team_task"> in your whole team </span>
@@ -80,26 +76,26 @@
     <div class="ui message warning icon" *ngIf="isReadyToSubmit && lateDays!= null">
       <i class="icon clock"></i>
       <div class="content">
-        <div class="header">Hey! You are late!</div>
+        <div class="header" i18n>Hey! You are late!</div>
         Your NEW submission will get a <span *ngIf="latePenalty!=null">{{latePenalty|percent}}</span> deduction on the final marks as being {{lateDays}} <span *ngIf="lateDays>1; else oneDayLate">days</span> late.
         <ng-template #oneDayLate>day</ng-template>
       </div>
     </div>
 
     <div class="ui segment center aligned" *ngIf="countDownSeconds!=null">
-      <h3>Deadline approaching!</h3>
+      <h3 i18n>Deadline approaching!</h3>
       <div class="ui three statistics">
         <div class="statistic">
           <div class="value">{{countDownHours|number:'2.0-0'}}</div>
-          <div class="label">hours</div>
+          <div class="label" i18n>hours</div>
         </div>
         <div class="statistic">
           <div class="value">{{countDownMinutes|number:'2.0-0'}}</div>
-          <div class="label">minutes</div>
+          <div class="label" i18n>minutes</div>
         </div>
         <div class="statistic">
           <div class="value">{{countDownSeconds|number:'2.0-0'}}</div>
-          <div class="label">seconds</div>
+          <div class="label" i18n>seconds</div>
         </div>
       </div>
     </div>
@@ -110,7 +106,7 @@
           <div class="item" *ngFor="let entry of attemptEntries" [ngClass]="{'attempted': entry.attempted}"></div>
         </div>
         <div class="label">
-          Attempts: {{status.attempts}} &nbsp; Limit: {{task.submission_attempt_limit}}
+          <ng-container i18n>Attempts</ng-container>: {{status.attempts}} &nbsp; <ng-container i18n>Limit</ng-container>: {{task.submission_attempt_limit}}
           <span *ngIf="status.special_consideration?.submission_attempt_limit_extension">
               (+{{status.special_consideration?.submission_attempt_limit_extension}})
             </span>
@@ -134,10 +130,10 @@
           <span *ngIf="req.description"><i class="icon info circle"></i> {{req.description}}</span>
         </div>
         <ng-container *ngIf="lateDays==null; else lateSubmitBtn">
-          <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit</button>
+          <button type="submit" class="ui primary button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> <ng-container i18n>Submit</ng-container></button>
         </ng-container>
         <ng-template #lateSubmitBtn>
-          <button type="submit" class="ui yellow button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> Submit Late Submission</button>
+          <button type="submit" class="ui yellow button submit fluid" [ngClass]="{'disabled': !isReadyToSubmit}"><i class="icon paper plane outline"></i> <ng-container i18n>Submit Late Submission</ng-container></button>
         </ng-template>
       </form>
     </div>
@@ -146,8 +142,8 @@
       <div class="ui info message icon">
         <i class="icon expand"></i>
         <div class="content">
-          <div class="header">No file requirements</div>
-          <p>You are not required to submit anything for this task right now.</p>
+          <div class="header" i18n>No file requirements</div>
+          <p i18n>You are not required to submit anything for this task right now.</p>
         </div>
       </div>
     </ng-template>

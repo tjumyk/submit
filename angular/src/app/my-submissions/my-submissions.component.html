@@ -1,6 +1,6 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingStatus">Loading status...</div>
-<div class="ui loader text active" *ngIf="loadingSubmissions">Loading my submissions...</div>
+<div class="ui loader text active" *ngIf="loadingStatus" i18n>Loading status...</div>
+<div class="ui loader text active" *ngIf="loadingSubmissions" i18n>Loading my submissions...</div>
 
 <app-auto-test-conclusions-card [task]="task" [conclusions]="autoTestConclusions"></app-auto-test-conclusions-card>
 <app-submissions-table [task]="task" [status]="status" [submissions]="submissions" [lastAutoTests]="lastAutoTests"></app-submissions-table>

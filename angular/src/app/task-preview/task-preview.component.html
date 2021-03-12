@@ -2,11 +2,11 @@
   <app-error-message [error]="error"></app-error-message>
 </div>
 
-<div class="ui text loader active" *ngIf="loadingTask">Loading task info...</div>
+<div class="ui text loader active" *ngIf="loadingTask" i18n>Loading task info...</div>
 
 <div *ngIf="task" class="sub wrapper">
   <div class="header container">
-    <a routerLink="/terms/{{term.id}}/tasks"><i class="icon left arrow"></i> Tasks</a>
+    <a routerLink="/terms/{{term.id}}/tasks"><i class="icon left arrow"></i> <ng-container i18n>Tasks</ng-container></a>
     <h1 class="ui header">
       <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
       <div class="content">
@@ -16,9 +16,9 @@
   </div>
   <div class="ui title divider"></div>
 
-  <ng-template #timeTbd>TBD</ng-template>
-  <ng-template #no>No</ng-template>
-  <ng-template #noLimit>No limit</ng-template>
+  <ng-template #timeTbd><ng-container i18n>TBD</ng-container></ng-template>
+  <ng-template #no><ng-container i18n>No</ng-container></ng-template>
+  <ng-template #noLimit><ng-container i18n>No limit</ng-container></ng-template>
 
   <div class="main container">
 
@@ -26,11 +26,11 @@
       <div class="ui grid stackable">
         <div class="column">
           <div class="ui labeled icon task-actions menu stackable">
-            <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
-            <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
-            <div class="item disabled" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</div>
-            <div class="item disabled" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> My Submissions</div>
-            <div class="item disabled" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> Team Submissions</div>
+            <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> <ng-container i18n>Task Details</ng-container></a>
+            <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> <ng-container i18n>My Team</ng-container></a>
+            <div class="item disabled" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> <ng-container i18n>New Submission</ng-container></div>
+            <div class="item disabled" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> <ng-container i18n>My Submissions</ng-container></div>
+            <div class="item disabled" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> <ng-container i18n>Team Submissions</ng-container></div>
           </div>
 
           <router-outlet></router-outlet>
@@ -46,7 +46,7 @@
             <div class="item">
               <i class="icon clock outline"></i>
               <div class="content">
-                <div class="header">Open Time</div>
+                <div class="header" i18n>Open Time</div>
                 <div class="description">
                   <div *ngIf="task.open_time; else timeTbd">
                     <div>{{ task.open_time|date:'medium' }} {{task.open_time|date: 'z'}}</div>
@@ -58,7 +58,7 @@
             <div class="item">
               <i class="icon clock"></i>
               <div class="content">
-                <div class="header">Due Time</div>
+                <div class="header" i18n>Due Time</div>
                 <div class="description">
                   <div *ngIf="task.due_time; else timeTbd">
                     <div>{{ task.due_time|date:'medium' }} {{task.due_time|date: 'z'}}</div>
@@ -77,16 +77,16 @@
             <div class="item">
               <i class="icon users"></i>
               <div class="content">
-                <div class="header">Is Team Task?</div>
+                <div class="header" i18n>Is Team Task?</div>
                 <div class="description">
-                  <span *ngIf="task.is_team_task; else no">Yes</span>
+                  <span *ngIf="task.is_team_task; else no" i18n>Yes</span>
                 </div>
               </div>
             </div>
             <div class="item" *ngIf="task.is_team_task">
               <i class="icon users"></i>
               <div class="content">
-                <div class="header">Team Size</div>
+                <div class="header" i18n>Team Size</div>
                 <div class="description">
                   {{printTaskTeamSize(task) | titlecase}}
                 </div>
@@ -95,7 +95,7 @@
             <div class="item" *ngIf="task.is_team_task">
               <i class="icon hand paper outline"></i>
               <div class="content">
-                <div class="header">Team Join Close Time</div>
+                <div class="header" i18n>Team Join Close Time</div>
                 <div class="description">
                   <div *ngIf="task.team_join_close_time; else timeTbd">
                     <div>{{ task.team_join_close_time|date:'medium' }} {{task.team_join_close_time|date: 'z'}}</div>

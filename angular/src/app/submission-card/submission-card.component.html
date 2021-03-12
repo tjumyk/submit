@@ -9,11 +9,11 @@
     {{submission.id}}
   </div>
   <div class="item" *ngIf="submission.submitter">
-    <div class="header">Submitter</div>
+    <div class="header" i18n>Submitter</div>
     <app-user-mini-card [user]="submission.submitter"></app-user-mini-card>
   </div>
   <div class="item">
-    <div class="header">Submitted At</div>
+    <div class="header" i18n>Submitted At</div>
     {{ submission.created_at | date: 'medium' }} ({{createdFromNow}})
   </div>
 </div>
@@ -42,8 +42,8 @@
       </div>
       <div class="extra content">
         <div class="ui two buttons">
-          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/view" target="_blank"><i class="icon eye"></i> View</a>
-          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/download"><i class="icon download"></i> Download</a>
+          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/view" target="_blank"><i class="icon eye"></i> <ng-container i18n>View</ng-container></a>
+          <a class="ui basic grey button" href="{{apiBase}}/{{file.submission_id}}/files/{{file.id}}/download"><i class="icon download"></i> <ng-container i18n>Download</ng-container></a>
         </div>
       </div>
     </div>

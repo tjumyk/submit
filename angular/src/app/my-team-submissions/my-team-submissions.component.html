@@ -1,13 +1,13 @@
 <app-error-message [error]="error"></app-error-message>
-<div class="ui loader text active" *ngIf="loadingStatus">Loading status...</div>
-<div class="ui loader text active" *ngIf="loadingSubmissions">Loading team submissions...</div>
+<div class="ui loader text active" *ngIf="loadingStatus" i18n>Loading status...</div>
+<div class="ui loader text active" *ngIf="loadingSubmissions" i18n>Loading team submissions...</div>
 
 <div *ngIf="status">
   <div class="ui message warning icon" *ngIf="!status.team_association || !status.team_association.team.is_finalised">
     <i class="icon dont"></i>
     <div class="content">
-      <div class="header">Team submissions are not available now</div>
-      <p>You must be a member of a finalised team first.</p>
+      <div class="header" i18n>Team submissions are not available now</div>
+      <p i18n>You must be a member of a finalised team first.</p>
     </div>
   </div>
 </div>

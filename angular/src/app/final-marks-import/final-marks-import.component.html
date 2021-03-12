@@ -2,54 +2,54 @@
 <app-success-message [success]="success"></app-success-message>
 
 <div class="top bar">
-  <a routerLink=".." class="ui button"><i class="icon left angle"></i> Back</a>
+  <a routerLink=".." class="ui button"><i class="icon left angle"></i> <ng-container i18n>Back</ng-container></a>
 </div>
 
 <div class="ui two column grid stackable">
   <div class="column">
     <div class="ui segment">
-      <div class="ui label top attached">Import Final Marks</div>
+      <div class="ui label top attached" i18n>Import Final Marks</div>
       <form class="ui form">
         <div class="field">
-          <label>TSV Table</label>
+          <label i18n>TSV Table</label>
           <textarea name="input" rows="20" (keyup)="input.next(inputElement.value)" #inputElement></textarea>
         </div>
         <div class="field">
           <div class="ui checkbox">
             <input class="hidden" type="checkbox" name="has_header" #checkboxHasHeader [(ngModel)]="hasHeader">
-            <label (click)="checkboxHasHeader.click()">Table has header</label>
+            <label (click)="checkboxHasHeader.click()" i18n>Table has header</label>
           </div>
         </div>
         <div class="field">
-          <label>User Name Column</label>
+          <label i18n>User Name Column</label>
           <select name="user_column" [(ngModel)]="userColumn">
             <option *ngFor="let col of table.columns" [ngValue]="col">
               <ng-container *ngIf="hasHeader; else columnLabel">{{col.head}}</ng-container>
-              <ng-template #columnLabel>Column {{col.index+1}}</ng-template>
+              <ng-template #columnLabel><ng-container i18n>Column</ng-container> {{col.index+1}}</ng-template>
             </option>
           </select>
         </div>
         <div class="field">
-          <label>Marks Column</label>
+          <label i18n>Marks Column</label>
           <select name="marks_column" [(ngModel)]="marksColumn">
             <option *ngFor="let col of table.columns" [ngValue]="col">
               <ng-container *ngIf="hasHeader; else columnLabel">{{col.head}}</ng-container>
-              <ng-template #columnLabel>Column {{col.index+1}}</ng-template>
+              <ng-template #columnLabel><ng-container i18n>Column</ng-container> {{col.index+1}}</ng-template>
             </option>
           </select>
         </div>
         <div class="field">
-          <label>Comment Column (Optional)</label>
+          <label i18n>Comment Column (Optional)</label>
           <select name="comment_column" [(ngModel)]="commentColumn">
             <option *ngFor="let col of table.columns" [ngValue]="col">
               <ng-container *ngIf="hasHeader; else columnLabel">{{col.head}}</ng-container>
-              <ng-template #columnLabel>Column {{col.index+1}}</ng-template>
+              <ng-template #columnLabel><ng-container i18n>Column</ng-container> {{col.index+1}}</ng-template>
             </option>
-            <option [ngValue]="undefined">(none)</option>
+            <option [ngValue]="undefined" i18n>(none)</option>
           </select>
         </div>
         <button class="ui button primary fluid" [class.disabled]="!userColumn||!marksColumn||submitting"
-                [class.loading]="submitting" (click)="submit()">Submit</button>
+                [class.loading]="submitting" (click)="submit()" i18n>Submit</button>
       </form>
     </div>
   </div>
@@ -58,9 +58,9 @@
       <thead>
       <tr>
         <th>#</th>
-        <th>User Name</th>
-        <th>Marks</th>
-        <th *ngIf="commentColumn">Comment</th>
+        <th i18n>User Name</th>
+        <th i18n>Marks</th>
+        <th *ngIf="commentColumn" i18n>Comment</th>
       </tr>
       </thead>
       <tbody>

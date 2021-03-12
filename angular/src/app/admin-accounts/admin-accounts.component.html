@@ -3,7 +3,7 @@
 
 <div class="ui grid stackable one column">
   <div class="column">
-    <div class="ui active text loader inline centered" *ngIf="loadingUsers">Loading users...</div>
+    <div class="ui active text loader inline centered" *ngIf="loadingUsers" i18n>Loading users...</div>
     <div *ngIf="!loadingUsers">
       <div class="ui top attached clearing segment">
         <div class="ui right floated menu secondary fitted">
@@ -16,12 +16,12 @@
           </div>
           <div class="item">
             <a class="ui button small primary" (click)="syncUsers()" [ngClass]="{'loading disabled': syncingUsers}">
-              <i class="icon sync"></i> Sync Users
+              <i class="icon sync"></i> <ng-container i18n>Sync Users</ng-container>
             </a>
           </div>
         </div>
         <div class="ui left floated header">
-          <i class="icon user"></i> Synced Users
+          <i class="icon user"></i> <ng-container i18n>Synced Users</ng-container>
         </div>
       </div>
       <table class="ui sortable compact unstackable attached table celled">
@@ -29,11 +29,11 @@
         <tr>
           <th>#</th>
           <th (click)="sortField('id', thID)" #thID>ID</th>
-          <th (click)="sortField('name', thName)" #thName>Name</th>
+          <th (click)="sortField('name', thName)" #thName i18n>Name</th>
           <th (click)="sortField('email', thEmail)" #thEmail>E-mail</th>
-          <th (click)="sortField('nickname', thNickName)" #thNickName>Nickname</th>
-          <th>Groups</th>
-          <th>Ops</th>
+          <th (click)="sortField('nickname', thNickName)" #thNickName i18n>Nickname</th>
+          <th i18n>Groups</th>
+          <th i18n>Ops</th>
         </tr>
         </thead>
         <tbody>
@@ -61,18 +61,18 @@
   </div>
 
   <div class="column">
-    <div class="ui active text loader inline centered" *ngIf="loadingGroups">Loading groups...</div>
+    <div class="ui active text loader inline centered" *ngIf="loadingGroups" i18n>Loading groups...</div>
     <div *ngIf="groups">
       <div class="ui top attached clearing segment">
         <a class="ui right floated button small primary" (click)="syncGroups()" [ngClass]="{'loading disabled': syncingGroups}">
-          <i class="icon sync"></i> Sync Groups
+          <i class="icon sync"></i> <ng-container i18n>Sync Groups</ng-container>
         </a>
         <div class="ui left floated header">
-          <i class="icon users"></i> Synced Groups
+          <i class="icon users"></i> <ng-container i18n>Synced Groups</ng-container>
         </div>
       </div>
       <table class="ui compact unstackable bottom attached table celled">
-        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Ops</th></tr></thead>
+        <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Description</th><th i18n>Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let group of groups; index as i">
           <td>{{ group.id }}</td>

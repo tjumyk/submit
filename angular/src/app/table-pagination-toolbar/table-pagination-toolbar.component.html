@@ -5,7 +5,7 @@
   <div class="item">
     <form class="ui form">
       <div class="inline field">
-        <label>Rows Per Page</label>
+        <label i18n>Rows Per Page</label>
         <select name="itemsPerPage" [(ngModel)]="pagination.itemsPerPage">
           <option [value]="num" *ngFor="let num of pagination.itemsPerPageOptions">{{num}}</option>
         </select>

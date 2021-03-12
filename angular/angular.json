@@ -56,6 +56,11 @@
             "i18nLocale": "en-AU"
           },
           "configurations": {
+            "locale_cn": {
+              "aot": true,
+              "i18nLocale": "zh-CN",
+              "i18nFile": "src/messages.zh_cn.xlf"
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -72,6 +77,26 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true
+            },
+            "production_locale_cn": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "i18nLocale": "zh-CN",
+              "i18nFile": "src/messages.zh_cn.xlf",
+              "i18nMissingTranslation": "error"
             },
             "production_cn": {
               "fileReplacements": [

@@ -1,5 +1,5 @@
 <div class="header container">
-  <a routerLink=".."><i class="icon left arrow"></i> Messages</a>
+  <a routerLink=".."><i class="icon left arrow"></i> <ng-container i18n>Messages</ng-container></a>
   <h1 class="ui header">
     <i class="icon envelope outline" [ngClass]="{'open': message && message.is_read}"></i>
     <ng-container *ngIf="message">{{message.subject}}</ng-container>
@@ -12,7 +12,7 @@
     <div class="column">
 
       <app-error-message [error]="error"></app-error-message>
-      <div class="ui text loader active" *ngIf="loadingMessage">Loading message...</div>
+      <div class="ui text loader active" *ngIf="loadingMessage" i18n>Loading message...</div>
 
       <ng-container *ngIf="message">
         <div class="ui segment secondary">
@@ -23,16 +23,16 @@
             </div>
             <div class="item">
               <div class="content">
-                <div class="header">Sender</div>
+                <div class="header" i18n>Sender</div>
                 <ng-container *ngIf="message.sender; else fromSystem">
                   <app-user-mini-card [user]="message.sender"></app-user-mini-card>
                 </ng-container>
-                <ng-template #fromSystem>System</ng-template>
+                <ng-template #fromSystem><ng-container i18n>System</ng-container></ng-template>
               </div>
             </div>
             <div class="item">
               <div class="content">
-                <div class="header">Receiver</div>
+                <div class="header" i18n>Receiver</div>
                 <ng-container *ngIf="message.receiver; else noReceiver">
                   <app-user-mini-card [user]="message.receiver"></app-user-mini-card>
                 </ng-container>
@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="item">
-              <div class="header">Time</div>
+              <div class="header" i18n>Time</div>
               {{message.created_at|date:'medium'}}
               ({{message._created_from_now}})
             </div>

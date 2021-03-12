@@ -2,11 +2,11 @@
   <app-error-message [error]="error"></app-error-message>
 </div>
 
-<div class="ui text loader active" *ngIf="loadingTask">Loading task info...</div>
+<div class="ui text loader active" *ngIf="loadingTask" i18n>Loading task info...</div>
 
 <div *ngIf="task" class="sub wrapper">
   <div class="header container">
-    <a routerLink="/terms/{{term.id}}/tasks"><i class="icon left arrow"></i> Tasks</a>
+    <a routerLink="/terms/{{term.id}}/tasks"><i class="icon left arrow"></i> <ng-container i18n>Tasks</ng-container></a>
     <h1 class="ui header">
       <i class="icon" *ngIf="category.icon" [ngClass]="category.icon"></i>
       <div class="content">
@@ -14,16 +14,16 @@
       </div>
       <div class="final-marks" *ngIf="myFinalMarks">
         <a class="ui red left pointing basic label large" (click)="showMyFinalMarksModal=true">
-          My Final Marks: {{myFinalMarks.marks}}
+          <ng-container i18n>My Final Marks</ng-container>: {{myFinalMarks.marks}}
         </a>
       </div>
     </h1>
   </div>
   <div class="ui title divider"></div>
 
-  <ng-template #timeTbd>TBD</ng-template>
-  <ng-template #no>No</ng-template>
-  <ng-template #noLimit>No limit</ng-template>
+  <ng-template #timeTbd><ng-container i18n>TBD</ng-container></ng-template>
+  <ng-template #no><ng-container i18n>No</ng-container></ng-template>
+  <ng-template #noLimit><ng-container i18n>No limit</ng-container></ng-template>
 
   <div class="main container">
 
@@ -36,17 +36,17 @@
           </div>
 
           <div class="ui labeled icon task-actions menu stackable">
-            <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> Task Details</a>
-            <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> My Team</a>
-            <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> New Submission</a>
-            <a routerLink="my-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> My Submissions</a>
-            <a routerLink="my-team-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> Team Submissions</a>
+            <a routerLink="details" routerLinkActive="active" class="item"><i class="icon list"></i> <ng-container i18n>Task Details</ng-container></a>
+            <a routerLink="my-team" routerLinkActive="active" class="item" *ngIf="task.is_team_task && accessRoles.has('student')"><i class="icon users"></i> <ng-container i18n>My Team</ng-container></a>
+            <a routerLink="submit" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student')"><i class="icon plus"></i> <ng-container i18n>New Submission</ng-container></a>
+            <a routerLink="my-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && !task.is_team_task"><i class="icon paper plane outline"></i> <ng-container i18n>My Submissions</ng-container></a>
+            <a routerLink="my-team-submissions" routerLinkActive="active" class="item" *ngIf="accessRoles.has('student') && task.is_team_task"><i class="icon paper plane outline"></i> <ng-container i18n>Team Submissions</ng-container></a>
             <div class="menu right" *ngIf="accessRoles.has('admin') || accessRoles.has('tutor')">
-              <a routerLink="teams" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon users"></i> Teams</a>
-              <a routerLink="user-submissions" routerLinkActive="active" class="item" *ngIf="!task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
-              <a routerLink="team-submissions" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon paper plane"></i>Submissions</a>
-              <a routerLink="comments" routerLinkActive="active" class="item"><i class="icon comments"></i>Comments</a>
-              <a routerLink="final-marks" routerLinkActive="active" class="item"><i class="icon star"></i>Final Marks</a>
+              <a routerLink="teams" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon users"></i> <ng-container i18n>Teams</ng-container></a>
+              <a routerLink="user-submissions" routerLinkActive="active" class="item" *ngIf="!task.is_team_task"><i class="icon paper plane"></i><ng-container i18n>Submissions</ng-container></a>
+              <a routerLink="team-submissions" routerLinkActive="active" class="item" *ngIf="task.is_team_task"><i class="icon paper plane"></i><ng-container i18n>Submissions</ng-container></a>
+              <a routerLink="comments" routerLinkActive="active" class="item"><i class="icon comments"></i><ng-container i18n>Comments</ng-container></a>
+              <a routerLink="final-marks" routerLinkActive="active" class="item"><i class="icon star"></i><ng-container i18n>Final Marks</ng-container></a>
             </div>
           </div>
 
@@ -63,7 +63,7 @@
             <div class="item">
               <i class="icon clock outline"></i>
               <div class="content">
-                <div class="header">Open Time</div>
+                <div class="header" i18n>Open Time</div>
                 <div class="description">
                   <div *ngIf="task.open_time; else timeTbd">
                     <div>{{ task.open_time|date:'medium' }} {{task.open_time|date: 'z'}}</div>
@@ -75,7 +75,7 @@
             <div class="item">
               <i class="icon clock"></i>
               <div class="content">
-                <div class="header">Due Time</div>
+                <div class="header" i18n>Due Time</div>
                 <div class="description">
                   <div *ngIf="task.due_time; else timeTbd">
                     <div>{{ task.due_time|date:'medium' }} {{ task.due_time|date:'z' }}</div>
@@ -87,7 +87,7 @@
             <div class="item">
               <i class="icon cut"></i>
               <div class="content">
-                <div class="header">Late Penalty</div>
+                <div class="header" i18n>Late Penalty</div>
                 <div class="description">
                   <div *ngIf="latePenalty; else unknownLatePenalty">
                     <div *ngIf="latePenalty.segments.length>1; else oneSegment" class="ui list horizontal">
@@ -115,16 +115,16 @@
                     <span *ngIf="latePenalty.segments[0].penaltyPerDay!=0; else noLatePenalty">
                       -{{latePenalty.segments[0].penaltyPerDay | percent: '1.0-3'}} per day
                     </span>
-                    <ng-template #noLatePenalty>No late penalty</ng-template>
+                    <ng-template #noLatePenalty><ng-container i18n>No late penalty</ng-container></ng-template>
                   </ng-template>
-                  <ng-template #unknownLatePenalty>Please refer to the specification</ng-template>
+                  <ng-template #unknownLatePenalty><ng-container i18n>Please refer to the specification</ng-container></ng-template>
                 </div>
               </div>
             </div>
             <div class="item">
               <i class="icon times circle outline"></i>
               <div class="content">
-                <div class="header">Close Time</div>
+                <div class="header" i18n>Close Time</div>
                 <div class="description">
                   <div *ngIf="task.close_time; else timeTbd">
                     <div>{{ task.close_time|date:'medium' }} {{ task.close_time|date:'z' }}</div>
@@ -143,16 +143,16 @@
             <div class="item">
               <i class="icon users"></i>
               <div class="content">
-                <div class="header">Is Team Task?</div>
+                <div class="header" i18n>Is Team Task?</div>
                 <div class="description">
-                  <span *ngIf="task.is_team_task; else no">Yes</span>
+                  <span *ngIf="task.is_team_task; else no" i18n>Yes</span>
                 </div>
               </div>
             </div>
             <div class="item" *ngIf="task.is_team_task">
               <i class="icon users"></i>
               <div class="content">
-                <div class="header">Team Size</div>
+                <div class="header" i18n>Team Size</div>
                 <div class="description">
                   {{printTaskTeamSize(task) | titlecase}}
                 </div>
@@ -161,7 +161,7 @@
             <div class="item" *ngIf="task.is_team_task">
               <i class="icon hand paper outline"></i>
               <div class="content">
-                <div class="header">Team Join Close Time</div>
+                <div class="header" i18n>Team Join Close Time</div>
                 <div class="description">
                   <div *ngIf="task.team_join_close_time; else timeTbd">
                     <div>{{ task.team_join_close_time|date:'medium' }} {{ task.team_join_close_time|date:'z' }}</div>
@@ -180,7 +180,7 @@
             <div class="item">
               <i class="icon paper plane outline"></i>
               <div class="content">
-                <div class="header">Submission Attempt Limit</div>
+                <div class="header" i18n>Submission Attempt Limit</div>
                 <div class="description">
                   <span *ngIf="task.submission_attempt_limit!=null; else noLimit">{{task.submission_attempt_limit}}</span>
                 </div>
@@ -189,7 +189,7 @@
             <div class="item">
               <i class="icon history"></i>
               <div class="content">
-                <div class="header">Submission History Limit</div>
+                <div class="header" i18n>Submission History Limit</div>
                 <div class="description">
                   <span *ngIf="task.submission_history_limit!=null; else noLimit">{{task.submission_history_limit}}</span>
                 </div>
@@ -198,10 +198,10 @@
             <div class="item">
               <i class="icon balance scale"></i>
               <div class="content">
-                <div class="header">Evaluation Method</div>
+                <div class="header" i18n>Evaluation Method</div>
                 <div class="description">
-                  <span *ngIf="task.evaluation_method=='auto_test'">Auto Testing</span>
-                  <span *ngIf="!task.evaluation_method">Offline</span>
+                  <span *ngIf="task.evaluation_method=='auto_test'" i18n>Auto Testing</span>
+                  <span *ngIf="!task.evaluation_method" i18n>Offline</span>
                 </div>
               </div>
             </div>
@@ -211,7 +211,7 @@
 
         <div class="ui segment" *ngIf="accessRoles.has('admin')">
           <a class="ui button fluid" routerLink="/admin/tasks/{{task.id}}">
-            <i class="icon cog"></i> Configurations
+            <i class="icon cog"></i> <ng-container i18n>Configurations</ng-container>
           </a>
         </div>
       </div>
@@ -222,7 +222,7 @@
   </div>
 
   <app-modal [(show)]="showMyFinalMarksModal" modalClass="mini" *ngIf="myFinalMarks">
-    <div class="header">My Final Marks - {{task.title}}</div>
+    <div class="header"><ng-container i18n>My Final Marks</ng-container> - {{task.title}}</div>
     <div class="content final-marks-detail">
       <div class="marks">
         {{myFinalMarks.marks}}
@@ -232,7 +232,7 @@
       <div class="comment" *ngIf="myFinalMarks.comment">{{myFinalMarks.comment}}</div>
     </div>
     <div class="actions">
-      <button class="ui button" (click)="showMyFinalMarksModal=false">Close</button>
+      <button class="ui button" (click)="showMyFinalMarksModal=false" i18n>Close</button>
     </div>
   </app-modal>
 
