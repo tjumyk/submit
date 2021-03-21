@@ -54,7 +54,8 @@ class SubmissionFileDiffService:
         'sh',
         'json', 'xml',
         'sql',
-        'md', 'markdown'
+        'md', 'markdown',
+        'source'
     }
     _result_cache = OrderedDict()  # (from_id, to_id) -> (additions, deletions) FIFO order
     _result_cache_max_size = 1024

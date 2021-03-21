@@ -14,7 +14,8 @@ class SubmissionFileViewerService:
         'sh',
         'json', 'xml',
         'sql',
-        'md', 'markdown'
+        'md', 'markdown',
+        'source'
     }
 
     @classmethod
