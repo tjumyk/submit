@@ -108,6 +108,7 @@
           <div class="field required" [ngClass]="{'error': (newTaskTypeModel.touched||newTaskTypeModel.dirty||f.submitted) && newTaskTypeModel.invalid }">
             <label i18n>Task Type</label>
             <select name="task_type" [(ngModel)]="newTaskForm.type" required #newTaskTypeModel="ngModel" (change)="autoFillTaskTitle()">
+              <option value="quiz">Quiz</option>
               <option value="lab">Lab</option>
               <option value="assignment">Assignment</option>
               <option value="project">Project</option>

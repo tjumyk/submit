@@ -44,6 +44,10 @@ export class TaskService {
   }
 
   static categories: { [key: string]: CategoryInfo } = {
+    quiz: {
+      name: 'Quizzes',
+      icon: 'check'
+    },
     lab: {
       name: 'Labs',
       icon: 'lightbulb outline'
