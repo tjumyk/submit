@@ -26,8 +26,8 @@ class SubmissionFileViewerService:
         ext = ext.lower().lstrip('.')
         if ext in cls._code_highlight_file_extensions:
             with open(os.path.join(data_root, file.path), 'rb') as f_file:
-                file_content = FileUtils.read_text(f_file.read())
-            title = '%s (#%s)' % (file_name, file.md5[0:6])
+                file_content, file_encoding = FileUtils.read_text(f_file.read())
+            title = '%s [#%s] [%s]' % (file_name, file.md5[0:6], file_encoding)
             return cls._template_name, dict(title=title, content=file_content, language_class=ext)
 
         return None

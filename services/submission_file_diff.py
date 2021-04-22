@@ -40,7 +40,7 @@ class SubmissionFileDiff:
 @lru_cache(maxsize=128)
 def cached_read_file(path: str):
     with open(path, 'rb') as f:
-        content = FileUtils.read_text(f.read())
+        content, _ = FileUtils.read_text(f.read())
         return content.splitlines(keepends=True)
 
 
