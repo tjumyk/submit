@@ -5,6 +5,7 @@ from functools import lru_cache
 
 from error import BasicError
 from models import SubmissionFile, FileRequirement
+from utils.file import FileUtils
 
 
 class SubmissionFileDiffServiceError(BasicError):
@@ -38,8 +39,9 @@ class SubmissionFileDiff:
 
 @lru_cache(maxsize=128)
 def cached_read_file(path: str):
-    with open(path) as f:
-        return f.readlines()
+    with open(path, 'rb') as f:
+        content = FileUtils.read_text(f.read())
+        return content.splitlines(keepends=True)
 
 
 class SubmissionFileDiffService:

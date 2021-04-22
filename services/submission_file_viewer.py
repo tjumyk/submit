@@ -1,6 +1,7 @@
 import os
 
 from models import SubmissionFile
+from utils.file import FileUtils
 
 
 class SubmissionFileViewerService:
@@ -24,8 +25,8 @@ class SubmissionFileViewerService:
         _, ext = os.path.splitext(file_name)
         ext = ext.lower().lstrip('.')
         if ext in cls._code_highlight_file_extensions:
-            with open(os.path.join(data_root, file.path)) as f_file:
-                file_content = f_file.read()
+            with open(os.path.join(data_root, file.path), 'rb') as f_file:
+                file_content = FileUtils.read_text(f_file.read())
             title = '%s (#%s)' % (file_name, file.md5[0:6])
             return cls._template_name, dict(title=title, content=file_content, language_class=ext)
 
