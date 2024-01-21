@@ -1,5 +1,6 @@
 import os
 import re
+import json
 
 import click
 from flask import Flask, request, jsonify, send_from_directory
@@ -55,7 +56,7 @@ class MyFlask(Flask):
             cache_timeout = self.get_send_file_max_age(filename)
 
         static_folder = self.get_region_static_folder(region)
-        return send_from_directory(static_folder, filename, cache_timeout=cache_timeout)
+        return send_from_directory(static_folder, filename, max_age=cache_timeout)
 
     def get_region_static_folder(self, region):
         if region:  # use the static folder for this region
@@ -77,7 +78,9 @@ class MyFlask(Flask):
 
 
 app = MyFlask(__name__)
-app.config.from_json('config.json')
+with open('config.json') as _f_cfg:
+    app.config.from_mapping(json.load(_f_cfg))
+
 
 db.init_app(app)
 upload.init_app(app)
