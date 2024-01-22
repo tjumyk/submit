@@ -6,7 +6,7 @@
 2. postgresql
 3. rabbitmq
 4. redis
-5. msmtp-mta (for sending e-mails, also need to setup an smtp provider in `/etc/msmtprc`, e.g. [Aliyun DirectMail](https://aliyun.com/product/directmail))
+5. msmtp-mta (for sending e-mails, also need to setup an smtp provider in `/etc/msmtprc`, e.g. [Setup Aliyun DirectMail](https://gist.github.com/tjumyk/342611a2b2e7c5f12a9ea9d1162c8b26))
 6. [auth system](https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
 
 ## Setup
