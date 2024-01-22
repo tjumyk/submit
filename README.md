@@ -6,7 +6,7 @@
 2. postgresql
 3. rabbitmq
 4. redis
-5. auth system (https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
+5. [auth system](https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
 
 ## Setup
 
