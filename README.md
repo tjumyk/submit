@@ -6,7 +6,8 @@
 2. postgresql
 3. rabbitmq
 4. redis
-5. [auth system](https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
+5. msmtp-mta (for sending e-mails, also need to setup an smtp provider in `/etc/msmtprc`, e.g. [Aliyun DirectMail](https://aliyun.com/product/directmail))
+6. [auth system](https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
 
 ## Setup
 
@@ -122,6 +123,8 @@ Then, start the bot process
 ```bash
 celery -A testbot.bot worker -Q testbot_anti_plagiarism -l info -n 'apbot@%h' -c 1 
 ```
+
+For deployment in production environment, please refer to [notes for auth system](https://github.com/tjumyk/auth/blob/master/README.md#notes-for-running-in-production-environment)
 
 ## Run test bot (possibly in a different server)
 
