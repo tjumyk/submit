@@ -6,9 +6,7 @@
 2. postgresql
 3. rabbitmq
 4. redis
-5. supervisor
-6. docker
-7. auth system (https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
+5. auth system (https://github.com/tjumyk/auth) (other oauth providers like GitLab are also possible)
 
 ## Setup
 
@@ -127,8 +125,4 @@ celery -A testbot.bot worker -Q testbot_anti_plagiarism -l info -n 'apbot@%h' -c
 
 ## Run test bot (possibly in a different server)
 
-```bash
-celery -A testbot.bot worker -Q testbot_env_test_script,testbot_env_test_docker -l info -n 'testbot@%h' -c 2
-```
-
-Note: the user who runs this test bot need to be in the group `docker` to use docker without password.
+See [testbot project](https://github.com/tjumyk/submit-testbot)
