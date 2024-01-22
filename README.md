@@ -28,6 +28,7 @@ pip install -r requirements.txt
 For node version >= 17:
 ```bash
 cd angular
+npm i
 NODE_OPTIONS=--openssl-legacy-provider npm run build
 cd ..
 ```
@@ -35,6 +36,7 @@ cd ..
 For node version < 17:
 ```bash
 cd angular
+npm i
 npm run build
 cd ..
 ```
