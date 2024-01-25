@@ -51,7 +51,7 @@ createdb submit -O submit
 
 ## Register client in auth system
 
-1. Access '<auth-system-url>/admin/oauth/clients/new'
+1. Access `<auth-system-url>/admin/oauth/clients/new`
 2. Input details of submit app. The `Redirect URL` should be `<submit-system-url>/oauth-callback`.
 3. Click 'Add' button
 4. Click 'Download Client Configuration File' button to download the oauth config file, put it in project root.
