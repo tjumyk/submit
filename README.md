@@ -49,6 +49,15 @@ createuser submit -P
 createdb submit -O submit
 ```
 
+5. build email templates
+
+```bash
+cd mail_templates/mjml
+npm i
+npm run build
+cd ../..
+```
+
 ## Register client in auth system
 
 1. Access `<auth-system-url>/admin/oauth/clients/new`
