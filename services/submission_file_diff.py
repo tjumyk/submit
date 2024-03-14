@@ -5,6 +5,7 @@ from functools import lru_cache
 
 from error import BasicError
 from models import SubmissionFile, FileRequirement
+from utils.file import FileUtils
 
 
 class SubmissionFileDiffServiceError(BasicError):
@@ -38,8 +39,9 @@ class SubmissionFileDiff:
 
 @lru_cache(maxsize=128)
 def cached_read_file(path: str):
-    with open(path) as f:
-        return f.readlines()
+    with open(path, 'rb') as f:
+        content, _ = FileUtils.read_text(f.read())
+        return content.splitlines(keepends=True)
 
 
 class SubmissionFileDiffService:
@@ -54,7 +56,8 @@ class SubmissionFileDiffService:
         'sh',
         'json', 'xml',
         'sql',
-        'md', 'markdown'
+        'md', 'markdown',
+        'source'
     }
     _result_cache = OrderedDict()  # (from_id, to_id) -> (additions, deletions) FIFO order
     _result_cache_max_size = 1024

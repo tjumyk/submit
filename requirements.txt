@@ -14,3 +14,4 @@ IPython
 tzlocal
 beautifulsoup4
 geoip2
+chardet
