@@ -1,0 +1,27 @@
+<div *ngIf="isAdmin" class="ui grid stackable center aligned one column">
+  <div class="column">
+    <button (click)="showModal=true" class="ui button"><i class="icon terminal"></i> Remove Pending Auto Tests</button>
+  </div>
+
+  <app-modal [(show)]="showModal" modalClass="tiny">
+    <i class="close icon" (click)="showModal=false"></i>
+    <div class="ui header">Remove Pending Auto Tests</div>
+    <div class="content">
+      <app-error-message *ngIf="modalError" [error]="modalError"></app-error-message>
+      <app-success-message *ngIf="modelSuccess" [success]="modelSuccess"></app-success-message>
+
+      <form class="ui form" [ngClass]="{'loading': requesting}">
+        <div class="ui field">
+          <label>Test Config</label>
+          <select name="auto_test_config" [(ngModel)]="activeConfig">
+            <option *ngFor="let config of task.auto_test_configs" [ngValue]="config">{{config.name}}</option>
+          </select>
+        </div>
+        <button class="ui button fluid red" (click)="removePendingAutoTest()" type="submit">
+          <i class="icon trash"></i>
+          Remove
+        </button>
+      </form>
+    </div>
+  </app-modal>
+</div>

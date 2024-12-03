@@ -75,6 +75,9 @@ import { TermFinalMarksComponent } from './term-final-marks/term-final-marks.com
 import { AdminAutoTestsComponent } from './admin-auto-tests/admin-auto-tests.component';
 import { NotebookViewComponent } from './notebook-view/notebook-view.component';
 import { FilenamePipe } from './filename.pipe';
+import {
+  RemovePendingAutoTestCardComponent
+} from "./remove-pending-auto-test-card/remove-pending-auto-test-card.component";
 
 @NgModule({
   declarations: [
@@ -147,7 +150,8 @@ import { FilenamePipe } from './filename.pipe';
     TermFinalMarksComponent,
     AdminAutoTestsComponent,
     NotebookViewComponent,
-    FilenamePipe
+    FilenamePipe,
+    RemovePendingAutoTestCardComponent
   ],
   imports: [
     BrowserModule,

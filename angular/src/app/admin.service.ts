@@ -141,6 +141,10 @@ export class BatchSetFinalMarksResponse{
   updated: number;
 }
 
+export interface RemovePendingAutoTestsResponse{
+  total: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -396,6 +400,10 @@ export class AdminService {
     if(skip_successful)
       params = params.append('skip_successful', "true");
     return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/run`, {params: params})
+  }
+
+  removePendingAutoTests(config_id: number):Observable<RemovePendingAutoTestsResponse> {
+    return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/remove-pending`);
   }
 
   setFinalMarks(task_id: number, form: SetFinalMarksRequest): Observable<FinalMarks> {

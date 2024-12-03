@@ -817,6 +817,21 @@ def admin_run_auto_test(cid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+
+@admin_api.route('/auto-test-configs/<int:cid>/remove-pending', methods=['GET'])
+@requires_admin
+def admin_remove_pending_auto_test(cid):
+    try:
+        config = TaskService.get_auto_test_config(cid)
+        if config is None:
+            return jsonify(msg='auto test config not found'), 404
+
+        total_removed = AutoTestService.remove_pending_tests_for_config(config)
+        return jsonify(total=total_removed), 200
+    except (SubmissionServiceError, AutoTestServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin_api.route('/tasks/<int:tid>/final-marks', methods=['POST'])
 @requires_admin
 def do_final_marks(tid):
@@ -1004,3 +1019,4 @@ def export_submissions(tid: int):
     except (TaskServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
+@admin_api.route('/tasks/')

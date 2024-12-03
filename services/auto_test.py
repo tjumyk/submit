@@ -165,3 +165,20 @@ class AutoTestService:
             heads[_type] = type_heads
 
         return dict({_type: dict(counts=counts[_type], heads=heads.get(_type)) for _type in counts})
+
+
+    @classmethod
+    def remove_pending_tests_for_config(cls, config: AutoTestConfig) -> int:
+        incomplete_tests = db.session.query(AutoTest).filter(
+            AutoTest.config_id == config.id,
+            AutoTest.final_state.is_(None)
+        ).all()
+        removed = 0
+        for test in incomplete_tests:
+            result = cls.get_result(test)
+            if result.state == 'PENDING':
+                result.forget()
+                db.session.delete(test)  # should be no files or file objs associated
+                db.session.commit()  # instantly commit to avoid any inconsistency
+                removed += 1
+        return removed
