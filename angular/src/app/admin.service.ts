@@ -403,7 +403,7 @@ export class AdminService {
   }
 
   removePendingAutoTests(config_id: number):Observable<RemovePendingAutoTestsResponse> {
-    return this.http.get<AutoTest[]>(`${this.api}/auto-test-configs/${config_id}/remove-pending`);
+    return this.http.get<RemovePendingAutoTestsResponse>(`${this.api}/auto-test-configs/${config_id}/remove-pending`);
   }
 
   setFinalMarks(task_id: number, form: SetFinalMarksRequest): Observable<FinalMarks> {
