@@ -1019,4 +1019,3 @@ def export_submissions(tid: int):
     except (TaskServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
-@admin_api.route('/tasks/')
