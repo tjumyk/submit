@@ -35,7 +35,7 @@ def material_download(mid):
             if not task.open_time or task.open_time > datetime.utcnow():
                 return jsonify(msg='task has not yet open'), 403
 
-        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, cache_timeout=0)
+        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, max_age=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -47,7 +47,7 @@ def material_worker_download(mid):
         material = TaskService.get_material(mid)
         if material is None:
             return jsonify(msg='material not found'), 404
-        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, cache_timeout=0)
+        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, max_age=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -113,13 +113,13 @@ def material_get_notebook_content(mid, path: str):
             return jsonify(msg='notebook not found'), 404
 
         if not sub_path:  # requesting notebook html
-            return send_from_directory(notebook.base_dir, notebook.html_name, cache_timeout=0)
+            return send_from_directory(notebook.base_dir, notebook.html_name, max_age=0)
         else:  # requesting associated resource files
             # when 'custom.css' is requested and the notebook itself does not have one, the default 'notebook.css' in
             # the root folder will be used
             if sub_path == 'custom.css' and not os.path.exists(os.path.join(notebook.base_dir, sub_path)):
                 return send_from_directory(app.root_path, 'notebook-page.css')
 
-            return send_from_directory(notebook.base_dir, sub_path, cache_timeout=0)
+            return send_from_directory(notebook.base_dir, sub_path, max_age=0)
     except (TaskServiceError, TermServiceError, MaterialPreviewServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

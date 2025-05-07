@@ -209,13 +209,13 @@ class SubmissionService:
             raise SubmissionServiceError('task is required')
 
         # cast the 'Submission.created_at' field to the precision of days in the local timezone
-        db_type = db.session.bind.dialect.name
+        db_type = db.session.get_bind().dialect.name
         if db_type == 'sqlite':
             # https://www.sqlite.org/lang_datefunc.html
             created_at_day = func.date(Submission.created_at, 'localtime')
         elif db_type == 'postgresql':
             # Get the geographical local timezone, e.g. 'Australia/Sydney', to avoid the Daylight Saving Time issue.
-            timezone = tzlocal.get_localzone().zone
+            timezone = tzlocal.get_localzone().key
             # https://www.postgresql.org/docs/current/functions-datetime.html
             created_at_day = func.date(func.timezone(timezone, func.timezone('utc', Submission.created_at)))
         else:  # TODO support other DB types

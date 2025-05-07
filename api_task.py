@@ -1098,7 +1098,7 @@ def download_materials_zip(task_id):
         zip_attachment_name += '.zip'
         zip_attachment_name = zip_attachment_name.replace(' ', '_')
         return send_from_directory(tmp_dir, zip_file_name, as_attachment=True,
-                                   attachment_filename=zip_attachment_name, cache_timeout=0)
+                                   download_name=zip_attachment_name, max_age=0)
     except (TaskServiceError, TermServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -1380,8 +1380,8 @@ def task_download_submissions(tid, user_id=None, team_id=None):
                     for sub_file in sub.files:
                         f_zip.write(os.path.join(data_folder, sub_file.path),
                                     os.path.join(target_name, str(sub.id), sub_file.requirement.name))
-            return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
-                                       cache_timeout=0)
+            return send_from_directory(tmp_dir, zip_name, as_attachment=True, download_name=zip_name,
+                                       max_age=0)
     except (TaskServiceError, TermServiceError, AccountServiceError, TeamServiceError, SubmissionServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

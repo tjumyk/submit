@@ -134,7 +134,7 @@ def page_not_found(error):
     region = app.get_request_region()
     # in case we are building the front-end
     if not os.path.exists(os.path.join(app.get_region_static_folder(region), 'index.html')):
-        return send_from_directory(app.root_path, 'building.html', cache_timeout=0), 503
+        return send_from_directory(app.root_path, 'building.html', max_age=0), 503
     return app.send_region_static_file('index.html', region), 404
 
 

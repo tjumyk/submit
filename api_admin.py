@@ -385,7 +385,7 @@ def admin_material_download(mid):
         if material is None:
             return jsonify(msg='material not found'), 404
 
-        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, cache_timeout=0)
+        return send_from_directory(app.config['DATA_FOLDER'], material.file_path, as_attachment=True, max_age=0)
     except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -999,8 +999,8 @@ def export_submissions(tid: int):
                         member_names = [ass.user.name for ass in team.user_associations]
                         teams_info.append(dict(name=team.name, members=member_names))
                     f_zip.writestr('teams.json', json.dumps(teams_info))
-            return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
-                                       cache_timeout=0)
+            return send_from_directory(tmp_dir, zip_name, as_attachment=True, download_name=zip_name,
+                                       max_age=0)
     except (TaskServiceError, TeamServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

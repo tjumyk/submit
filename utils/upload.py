@@ -16,7 +16,7 @@ _cache_timeout = 365 * 24 * 60 * 60  # 1 year
 
 
 def get_upload(path):
-    return send_from_directory(app.config['UPLOAD']['root_folder'], path, cache_timeout=_cache_timeout)
+    return send_from_directory(app.config['UPLOAD']['root_folder'], path, max_age=_cache_timeout)
 
 
 def init_app(app):
